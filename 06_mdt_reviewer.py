@@ -3,7 +3,7 @@ from __future__ import annotations
 import hmac
 import streamlit as st
 
-from juog_common import registry_call, text
+from juog_common import registry_call, send_office_email, text
 
 ROLE_LABELS = {
     "radiology": "放射線診断専門医",
@@ -94,6 +94,10 @@ all_cases = result.get("cases") or []
 notice = st.session_state.pop("juog_review_submit_notice", None)
 if notice:
     st.success(notice)
+mail_warning = st.session_state.pop("juog_review_mail_warning", None)
+if mail_warning:
+    st.warning("判定データは保存されていますが、事務局通知メールの送信に失敗しました。")
+    st.code(mail_warning)
 
 if not all_cases:
     st.success("現在、判定対象の症例はありません。")
@@ -358,9 +362,68 @@ if submitted:
         if not result.get("ok"):
             st.error("判定を保存できませんでした：" + (result.get("message") or result.get("error") or "unknown error"))
         else:
+            # Notify the office after the review has been safely stored.
+            # The e-mail intentionally contains workflow status only, not the
+            # review decision itself or detailed clinical information.
+            progress = registry_call("get_mdt_reviews", {"screening_id": screening_id})
+            mail_sent = False
+            mail_err = None
+
+            if progress.get("ok"):
+                completed = int(progress.get("completed", 0))
+                required = int(progress.get("required", 3) or 3)
+                reviews_now = progress.get("reviews") or {}
+                pending_roles = [
+                    ROLE_LABELS[r]
+                    for r in ["radiology", "medical_oncology", "urology"]
+                    if not reviews_now.get(r)
+                ]
+                pending_text = "なし" if not pending_roles else "、".join(pending_roles)
+
+                if is_correction:
+                    subject = f"【JUOG MDT判定訂正受領】【{screening_id}】{ROLE_LABELS[role]}"
+                elif completed >= required:
+                    subject = f"【JUOG MDT審査完了】【{screening_id}】3/3判定完了・事務局確認待ち"
+                else:
+                    subject = f"【JUOG MDT判定受領】【{screening_id}】{ROLE_LABELS[role]} {completed}/{required}完了"
+
+                body = f"""【JUOG 中央MDT進捗通知】
+MDT審査受付番号: {screening_id}
+施設: {case.get('facility_name','')}
+施設内研究対象者識別コード: {case.get('local_subject_code','')}
+審査ラウンド: {review_round}
+
+今回の提出: {ROLE_LABELS[role]}
+判定提出状況: {completed}/{required}
+未提出: {pending_text}
+
+判定内容そのものはメールには記載していません。
+事務局専用画面で確認してください。
+"""
+                mail_sent, mail_err = send_office_email(subject, body)
+            else:
+                subject = f"【JUOG MDT判定受領】【{screening_id}】{ROLE_LABELS[role]}"
+                body = f"""【JUOG 中央MDT進捗通知】
+MDT審査受付番号: {screening_id}
+施設: {case.get('facility_name','')}
+施設内研究対象者識別コード: {case.get('local_subject_code','')}
+審査ラウンド: {review_round}
+
+{ROLE_LABELS[role]}の判定を受領しました。
+進捗数の自動取得には失敗したため、事務局専用画面で確認してください。
+"""
+                mail_sent, mail_err = send_office_email(subject, body)
+
             if is_correction:
                 st.session_state[correction_key] = False
-            st.session_state["juog_review_submit_notice"] = (
-                f"✅ {screening_id} の判定を提出しました（version {result.get('review_version')}）。"
-            )
+
+            notice = f"✅ {screening_id} の判定を提出しました（version {result.get('review_version')}）。"
+            if mail_sent:
+                notice += " 事務局へ進捗通知メールを送信しました。"
+            else:
+                notice += " 判定は保存済みですが、事務局への通知メール送信に失敗しました。"
+
+            st.session_state["juog_review_submit_notice"] = notice
+            if not mail_sent and mail_err:
+                st.session_state["juog_review_mail_warning"] = str(mail_err)
             st.rerun()

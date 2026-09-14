@@ -360,21 +360,51 @@ def get_secret(path: tuple[str, ...]):
     return obj
 
 
-def send_email(subject: str, content: str, reporter_email: str | None = None):
+def _office_email_addresses():
+    """Return office notification recipients.
+
+    Preferred configuration in Streamlit Secrets:
+    [office]
+    emails = ["office1@example.org", "office2@example.org"]
+
+    Falls back to the two legacy office recipients so existing deployments
+    continue to work until [office] is configured.
+    """
+    import streamlit as st
+    fallback = ["urosec@kmu.ac.jp", "yoshida.tks@kmu.ac.jp"]
+    try:
+        raw = st.secrets["office"]["emails"]
+        if isinstance(raw, str):
+            raw = [raw]
+        addrs = []
+        for value in raw:
+            addr = str(value).strip()
+            if addr and addr not in addrs:
+                addrs.append(addr)
+        return addrs or fallback
+    except Exception:
+        return fallback
+
+
+def _smtp_send(subject: str, content: str, to_addrs: list[str]):
     import streamlit as st
     try:
         mail_user = st.secrets["email"]["user"]
         mail_pass = st.secrets["email"]["pass"]
-        to_addrs = ["urosec@kmu.ac.jp", "yoshida.tks@kmu.ac.jp"]
-        if reporter_email:
-            addr = reporter_email.strip()
-            if addr and addr not in to_addrs:
-                to_addrs.append(addr)
+        clean = []
+        for value in to_addrs:
+            addr = str(value).strip()
+            if addr and addr not in clean:
+                clean.append(addr)
+        if not clean:
+            return False, "NO_RECIPIENTS"
+
         msg = MIMEMultipart()
         msg["From"] = mail_user
-        msg["To"] = ", ".join(to_addrs)
+        msg["To"] = ", ".join(clean)
         msg["Subject"] = subject
         msg.attach(MIMEText(content, "plain", "utf-8"))
+
         import smtplib
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
             server.login(mail_user, mail_pass)
@@ -382,6 +412,21 @@ def send_email(subject: str, content: str, reporter_email: str | None = None):
         return True, None
     except Exception as exc:
         return False, str(exc)
+
+
+def send_office_email(subject: str, content: str):
+    """Send a notification to the JUOG office only."""
+    return _smtp_send(subject, content, _office_email_addresses())
+
+
+def send_email(subject: str, content: str, reporter_email: str | None = None):
+    """Send an office notification, optionally also to the submitting facility."""
+    to_addrs = _office_email_addresses()
+    if reporter_email:
+        addr = reporter_email.strip()
+        if addr and addr not in to_addrs:
+            to_addrs.append(addr)
+    return _smtp_send(subject, content, to_addrs)
 
 
 def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
