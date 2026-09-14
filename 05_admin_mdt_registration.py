@@ -11,6 +11,7 @@ ROLE_LABELS = {
     "urology": "泌尿器科専門医",
 }
 DECISION_JP = {"ELIGIBLE": "適格", "INELIGIBLE": "不適格", "HOLD": "保留"}
+EXPECTED_BACKEND_VERSION = "v2.2.7"
 
 st.markdown(
     """
@@ -55,6 +56,36 @@ c_logout, _ = st.columns([1, 5])
 if c_logout.button("ログアウト"):
     st.session_state.juog_admin_authenticated = False
     st.rerun()
+
+# Backend identity / deployment guard.
+# This prevents the admin page from silently using an older Apps Script deployment.
+backend = registry_call("backend_info")
+if not backend.get("ok"):
+    st.error(
+        "Backend情報を取得できません。Apps Script が旧デプロイの可能性があります。"
+        "最新版を保存後、『デプロイを管理 → 新バージョン → デプロイ』してください。"
+    )
+    st.code(backend.get("message") or backend.get("error") or "backend_info unavailable")
+    st.stop()
+
+backend_version = str(backend.get("backend_version") or "UNKNOWN")
+environment = str(backend.get("environment") or "UNKNOWN").upper()
+spreadsheet_name = str(backend.get("spreadsheet_name") or "")
+
+if backend_version != EXPECTED_BACKEND_VERSION:
+    st.error(
+        f"Backend version mismatch：アプリは {EXPECTED_BACKEND_VERSION} を要求していますが、"
+        f"接続先は {backend_version} です。正式登録を停止しました。"
+    )
+    st.stop()
+
+if environment == "TEST":
+    st.warning(f"🧪 TEST環境 ｜ Backend {backend_version} ｜ Sheet: {spreadsheet_name}")
+elif environment == "PRODUCTION":
+    st.success(f"✅ PRODUCTION環境 ｜ Backend {backend_version} ｜ Sheet: {spreadsheet_name}")
+else:
+    st.error(f"環境種別を判定できません：{environment} ｜ Backend {backend_version} ｜ Sheet: {spreadsheet_name}")
+    st.stop()
 
 stats = registry_call("stats")
 if not stats.get("ok"):
