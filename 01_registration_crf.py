@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from datetime import date
 import streamlit as st
 
 from juog_common import (
@@ -64,7 +65,7 @@ with c1:
     )
     reporter_email = st.text_input("担当者メールアドレス*", disabled=L)
     consent_date = st.date_input("本人同意取得日*", value=None, disabled=L)
-    birth_date = st.date_input("生年月日*", value=None, disabled=L, help="研究計画書 8.1.1 の患者背景項目。氏名・カルテ番号は入力しません。")
+    birth_date = st.date_input("生年月日*", value=None, min_value=date(1900, 1, 1), max_value=today_jst(), disabled=L, help="研究計画書 8.1.1 の患者背景項目。氏名・カルテ番号は入力しません。")
     age = age_on_date(birth_date, consent_date)
     if age is not None:
         st.caption(f"同意取得時年齢（自動計算）：{age}歳")
