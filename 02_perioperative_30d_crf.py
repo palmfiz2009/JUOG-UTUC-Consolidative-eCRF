@@ -25,7 +25,6 @@ from juog_common import (
     window_info,
 )
 
-st.set_page_config(page_title="JUOG UTUC_Consolidative 周術期・30日CRF", layout="wide")
 st.markdown("""
 <style>
 .block-container {max-width:1180px!important; padding-top:1.3rem!important; padding-bottom:5rem!important;}

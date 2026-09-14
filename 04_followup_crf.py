@@ -15,7 +15,7 @@ from juog_common import (
     render_facility,
     render_lab_panel,
     render_submission_kind,
-    render_urine_panel,
+    render_cytology,
     send_email,
     text,
     today_jst,
@@ -24,10 +24,9 @@ from juog_common import (
     valid_registration_id,
     validate_lab_panel,
     validate_registry_id,
-    validate_urine_panel,
+    validate_cytology,
 )
 
-st.set_page_config(page_title="JUOG UTUC_Consolidative 定期経過CRF", layout="wide")
 st.markdown("""
 <style>
 .block-container {max-width:1180px!important;padding-top:1.3rem!important;padding-bottom:5rem!important;}
@@ -38,7 +37,7 @@ label {font-weight:600!important;color:#334155!important;}
 """, unsafe_allow_html=True)
 
 st.title("JUOG UTUC_Consolidative 定期経過報告CRF")
-st.caption("術後3か月毎（6〜24か月）の経過報告。計画書上、尿検査/尿細胞診・画像検査・膀胱鏡は各時点で必須、採血は3か月毎は必要に応じて、2年終了時は必須です。")
+st.caption("術後3か月毎（6〜24か月）の経過報告。尿細胞診・画像検査・膀胱鏡は各時点で必須、採血は3か月毎は必要に応じて、2年終了時は必須です。")
 
 if "fu_sent" not in st.session_state:
     st.session_state.fu_sent = False
@@ -70,8 +69,8 @@ with b2:
                 timing_note = st.text_area("評価時期がずれた理由（任意だが記録推奨）", disabled=L)
 
 # ---------------- surveillance ----------------
-st.markdown('<div class="juog-header">2. 定期検査（尿・画像・膀胱鏡）</div>', unsafe_allow_html=True)
-urine = render_urine_panel("fu", required=True, include_cytology=True, disabled=L)
+st.markdown('<div class="juog-header">2. 定期検査（尿細胞診・画像・膀胱鏡）</div>', unsafe_allow_html=True)
+cytology = render_cytology("fu", required=True, disabled=L)
 
 s1, s2 = st.columns(2)
 with s1:
@@ -120,9 +119,9 @@ else:
     st.caption("今回採血なし。")
 
 required_test_omission_reason = ""
-urine_not_done_now = any(v == "未実施" for v in urine.values())
+cytology_not_done_now = cytology == "未実施"
 lab_na_now = show_labs and any(str(v).strip().upper() in {"NA", "N/A", "未実施", "欠測"} for v in labs_raw.values())
-if urine_not_done_now or (is_final and lab_na_now):
+if cytology_not_done_now or (is_final and lab_na_now):
     required_test_omission_reason = st.text_area("必須検査の欠測/未実施理由*", placeholder="未実施またはNAとした項目の理由を記載してください", disabled=L)
 
 # ---------------- intraluminal recurrence ----------------
@@ -228,9 +227,9 @@ def validate_all():
     if visit_date and visit_date > today_jst(): errors.append("評価日が未来日です")
     if reference_date and visit_date and visit_date < reference_date: errors.append("評価日が手術/予定日より前です")
 
-    missing.extend([f"定期{x}" for x in validate_urine_panel(urine, required=True)])
-    if urine_not_done_now and not text(required_test_omission_reason):
-        missing.append("必須尿検査/尿細胞診の未実施理由")
+    missing.extend([f"定期{x}" for x in validate_cytology(cytology, required=True)])
+    if cytology_not_done_now and not text(required_test_omission_reason):
+        missing.append("必須尿細胞診の未実施理由")
     if imaging_status is None: missing.append("画像検査実施有無")
     elif imaging_status == "実施":
         if imaging_date is None: missing.append("画像検査日")
@@ -332,7 +331,7 @@ if st.button("🚀 定期経過データを確定送信", type="primary", use_co
                 "visit_month": visit_month,
                 "visit_date": date_str(visit_date),
                 "timing_note": text(timing_note),
-                "urinalysis": urine,
+                "urine_cytology": cytology,
                 "required_test_omission_reason": text(required_test_omission_reason),
                 "imaging_status": imaging_status,
                 "imaging_date": date_str(imaging_date),

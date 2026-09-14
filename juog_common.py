@@ -13,10 +13,10 @@ from email.mime.text import MIMEText
 from zoneinfo import ZoneInfo
 
 STUDY_CODE = "JUOG_UTUC_Consolidative"
-SCHEMA_VERSION = "2026-09-final-v1"
+SCHEMA_VERSION = "2026-09-14-v2.1"
 TZ = ZoneInfo("Asia/Tokyo")
 
-# Canonical institution names follow the protocol (2026-08-15, v2).
+# Canonical institution names follow the protocol (2026-09-14, v3).
 FACILITIES = [
     ("F01", "愛知県がんセンター"),
     ("F02", "秋田大学"),
@@ -105,8 +105,6 @@ CYTOLOGY_OPTIONS = [
 ]
 POSITIVE_CYTOLOGY = {"SHGUC (高異型度癌疑い)", "HGUC (クラスIV・V相当)", "LGUC (低異型度腫瘍)"}
 
-URINE_SEMIQUANT_OPTIONS = ["選択してください", "陰性", "±", "1+", "2+", "3+", "4+", "未実施"]
-UROBILINOGEN_OPTIONS = ["選択してください", "正常", "増加", "低下/陰性", "未実施"]
 
 POSTOP_TREATMENT_OPTIONS = [
     "選択してください",
@@ -434,31 +432,21 @@ def render_lab_panel(prefix: str, required: bool, disabled=False, columns=2):
     return out
 
 
-def render_urine_panel(prefix: str, required: bool, include_cytology=True, disabled=False):
+def render_cytology(prefix: str, required: bool, disabled=False):
     import streamlit as st
     star = "*" if required else ""
-    fields = {}
-    c1, c2 = st.columns(2)
-    fields["protein"] = c1.selectbox(f"尿蛋白{star}", URINE_SEMIQUANT_OPTIONS, key=f"{prefix}_urine_protein", disabled=disabled)
-    fields["glucose"] = c1.selectbox(f"尿糖{star}", URINE_SEMIQUANT_OPTIONS, key=f"{prefix}_urine_glucose", disabled=disabled)
-    fields["occult_blood"] = c2.selectbox(f"尿潜血{star}", URINE_SEMIQUANT_OPTIONS, key=f"{prefix}_urine_occult", disabled=disabled)
-    fields["urobilinogen"] = c2.selectbox(f"ウロビリノーゲン{star}", UROBILINOGEN_OPTIONS, key=f"{prefix}_urine_urob", disabled=disabled)
-    if include_cytology:
-        fields["cytology"] = st.selectbox(f"尿細胞診{star}", CYTOLOGY_OPTIONS, key=f"{prefix}_cytology", disabled=disabled)
-    return fields
+    return st.selectbox(
+        f"尿細胞診{star}",
+        CYTOLOGY_OPTIONS,
+        key=f"{prefix}_cytology",
+        disabled=disabled,
+    )
 
 
-def validate_urine_panel(values: dict, required: bool):
-    errors = []
-    if not required:
-        return errors
-    for key, label in [("protein", "尿蛋白"), ("glucose", "尿糖"), ("occult_blood", "尿潜血"), ("urobilinogen", "ウロビリノーゲン")]:
-        if values.get(key) in {None, "", "選択してください"}:
-            errors.append(label)
-    if "cytology" in values and values.get("cytology") in {None, "", "選択してください"}:
-        errors.append("尿細胞診")
-    return errors
-
+def validate_cytology(value: str, required: bool):
+    if required and value in {None, "", "選択してください"}:
+        return ["尿細胞診"]
+    return []
 
 def render_submission_kind(prefix: str, disabled=False):
     import streamlit as st

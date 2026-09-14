@@ -1,37 +1,29 @@
 from __future__ import annotations
 
-import html
-import json
-from datetime import date, timedelta
-
+import uuid
 import streamlit as st
 
 from juog_common import (
-    CYTOLOGY_OPTIONS,
-    FACILITY_NAME_TO_CODE,
     POSITIVE_CYTOLOGY,
     add_months,
     age_on_date,
     date_str,
     json_block,
-    lab_payload,
-    make_submission_metadata,
     now_iso,
     recist_target_response,
     registry_call,
     render_facility,
     render_lab_panel,
-    render_urine_panel,
+    render_cytology,
     send_email,
     text,
     today_jst,
     unique_messages,
     valid_email,
     validate_lab_panel,
-    validate_urine_panel,
+    validate_cytology,
 )
 
-st.set_page_config(page_title="JUOG UTUC_Consolidative 登録判定CRF", layout="wide")
 st.markdown(
     """
     <style>
@@ -44,17 +36,19 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("JUOG UTUC_Consolidative 登録判定CRF")
-st.caption("研究計画書 第2版（2026/08/15）に基づく。最終的な適格性・手術適応は中央MDT判定を優先します。")
+st.title("JUOG UTUC_Consolidative 中央MDT審査申請CRF")
+st.caption("研究計画書 第3版（2026/09/14）に基づく中央MDT審査申請用CRFです。")
 
 RECIST_HELP = """RECIST v1.1 補助計算：CT等の非リンパ節標的病変は長径、リンパ節は短径を入力します。\n
 標的病変は最大5個（1臓器最大2個）が原則です。この画面の自動計算は入力整合性確認用であり、中央放射線診断医によるRECIST総合判定を置き換えません。"""
 
-if "registration_issued_id" not in st.session_state:
-    st.session_state.registration_issued_id = ""
-if "registration_locked" not in st.session_state:
-    st.session_state.registration_locked = False
-L = st.session_state.registration_locked
+if "screening_sent" not in st.session_state:
+    st.session_state.screening_sent = False
+L = st.session_state.screening_sent
+if L:
+    sid = st.session_state.get("screening_id", "")
+    suffix = f"（受付番号: {sid}）" if sid else ""
+    st.info(f"このセッションでは中央MDT審査申請を送信済みです{suffix}。訂正する場合はページを再読み込みして再入力してください。")
 
 # -------------------- 1. Basic / screening --------------------
 st.header("1. 患者背景・スクリーニング")
@@ -131,14 +125,22 @@ with d2:
     if cystoscopy_result == "腫瘍あり":
         st.text_area("膀胱病変の詳細*", key="reg_cysto_detail", disabled=L)
 
-st.subheader("スクリーニング尿検査・尿細胞診")
-screen_urine = render_urine_panel("reg_screen", required=True, include_cytology=True, disabled=L)
+st.subheader("スクリーニング尿細胞診")
+screen_cytology = render_cytology("reg_screen", required=True, disabled=L)
 
 st.subheader("スクリーニング血液検査")
 screen_labs_raw = render_lab_panel("reg_screen_lab", required=True, disabled=L, columns=3)
+screen_glucose_raw = st.text_input(
+    "血糖 (mg/dL)*",
+    value=st.session_state.get("reg_screen_glucose", ""),
+    disabled=L,
+    help="スクリーニング時のみ収集します。未測定の場合はNAと入力してください。",
+)
+st.session_state["reg_screen_glucose"] = screen_glucose_raw
 screening_required_omission = (
     any(str(v).strip().upper() in {"NA", "N/A", "未実施", "欠測"} for v in screen_labs_raw.values())
-    or any(v == "未実施" for v in screen_urine.values())
+    or str(screen_glucose_raw).strip().upper() in {"NA", "N/A", "未実施", "欠測"}
+    or screen_cytology == "未実施"
 )
 screening_omission_reason = ""
 if screening_required_omission:
@@ -159,7 +161,7 @@ with e1:
 with e2:
     best_effect = st.selectbox("EVP最良総合効果*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
     first_control_date = st.date_input("最初にCR/PR/SDが確認された画像検査日*", value=None, disabled=L)
-    central_recist = st.selectbox("直近のRECIST v1.1総合判定（中央/放射線評価）*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
+    central_recist = st.selectbox("施設判定 RECIST v1.1総合判定*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
     preop_imaging_date = st.date_input("手術適応判定前の直近画像日*", value=None, disabled=L)
     nadir_sum = st.number_input(
         "治療中の標的病変最小SLD（nadir, mm・分かる場合）",
@@ -191,7 +193,7 @@ if recist_support["change_pct"] is not None:
     st.metric("標的病変 SLD変化率（baseline比・補助）", f"{recist_support['change_pct']:.1f}%")
 if recist_support.get("pd_change_pct_from_nadir") is not None:
     st.caption(f"nadir比変化率：{recist_support['pd_change_pct_from_nadir']:.1f}%")
-st.info(f"標的病変の補助判定：{recist_support['response']}（最終判断は中央/放射線RECIST総合判定を使用）")
+st.info(f"標的病変の補助判定：{recist_support['response']}（中央MDTでは画像と臨床情報を再評価します）")
 
 # cM1 requirements
 cm1_basis = ""
@@ -213,8 +215,8 @@ if cm == "cM1":
         if "その他" in cm1_local_tx:
             st.text_input("局所療法 その他詳細*", key="reg_cm1_other", disabled=L)
 
-# -------------------- 4. Exclusion / surgery / MDT --------------------
-st.header("4. 選択・除外基準、手術予定、中央MDT")
+# -------------------- 4. Exclusion / planned surgery --------------------
+st.header("4. 選択・除外基準、手術予定")
 x1, x2 = st.columns(2)
 with x1:
     g3_unrecovered = st.radio("EVP関連 Grade 3以上の未回復有害事象*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
@@ -238,10 +240,6 @@ with x2:
             st.error("4週未満です。手術予定時期を再確認してください。")
         else:
             st.error("12週を超えています。計画書の規定外です。")
-    mdt_status = st.selectbox("中央MDT判定*", ["未審査", "手術適応あり（適格）", "不適格", "保留"], disabled=L)
-    mdt_date = st.date_input("中央MDT判定日", value=None, disabled=L)
-    if mdt_status in ["不適格", "保留"]:
-        st.text_area("MDT理由*", key="reg_mdt_reason", disabled=L)
 
 # -------------------- Validation --------------------
 def collect_validation():
@@ -285,7 +283,7 @@ def collect_validation():
             reasons.append("組織診がUrothelial carcinomaとして確認されていない")
     if biopsy_done == "生検困難のため未実施":
         if not text(biopsy_reason): missing.append("生検困難の理由")
-        if screen_urine.get("cytology") not in POSITIVE_CYTOLOGY:
+        if screen_cytology not in POSITIVE_CYTOLOGY:
             reasons.append("生検未実施例で尿細胞診陽性が確認されていない")
         if imaging_utuc_compatible != "あり":
             reasons.append("生検未実施例で画像上UTUC所見が確認されていない")
@@ -304,12 +302,24 @@ def collect_validation():
     elif cystoscopy_date > today_jst(): errors.append("スクリーニング膀胱鏡日が未来日です")
     if cystoscopy_result == "選択してください": missing.append("膀胱鏡所見")
     if cystoscopy_result == "腫瘍あり" and not text(st.session_state.get("reg_cysto_detail", "")): missing.append("膀胱病変詳細")
-    urine_errors = validate_urine_panel(screen_urine, required=True)
-    missing.extend([f"スクリーニング {x}" for x in urine_errors])
+    missing.extend([f"スクリーニング {x}" for x in validate_cytology(screen_cytology, required=True)])
     parsed_labs, lab_errors, lab_warn = validate_lab_panel(screen_labs_raw, required=True)
     errors.extend([f"スクリーニング血液検査：{x}" for x in lab_errors])
     warnings.extend([f"スクリーニング血液検査：{x}" for x in lab_warn])
-    if (lab_warn or any(v == "未実施" for v in screen_urine.values())) and not text(screening_omission_reason):
+    glucose_text = str(screen_glucose_raw).strip()
+    glucose_value = None
+    if not glucose_text:
+        errors.append("スクリーニング血液検査：血糖が空欄です（未測定の場合はNAと入力）")
+    elif glucose_text.upper() in {"NA", "N/A", "未実施", "欠測"}:
+        warnings.append("スクリーニング血液検査：血糖：NA")
+    else:
+        try:
+            glucose_value = float(glucose_text)
+            if glucose_value < 0:
+                errors.append("スクリーニング血液検査：血糖に負の値は入力できません")
+        except ValueError:
+            errors.append("スクリーニング血液検査：血糖は数値またはNAで入力してください")
+    if (lab_warn or glucose_value is None or screen_cytology == "未実施") and not text(screening_omission_reason):
         missing.append("スクリーニング必須検査の欠測/未実施理由")
 
     if evp_start is None: missing.append("EVP初回投与日")
@@ -323,7 +333,7 @@ def collect_validation():
     if pembro_stop == "あり" and not text(pembro_stop_detail): missing.append("Pembro中止の詳細")
     if best_effect == "選択してください": missing.append("EVP最良総合効果")
     if first_control_date is None: missing.append("最初のCR/PR/SD確認日")
-    if central_recist == "選択してください": missing.append("直近RECIST総合判定")
+    if central_recist == "選択してください": missing.append("施設判定RECIST総合判定")
     if preop_imaging_date is None: missing.append("手術適応判定前画像日")
     elif preop_imaging_date > today_jst(): errors.append("手術適応判定前画像日が未来日です")
     if new_lesion is None: missing.append("新病変の有無")
@@ -335,7 +345,7 @@ def collect_validation():
     if courses is not None and courses < 3:
         if not text(short_course_reason): missing.append("3コース未満の理由")
         # Protocol allows <3 courses only when >=63 days from first dose at eligibility.
-        ref_date = mdt_date or today_jst()
+        ref_date = today_jst()
         if evp_start and (ref_date - evp_start).days < 63:
             reasons.append("EVP 3コース未満かつ初回投与から63日未満")
 
@@ -358,9 +368,9 @@ def collect_validation():
     if nadir_sum is not None and nadir_sum < 0:
         errors.append("nadir SLDに負の値は入力できません")
     if nadir_sum is None and recist_support["response"] == "SD/PD要nadir確認":
-        warnings.append("標的病変のみのPD判定には治療中nadirが必要です。中央RECIST総合判定を優先してください")
+        warnings.append("標的病変のみのPD判定には治療中nadirが必要です。施設判定と中央MDT画像評価で確認してください")
     if recist_support["response"] == "PD" and central_recist in ["CR", "PR", "SD"]:
-        warnings.append("標的病変の補助計算はPDですが、入力されたRECIST総合判定は非PDです。中央画像判定を再確認してください")
+        warnings.append("標的病変の補助計算はPDですが、入力された施設RECIST総合判定は非PDです。画像判定を再確認してください")
 
     if cm == "cM1":
         if not cm1_basis: missing.append("cM1登録根拠")
@@ -371,10 +381,8 @@ def collect_validation():
             if cned_date is None: missing.append("cNED確認日")
             elif cned_date > today_jst(): errors.append("cNED確認日が未来日です")
             if not cm1_local_tx: missing.append("遠隔転移に対する局所療法")
-            if cned_date and mdt_date and mdt_date < add_months(cned_date, 3):
+            if cned_date and today_jst() < add_months(cned_date, 3):
                 reasons.append("cNEDの3か月維持期間不足")
-            elif cned_date and not mdt_date:
-                warnings.append("cNED 3か月維持の最終確認はMDT判定日入力後に行われます")
 
     for val, label in [(g3_unrecovered, "Grade 3以上未回復AE"), (unresectable_vessel, "大血管浸潤"), (unresectable_organ, "他臓器浸潤"), (other_cancer, "活動性重複がん"), (other_unsuitable, "その他不適当")]:
         if val is None: missing.append(label)
@@ -392,12 +400,9 @@ def collect_validation():
         if wd < 28: reasons.append("EVP最終投与から手術予定まで4週未満")
         elif wd > 84: reasons.append("EVP最終投与から手術予定まで12週超")
         elif wd > 56 and not text(washout_extension_reason): missing.append("8週超となる理由")
-    if mdt_status != "未審査" and mdt_date is None: missing.append("中央MDT判定日")
-    if mdt_status == "不適格": reasons.append("中央MDT判定：不適格")
-    if mdt_status == "保留": reasons.append("中央MDT判定：保留")
 
     # Basic chronology
-    dates = [(diagnosis_date, "初回診断日"), (consent_date, "同意日"), (evp_start, "EVP初回"), (evp_end, "EVP最終"), (first_control_date, "初回病勢制御"), (preop_imaging_date, "直近画像"), (mdt_date, "MDT判定"), (surgery_date, "手術予定")]
+    dates = [(diagnosis_date, "初回診断日"), (consent_date, "同意日"), (evp_start, "EVP初回"), (evp_end, "EVP最終"), (first_control_date, "初回病勢制御"), (preop_imaging_date, "直近画像"), (surgery_date, "手術予定")]
     for d, label in dates:
         if d and d > today_jst() and label != "手術予定": errors.append(f"{label}が未来日です")
     if diagnosis_date and evp_start and diagnosis_date > evp_start: errors.append("初回診断日がEVP初回投与日より後です")
@@ -408,8 +413,6 @@ def collect_validation():
     if evp_start and evp_end and evp_end < evp_start: errors.append("EVP最終投与日が初回投与日より前です")
     if evp_start and first_control_date and first_control_date < evp_start: errors.append("病勢制御確認日がEVP初回投与日より前です")
     if first_control_date and preop_imaging_date and preop_imaging_date < first_control_date: warnings.append("手術適応判定前画像日が最初の病勢制御確認日より前です")
-    if consent_date and mdt_date and mdt_date < consent_date: errors.append("MDT判定日が同意取得日より前です")
-    if mdt_date and surgery_date and surgery_date < mdt_date: errors.append("手術予定日がMDT判定日より前です")
 
     return unique_messages(missing), unique_messages(errors), unique_messages(reasons), unique_messages(warnings), parsed_labs
 
@@ -446,8 +449,8 @@ def build_data(parsed_labs):
         "cystoscopy_date": date_str(cystoscopy_date),
         "cystoscopy_result": cystoscopy_result,
         "cystoscopy_detail": text(st.session_state.get("reg_cysto_detail", "")),
-        "screening_urine": screen_urine,
-        "screening_labs": parsed_labs,
+        "screening_cytology": screen_cytology,
+        "screening_labs": {**parsed_labs, "Glucose": (None if str(screen_glucose_raw).strip().upper() in {"NA", "N/A", "未実施", "欠測", ""} else float(screen_glucose_raw))},
         "screening_required_test_omission_reason": text(screening_omission_reason),
         "evp_start": date_str(evp_start),
         "evp_end": date_str(evp_end),
@@ -461,7 +464,7 @@ def build_data(parsed_labs):
         "first_disease_control_date": date_str(first_control_date),
         "preop_imaging_date": date_str(preop_imaging_date),
         "target_nadir_sum_mm": nadir_sum,
-        "central_recist": central_recist,
+        "site_recist": central_recist,
         "new_lesion": new_lesion,
         "nontarget_pd": nontarget_pd,
         "short_course_reason": text(short_course_reason),
@@ -479,165 +482,104 @@ def build_data(parsed_labs):
         "planned_surgery": planned_surgery,
         "planned_surgery_date": date_str(surgery_date),
         "washout_extension_reason": text(washout_extension_reason),
-        "mdt_status": mdt_status,
-        "mdt_date": date_str(mdt_date),
-        "mdt_reason": text(st.session_state.get("reg_mdt_reason", "")),
     }
 
 missing, errors, ineligible, warnings, parsed_labs = collect_validation()
 eligible_candidate = not missing and not errors and not ineligible
 
-st.header("5. 判定・MDT資料送信・症例登録")
+st.header("5. 中央MDT審査申請")
 if missing:
     st.warning("未入力：" + " / ".join(missing))
 if errors:
     st.error("入力エラー：\n" + "\n".join([f"・{x}" for x in errors]))
 if ineligible:
-    st.error("不適格/登録不可となる項目：\n" + "\n".join([f"・{x}" for x in ineligible]))
+    st.error("適格基準上の確認事項：\n" + "\n".join([f"・{x}" for x in ineligible]))
 if warnings:
     st.info("確認事項：\n" + "\n".join([f"・{x}" for x in warnings]))
 
 if eligible_candidate:
-    st.success("入力された選択・除外基準上は適格候補です。最終登録には中央MDT『手術適応あり』が必要です。")
+    st.success("入力内容は中央MDT審査へ提出可能です。")
 elif not missing and not errors and ineligible:
-    st.error("現時点では登録基準を満たしません。")
+    st.error("現時点では中央MDT審査申請前に適格性を再確認してください。")
 
-# Screening/MDT report can be sent before formal registration.
-if st.button("📨 MDT審査用レポートを事務局へ送信", use_container_width=True, disabled=bool(missing or errors or L)):
+if st.button("📨 中央MDT審査を申請", type="primary", use_container_width=True, disabled=bool(missing or errors or ineligible or L)):
     data = build_data(parsed_labs)
+    submission_id = str(uuid.uuid4())
     screening_payload = {
-        "schema_version": "2026-09-final-v1",
+        "schema_version": "2026-09-14-v2.1",
         "study_code": "JUOG_UTUC_Consolidative",
-        "crf_type": "registration_screening",
+        "crf_type": "mdt_screening",
+        "record_key": f"{facility_code}|{text(local_subject_code)}|mdt_screening",
+        "submission_id": submission_id,
         "submitted_at": now_iso(),
         "facility_code": facility_code,
         "facility_name": facility_name,
         "local_subject_code": text(local_subject_code),
         "reporter_email": text(reporter_email),
-        "eligibility_candidate": not bool(ineligible),
-        "ineligibility_reasons": ineligible,
+        "eligibility_candidate": True,
         "warnings": warnings,
         "data": data,
     }
-    report = f"""【JUOG 登録/MDT審査用レポート】
-施設: {facility_name}
-施設内研究対象者識別コード: {text(local_subject_code)}
-担当者: {text(reporter_email)}
-基準上の適格候補: {'はい' if not ineligible else 'いいえ'}
-不適格理由: {', '.join(ineligible) if ineligible else 'なし'}
-確認事項: {', '.join(warnings) if warnings else 'なし'}
-中央MDT判定: {mdt_status}
-中央MDT判定日: {date_str(mdt_date) or 'N/A'}
-
-EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
-最良総合効果: {best_effect}
-最初の病勢制御確認日: {date_str(first_control_date)}
-直近RECIST: {central_recist}
-予定術式: {planned_surgery}
-手術予定日: {date_str(surgery_date)}
-
-{json_block(screening_payload)}
-"""
-    sent, err = send_email(f"【JUOG CRF】【MDT screening】【{facility_name}】【{text(local_subject_code)}】", report, reporter_email)
-    if sent:
-        st.success("MDT審査用レポートを送信しました。画像データは計画書に定めた方法で別途提出してください。")
-    else:
-        st.error("メール送信に失敗しました。事務局へ連絡してください。")
-        print(f"[JUOG registration screening] email failed: {err}")
-
-# Final registration: require protocol eligibility + central MDT approval.
-can_register = eligible_candidate and mdt_status == "手術適応あり（適格）" and mdt_date is not None and not L
-if mdt_status != "手術適応あり（適格）":
-    st.caption("JUOG登録番号は中央MDTで『手術適応あり（適格）』となった後に発行されます。")
-
-if st.button("✅ 症例登録を確定し JUOG登録番号を発行", type="primary", use_container_width=True, disabled=not can_register):
-    data = build_data(parsed_labs)
+    # First persist the screening workflow record in the central registry.
+    # Only the minimum enrollment-control data are stored there; detailed CRF data remain in the coded email report.
     reg_result = registry_call(
-        "register",
+        "submit_screening",
         {
             "facility_code": facility_code,
             "facility_name": facility_name,
             "local_subject_code": text(local_subject_code),
             "reporter_email": text(reporter_email),
+            "submission_id": submission_id,
             "consent_date": date_str(consent_date),
-            "mdt_date": date_str(mdt_date),
+            "ct": ct,
             "cn": cn,
+            "cm": cm,
             "best_effect": best_effect,
+            "site_recist": central_recist,
+            "planned_surgery": planned_surgery,
+            "planned_surgery_date": date_str(surgery_date),
         },
     )
     if not reg_result.get("ok"):
-        code = reg_result.get("error", "")
-        if code == "TOTAL_CAP_REACHED":
-            st.error("目標登録数42例に到達しているため自動登録を停止しました。追加登録が必要な場合は研究事務局で計画書・集積方針を確認してください。")
-        elif code == "SD_CAP_HOLD":
-            st.error("SD症例が管理上の目安（12例）に達しているため自動登録を保留しました。研究事務局・統計責任者で集積方針を確認してください。")
-        elif code == "CN1_CAP_REACHED":
-            st.error("cN1症例の登録上限（20例）に達しているため登録できません。")
-        elif code == "REGISTRY_NOT_CONFIGURED":
-            st.error("中央登録台帳が未設定のためJUOG番号を安全に発番できません。registry設定後に登録してください。")
-        else:
-            st.error(f"中央登録でエラーが発生しました：{reg_result.get('message') or code}")
+        msg = reg_result.get("message") or reg_result.get("error") or "中央台帳への登録に失敗しました"
+        if reg_result.get("registration_id"):
+            msg += f"（既登録番号: {reg_result.get('registration_id')}）"
+        st.error(f"中央MDT審査申請を確定できませんでした：{msg}")
     else:
-        registration_id = reg_result["registration_id"]
-        registration_date = reg_result.get("registration_date", today_jst().isoformat())
-        # The central registry commit is authoritative. Lock immediately so a mail failure cannot lead to a second registration number.
-        st.session_state.registration_issued_id = registration_id
-        st.session_state.registration_locked = True
-        final_meta = make_submission_metadata(
-            "registration", "registration", registration_id, facility_code, facility_name, text(reporter_email),
-            "初回報告", "",
-        )
-        final_payload = {**final_meta, "registration_date": registration_date, "data": data}
-        final_report = f"""【JUOG 症例登録完了】
-JUOG登録番号: {registration_id}
-登録日: {registration_date}
+        screening_id = reg_result.get("screening_id", "")
+        screening_payload["screening_id"] = screening_id
+        report = f"""【JUOG 中央MDT審査申請】
+MDT審査受付番号: {screening_id}
 施設: {facility_name}
 施設内研究対象者識別コード: {text(local_subject_code)}
-中央MDT判定: {mdt_status} ({date_str(mdt_date)})
-RECIST総合判定: {central_recist}
-EVP最良総合効果: {best_effect}
+担当者: {text(reporter_email)}
+申請ID: {submission_id}
+
+EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
+最良総合効果: {best_effect}
+最初の病勢制御確認日: {date_str(first_control_date)}
+施設判定RECIST: {central_recist}
 予定術式: {planned_surgery}
 手術予定日: {date_str(surgery_date)}
 
-今後のすべてのCRFでは JUOG登録番号「{registration_id}」を使用してください。
-
-{json_block(final_payload)}
+{json_block(screening_payload)}
 """
-        mail_subject = f"【JUOG CRF】【registration】【{registration_id}】"
-        st.session_state.registration_retry_subject = mail_subject
-        st.session_state.registration_retry_report = final_report
-        st.session_state.registration_retry_email = text(reporter_email)
-        sent, err = send_email(mail_subject, final_report, reporter_email)
+        sent, err = send_email(
+            f"【JUOG MDT申請】【{screening_id}】【{facility_name}】",
+            report,
+            reporter_email,
+        )
         if sent:
-            st.session_state.registration_retry_subject = ""
-            st.session_state.registration_retry_report = ""
-            st.session_state.registration_retry_email = ""
-            st.success("症例登録が完了しました。")
-            st.markdown(f"## JUOG登録番号：`{registration_id}`")
-            st.warning("この番号を今後の周術期・90日・定期経過CRFで使用してください。担当者宛の控えメールにも記載しています。")
-            st.balloons()
-        else:
-            # Registration itself has already been committed centrally. Never issue another ID.
-            st.error("中央登録とJUOG番号発行は完了しましたが、確認メール送信に失敗しました。下記番号を控え、事務局へ連絡してください。")
-            st.markdown(f"## JUOG登録番号：`{registration_id}`")
-            print(f"[JUOG registration] confirmation email failed: {err}")
-
-if st.session_state.registration_issued_id:
-    st.info(f"このセッションで発行済みのJUOG登録番号：{st.session_state.registration_issued_id}")
-    if st.session_state.get("registration_retry_report"):
-        st.warning("中央登録は完了していますが、確認メールが未送信です。下のボタンで同じ登録内容のメール送信だけを再試行できます。")
-        if st.button("✉️ 登録確認メールを再送", use_container_width=True):
-            retry_sent, retry_err = send_email(
-                st.session_state.get("registration_retry_subject", ""),
-                st.session_state.get("registration_retry_report", ""),
-                st.session_state.get("registration_retry_email", ""),
+            st.session_state.screening_sent = True
+            st.session_state.screening_id = screening_id
+            st.success(
+                f"中央MDT審査申請を受け付けました（受付番号: {screening_id}）。"
+                "正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。"
             )
-            if retry_sent:
-                st.session_state.registration_retry_subject = ""
-                st.session_state.registration_retry_report = ""
-                st.session_state.registration_retry_email = ""
-                st.success("登録確認メールを再送しました。")
-                st.rerun()
-            else:
-                st.error("確認メールの再送に失敗しました。JUOG登録番号はすでに有効ですので、事務局へ連絡してください。")
-                print(f"[JUOG registration] retry email failed: {retry_err}")
+            st.rerun()
+        else:
+            st.error(
+                f"中央台帳には受付済みです（受付番号: {screening_id}）が、通知メール送信に失敗しました。"
+                "再送のため研究事務局へ連絡してください。二重申請を避けるため、まず受付番号を控えてください。"
+            )
+            print(f"[JUOG MDT screening] email failed: {err}")

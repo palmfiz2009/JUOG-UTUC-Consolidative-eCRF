@@ -15,7 +15,7 @@ from juog_common import (
     render_facility,
     render_lab_panel,
     render_submission_kind,
-    render_urine_panel,
+    render_cytology,
     send_email,
     text,
     today_jst,
@@ -24,11 +24,10 @@ from juog_common import (
     valid_registration_id,
     validate_lab_panel,
     validate_registry_id,
-    validate_urine_panel,
+    validate_cytology,
     window_info,
 )
 
-st.set_page_config(page_title="JUOG UTUC_Consolidative 術後90日CRF", layout="wide")
 st.markdown("""
 <style>
 .block-container {max-width:1180px!important;padding-top:1.3rem!important;padding-bottom:5rem!important;}
@@ -39,7 +38,6 @@ label {font-weight:600!important;color:#334155!important;}
 """, unsafe_allow_html=True)
 
 st.title("JUOG UTUC_Consolidative 術後90日CRF")
-st.caption("90日評価日は研究計画書どおり90日±14日（術後76〜104日）を許容します。84日目は許容範囲内です。手術関連合併症の副次評価項目は実際の術後90日以内で判定します。")
 
 if "d90_sent" not in st.session_state:
     st.session_state.d90_sent = False
@@ -76,8 +74,8 @@ st.markdown('<div class="juog-header">2. 90日検査（計画書必須）</div>'
 st.subheader("血液検査")
 labs_raw = render_lab_panel("d90_lab", required=True, disabled=L, columns=3)
 
-st.subheader("尿検査・尿細胞診")
-urine = render_urine_panel("d90", required=True, include_cytology=True, disabled=L)
+st.subheader("尿細胞診")
+cytology = render_cytology("d90", required=True, disabled=L)
 
 st.subheader("画像検査・膀胱鏡")
 i1, i2 = st.columns(2)
@@ -114,8 +112,8 @@ with i2:
 required_test_omission_reason = ""
 # Required tests may legitimately be unavailable (e.g. death before visit); record why rather than blocking the CRF completely.
 lab_na_now = any(str(v).strip().upper() in {"NA", "N/A", "未実施", "欠測"} for v in labs_raw.values())
-urine_not_done_now = any(v == "未実施" for v in urine.values())
-if lab_na_now or urine_not_done_now:
+cytology_not_done_now = cytology == "未実施"
+if lab_na_now or cytology_not_done_now:
     required_test_omission_reason = st.text_area("必須検査の欠測/未実施理由*", placeholder="NAまたは未実施とした項目の理由を記載してください", disabled=L)
 
 # ---------------- safety ----------------
@@ -247,8 +245,8 @@ def validate_all():
     parsed_labs, lab_errors, lab_warn = validate_lab_panel(labs_raw, required=True)
     errors.extend([f"90日血液検査：{x}" for x in lab_errors])
     warnings.extend([f"90日血液検査：{x}" for x in lab_warn])
-    missing.extend([f"90日{x}" for x in validate_urine_panel(urine, required=True)])
-    if (lab_warn or any(v == "未実施" for v in urine.values())) and not text(required_test_omission_reason):
+    missing.extend([f"90日{x}" for x in validate_cytology(cytology, required=True)])
+    if (lab_warn or cytology == "未実施") and not text(required_test_omission_reason):
         missing.append("必須検査の欠測/未実施理由")
     if imaging_status is None: missing.append("画像検査実施有無")
     elif imaging_status == "実施":
@@ -352,7 +350,7 @@ if st.button("🚀 90日データを確定送信", type="primary", use_container
                 "visit_date": date_str(visit_date),
                 "visit_deviation_reason": text(visit_deviation_reason),
                 "labs": parsed_labs,
-                "urinalysis": urine,
+                "urine_cytology": cytology,
                 "required_test_omission_reason": text(required_test_omission_reason),
                 "imaging_status": imaging_status,
                 "imaging_date": date_str(imaging_date),
