@@ -221,35 +221,88 @@ else:
     st.warning("3名の個別判定が一致していません。中央MDTで協議し、構成委員の合意を形成してください。多数決による自動判定は行いません。")
 
 st.header("4. 中央MDT最終合意・正式登録")
-with st.form(f"final_mdt_{screening_id}_{case.get('review_round')}"):
-    b1, b2 = st.columns(2)
-    with b1:
-        mdt_date = st.date_input("中央MDT最終判定日*", value=today_jst(), max_value=today_jst())
-        st.text_input("中央RECIST（放射線診断医判定）", value=radiology_recist, disabled=True)
-        site_r = str(case.get("site_recist", "") or "").upper()
-        central_r = str(radiology_recist or "").upper()
-        if site_r and central_r and site_r != central_r:
-            st.warning(f"施設判定 {site_r} と中央判定 {central_r} に乖離があります。適格性に用いるRECISTは中央判定です。")
-        elif site_r and central_r:
-            st.caption(f"施設判定と中央判定は一致（{central_r}）")
-    with b2:
-        decision_jp = st.radio("中央MDT最終合意*", ["適格（手術適応あり）", "不適格", "保留"], index=None)
-        admin_user = st.text_input("記録者（事務局）*")
-    reason = st.text_area("不適格・保留の理由*" if decision_jp in {"不適格", "保留"} else "理由/備考（任意）")
-    consensus_note = st.text_area(
-        "合意形成記録" + ("*" if (not unanimous or (decision_jp and {"適格（手術適応あり）": "ELIGIBLE", "不適格": "INELIGIBLE", "保留": "HOLD"}.get(decision_jp) != individual[0])) else "（任意）"),
-        help="個別判定が不一致だった場合や、最終合意が個別判定と異なる場合は、協議後にどのように合意したかを簡潔に記録してください。",
+
+# v2.2.8 UI fix:
+# Do not use st.form here. The final MDT controls need immediate reruns so that
+# radio/checkbox state is reflected before the single final submit action.
+widget_suffix = f"{screening_id}_{case.get('review_round')}"
+
+b1, b2 = st.columns(2)
+with b1:
+    mdt_date = st.date_input(
+        "中央MDT最終判定日*",
+        value=today_jst(),
+        max_value=today_jst(),
+        key=f"final_mdt_date_{widget_suffix}",
     )
-    consensus_confirmed = st.checkbox("中央MDT構成委員3名の合意が得られたことを確認しました。")
-    formal_confirm = st.checkbox(
-        "適格の場合、正式登録してJUOG登録番号を発行することを確認しました。",
-        help="適格として正式登録する場合にチェックしてください。不適格・保留ではチェック不要です。",
+    st.text_input(
+        "中央RECIST（放射線診断医判定）",
+        value=radiology_recist,
+        disabled=True,
+        key=f"central_recist_display_{widget_suffix}",
     )
-    submitted = st.form_submit_button(
-        "正式登録・JUOG登録番号を発行" if decision_jp == "適格（手術適応あり）" else "中央MDT最終判定を確定",
-        type="primary",
-        use_container_width=True,
+    site_r = str(case.get("site_recist", "") or "").upper()
+    central_r = str(radiology_recist or "").upper()
+    if site_r and central_r and site_r != central_r:
+        st.warning(f"施設判定 {site_r} と中央判定 {central_r} に乖離があります。適格性に用いるRECISTは中央判定です。")
+    elif site_r and central_r:
+        st.caption(f"施設判定と中央判定は一致（{central_r}）")
+
+with b2:
+    decision_jp = st.radio(
+        "中央MDT最終合意*",
+        ["適格（手術適応あり）", "不適格", "保留"],
+        index=None,
+        key=f"final_decision_{widget_suffix}",
     )
+    admin_user = st.text_input(
+        "記録者（事務局）*",
+        key=f"final_admin_user_{widget_suffix}",
+    )
+
+reason = st.text_area(
+    "不適格・保留の理由*" if decision_jp in {"不適格", "保留"} else "理由/備考（任意）",
+    key=f"final_reason_{widget_suffix}",
+)
+
+decision_map = {
+    "適格（手術適応あり）": "ELIGIBLE",
+    "不適格": "INELIGIBLE",
+    "保留": "HOLD",
+}
+selected_decision_code = decision_map.get(decision_jp)
+
+consensus_note_required = (
+    not unanimous
+    or (
+        selected_decision_code
+        and selected_decision_code != individual[0]
+    )
+)
+
+consensus_note = st.text_area(
+    "合意形成記録*" if consensus_note_required else "合意形成記録（任意）",
+    help="個別判定が不一致だった場合や、最終合意が個別判定と異なる場合は、協議後にどのように合意したかを簡潔に記録してください。",
+    key=f"final_consensus_note_{widget_suffix}",
+)
+
+consensus_confirmed = st.checkbox(
+    "中央MDT構成委員3名の合意が得られたことを確認しました。",
+    key=f"final_consensus_confirmed_{widget_suffix}",
+)
+
+formal_confirm = st.checkbox(
+    "適格の場合、正式登録してJUOG登録番号を発行することを確認しました。",
+    help="適格として正式登録する場合にチェックしてください。不適格・保留ではチェック不要です。",
+    key=f"final_formal_confirm_{widget_suffix}",
+)
+
+submitted = st.button(
+    "中央MDT最終判定を確定／正式登録",
+    type="primary",
+    use_container_width=True,
+    key=f"final_submit_{widget_suffix}",
+)
 
 if submitted:
     errors = []
