@@ -161,6 +161,35 @@ with e1:
     reduction_detail = st.text_area("EV減量の詳細*" if reduction == "あり" else "EV減量の詳細", disabled=L)
     pembro_stop = st.radio("irAE等によるPembro中止の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
     pembro_stop_detail = st.text_area("Pembro中止の詳細*" if pembro_stop == "あり" else "Pembro中止の詳細", disabled=L)
+
+    important_ae_options = [
+        "なし",
+        "間質性肺炎/肺障害",
+        "心筋炎/心膜炎",
+        "1型糖尿病（劇症1型糖尿病を含む）",
+        "副腎不全",
+        "下垂体炎/下垂体機能低下",
+        "甲状腺機能異常",
+        "肝炎",
+        "大腸炎/重度下痢",
+        "腎炎",
+        "重症筋無力症/筋炎/その他神経系irAE",
+        "重症皮膚障害",
+        "EV関連末梢神経障害",
+        "EV関連皮膚障害",
+        "その他",
+    ]
+    important_ae = st.multiselect(
+        "中央MDTで共有すべきEVP関連重要AE / irAE（既往・回復済みを含む）*",
+        important_ae_options,
+        disabled=L,
+        help="中央MDTの周術期安全性評価に必要な重要AEを共有します。現在未回復のGrade 3以上AEは下の選択・除外基準で別途判定します。",
+    )
+    important_ae_detail = st.text_area(
+        "重要AE / irAEの詳細（Grade、発症時期、治療、現在の回復状況）*" if important_ae and important_ae != ["なし"] else "重要AE / irAEの詳細",
+        disabled=L,
+        help="例：免疫関連肺障害 Grade 2、2025/11発症、PSLで改善し現在Grade 0。劇症1型糖尿病、インスリン導入後コントロール中、など。",
+    )
 with e2:
     best_effect = st.selectbox("EVP最良総合効果*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
     first_control_date = st.date_input("最初にCR/PR/SDが確認された画像検査日*", value=None, disabled=L)
@@ -336,6 +365,12 @@ def collect_validation():
     if reduction == "あり" and not text(reduction_detail): missing.append("EV減量の詳細")
     if pembro_stop is None: missing.append("Pembro中止の有無")
     if pembro_stop == "あり" and not text(pembro_stop_detail): missing.append("Pembro中止の詳細")
+    if not important_ae:
+        missing.append("中央MDT共有用の重要AE / irAE")
+    elif "なし" in important_ae and len(important_ae) > 1:
+        errors.append("重要AE / irAEで『なし』と他の項目を同時に選択できません")
+    elif important_ae != ["なし"] and not text(important_ae_detail):
+        missing.append("重要AE / irAEの詳細")
     if best_effect == "選択してください": missing.append("EVP最良総合効果")
     if first_control_date is None: missing.append("最初のCR/PR/SD確認日")
     if central_recist == "選択してください": missing.append("施設判定RECIST総合判定")
@@ -467,6 +502,8 @@ def build_data(parsed_labs):
         "ev_reduction_detail": text(reduction_detail),
         "pembro_stop": pembro_stop,
         "pembro_stop_detail": text(pembro_stop_detail),
+        "important_ae_irAE": important_ae,
+        "important_ae_irAE_detail": text(important_ae_detail),
         "best_effect": best_effect,
         "first_disease_control_date": date_str(first_control_date),
         "preop_imaging_date": date_str(preop_imaging_date),

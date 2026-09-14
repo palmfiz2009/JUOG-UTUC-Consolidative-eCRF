@@ -11,6 +11,24 @@ ROLE_LABELS = {
     "urology": "泌尿器科専門医",
 }
 
+LAB_DISPLAY = [
+    ("WBC", "WBC", "/μL"), ("Hb", "Hb", "g/dL"), ("PLT", "PLT", "×10^4/μL"),
+    ("Neutro", "Neutro", "%"), ("Lympho", "Lympho", "%"),
+    ("Alb", "Alb", "g/dL"), ("AST", "AST", "U/L"), ("ALT", "ALT", "U/L"),
+    ("T_Bil", "T-Bil", "mg/dL"), ("Cre", "Cre", "mg/dL"),
+    ("eGFR", "eGFR", "mL/min/1.73m²"), ("BUN", "BUN", "mg/dL"),
+    ("Na", "Na", "mEq/L"), ("K", "K", "mEq/L"), ("Cl", "Cl", "mEq/L"),
+    ("CRP", "CRP", "mg/dL"), ("Glucose", "血糖", "mg/dL"),
+]
+
+def render_screening_labs(data):
+    labs = data.get("screening_labs") or {}
+    rows = []
+    for key, label, unit in LAB_DISPLAY:
+        value = labs.get(key)
+        rows.append({"項目": label, "値": "NA" if value in (None, "") else value, "単位": unit})
+    st.dataframe(rows, use_container_width=True, hide_index=True)
+
 st.markdown(
     """
     <style>
@@ -144,6 +162,38 @@ with st.expander("患者背景・EVP・画像情報を確認", expanded=True):
         st.write("**標的病変**")
         st.dataframe(lesions, use_container_width=True, hide_index=True)
 
+if role == "medical_oncology":
+    st.subheader("腫瘍内科評価用の提出情報")
+    st.caption("以下は申請施設から提出された情報です。本中央判定は提出情報に基づく評価であり、判定者が患者を直接診察したことを意味しません。")
+    m1, m2 = st.columns(2)
+    with m1:
+        st.write(f"**申請ECOG PS**：{data.get('ecog_ps','')} ")
+        st.write(f"**EVP関連Grade 3以上未回復AE**：{data.get('g3_unrecovered_ae','')}")
+        st.write(f"**Pembro中止**：{data.get('pembro_stop','')}")
+        if data.get('pembro_stop_detail'):
+            st.write(f"Pembro中止詳細：{data.get('pembro_stop_detail')}")
+        important_ae = data.get('important_ae_irAE')
+        if important_ae:
+            st.write("**重要AE / irAE（既往・回復済みを含む）**：" + "、".join(important_ae))
+            if data.get('important_ae_irAE_detail'):
+                st.write(f"詳細：{data.get('important_ae_irAE_detail')}")
+        else:
+            st.caption("重要AE / irAE詳細：この申請では詳細項目未収集（既存のAE・Pembro中止情報等で評価）")
+    with m2:
+        st.write(f"**現在の合併症**：{data.get('comorbidity','')}")
+        st.write(f"**現在の併用薬**：{data.get('concomitant_meds','')}")
+        st.write(f"**現在の併用治療**：{data.get('concomitant_treatment','')}")
+        vitals = data.get('screening_vitals') or {}
+        st.write(
+            f"**スクリーニングバイタル**：BP {vitals.get('sbp','')}/{vitals.get('dbp','')} mmHg、"
+            f"HR {vitals.get('pulse','')}/min、T {vitals.get('temperature','')}℃"
+        )
+    st.write("**スクリーニング採血データ**")
+    render_screening_labs(data)
+    st.caption("異常値が疑わしい場合や、irAE（例：肺障害、心筋炎、1型/劇症1型糖尿病、内分泌障害等）の回復状況が不十分な場合は『追加情報/回復待ち』として事務局へ確認できます。")
+elif role == "urology":
+    st.caption("泌尿器科中央判定は、申請施設から提出された臨床情報・画像情報に基づく評価であり、判定者による患者の直接診察を意味しません。")
+
 # An unreviewed case is already identified by list_review_cases, so avoid an
 # unnecessary extra round-trip to Google Apps Script. Fetch prior details only
 # when this reviewer has actually submitted a review for the current round.
@@ -191,17 +241,29 @@ with st.form(f"review_form_{role}_{screening_id}_{review_round}"):
             "cm1_status": cm1_status,
         }
     elif role == "medical_oncology":
-        g3_ae_recovered = st.selectbox("EVP関連Grade 3以上AEの回復状況*", ["選択してください", "Grade 3以上の未回復AEなし", "未回復AEあり", "判定困難"])
-        ecog_0_1 = st.selectbox("ECOG PS 0–1の確認*", ["選択してください", "0–1", "2以上", "判定困難"])
-        medical_safety = st.selectbox("内科的観点からの手術移行安全性*", ["選択してください", "手術移行可能", "手術移行不適", "追加情報/回復待ち"])
+        g3_ae_recovered = st.selectbox(
+            "申請情報上、EVP関連Grade 3以上AEの未回復がないこと*",
+            ["選択してください", "確認できる", "未回復AEあり", "追加情報が必要"],
+            help="申請施設から提出されたAE情報を確認します。判定者による直接診察を意味しません。",
+        )
+        ecog_0_1 = st.selectbox(
+            "申請情報上、ECOG PS 0–1であること*",
+            ["選択してください", "確認できる", "ECOG PS 2以上と報告", "追加情報が必要"],
+            help="申請施設が報告したECOG PSを確認します。中央判定者が患者を直接診察して採点する項目ではありません。",
+        )
+        medical_safety = st.selectbox(
+            "提出された臨床情報・検査値を踏まえた内科的な手術移行安全性*",
+            ["選択してください", "手術移行可能", "手術移行不適", "追加情報/回復待ち"],
+            help="採血、バイタル、併存疾患、EVP関連AE/irAEの回復状況等を総合して判定してください。",
+        )
         role_payload = {
             "g3_ae_recovered": g3_ae_recovered,
             "ecog_0_1": ecog_0_1,
             "medical_safety": medical_safety,
         }
     else:
-        technically_resectable = st.selectbox("技術的切除可能性*", ["選択してください", "切除可能", "切除不能/危険", "追加情報が必要"])
-        surgery_appropriate = st.selectbox("Consolidative surgery適応の外科的妥当性*", ["選択してください", "適応あり", "適応なし", "保留"])
+        technically_resectable = st.selectbox("申請情報・画像に基づく技術的切除可能性*", ["選択してください", "切除可能", "切除不能/危険", "追加情報が必要"])
+        surgery_appropriate = st.selectbox("提出情報に基づくConsolidative surgeryの外科的妥当性*", ["選択してください", "適応あり", "適応なし", "保留"])
         role_payload = {
             "technically_resectable": technically_resectable,
             "surgery_appropriate": surgery_appropriate,
