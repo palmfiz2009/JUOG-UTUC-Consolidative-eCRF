@@ -212,7 +212,7 @@ with st.form(f"final_mdt_{screening_id}_{case.get('review_round')}"):
     consensus_confirmed = st.checkbox("中央MDT構成委員3名の合意が得られたことを確認しました。")
     formal_confirm = st.checkbox(
         "適格の場合、正式登録してJUOG登録番号を発行することを確認しました。",
-        disabled=decision_jp != "適格（手術適応あり）",
+        help="適格として正式登録する場合にチェックしてください。不適格・保留ではチェック不要です。",
     )
     submitted = st.form_submit_button(
         "正式登録・JUOG登録番号を発行" if decision_jp == "適格（手術適応あり）" else "中央MDT最終判定を確定",
