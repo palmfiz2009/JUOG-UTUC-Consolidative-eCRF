@@ -89,15 +89,33 @@ if not result.get("ok"):
     st.code(result.get("message") or result.get("error") or "unknown error")
     st.stop()
 
-cases = result.get("cases") or []
-if not cases:
+all_cases = result.get("cases") or []
+
+notice = st.session_state.pop("juog_review_submit_notice", None)
+if notice:
+    st.success(notice)
+
+if not all_cases:
     st.success("現在、判定対象の症例はありません。")
+    st.stop()
+
+show_submitted = st.checkbox(
+    "判定済み症例も表示する",
+    value=False,
+    key=f"show_submitted_{role}",
+    help="通常は未判定症例だけを表示します。過去の自分の判定を確認・訂正する場合のみONにしてください。",
+)
+
+cases = all_cases if show_submitted else [c for c in all_cases if not c.get("review_submitted")]
+if not cases:
+    st.success("✅ 現在、未判定の症例はありません。自分に割り当てられた判定はすべて提出済みです。")
+    st.caption("過去の判定を確認・訂正する場合は「判定済み症例も表示する」をONにしてください。")
     st.stop()
 
 labels = []
 case_by_label = {}
 for case in cases:
-    mark = "判定済" if case.get("review_submitted") else "未判定"
+    mark = "✅ 判定済" if case.get("review_submitted") else "未判定"
     label = (
         f"{case.get('screening_id','')}｜{mark}｜{case.get('facility_name','')}｜"
         f"{case.get('ct','')}/{case.get('cn','')}/{case.get('cm','')}｜Best {case.get('best_effect','')}"
@@ -209,13 +227,38 @@ if case.get("review_submitted"):
         st.stop()
     prior = own_result.get("review")
 
+correction_key = f"juog_correction_mode_{role}_{screening_id}_{review_round}"
+correction_mode = bool(st.session_state.get(correction_key, False))
+
 if prior:
-    st.info(
-        f"このラウンドは判定提出済みです：{prior.get('decision','')} / "
-        f"version {prior.get('review_version','')} / {prior.get('submitted_at','')}"
+    decision_label = {
+        "ELIGIBLE": "適格",
+        "INELIGIBLE": "不適格",
+        "HOLD": "保留",
+    }.get(str(prior.get("decision", "")).upper(), str(prior.get("decision", "")))
+
+    st.success("✅ この症例の中央MDT判定は提出完了しています。通常は追加操作は不要です。")
+    s1, s2, s3 = st.columns(3)
+    s1.metric("提出済み判定", decision_label or "—")
+    s2.metric("Version", str(prior.get("review_version", "") or "—"))
+    s3.metric("審査ラウンド", str(review_round))
+    st.caption(
+        f"判定者：{prior.get('reviewer_name','')}　／　提出日時：{prior.get('submitted_at','')}"
     )
     if prior.get("comment"):
-        st.write(f"前回コメント：{prior.get('comment')}")
+        st.write(f"**前回コメント**：{prior.get('comment')}")
+
+    if not correction_mode:
+        if st.button("提出済み判定を訂正する", type="secondary", use_container_width=True):
+            st.session_state[correction_key] = True
+            st.rerun()
+        st.caption("訂正が不要であれば、この症例での操作は終了です。")
+        st.stop()
+    else:
+        st.warning("⚠️ 訂正再提出モードです。訂正理由を入力し、全項目を再確認して提出してください。")
+        if st.button("訂正をやめる", use_container_width=True):
+            st.session_state[correction_key] = False
+            st.rerun()
 
 st.header("3. 独立判定")
 with st.form(f"review_form_{role}_{screening_id}_{review_round}"):
@@ -271,10 +314,11 @@ with st.form(f"review_form_{role}_{screening_id}_{review_round}"):
 
     decision_jp = st.radio("担当領域としての判定*", ["適格", "不適格", "保留"], index=None, horizontal=True)
     comment = st.text_area("コメント" + ("*" if decision_jp in {"不適格", "保留"} else "（任意）"))
-    is_correction = st.checkbox("提出済み判定の訂正再提出", value=False, disabled=not bool(prior))
-    correction_reason = st.text_input("訂正理由*", disabled=not is_correction)
+    is_correction = bool(prior) and correction_mode
+    correction_reason = st.text_input("訂正理由*") if is_correction else ""
     confirm = st.checkbox("申請資料を確認し、自分の担当領域として独立して判定しました。")
-    submitted = st.form_submit_button("判定を提出", type="primary", use_container_width=True)
+    submit_label = "訂正版を提出" if is_correction else "判定を提出"
+    submitted = st.form_submit_button(submit_label, type="primary", use_container_width=True)
 
 if submitted:
     errors = []
@@ -314,6 +358,9 @@ if submitted:
         if not result.get("ok"):
             st.error("判定を保存できませんでした：" + (result.get("message") or result.get("error") or "unknown error"))
         else:
-            st.success(f"判定を保存しました（version {result.get('review_version')}）。")
-            st.caption("他の判定者の結果は事務局画面で3名分が揃った後に集約されます。")
+            if is_correction:
+                st.session_state[correction_key] = False
+            st.session_state["juog_review_submit_notice"] = (
+                f"✅ {screening_id} の判定を提出しました（version {result.get('review_version')}）。"
+            )
             st.rerun()
