@@ -1,5 +1,5 @@
 /**
- * JUOG UTUC_Consolidative central eCRF service (v2.2.2)
+ * JUOG UTUC_Consolidative central eCRF service (v2.2.6)
  * Google Apps Script Web App bound to a dedicated Google Sheet.
  *
  * Workflow:
@@ -469,6 +469,31 @@ function finalizeMdt_(p) {
     const recistConcordance = recistConcordance_(siteRecist, centralRecist);
     if (decision === 'ELIGIBLE' && ['CR', 'PR', 'SD'].indexOf(centralRecist) < 0) {
       return {ok: false, error: 'RECIST_NOT_ELIGIBLE', message: '正式登録には放射線診断医の中央RECISTがCR/PR/SDである必要があります'};
+    }
+
+    // v2.2.6: chronology hard stops for ELIGIBLE formal registration.
+    // The study workflow requires central MDT approval and formal registration
+    // before surgery. HOLD / INELIGIBLE decisions are not blocked by these checks.
+    if (decision === 'ELIGIBLE') {
+      const plannedSurgeryDate = dateOnly_(found.row[found.idx.planned_surgery_date]);
+      const mdtDateOnly = dateOnly_(mdtDate);
+      const registrationDate = Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd');
+
+      if (plannedSurgeryDate && mdtDateOnly && plannedSurgeryDate < mdtDateOnly) {
+        return {
+          ok: false,
+          error: 'SURGERY_BEFORE_MDT',
+          message: `手術予定日（${plannedSurgeryDate}）が中央MDT最終判定日（${mdtDateOnly}）より前です。日付を確認してください。`
+        };
+      }
+
+      if (plannedSurgeryDate && plannedSurgeryDate < registrationDate) {
+        return {
+          ok: false,
+          error: 'SURGERY_BEFORE_REGISTRATION',
+          message: `手術予定日（${plannedSurgeryDate}）が正式登録日（${registrationDate}）より前です。正式登録は手術前に完了する必要があります。`
+        };
+      }
     }
 
     const ss = getSpreadsheet_();
