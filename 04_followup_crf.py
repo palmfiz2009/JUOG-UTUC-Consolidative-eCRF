@@ -15,6 +15,7 @@ from juog_common import (
     render_facility,
     render_lab_panel,
     render_submission_kind,
+    save_crf_payload,
     render_cytology,
     send_email,
     text,
@@ -389,12 +390,16 @@ RECIST進行状況: {recist_status}
 
 {json_block(payload)}
 """
-            sent, send_err = send_email(f"【JUOG CRF】【followup-{visit_key}】【{registration_id}】", report, reporter_email)
-            if sent:
-                st.session_state.fu_sent = True
-                st.success("定期経過データを確定送信しました。")
-                st.balloons()
-                st.rerun()
+            save_result = save_crf_payload(payload)
+            if not save_result.get("ok"):
+                st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
             else:
-                st.error("メール送信に失敗しました。データは送信されていません。")
-                print(f"[JUOG followup] email failed: {send_err}")
+                st.session_state.fu_sent = True
+                sent, send_err = send_email(f"【JUOG CRF】【followup-{visit_key}】【{registration_id}】", report, reporter_email)
+                st.success(f"定期経過データを確定保存しました（version {save_result.get('record_version', '')}）。")
+                if not sent:
+                    st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
+                    print(f"[JUOG followup] email failed: {send_err}")
+                else:
+                    st.balloons()
+                    st.rerun()

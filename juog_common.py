@@ -13,7 +13,7 @@ from email.mime.text import MIMEText
 from zoneinfo import ZoneInfo
 
 STUDY_CODE = "JUOG_UTUC_Consolidative"
-SCHEMA_VERSION = "2026-09-14-v2.1"
+SCHEMA_VERSION = "2026-09-14-v2.2.2"
 TZ = ZoneInfo("Asia/Tokyo")
 
 # Canonical institution names follow the protocol (2026-09-14, v3).
@@ -196,6 +196,37 @@ def window_info(anchor: date | None, target_days: int, tolerance_days: int):
 
 def in_window(value: date | None, min_date: date | None, max_date: date | None) -> bool:
     return bool(value and min_date and max_date and min_date <= value <= max_date)
+
+
+def validate_anthropometrics(height_cm, weight_kg):
+    """Hard-stop only clearly implausible / likely digit-entry errors.
+
+    Deliberately broad ranges: this is not a clinical normal-range check.
+    A 200 kg patient is accepted; 300 kg is rejected as a likely input error for this trial.
+    """
+    errors = []
+    if height_cm is not None and not (80.0 <= float(height_cm) <= 250.0):
+        errors.append("身長は80〜250 cmの範囲で入力してください（桁・単位を確認してください）")
+    if weight_kg is not None and not (20.0 <= float(weight_kg) < 300.0):
+        errors.append("体重は20〜300 kg未満の範囲で入力してください（桁・単位を確認してください）")
+    return errors
+
+
+def validate_vitals(sbp, dbp, pulse, temperature, prefix=""):
+    """Hard-stop only impossible/very implausible values and SBP/DBP reversal."""
+    errors = []
+    lead = f"{prefix}：" if prefix else ""
+    if sbp is not None and not (40 <= float(sbp) <= 300):
+        errors.append(f"{lead}収縮期血圧は40〜300 mmHgの範囲で入力してください（桁を確認してください）")
+    if dbp is not None and not (20 <= float(dbp) <= 200):
+        errors.append(f"{lead}拡張期血圧は20〜200 mmHgの範囲で入力してください（桁を確認してください）")
+    if pulse is not None and not (20 <= float(pulse) <= 250):
+        errors.append(f"{lead}脈拍は20〜250 /minの範囲で入力してください（桁を確認してください）")
+    if temperature is not None and not (25.0 <= float(temperature) <= 45.0):
+        errors.append(f"{lead}体温は25〜45 ℃の範囲で入力してください（桁・単位を確認してください）")
+    if sbp is not None and dbp is not None and float(dbp) >= float(sbp):
+        errors.append(f"{lead}拡張期血圧が収縮期血圧以上になっています。入力を確認してください")
+    return errors
 
 
 def parse_lab_value(raw):
@@ -385,6 +416,16 @@ def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
     except Exception as exc:
         return {"ok": False, "error": f"REGISTRY_ERROR:{exc}"}
 
+
+
+
+def save_crf_payload(payload: dict, timeout: int = 30):
+    """Persist one eCRF submission to the central Google Sheet service.
+
+    The service is append-only at the submission level. A correction creates a new
+    version for the same record_key; the prior submission remains in the audit trail.
+    """
+    return registry_call("save_crf", {"payload": payload}, timeout=timeout)
 
 def validate_registry_id(registration_id: str, facility_code: str):
     if not valid_registration_id(registration_id):

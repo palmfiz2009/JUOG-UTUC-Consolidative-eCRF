@@ -22,6 +22,8 @@ from juog_common import (
     valid_email,
     validate_lab_panel,
     validate_cytology,
+    validate_anthropometrics,
+    validate_vitals,
 )
 
 st.markdown(
@@ -262,10 +264,12 @@ def collect_validation():
         if breastfeeding == "あり": reasons.append("授乳中")
     if height is None or height <= 0: missing.append("身長")
     if weight is None or weight <= 0: missing.append("体重")
+    errors.extend(validate_anthropometrics(height, weight))
     if ecog is None: missing.append("ECOG PS")
     elif ecog not in ["0", "1"]: reasons.append("ECOG PSが2以上")
     for val, label in [(sbp, "収縮期血圧"), (dbp, "拡張期血圧"), (pulse, "脈拍"), (temp, "体温")]:
         if val is None: missing.append(label)
+    errors.extend(validate_vitals(sbp, dbp, pulse, temp, "スクリーニングバイタル"))
     if physical_abnormal is None: missing.append("身体所見")
     if physical_abnormal == "あり" and not text(physical_detail): missing.append("身体所見詳細")
     for val, label in [(past_history, "既往歴"), (comorbidity, "現在の合併症"), (concomitant_meds, "現在の併用薬"), (concomitant_tx, "現在の併用治療")]:
@@ -411,6 +415,8 @@ def collect_validation():
     if evp_start and consent_date and evp_start > consent_date:
         warnings.append("EVP初回投与日が研究同意取得日より後です。本研究ではEVPはスクリーニング前治療のため日付を確認してください")
     if evp_start and evp_end and evp_end < evp_start: errors.append("EVP最終投与日が初回投与日より前です")
+    if consent_date and surgery_date and surgery_date < consent_date: errors.append("手術予定日が同意取得日より前です")
+    if evp_end and surgery_date and evp_end > surgery_date: errors.append("EVP最終投与日が手術予定日より後です")
     if evp_start and first_control_date and first_control_date < evp_start: errors.append("病勢制御確認日がEVP初回投与日より前です")
     if first_control_date and preop_imaging_date and preop_imaging_date < first_control_date: warnings.append("手術適応判定前画像日が最初の病勢制御確認日より前です")
 
@@ -421,7 +427,7 @@ def build_data(parsed_labs):
     return {
         "local_subject_code": text(local_subject_code),
         "consent_date": date_str(consent_date),
-        "birth_date": date_str(birth_date),
+        "birth_year_month": birth_date.strftime("%Y-%m") if birth_date else "",
         "age_at_consent": age,
         "sex": sex,
         "height_cm": height,
@@ -506,7 +512,7 @@ if st.button("📨 中央MDT審査を申請", type="primary", use_container_widt
     data = build_data(parsed_labs)
     submission_id = str(uuid.uuid4())
     screening_payload = {
-        "schema_version": "2026-09-14-v2.1",
+        "schema_version": "2026-09-14-v2.2.2",
         "study_code": "JUOG_UTUC_Consolidative",
         "crf_type": "mdt_screening",
         "record_key": f"{facility_code}|{text(local_subject_code)}|mdt_screening",
@@ -521,7 +527,7 @@ if st.button("📨 中央MDT審査を申請", type="primary", use_container_widt
         "data": data,
     }
     # First persist the screening workflow record in the central registry.
-    # Only the minimum enrollment-control data are stored there; detailed CRF data remain in the coded email report.
+    # The workflow summary and a full append-only CRF snapshot are stored in the central Google Sheet.
     reg_result = registry_call(
         "submit_screening",
         {
@@ -538,6 +544,7 @@ if st.button("📨 中央MDT審査を申請", type="primary", use_container_widt
             "site_recist": central_recist,
             "planned_surgery": planned_surgery,
             "planned_surgery_date": date_str(surgery_date),
+            "crf_payload": screening_payload,
         },
     )
     if not reg_result.get("ok"):

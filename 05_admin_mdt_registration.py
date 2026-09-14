@@ -5,6 +5,13 @@ import streamlit as st
 
 from juog_common import date_str, registry_call, send_email, text, today_jst
 
+ROLE_LABELS = {
+    "radiology": "放射線診断専門医",
+    "medical_oncology": "腫瘍内科専門医",
+    "urology": "泌尿器科専門医",
+}
+DECISION_JP = {"ELIGIBLE": "適格", "INELIGIBLE": "不適格", "HOLD": "保留"}
+
 st.markdown(
     """
     <style>
@@ -17,8 +24,8 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("JUOG 事務局専用：中央MDT判定・正式登録")
-st.caption("施設から提出された中央MDT審査申請の判定を記録し、適格例のみJUOG登録番号を発行します。")
+st.title("JUOG 事務局専用：中央MDT集約・正式登録")
+st.caption("3名の独立判定を集約し、中央MDTの合意を確認した後、適格例のみJUOG登録番号を発行します。")
 
 
 def admin_authenticated() -> bool:
@@ -29,7 +36,6 @@ def admin_authenticated() -> bool:
     except Exception:
         st.error("事務局認証が設定されていません。Streamlit Secrets に [admin] password を設定してください。")
         return False
-
     with st.form("admin_login"):
         password = st.text_input("事務局パスワード", type="password")
         submitted = st.form_submit_button("ログイン", type="primary", use_container_width=True)
@@ -59,38 +65,36 @@ if not stats.get("ok"):
 m1, m2, m3, m4 = st.columns(4)
 m1.metric("正式登録", f"{stats.get('total', 0)} / 42")
 m2.metric("cN1", f"{stats.get('cN1', 0)} / 20")
-m3.metric("SD", f"{stats.get('SD', 0)} / 12")
+m3.metric("EVP最良効果 SD", f"{stats.get('SD', 0)} / 12")
 scr_stats = stats.get("screenings") or {}
-m4.metric("MDT未判定/保留", int(scr_stats.get("PENDING", 0)) + int(scr_stats.get("HOLD", 0)))
+m4.metric("MDT審査中/保留", int(scr_stats.get("PENDING", 0)) + int(scr_stats.get("HOLD", 0)))
 
-st.header("1. 審査対象の選択")
+st.header("1. 症例の選択")
 status_label = st.radio(
-    "表示する症例",
-    ["未判定・保留", "未判定のみ", "保留のみ", "不適格", "登録済み", "すべて"],
+    "表示",
+    ["審査中", "保留", "不適格", "登録済み", "すべて"],
     horizontal=True,
 )
 status_map = {
-    "未判定・保留": "PENDING,HOLD",
-    "未判定のみ": "PENDING",
-    "保留のみ": "HOLD",
+    "審査中": "PENDING",
+    "保留": "HOLD",
     "不適格": "INELIGIBLE",
     "登録済み": "REGISTERED",
     "すべて": "PENDING,HOLD,INELIGIBLE,REGISTERED",
 }
 list_result = registry_call("list_screenings", {"statuses": status_map[status_label]})
 if not list_result.get("ok"):
-    st.error("審査対象一覧を取得できませんでした。")
+    st.error("症例一覧を取得できませんでした。")
     st.code(list_result.get("message") or list_result.get("error") or "unknown error")
     st.stop()
 
 rows = list_result.get("screenings") or []
 if not rows:
-    st.info("該当する中央MDT審査申請はありません。")
+    st.info("該当症例はありません。")
     st.stop()
 
-status_jp = {"PENDING": "未判定", "HOLD": "保留", "INELIGIBLE": "不適格", "REGISTERED": "登録済み"}
-options = []
-row_by_label = {}
+status_jp = {"PENDING": "審査中", "HOLD": "保留", "INELIGIBLE": "不適格", "REGISTERED": "登録済み"}
+options, row_by_label = [], {}
 for r in rows:
     label = (
         f"{r.get('screening_id','')}｜{status_jp.get(r.get('status',''), r.get('status',''))}｜"
@@ -100,104 +104,157 @@ for r in rows:
     options.append(label)
     row_by_label[label] = r
 
-selected_label = st.selectbox("MDT審査受付番号 / 症例", options)
-selected = row_by_label[selected_label]
+selected = row_by_label[st.selectbox("MDT受付番号 / 症例", options)]
 screening_id = selected.get("screening_id", "")
-
 detail_result = registry_call("get_screening", {"screening_id": screening_id})
 if not detail_result.get("ok"):
     st.error("症例情報を取得できませんでした。")
-    st.code(detail_result.get("message") or detail_result.get("error") or "unknown error")
     st.stop()
 case = detail_result.get("screening") or {}
 
-st.header("2. 申請情報の確認")
+st.header("2. 申請情報")
 a1, a2, a3 = st.columns(3)
 a1.write(f"**MDT受付番号**  {case.get('screening_id','')}")
+a1.write(f"**審査ラウンド**  {case.get('review_round','')}")
 a1.write(f"**施設**  {case.get('facility_name','')}")
 a1.write(f"**施設内識別コード**  {case.get('local_subject_code','')}")
 a2.write(f"**診断時TNM**  {case.get('ct','')} / {case.get('cn','')} / {case.get('cm','')}")
 a2.write(f"**EVP最良総合効果**  {case.get('best_effect','')}")
-a2.write(f"**施設判定RECIST**  {case.get('site_recist','')}")
+a2.write(f"**施設RECIST**  {case.get('site_recist','')}")
 a3.write(f"**予定術式**  {case.get('planned_surgery','') or '—'}")
 a3.write(f"**手術予定日**  {case.get('planned_surgery_date','') or '—'}")
-a3.write(f"**現在の状態**  {status_jp.get(case.get('status',''), case.get('status',''))}")
-
-if case.get("status") in {"HOLD", "INELIGIBLE", "REGISTERED"}:
-    st.info(
-        f"前回MDT：{case.get('mdt_date','') or '—'} / 中央RECIST {case.get('central_recist','') or '—'} / "
-        f"判定 {case.get('mdt_decision','') or '—'}"
-        + (f" / 理由：{case.get('mdt_reason','')}" if case.get("mdt_reason") else "")
-        + (f" / 登録番号：{case.get('registration_id','')}" if case.get("registration_id") else "")
-    )
-
-st.warning("中央MDTの実際の審査は、施設から提出されたCRF・画像等の匿名化資料を確認した上で行ってください。この画面は判定記録と正式登録の管理用です。")
+a3.write(f"**状態**  {status_jp.get(case.get('status',''), case.get('status',''))}")
 
 if case.get("status") == "REGISTERED":
     st.success(f"正式登録済み：{case.get('registration_id','')}")
     st.stop()
 if case.get("status") == "INELIGIBLE":
-    st.error("この審査受付は不適格確定済みです。再審査が必要な場合は、台帳を直接変更せず研究事務局で手順を確認してください。")
+    st.info("中央MDTで不適格確定済みです。正式登録番号は発行されていません。Screening記録は監査用に保持されます。")
+    st.stop()
+if case.get("status") == "HOLD":
+    st.warning("中央MDTで保留となっています。施設から追加情報が再提出されると、同じMDT受付番号で新しい審査ラウンドが開始されます。")
     st.stop()
 
-st.header("3. 中央MDT判定")
-with st.form(f"mdt_form_{screening_id}"):
+reviews_result = registry_call("get_mdt_reviews", {"screening_id": screening_id})
+if not reviews_result.get("ok"):
+    st.error("MDT判定を取得できませんでした。")
+    st.code(reviews_result.get("message") or reviews_result.get("error") or "unknown error")
+    st.stop()
+reviews = reviews_result.get("reviews") or {}
+
+st.header("3. 3名の独立判定")
+cols = st.columns(3)
+for col, role in zip(cols, ["radiology", "medical_oncology", "urology"]):
+    review = reviews.get(role)
+    with col:
+        st.markdown(f"**{ROLE_LABELS[role]}**")
+        if not review:
+            st.warning("未提出")
+        else:
+            st.success(f"{DECISION_JP.get(review.get('decision'), review.get('decision',''))}")
+            st.caption(f"{review.get('reviewer_name','')} / version {review.get('review_version','')} / {review.get('submitted_at','')}")
+            if role == "radiology":
+                st.write(f"中央RECIST：{review.get('central_recist','')}")
+                st.write(f"他臓器浸潤：{review.get('organ_invasion','')}")
+                st.write(f"大血管浸潤：{review.get('vessel_invasion','')}")
+                st.write(f"cM1：{review.get('cm1_status','')}")
+                site_r = str(case.get("site_recist", "") or "").upper()
+                central_r = str(review.get("central_recist", "") or "").upper()
+                if site_r and central_r:
+                    if site_r == central_r:
+                        st.success(f"施設RECISTと一致：{site_r}")
+                    else:
+                        st.warning(f"RECIST判定乖離：施設 {site_r} → 中央 {central_r}")
+            elif role == "medical_oncology":
+                st.write(f"Grade 3以上AE：{review.get('g3_ae_recovered','')}")
+                st.write(f"ECOG：{review.get('ecog_0_1','')}")
+                st.write(f"内科的安全性：{review.get('medical_safety','')}")
+            else:
+                st.write(f"切除可能性：{review.get('technically_resectable','')}")
+                st.write(f"外科適応：{review.get('surgery_appropriate','')}")
+            if review.get("comment"):
+                st.write(f"コメント：{review.get('comment')}")
+
+completed = int(reviews_result.get("completed", 0))
+st.progress(completed / 3, text=f"判定提出 {completed}/3")
+if not reviews_result.get("all_complete"):
+    st.info("3名全員の判定が揃うまで、事務局の最終合意・正式登録はできません。")
+    st.stop()
+
+individual = [reviews[r].get("decision") for r in ["radiology", "medical_oncology", "urology"]]
+unanimous = len(set(individual)) == 1
+radiology_recist = reviews["radiology"].get("central_recist", "")
+if unanimous:
+    st.success(f"3名の個別判定は一致しています：{DECISION_JP.get(individual[0], individual[0])}")
+else:
+    st.warning("3名の個別判定が一致していません。中央MDTで協議し、構成委員の合意を形成してください。多数決による自動判定は行いません。")
+
+st.header("4. 中央MDT最終合意・正式登録")
+with st.form(f"final_mdt_{screening_id}_{case.get('review_round')}"):
     b1, b2 = st.columns(2)
     with b1:
-        mdt_date = st.date_input("中央MDT判定日*", value=today_jst(), max_value=today_jst())
-        central_recist = st.selectbox("中央RECIST v1.1総合判定*", ["選択してください", "CR", "PR", "SD", "PD", "NE"])
+        mdt_date = st.date_input("中央MDT最終判定日*", value=today_jst(), max_value=today_jst())
+        st.text_input("中央RECIST（放射線診断医判定）", value=radiology_recist, disabled=True)
+        site_r = str(case.get("site_recist", "") or "").upper()
+        central_r = str(radiology_recist or "").upper()
+        if site_r and central_r and site_r != central_r:
+            st.warning(f"施設判定 {site_r} と中央判定 {central_r} に乖離があります。適格性に用いるRECISTは中央判定です。")
+        elif site_r and central_r:
+            st.caption(f"施設判定と中央判定は一致（{central_r}）")
     with b2:
-        decision_jp = st.radio("本試験における手術適応判定*", ["適格（手術適応あり）", "不適格", "保留"], index=None)
-        admin_user = st.text_input("判定記録者（事務局）*")
-    reason = st.text_area("不適格・保留の理由*" if decision_jp in {"不適格", "保留"} else "備考（任意）")
-
-    is_eligible = decision_jp == "適格（手術適応あり）"
-    confirm = st.checkbox(
-        "中央MDTで『手術適応あり』と判定され、正式登録してJUOG登録番号を発行することを確認しました。",
-        disabled=not is_eligible,
+        decision_jp = st.radio("中央MDT最終合意*", ["適格（手術適応あり）", "不適格", "保留"], index=None)
+        admin_user = st.text_input("記録者（事務局）*")
+    reason = st.text_area("不適格・保留の理由*" if decision_jp in {"不適格", "保留"} else "理由/備考（任意）")
+    consensus_note = st.text_area(
+        "合意形成記録" + ("*" if (not unanimous or (decision_jp and {"適格（手術適応あり）": "ELIGIBLE", "不適格": "INELIGIBLE", "保留": "HOLD"}.get(decision_jp) != individual[0])) else "（任意）"),
+        help="個別判定が不一致だった場合や、最終合意が個別判定と異なる場合は、協議後にどのように合意したかを簡潔に記録してください。",
+    )
+    consensus_confirmed = st.checkbox("中央MDT構成委員3名の合意が得られたことを確認しました。")
+    formal_confirm = st.checkbox(
+        "適格の場合、正式登録してJUOG登録番号を発行することを確認しました。",
+        disabled=decision_jp != "適格（手術適応あり）",
     )
     submitted = st.form_submit_button(
-        "MDT判定を確定" if not is_eligible else "正式登録・JUOG登録番号を発行",
+        "正式登録・JUOG登録番号を発行" if decision_jp == "適格（手術適応あり）" else "中央MDT最終判定を確定",
         type="primary",
         use_container_width=True,
     )
 
 if submitted:
     errors = []
-    if central_recist == "選択してください":
-        errors.append("中央RECISTを選択してください")
     if decision_jp is None:
-        errors.append("MDT判定を選択してください")
+        errors.append("中央MDT最終合意を選択してください")
     if not text(admin_user):
-        errors.append("判定記録者を入力してください")
+        errors.append("記録者を入力してください")
+    if not consensus_confirmed:
+        errors.append("3名の合意確認が必要です")
+    decision_code = {"適格（手術適応あり）": "ELIGIBLE", "不適格": "INELIGIBLE", "保留": "HOLD"}.get(decision_jp)
     if decision_jp in {"不適格", "保留"} and not text(reason):
         errors.append("不適格・保留の理由を入力してください")
-    if is_eligible and central_recist not in {"CR", "PR", "SD"}:
+    if (not unanimous or (decision_code and decision_code != individual[0])) and not text(consensus_note):
+        errors.append("個別判定と最終合意が一致しないため、合意形成記録が必要です")
+    if decision_code == "ELIGIBLE" and radiology_recist not in {"CR", "PR", "SD"}:
         errors.append("適格として正式登録する場合、中央RECISTはCR/PR/SDである必要があります")
-    if is_eligible and not confirm:
-        errors.append("正式登録の確認チェックが必要です")
+    if decision_code == "ELIGIBLE" and not formal_confirm:
+        errors.append("正式登録・発番の確認チェックが必要です")
 
     if errors:
-        st.error("\n".join([f"・{x}" for x in errors]))
+        st.error("\n".join(f"・{x}" for x in errors))
     else:
-        decision_code = {
-            "適格（手術適応あり）": "ELIGIBLE",
-            "不適格": "INELIGIBLE",
-            "保留": "HOLD",
-        }[decision_jp]
         result = registry_call(
             "finalize_mdt",
             {
                 "screening_id": screening_id,
                 "mdt_date": date_str(mdt_date),
-                "central_recist": central_recist,
                 "decision": decision_code,
                 "reason": text(reason),
+                "consensus_note": text(consensus_note),
+                "consensus_confirmed": True,
                 "admin_user": text(admin_user),
             },
         )
         if not result.get("ok"):
-            st.error("MDT判定を確定できませんでした：" + (result.get("message") or result.get("error") or "unknown error"))
+            st.error("最終判定を確定できませんでした：" + (result.get("message") or result.get("error") or "unknown error"))
         else:
             reporter_email = case.get("reporter_email", "")
             if decision_code == "ELIGIBLE":
@@ -206,8 +263,8 @@ if submitted:
 MDT審査受付番号: {screening_id}
 施設: {case.get('facility_name','')}
 施設内研究対象者識別コード: {case.get('local_subject_code','')}
-中央MDT判定日: {date_str(mdt_date)}
-中央RECIST: {central_recist}
+中央MDT最終判定日: {date_str(mdt_date)}
+中央RECIST: {result.get('central_recist', radiology_recist)}
 判定: 手術適応あり（適格）
 
 正式登録番号: {registration_id}
@@ -215,11 +272,7 @@ MDT審査受付番号: {screening_id}
 
 以後の周術期・90日・定期経過CRFでは、このJUOG登録番号を使用してください。
 """
-                sent, mail_err = send_email(
-                    f"【JUOG 正式登録】【{registration_id}】【{case.get('facility_name','')}】",
-                    body,
-                    reporter_email,
-                )
+                sent, mail_err = send_email(f"【JUOG 正式登録】【{registration_id}】【{case.get('facility_name','')}】", body, reporter_email)
                 st.success(f"正式登録しました：{registration_id}")
                 if result.get("counts_after"):
                     ca = result["counts_after"]
@@ -228,28 +281,23 @@ MDT審査受付番号: {screening_id}
                     st.warning("正式登録は完了していますが、結果通知メールの送信に失敗しました。JUOG番号は再発行しないでください。")
                     st.code(mail_err or "mail error")
             else:
-                decision_text = "不適格" if decision_code == "INELIGIBLE" else "保留"
+                label = "不適格" if decision_code == "INELIGIBLE" else "保留"
                 body = f"""【JUOG UTUC_Consolidative 中央MDT結果】
 MDT審査受付番号: {screening_id}
 施設: {case.get('facility_name','')}
 施設内研究対象者識別コード: {case.get('local_subject_code','')}
-中央MDT判定日: {date_str(mdt_date)}
-中央RECIST: {central_recist}
-判定: {decision_text}
+中央MDT最終判定日: {date_str(mdt_date)}
+中央RECIST: {result.get('central_recist', radiology_recist)}
+判定: {label}
 理由: {text(reason)}
 
 JUOG正式登録番号は発行されていません。
 """
-                sent, mail_err = send_email(
-                    f"【JUOG MDT結果】【{screening_id}】【{decision_text}】",
-                    body,
-                    reporter_email,
-                )
+                sent, mail_err = send_email(f"【JUOG MDT結果】【{screening_id}】【{label}】", body, reporter_email)
                 if decision_code == "INELIGIBLE":
-                    st.success("不適格として判定を確定しました。正式登録番号は発行されていません。")
+                    st.success("不適格として確定しました。正式登録番号は発行されていません。Screening記録は保持されます。")
                 else:
-                    st.success("保留として判定を記録しました。追加情報提出後に再審査できます。")
+                    st.success("保留として確定しました。追加情報再提出後に新しい審査ラウンドで再審査できます。")
                 if not sent:
                     st.warning("判定記録は完了していますが、結果通知メールの送信に失敗しました。")
                     st.code(mail_err or "mail error")
-            st.session_state["last_admin_screening"] = screening_id

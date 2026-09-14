@@ -14,6 +14,7 @@ from juog_common import (
     render_facility,
     render_lab_panel,
     render_submission_kind,
+    save_crf_payload,
     send_email,
     text,
     today_jst,
@@ -22,6 +23,7 @@ from juog_common import (
     valid_registration_id,
     validate_lab_panel,
     validate_registry_id,
+    validate_vitals,
     window_info,
 )
 
@@ -289,6 +291,7 @@ def validate_all():
         if unrecovered_g2_relevant == "あり" and not text(st.session_state.get("peri_g2_detail", "")): missing.append("未回復AE詳細")
         if op_date and last_evp_date:
             wd = (op_date - last_evp_date).days
+            if last_evp_date > op_date: errors.append("EVP最終投与日が手術実施日より後です")
             if (wd > 56 or wd < 28) and not text(protocol_deviation_reason): missing.append("手術時期の理由/逸脱理由")
         if op_admission_date and op_date and op_admission_date > op_date: errors.append("入院日が手術日より後です")
         if op_discharge_date and op_date and op_discharge_date < op_date: errors.append("退院日が手術日より前です")
@@ -319,6 +322,8 @@ def validate_all():
     if surgery_performed == "実施した":
         for v, label in [(day0_sbp, "Day0収縮期血圧"), (day0_dbp, "Day0拡張期血圧"), (day0_pulse, "Day0脈拍"), (day0_temp, "Day0体温"), (inpatient_sbp, "入院中収縮期血圧"), (inpatient_dbp, "入院中拡張期血圧"), (inpatient_pulse, "入院中脈拍"), (inpatient_temp, "入院中体温")]:
             if v is None: missing.append(label)
+        errors.extend(validate_vitals(day0_sbp, day0_dbp, day0_pulse, day0_temp, "Day0バイタル"))
+        errors.extend(validate_vitals(inpatient_sbp, inpatient_dbp, inpatient_pulse, inpatient_temp, "入院中バイタル"))
 
     if visit_date_30 is None: missing.append("30日評価日")
     if reference_date and visit_date_30:
@@ -359,7 +364,8 @@ def validate_all():
     else:
         if death_date is None: missing.append("死亡日")
         if death_cause == "選択してください": missing.append("死因")
-        if death_date and reference_date and death_date < reference_date: errors.append("死亡日が手術/予定日より前です")
+        if surgery_performed == "実施した" and death_date and op_date and death_date < op_date:
+            errors.append("死亡日が手術実施日より前です")
 
     return unique_messages(missing), unique_messages(errors), unique_messages(warnings), inpatient_parsed, day30_parsed
 
@@ -467,14 +473,18 @@ pCR: {'はい' if path.get('pcr') else 'いいえ/N/A'}
 
 {json_block(payload)}
 """
-            sent, send_err = send_email(f"【JUOG CRF】【perioperative_30d】【{registration_id}】", report, reporter_email)
-            if sent:
-                st.session_state.peri_sent = True
-                st.success("確定送信しました。")
-                st.balloons()
-                if warnings:
-                    st.warning("確認事項もJSON内に保存されています。")
-                st.rerun()
+            save_result = save_crf_payload(payload)
+            if not save_result.get("ok"):
+                st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
             else:
-                st.error("メール送信に失敗しました。データは送信されていません。事務局へ連絡してください。")
-                print(f"[JUOG perioperative] email failed: {send_err}")
+                st.session_state.peri_sent = True
+                sent, send_err = send_email(f"【JUOG CRF】【perioperative_30d】【{registration_id}】", report, reporter_email)
+                st.success(f"確定保存しました（version {save_result.get('record_version', '')}）。")
+                if warnings:
+                    st.warning("確認事項も中央データに保存されています。")
+                if not sent:
+                    st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
+                    print(f"[JUOG perioperative] email failed: {send_err}")
+                else:
+                    st.balloons()
+                    st.rerun()
