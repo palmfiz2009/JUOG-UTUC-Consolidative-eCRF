@@ -107,7 +107,10 @@ q1.write(f"**施設**：{case.get('facility_name','')}")
 q1.write(f"**施設内識別コード**：{case.get('local_subject_code','')}")
 q2.write(f"**診断時TNM**：{case.get('ct','')} / {case.get('cn','')} / {case.get('cm','')}")
 q2.write(f"**EVP最良総合効果**：{case.get('best_effect','')}")
-q3.write(f"**施設RECIST**：{case.get('site_recist','')}")
+if role == "radiology":
+    q3.write("**RECIST**：中央で独立判定")
+else:
+    q3.write(f"**施設RECIST**：{case.get('site_recist','')}")
 q3.write(f"**予定術式**：{case.get('planned_surgery','') or '—'}")
 
 st.header("2. 申請情報")
@@ -125,11 +128,14 @@ with st.expander("患者背景・EVP・画像情報を確認", expanded=True):
         st.write(f"Grade 3以上未回復AE：{data.get('g3_unrecovered_ae','')}")
     with x2:
         st.write(f"直近画像日：{data.get('preop_imaging_date','')}")
-        st.write(f"施設RECIST：{data.get('site_recist','')}")
+        if role == "radiology":
+            st.caption("施設RECIST・施設側の浸潤判定は、中央放射線診断の独立性を保つため判定提出前は表示しません。")
+        else:
+            st.write(f"施設RECIST：{data.get('site_recist','')}")
+            st.write(f"他臓器浸潤：{data.get('unresectable_organ','')}")
+            st.write(f"大血管浸潤：{data.get('unresectable_vessel','')}")
         st.write(f"新病変：{data.get('new_lesion','')}")
         st.write(f"非標的病変増悪：{data.get('nontarget_pd','')}")
-        st.write(f"他臓器浸潤：{data.get('unresectable_organ','')}")
-        st.write(f"大血管浸潤：{data.get('unresectable_vessel','')}")
         st.write(f"cM1根拠：{data.get('cm1_basis','') or 'N/A'}")
         st.write(f"cNED確認日：{data.get('cned_date','') or 'N/A'}")
         st.write(f"予定術式・予定日：{data.get('planned_surgery','')} / {data.get('planned_surgery_date','')}")
@@ -138,14 +144,20 @@ with st.expander("患者背景・EVP・画像情報を確認", expanded=True):
         st.write("**標的病変**")
         st.dataframe(lesions, use_container_width=True, hide_index=True)
 
-own_result = registry_call(
-    "get_own_review",
-    {"screening_id": screening_id, "review_round": review_round, "reviewer_role": role},
-)
-if not own_result.get("ok"):
-    st.error("自分の判定履歴を取得できませんでした。")
-    st.stop()
-prior = own_result.get("review")
+# An unreviewed case is already identified by list_review_cases, so avoid an
+# unnecessary extra round-trip to Google Apps Script. Fetch prior details only
+# when this reviewer has actually submitted a review for the current round.
+prior = None
+if case.get("review_submitted"):
+    own_result = registry_call(
+        "get_own_review",
+        {"screening_id": screening_id, "review_round": review_round, "reviewer_role": role},
+    )
+    if not own_result.get("ok"):
+        st.error("自分の判定履歴を取得できませんでした。")
+        st.code(own_result.get("message") or own_result.get("error") or "unknown error")
+        st.stop()
+    prior = own_result.get("review")
 
 if prior:
     st.info(

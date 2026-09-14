@@ -405,16 +405,30 @@ def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
         headers={"Content-Type": "application/json"},
         method="POST",
     )
-    try:
-        ctx = ssl.create_default_context()
-        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as res:
-            text_body = res.read().decode("utf-8")
-        data = json.loads(text_body)
-        return data if isinstance(data, dict) else {"ok": False, "error": "INVALID_RESPONSE"}
-    except urllib.error.HTTPError as exc:
-        return {"ok": False, "error": f"HTTP_{exc.code}"}
-    except Exception as exc:
-        return {"ok": False, "error": f"REGISTRY_ERROR:{exc}"}
+    # Google Apps Script ContentService may transiently fail while resolving its
+    # one-time redirect URL. Retry a small number of times from the canonical
+    # /exec endpoint; persistent configuration errors still surface unchanged.
+    import time
+    retryable_http = {404, 408, 429, 500, 502, 503, 504}
+    last_error = None
+    for attempt in range(3):
+        try:
+            ctx = ssl.create_default_context()
+            with urllib.request.urlopen(req, timeout=timeout, context=ctx) as res:
+                text_body = res.read().decode("utf-8")
+            data = json.loads(text_body)
+            return data if isinstance(data, dict) else {"ok": False, "error": "INVALID_RESPONSE"}
+        except urllib.error.HTTPError as exc:
+            last_error = {"ok": False, "error": f"HTTP_{exc.code}"}
+            if exc.code not in retryable_http or attempt == 2:
+                return last_error
+            time.sleep(0.6 * (attempt + 1))
+        except Exception as exc:
+            last_error = {"ok": False, "error": f"REGISTRY_ERROR:{exc}"}
+            if attempt == 2:
+                return last_error
+            time.sleep(0.6 * (attempt + 1))
+    return last_error or {"ok": False, "error": "REGISTRY_ERROR:UNKNOWN"}
 
 
 
