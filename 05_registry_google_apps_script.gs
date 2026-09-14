@@ -1,5 +1,5 @@
 /**
- * JUOG UTUC_Consolidative central eCRF service (v2.2.6)
+ * JUOG UTUC_Consolidative central eCRF service (v2.2.7)
  * Google Apps Script Web App bound to a dedicated Google Sheet.
  *
  * Workflow:
@@ -23,6 +23,7 @@ const CRF_FOLLOWUP_SHEET = 'CRF_Followup';
 const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
+const BACKEND_VERSION = 'v2.2.7';
 
 const REVIEWER_ROLES = ['radiology', 'medical_oncology', 'urology'];
 
@@ -149,6 +150,7 @@ function doPost(e) {
     if (action === 'finalize_mdt') return jsonResponse_(finalizeMdt_(payload));
     if (action === 'save_crf') return jsonResponse_(saveCrf_(payload));
     if (action === 'validate') return jsonResponse_(validateSubject_(payload));
+    if (action === 'backend_info') return jsonResponse_(getBackendInfo_());
     if (action === 'stats') return jsonResponse_(getStats_());
     if (action === 'register') return jsonResponse_(legacyRegister_(payload));
 
@@ -754,6 +756,21 @@ function validateSubject_(p) {
     }
   }
   return {ok: false, error: 'ID_NOT_FOUND', message: '中央登録台帳に存在しないJUOG登録番号です'};
+}
+
+function getBackendInfo_() {
+  const ss = getSpreadsheet_();
+  const sheetName = String(ss.getName() || '');
+  const environment = /(^|[^A-Z])TEST([^A-Z]|$)/i.test(sheetName) || /TEST/i.test(sheetName)
+    ? 'TEST'
+    : 'PRODUCTION';
+  return {
+    ok: true,
+    backend_version: BACKEND_VERSION,
+    environment: environment,
+    spreadsheet_name: sheetName,
+    server_time: Utilities.formatDate(new Date(), TIMEZONE, "yyyy-MM-dd'T'HH:mm:ssXXX")
+  };
 }
 
 function getStats_() {
