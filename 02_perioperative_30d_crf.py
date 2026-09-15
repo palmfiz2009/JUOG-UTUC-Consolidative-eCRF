@@ -7,12 +7,12 @@ import streamlit as st
 from juog_common import (
     CD_MAJOR,
     CD_OPTIONS,
+    LAB_FIELDS,
     POSTOP_TREATMENT_OPTIONS,
     date_str,
     json_block,
     make_submission_metadata,
     render_facility,
-    render_lab_panel,
     render_submission_kind,
     save_crf_payload,
     send_email,
@@ -36,14 +36,59 @@ label {font-weight:600!important;color:#334155!important;}
 </style>
 """, unsafe_allow_html=True)
 
+def render_optional_lab_panel(prefix: str, disabled=False, columns=3):
+    """Optional routine-care labs: measured values only; unmeasured items stay blank."""
+    st.caption("数値を入力してください。未測定・欠測の項目は空欄で構いません。0 は実測値として保存されます。")
+    cols = st.columns(columns)
+    out = {}
+    for i, (key, label, unit) in enumerate(LAB_FIELDS):
+        session_key = f"{prefix}_{key}"
+        if session_key not in st.session_state:
+            st.session_state[session_key] = ""
+        out[key] = cols[i % columns].text_input(
+            f"{label} ({unit})",
+            value=st.session_state[session_key],
+            key=f"widget_{session_key}",
+            disabled=disabled,
+        )
+        st.session_state[session_key] = out[key]
+    return out
+
+
+def validate_optional_lab_panel(raw_values: dict):
+    """Reuse numeric/range checks while treating blank/NA as ordinary missingness."""
+    parsed, errors, _warnings = validate_lab_panel(raw_values, required=False)
+    clean_errors = [
+        x.replace("数値またはNAで入力してください", "数値で入力してください（未測定・欠測は空欄）")
+        for x in errors
+    ]
+    return parsed, clean_errors
+
+
 st.title("JUOG UTUC_Consolidative 周術期・術後30日CRF")
 st.caption("主要評価項目の手術関連合併症は『手術終了時〜術後30日目』で判定します。30日訪問自体は30日±14日を許容します。")
 
 if "peri_sent" not in st.session_state:
     st.session_state.peri_sent = False
-L = st.session_state.peri_sent
-if L:
-    st.info("このセッションでは送信済みです。訂正が必要な場合はページを再読み込みし『訂正報告』として送信してください。")
+
+if st.session_state.peri_sent:
+    sent_id = st.session_state.get("peri_sent_registration_id", "")
+    sent_version = st.session_state.get("peri_sent_version", "")
+    st.success("送信が完了しました。")
+    if sent_id:
+        st.write(f"**JUOG登録番号：{sent_id}**")
+    if sent_version:
+        st.caption(f"周術期・術後30日CRFを保存しました（version {sent_version}）。")
+    else:
+        st.caption("周術期・術後30日CRFを保存しました。")
+    if st.session_state.get("peri_sent_had_warnings"):
+        st.info("確認事項も中央データに保存されています。")
+    if st.session_state.get("peri_sent_email_failed"):
+        st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
+    st.caption("訂正する場合はページを再読み込みし、「訂正報告」を選択して送信してください。")
+    st.stop()
+
+L = False
 
 # ---------------- basic ----------------
 st.markdown('<div class="juog-header">1. 基本情報</div>', unsafe_allow_html=True)
@@ -288,8 +333,7 @@ if surgery_performed == "実施した":
         )
         if discharge_lab_available == "あり":
             discharge_lab_date = st.date_input("採血日*", value=None, disabled=L)
-            st.caption("測定された項目のみ入力してください。未測定項目は空欄で構いません。")
-            discharge_labs_raw = render_lab_panel("peri_discharge_lab", required=False, disabled=L, columns=3)
+            discharge_labs_raw = render_optional_lab_panel("peri_discharge_lab", disabled=L, columns=3)
     elif initial_hospital_outcome == "入院継続中":
         st.caption("入院継続中のため、退院時バイタル・退院前採血は未入力で構いません。")
     elif initial_hospital_outcome == "初回入院中に死亡":
@@ -406,8 +450,7 @@ day30_lab_date = None
 day30_labs_raw = {}
 if day30_lab_available == "あり":
     day30_lab_date = st.date_input("30日評価に用いた採血日*", value=None, disabled=L)
-    st.caption("実際に測定された項目のみ入力してください。未測定項目は空欄で構いません。")
-    day30_labs_raw = render_lab_panel("peri_day30_lab", required=False, disabled=L, columns=3)
+    day30_labs_raw = render_optional_lab_panel("peri_day30_lab", disabled=L, columns=3)
 
 cd_grade = "N/A"
 cd_date = None
@@ -558,11 +601,8 @@ def validate_all():
         if no_op_reason == "選択してください": missing.append("手術未施行理由")
         if no_op_reason == "その他" and not text(st.session_state.get("peri_noop_other", "")): missing.append("手術未施行理由その他詳細")
 
-    discharge_labs_parsed, discharge_labs_errors, discharge_labs_warn = validate_lab_panel(
-        discharge_labs_raw, required=False
-    )
+    discharge_labs_parsed, discharge_labs_errors = validate_optional_lab_panel(discharge_labs_raw)
     errors.extend([f"退院前最終採血：{x}" for x in discharge_labs_errors])
-    warnings.extend([f"退院前最終採血：{x}" for x in discharge_labs_warn])
     if surgery_performed == "実施した":
         for v, label in [
             (day0_sbp, "術後管理場所到着時 収縮期血圧"),
@@ -605,9 +645,8 @@ def validate_all():
             if not text(window_deviation_reason): missing.append("30日評価時期の逸脱理由")
             warnings.append("30日評価日が30日±14日の範囲外です")
 
-    day30_parsed, day30_errors, day30_warn = validate_lab_panel(day30_labs_raw, required=False)
+    day30_parsed, day30_errors = validate_optional_lab_panel(day30_labs_raw)
     errors.extend([f"30日血液検査：{x}" for x in day30_errors])
-    warnings.extend([f"30日血液検査：{x}" for x in day30_warn])
     if day30_lab_available is None:
         missing.append("30日評価期間内の採血有無")
     elif day30_lab_available == "あり":
@@ -644,10 +683,21 @@ def validate_all():
 
     if status_alive is None: missing.append("生存状況")
     elif status_alive == "生存":
-        if final_visit_date is None: missing.append("最終生存確認日")
-        if cd_grade == "Grade V": errors.append("CD Grade Vですが生存状況が『生存』です")
+        if final_visit_date is None:
+            missing.append("最終生存確認日")
+        else:
+            if final_visit_date > today_jst():
+                errors.append("最終生存確認日が未来日です")
+            if visit_date_30 and final_visit_date < visit_date_30:
+                warnings.append("最終生存確認日が30日評価日より前です。30日評価時に生存確認している場合は評価日を入力してください")
+        if cd_grade == "Grade V":
+            errors.append("CD Grade Vですが生存状況が『生存』です")
     else:
-        if death_date is None: missing.append("死亡日")
+        if death_date is None:
+            missing.append("死亡日")
+        else:
+            if death_date > today_jst():
+                errors.append("死亡日が未来日です")
         if death_cause == "選択してください": missing.append("死因")
         if surgery_performed == "実施した" and death_date and op_date and death_date < op_date:
             errors.append("死亡日が手術実施日より前です")
@@ -795,14 +845,16 @@ ypT0N0: {'はい' if path.get('pcr_ypt0n0') else 'いいえ/N/A'}
             if not save_result.get("ok"):
                 st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
             else:
+                sent, send_err = send_email(
+                    f"【JUOG CRF】【perioperative_30d】【{registration_id}】",
+                    report,
+                    reporter_email,
+                )
                 st.session_state.peri_sent = True
-                sent, send_err = send_email(f"【JUOG CRF】【perioperative_30d】【{registration_id}】", report, reporter_email)
-                st.success(f"確定保存しました（version {save_result.get('record_version', '')}）。")
-                if warnings:
-                    st.warning("確認事項も中央データに保存されています。")
+                st.session_state.peri_sent_registration_id = registration_id
+                st.session_state.peri_sent_version = str(save_result.get("record_version", "") or "")
+                st.session_state.peri_sent_had_warnings = bool(warnings)
+                st.session_state.peri_sent_email_failed = not sent
                 if not sent:
-                    st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
                     print(f"[JUOG perioperative] email failed: {send_err}")
-                else:
-                    st.balloons()
-                    st.rerun()
+                st.rerun()

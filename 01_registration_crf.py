@@ -47,11 +47,19 @@ RECIST_HELP = """RECIST v1.1 補助計算：CT等の非リンパ節標的病変�
 
 if "screening_sent" not in st.session_state:
     st.session_state.screening_sent = False
-L = st.session_state.screening_sent
-if L:
+
+if st.session_state.screening_sent:
     sid = st.session_state.get("screening_id", "")
-    suffix = f"（受付番号: {sid}）" if sid else ""
-    st.info(f"このセッションでは中央MDT審査申請を送信済みです{suffix}。訂正する場合はページを再読み込みして再入力してください。")
+    st.success("中央MDT審査申請を送信しました。")
+    if sid:
+        st.write(f"**MDT審査受付番号：{sid}**")
+    st.caption("正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。")
+    if st.session_state.get("screening_email_failed"):
+        st.warning("中央台帳への保存は完了していますが、通知メール送信に失敗しました。再申請はせず事務局へ連絡してください。")
+    st.caption("訂正が必要な場合はページを再読み込みして再入力してください。")
+    st.stop()
+
+L = False
 
 # -------------------- 1. Basic / screening --------------------
 st.header("1. 患者背景・スクリーニング")
@@ -161,35 +169,6 @@ with e1:
     reduction_detail = st.text_area("EV減量の詳細*" if reduction == "あり" else "EV減量の詳細", disabled=L)
     pembro_stop = st.radio("irAE等によるPembro中止の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
     pembro_stop_detail = st.text_area("Pembro中止の詳細*" if pembro_stop == "あり" else "Pembro中止の詳細", disabled=L)
-
-    important_ae_options = [
-        "なし",
-        "間質性肺炎/肺障害",
-        "心筋炎/心膜炎",
-        "1型糖尿病（劇症1型糖尿病を含む）",
-        "副腎不全",
-        "下垂体炎/下垂体機能低下",
-        "甲状腺機能異常",
-        "肝炎",
-        "大腸炎/重度下痢",
-        "腎炎",
-        "重症筋無力症/筋炎/その他神経系irAE",
-        "重症皮膚障害",
-        "EV関連末梢神経障害",
-        "EV関連皮膚障害",
-        "その他",
-    ]
-    important_ae = st.multiselect(
-        "中央MDTで共有すべきEVP関連重要AE / irAE（既往・回復済みを含む）*",
-        important_ae_options,
-        disabled=L,
-        help="中央MDTの周術期安全性評価に必要な重要AEを共有します。現在未回復のGrade 3以上AEは下の選択・除外基準で別途判定します。",
-    )
-    important_ae_detail = st.text_area(
-        "重要AE / irAEの詳細（Grade、発症時期、治療、現在の回復状況）*" if important_ae and important_ae != ["なし"] else "重要AE / irAEの詳細",
-        disabled=L,
-        help="例：免疫関連肺障害 Grade 2、2025/11発症、PSLで改善し現在Grade 0。劇症1型糖尿病、インスリン導入後コントロール中、など。",
-    )
 with e2:
     best_effect = st.selectbox("EVP最良総合効果*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
     first_control_date = st.date_input("最初にCR/PR/SDが確認された画像検査日*", value=None, disabled=L)
@@ -365,12 +344,6 @@ def collect_validation():
     if reduction == "あり" and not text(reduction_detail): missing.append("EV減量の詳細")
     if pembro_stop is None: missing.append("Pembro中止の有無")
     if pembro_stop == "あり" and not text(pembro_stop_detail): missing.append("Pembro中止の詳細")
-    if not important_ae:
-        missing.append("中央MDT共有用の重要AE / irAE")
-    elif "なし" in important_ae and len(important_ae) > 1:
-        errors.append("重要AE / irAEで『なし』と他の項目を同時に選択できません")
-    elif important_ae != ["なし"] and not text(important_ae_detail):
-        missing.append("重要AE / irAEの詳細")
     if best_effect == "選択してください": missing.append("EVP最良総合効果")
     if first_control_date is None: missing.append("最初のCR/PR/SD確認日")
     if central_recist == "選択してください": missing.append("施設判定RECIST総合判定")
@@ -502,8 +475,6 @@ def build_data(parsed_labs):
         "ev_reduction_detail": text(reduction_detail),
         "pembro_stop": pembro_stop,
         "pembro_stop_detail": text(pembro_stop_detail),
-        "important_ae_irAE": important_ae,
-        "important_ae_irAE_detail": text(important_ae_detail),
         "best_effect": best_effect,
         "first_disease_control_date": date_str(first_control_date),
         "preop_imaging_date": date_str(preop_imaging_date),
@@ -532,14 +503,33 @@ missing, errors, ineligible, warnings, parsed_labs = collect_validation()
 eligible_candidate = not missing and not errors and not ineligible
 
 st.header("5. 中央MDT審査申請")
-if missing:
-    st.warning("未入力：" + " / ".join(missing))
-if errors:
-    st.error("入力エラー：\n" + "\n".join([f"・{x}" for x in errors]))
-if ineligible:
-    st.error("適格基準上の確認事項：\n" + "\n".join([f"・{x}" for x in ineligible]))
-if warnings:
-    st.info("確認事項：\n" + "\n".join([f"・{x}" for x in warnings]))
+if missing or errors or ineligible or warnings:
+    summary_parts = []
+    if missing:
+        summary_parts.append(f"未入力 {len(missing)}項目")
+    if errors:
+        summary_parts.append(f"エラー {len(errors)}件")
+    if ineligible:
+        summary_parts.append(f"適格性確認 {len(ineligible)}件")
+    if warnings:
+        summary_parts.append(f"確認事項 {len(warnings)}件")
+    st.caption("入力状況：" + " / ".join(summary_parts))
+    with st.expander("入力状況の詳細を確認"):
+        if missing:
+            st.write("**未入力**")
+            st.write(" / ".join(missing))
+        if errors:
+            st.write("**入力エラー**")
+            for x in errors:
+                st.write(f"・{x}")
+        if ineligible:
+            st.write("**適格基準上の確認事項**")
+            for x in ineligible:
+                st.write(f"・{x}")
+        if warnings:
+            st.write("**確認事項**")
+            for x in warnings:
+                st.write(f"・{x}")
 
 if eligible_candidate:
     st.success("入力内容は中央MDT審査へ提出可能です。")
@@ -614,17 +604,9 @@ EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
             report,
             reporter_email,
         )
-        if sent:
-            st.session_state.screening_sent = True
-            st.session_state.screening_id = screening_id
-            st.success(
-                f"中央MDT審査申請を受け付けました（受付番号: {screening_id}）。"
-                "正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。"
-            )
-            st.rerun()
-        else:
-            st.error(
-                f"中央台帳には受付済みです（受付番号: {screening_id}）が、通知メール送信に失敗しました。"
-                "再送のため研究事務局へ連絡してください。二重申請を避けるため、まず受付番号を控えてください。"
-            )
+        st.session_state.screening_sent = True
+        st.session_state.screening_id = screening_id
+        st.session_state.screening_email_failed = not sent
+        if not sent:
             print(f"[JUOG MDT screening] email failed: {err}")
+        st.rerun()
