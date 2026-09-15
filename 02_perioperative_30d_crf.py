@@ -54,12 +54,19 @@ with b1:
     reporter_email = st.text_input("担当者メールアドレス*", disabled=L)
 with b2:
     submission_kind, correction_reason = render_submission_kind("peri", disabled=L)
-    surgery_performed = st.radio("Consolidative surgeryの実施*", ["実施した", "実施しなかった"], index=None, horizontal=True, disabled=L)
-    planned_or_reference_date = st.date_input("手術日（未施行例は予定日）*", value=None, disabled=L)
+    surgery_performed = st.radio(
+        "Consolidative surgeryの実施*",
+        ["実施した", "実施しなかった"],
+        index=None,
+        horizontal=True,
+        disabled=L,
+    )
 
 # ---------------- perioperative ----------------
 st.markdown('<div class="juog-header">2. 手術・入院経過</div>', unsafe_allow_html=True)
-last_evp_date = st.date_input("EVP最終投与日*", value=None, disabled=L)
+
+last_evp_date = None
+planned_or_reference_date = None
 protocol_deviation_reason = ""
 
 op_admission_date = op_date = op_discharge_date = None
@@ -69,6 +76,7 @@ readmission_date = None
 readmission_reason = ""
 readmission_day30_status = None
 readmission_discharge_date = None
+
 op_type = op_completed = None
 approaches = []
 approach_pattern = ""
@@ -81,48 +89,69 @@ ln_dissection = None
 ln_range = []
 unrecovered_g2_relevant = None
 
+no_op_reason = "選択してください"
+
+day0_sbp = day0_dbp = day0_pulse = day0_temp = None
+discharge_sbp = discharge_dbp = discharge_pulse = discharge_temp = None
+discharge_lab_available = None
+discharge_lab_date = None
+discharge_labs_raw = {}
+
 if surgery_performed == "実施した":
-    c1, c2 = st.columns(2)
-    with c1:
+    st.markdown("#### 手術情報")
+    d1, d2, d3 = st.columns(3)
+    with d1:
+        last_evp_date = st.date_input("EVP最終投与日*", value=None, disabled=L)
+    with d2:
         op_admission_date = st.date_input("入院日*", value=None, disabled=L)
-        op_date = st.date_input("手術実施日*", value=planned_or_reference_date, disabled=L)
-        initial_hospital_outcome = st.radio(
-            "初回手術入院の転帰*",
-            ["退院済み", "初回入院継続中", "初回入院中に死亡"],
-            index=None,
+    with d3:
+        op_date = st.date_input("手術実施日*", value=None, disabled=L)
+    planned_or_reference_date = op_date
+
+    s1, s2 = st.columns(2)
+    with s1:
+        op_type = st.selectbox(
+            "術式*",
+            ["選択してください", "根治的腎尿管全摘除術", "尿管部分切除術", "その他（プロトコル逸脱）"],
             disabled=L,
-            help="30日CRF入力時点での初回手術入院の転帰を選択してください。",
         )
-        if initial_hospital_outcome == "退院済み":
-            op_discharge_date = st.date_input("初回退院日*", value=None, disabled=L)
-        op_type = st.selectbox("術式*", ["選択してください", "根治的腎尿管全摘除術", "尿管部分切除術", "その他（プロトコル逸脱）"], disabled=L)
         if op_type == "その他（プロトコル逸脱）":
             st.text_input("実施術式の詳細*", key="peri_op_other", disabled=L)
+
         approaches = st.multiselect(
-            "実際に使用したアプローチ*",
+            "実際の手術アプローチ*",
             ["開腹", "腹腔鏡", "ロボット支援"],
             disabled=L,
-            help="複数のアプローチを予定して併用した場合は、使用したものをすべて選択してください。",
+            help="使用したアプローチをすべて選択してください。例：腎側を腹腔鏡、尿管膀胱処理を開腹で行った場合は「腹腔鏡」「開腹」の両方を選択します。",
         )
         if len(approaches) >= 2:
             approach_pattern = st.radio(
-                "複数アプローチとなった理由*",
+                "複数アプローチの扱い*",
                 ["予定されたハイブリッド", "予定外のアプローチ変更（conversion）"],
                 index=None,
                 horizontal=True,
                 disabled=L,
-                help="例：腎側を腹腔鏡、下部尿管・膀胱袖を開腹で予定して実施した場合は「予定されたハイブリッド」です。",
+                help="予定どおり複数アプローチを併用した場合は「予定されたハイブリッド」。術中判断で予定外に変更した場合はconversionです。",
             )
             if approach_pattern == "予定外のアプローチ変更（conversion）":
                 conversion_reason = st.text_area("conversionの理由*", disabled=L)
         elif len(approaches) == 1:
             approach_pattern = "単一アプローチ"
-        op_completed = st.radio("予定した原発巣切除を完遂*", ["はい", "いいえ"], index=None, horizontal=True, disabled=L)
+
+        op_completed = st.radio(
+            "予定した原発巣切除を完遂*",
+            ["はい", "いいえ"],
+            index=None,
+            horizontal=True,
+            disabled=L,
+        )
         if op_completed == "いいえ":
             op_incomplete_detail = st.text_area("完遂不能理由*", disabled=L)
-    with c2:
+
+    with s2:
         op_time = st.number_input("手術時間 (分)*", min_value=0, value=None, step=1, disabled=L)
         bleeding = st.number_input("出血量 (mL)*", min_value=0, value=None, step=1, disabled=L)
+
         eau_grade = st.selectbox(
             "術中合併症 (EAUiaiC)*",
             ["選択してください", "Grade 0", "Grade 1", "Grade 2", "Grade 3", "Grade 4A", "Grade 4B", "Grade 5A", "Grade 5B"],
@@ -130,119 +159,158 @@ if surgery_performed == "実施した":
             help=(
                 "EAU Intraoperative Adverse Incident Classification。\n"
                 "Grade 0：予定手順からの逸脱なし。\n"
-                "Grade 1：軽微な追加・代替処置を要するが、臓器切除や後遺症を伴わない。\n"
+                "Grade 1：軽微な追加・代替処置。\n"
                 "Grade 2：主要な追加・代替処置を要するが、直ちに生命を脅かさない。\n"
                 "Grade 3：主要な追加・代替処置を要し、直ちに生命を脅かす。\n"
-                "Grade 4A：重大事象により臓器の一部または全摘出を要する。\n"
+                "Grade 4A：臓器の一部または全摘出を要する重大事象。\n"
                 "Grade 4B：予定手術を完了できない、または予定外のストーマ等を要する。\n"
                 "Grade 5A：部位・側・患者間違い、または同意のない手術。\n"
                 "Grade 5B：術中死亡。"
             ),
         )
         if eau_grade not in ["選択してください", "Grade 0"]:
-            eau_detail = st.text_area("術中合併症詳細*", disabled=L)
-        ln_dissection = st.radio("リンパ節郭清*", ["実施した", "実施しなかった"], index=None, horizontal=True, disabled=L)
+            eau_detail = st.text_area("術中合併症の詳細*", disabled=L)
+
+        ln_dissection = st.radio(
+            "リンパ節郭清*",
+            ["実施した", "実施しなかった"],
+            index=None,
+            horizontal=True,
+            disabled=L,
+        )
         if ln_dissection == "実施した":
-            ln_range = st.multiselect("郭清範囲*", ["腎門部", "下大静脈周囲", "大動脈周囲", "傍大動脈", "大動脈静脈間", "総腸骨", "外腸骨", "内腸骨", "閉鎖", "その他"], disabled=L)
+            ln_range = st.multiselect(
+                "郭清範囲*",
+                ["腎門部", "下大静脈周囲", "大動脈周囲", "傍大動脈", "大動脈静脈間", "総腸骨", "外腸骨", "内腸骨", "閉鎖", "その他"],
+                disabled=L,
+            )
+
         unrecovered_g2_relevant = st.radio(
-            "手術時点で手術手技に影響しうるGrade 2以上の未回復AE*",
-            ["なし", "あり"], index=None, horizontal=True, disabled=L,
-            help="脱毛・色素沈着など手術手技に影響しない事象は除外します。",
+            "手術時 Grade 2以上の未回復AE（手術手技に影響するもの）*",
+            ["なし", "あり"],
+            index=None,
+            horizontal=True,
+            disabled=L,
+            help="脱毛・色素沈着など、手術手技に影響しない事象は除外します。",
         )
         if unrecovered_g2_relevant == "あり":
             st.text_area("未回復AEの詳細*", key="peri_g2_detail", disabled=L)
 
     if last_evp_date and op_date:
         washout_days = (op_date - last_evp_date).days
-        st.write(f"EVP最終投与→手術：**{washout_days}日**")
+        st.caption(f"EVP最終投与から手術まで：{washout_days}日")
         if 28 <= washout_days <= 56:
-            st.success("計画書の原則4–8週内です。")
+            st.success("原則4–8週の範囲内です。")
         elif 57 <= washout_days <= 84:
-            st.warning("8週超〜12週以内：計画書上、医学的理由等により許容される範囲です。")
+            st.warning("8週超〜12週以内です。理由を記録してください。")
             protocol_deviation_reason = st.text_area("8週超となった理由*", disabled=L)
         else:
-            st.warning("計画書の4–12週の範囲外です。実データは受理しますが、理由を記録してください。")
-            protocol_deviation_reason = st.text_area("手術時期のプロトコル逸脱理由*", disabled=L)
-else:
-    no_op_reason = st.selectbox("手術未施行理由*", ["選択してください", "病勢進行", "EVP関連有害事象", "中央MDT/手術適応変更", "同意撤回", "患者希望", "その他"], disabled=L)
-    if no_op_reason == "その他":
-        st.text_area("手術未施行理由 その他詳細*", key="peri_noop_other", disabled=L)
+            st.warning("4–12週の範囲外です。理由を記録してください。")
+            protocol_deviation_reason = st.text_area("手術時期の理由／プロトコル逸脱理由*", disabled=L)
 
-# ---------------- 30-day readmission ----------------
-if surgery_performed == "実施した" and initial_hospital_outcome == "退院済み":
-    st.markdown("**術後30日以内の再入院**")
-    readmission_30d = st.radio(
-        "初回退院後、術後30日以内に再入院しましたか？*",
-        ["なし", "あり"],
-        index=None,
-        horizontal=True,
-        disabled=L,
-    )
-    if readmission_30d == "あり":
-        readmission_date = st.date_input("再入院日*", value=None, disabled=L)
-        readmission_reason = st.text_area("再入院理由*", disabled=L)
-        readmission_day30_status = st.radio(
-            "術後30日目時点の再入院状況*",
-            ["再退院済み", "再入院継続中", "再入院中に死亡"],
+    st.markdown("#### 術後入院経過")
+    h1, h2 = st.columns(2)
+    with h1:
+        initial_hospital_outcome = st.radio(
+            "初回手術入院の転帰*",
+            ["退院済み", "入院継続中", "初回入院中に死亡"],
             index=None,
-            horizontal=True,
             disabled=L,
-            help="術後30日目の時点での状況を選択してください。",
+            help="このCRF入力時点での初回手術入院の転帰を選択してください。",
         )
-        if readmission_day30_status == "再退院済み":
-            readmission_discharge_date = st.date_input("再退院日*", value=None, disabled=L)
-elif surgery_performed == "実施した" and initial_hospital_outcome in ["初回入院継続中", "初回入院中に死亡"]:
-    st.caption("初回手術入院から退院していないため、術後30日以内の再入院はN/Aです。")
+    with h2:
+        if initial_hospital_outcome == "退院済み":
+            op_discharge_date = st.date_input("初回退院日*", value=None, disabled=L)
 
-# Day 0 / discharge vitals and pre-discharge labs
-day0_sbp = day0_dbp = day0_pulse = day0_temp = None
-discharge_sbp = discharge_dbp = discharge_pulse = discharge_temp = None
-discharge_lab_available = None
-discharge_lab_date = None
-discharge_labs_raw = {}
+    if initial_hospital_outcome == "退院済み" and op_discharge_date:
+        if op_date and op_discharge_date > op_date + timedelta(days=30):
+            readmission_30d = "N/A（術後30日まで初回入院）"
+            st.caption("初回退院が術後30日を超えているため、術後30日以内の再入院はN/Aです。")
+        else:
+            readmission_30d = st.radio(
+                "初回退院後、術後30日以内の再入院*",
+                ["なし", "あり"],
+                index=None,
+                horizontal=True,
+                disabled=L,
+            )
+            if readmission_30d == "あり":
+                r1, r2 = st.columns(2)
+                with r1:
+                    readmission_date = st.date_input("最初の再入院日*", value=None, disabled=L)
+                    readmission_reason = st.text_area(
+                        "再入院理由*",
+                        help="複数回の再入院がある場合は、理由欄にすべて記載してください。",
+                        disabled=L,
+                    )
+                with r2:
+                    readmission_day30_status = st.radio(
+                        "再入院後の転帰*",
+                        ["再退院済み", "再入院継続中", "再入院中に死亡"],
+                        index=None,
+                        disabled=L,
+                    )
+                    if readmission_day30_status == "再退院済み":
+                        readmission_discharge_date = st.date_input("再退院日*", value=None, disabled=L)
 
-st.subheader("術直後 / 退院時の安全性データ")
-if surgery_performed == "実施した":
-    st.caption(
-        "術直後バイタルは、手術終了後に術後管理場所（病棟・HCU・ICU・PACU等）へ到着した時点の最初の記録値を入力してください。"
-    )
-    day0_sbp = st.number_input("術後管理場所到着時 収縮期血圧 (mmHg)", min_value=0, value=None, step=1, disabled=L)
-    day0_dbp = st.number_input("術後管理場所到着時 拡張期血圧 (mmHg)", min_value=0, value=None, step=1, disabled=L)
-    day0_pulse = st.number_input("術後管理場所到着時 脈拍 (/min)", min_value=0, value=None, step=1, disabled=L)
-    day0_temp = st.number_input("術後管理場所到着時 体温 (℃)", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L)
+    st.markdown("#### 術直後・退院時データ")
+    st.caption("術直後バイタル：術後管理場所（病棟・HCU・ICU・PACU等）到着時の最初の記録値。")
+    v1, v2, v3, v4 = st.columns(4)
+    with v1:
+        day0_sbp = st.number_input("到着時 収縮期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+    with v2:
+        day0_dbp = st.number_input("到着時 拡張期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+    with v3:
+        day0_pulse = st.number_input("到着時 脈拍", min_value=0, value=None, step=1, disabled=L, help="/min")
+    with v4:
+        day0_temp = st.number_input("到着時 体温", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L, help="℃")
 
     if initial_hospital_outcome == "退院済み":
-        st.markdown("**初回退院時データ**")
-        st.caption(
-            "退院時バイタルは、初回退院当日または退院前24時間以内で、退院時に最も近い定時測定値を入力してください。"
-        )
-        discharge_sbp = st.number_input("初回退院時 収縮期血圧 (mmHg)", min_value=0, value=None, step=1, disabled=L)
-        discharge_dbp = st.number_input("初回退院時 拡張期血圧 (mmHg)", min_value=0, value=None, step=1, disabled=L)
-        discharge_pulse = st.number_input("初回退院時 脈拍 (/min)", min_value=0, value=None, step=1, disabled=L)
-        discharge_temp = st.number_input("初回退院時 体温 (℃)", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L)
+        st.caption("退院時バイタル：初回退院当日または退院前24時間以内で、退院時に最も近い定時測定値。")
+        d1, d2, d3, d4 = st.columns(4)
+        with d1:
+            discharge_sbp = st.number_input("退院時 収縮期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+        with d2:
+            discharge_dbp = st.number_input("退院時 拡張期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+        with d3:
+            discharge_pulse = st.number_input("退院時 脈拍", min_value=0, value=None, step=1, disabled=L, help="/min")
+        with d4:
+            discharge_temp = st.number_input("退院時 体温", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L, help="℃")
 
-        st.write("**初回退院前最終採血**")
-        st.caption(
-            "手術後かつ初回退院日以前に実施された採血のうち、初回退院日時点に最も近い採血結果を入力してください。"
-            "研究目的の追加採血は不要です。"
-        )
+        st.markdown("**退院前最終採血**")
+        st.caption("手術後〜初回退院日の採血のうち、退院日に最も近い採血を入力してください。研究目的の追加採血は不要です。")
         discharge_lab_available = st.radio(
-            "初回退院前最終採血*",
+            "退院前採血*",
             ["あり", "なし"],
             index=None,
             horizontal=True,
             disabled=L,
         )
         if discharge_lab_available == "あり":
-            discharge_lab_date = st.date_input("初回退院前最終採血日*", value=None, disabled=L)
-            st.caption("実際に測定された項目のみ入力してください。未測定項目は空欄で構いません。")
+            discharge_lab_date = st.date_input("採血日*", value=None, disabled=L)
+            st.caption("測定された項目のみ入力してください。未測定項目は空欄で構いません。")
             discharge_labs_raw = render_lab_panel("peri_discharge_lab", required=False, disabled=L, columns=3)
-    elif initial_hospital_outcome == "初回入院継続中":
-        st.info("初回入院継続中のため、退院時バイタル・退院前最終採血は現時点ではN/Aです。")
+    elif initial_hospital_outcome == "入院継続中":
+        st.caption("入院継続中のため、退院時バイタル・退院前採血は未入力で構いません。")
     elif initial_hospital_outcome == "初回入院中に死亡":
-        st.info("初回入院中死亡のため、退院時バイタル・退院前最終採血はN/Aです。")
+        st.caption("初回入院中死亡のため、退院時バイタル・退院前採血はN/Aです。")
+
+elif surgery_performed == "実施しなかった":
+    st.markdown("#### 手術未施行")
+    n1, n2 = st.columns(2)
+    with n1:
+        last_evp_date = st.date_input("EVP最終投与日*", value=None, disabled=L)
+        planned_or_reference_date = st.date_input("手術予定日*", value=None, disabled=L)
+    with n2:
+        no_op_reason = st.selectbox(
+            "手術未施行理由*",
+            ["選択してください", "病勢進行", "EVP関連有害事象", "中央MDT/手術適応変更", "同意撤回", "患者希望", "その他"],
+            disabled=L,
+        )
+        if no_op_reason == "その他":
+            st.text_area("手術未施行理由 その他詳細*", key="peri_noop_other", disabled=L)
 else:
-    st.info("手術未施行のため術直後・退院時データはN/Aです。")
+    st.caption("Consolidative surgeryの実施有無を選択すると、必要な項目が表示されます。")
 
 # ---------------- pathology ----------------
 st.markdown('<div class="juog-header">3. 術後病理</div>', unsafe_allow_html=True)
@@ -302,11 +370,6 @@ if surgery_performed == "実施した":
         and path.get("ypn") in {"ypN0", "ypNX（郭清なし）", "ypNX（評価不能）"}
     )
     path["pcr_ypt0n0"] = bool(path.get("ypt") == "ypT0" and path.get("ypn") == "ypN0")
-    if path["pcr"]:
-        if path["pcr_ypt0n0"]:
-            st.success("pCR（ypT0N0/Nx）に合致します。ypT0N0としても別途集計されます。")
-        else:
-            st.success("pCR（ypT0N0/Nx）に合致します（ypT0Nx）。")
 else:
     st.info("手術未施行のため病理項目はN/Aです。")
 
@@ -376,7 +439,9 @@ if surgery_performed == "実施した":
                 )
 
 has_ctcae = st.checkbox("術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある", disabled=L)
-ctcae_detail = st.text_area("CTCAE有害事象詳細*" if has_ctcae else "CTCAE有害事象詳細", disabled=L)
+ctcae_detail = ""
+if has_ctcae:
+    ctcae_detail = st.text_area("CTCAE有害事象詳細*", disabled=L)
 
 st.subheader("術後治療")
 adj_plan = st.selectbox("術後治療・今後の予定*", POSTOP_TREATMENT_OPTIONS, disabled=L)
@@ -409,12 +474,21 @@ with os2:
 def validate_all():
     missing, errors, warnings = [], [], []
     if facility_name == "選択してください": missing.append("施設名")
-    if not valid_registration_id(registration_id): errors.append("JUOG登録番号の形式が不正です（例：JUOG-001）")
-    if not valid_email(reporter_email): errors.append("担当者メールアドレスが不正です")
+    if not registration_id:
+        missing.append("JUOG登録番号")
+    elif not valid_registration_id(registration_id):
+        errors.append("JUOG登録番号の形式が不正です（例：JUOG-001）")
+    if not text(reporter_email):
+        missing.append("担当者メールアドレス")
+    elif not valid_email(reporter_email):
+        errors.append("担当者メールアドレスが不正です")
     if submission_kind == "訂正報告" and not text(correction_reason): missing.append("訂正理由")
-    if surgery_performed is None: missing.append("手術実施有無")
-    if planned_or_reference_date is None: missing.append("手術日/予定日")
-    if last_evp_date is None: missing.append("EVP最終投与日")
+    if surgery_performed is None:
+        missing.append("手術実施有無")
+    elif planned_or_reference_date is None:
+        missing.append("手術実施日" if surgery_performed == "実施した" else "手術予定日")
+    if surgery_performed is not None and last_evp_date is None:
+        missing.append("EVP最終投与日")
 
     if surgery_performed == "実施した":
         for v, label in [(op_admission_date, "入院日"), (op_date, "手術実施日")]:
@@ -449,7 +523,7 @@ def validate_all():
             errors.append("初回退院日が入院日より前です")
 
         if initial_hospital_outcome == "退院済み":
-            if readmission_30d is None:
+            if op_discharge_date and op_date and op_discharge_date <= op_date + timedelta(days=30) and readmission_30d is None:
                 missing.append("術後30日以内の再入院")
             elif readmission_30d == "あり":
                 if readmission_date is None:
@@ -457,7 +531,7 @@ def validate_all():
                 if not text(readmission_reason):
                     missing.append("再入院理由")
                 if readmission_day30_status is None:
-                    missing.append("術後30日目時点の再入院状況")
+                    missing.append("再入院後の転帰")
                 if readmission_day30_status == "再退院済み" and readmission_discharge_date is None:
                     missing.append("再退院日")
                 if readmission_date and op_discharge_date and readmission_date < op_discharge_date:
@@ -466,13 +540,6 @@ def validate_all():
                     errors.append("再入院日は術後30日以内の日付を入力してください")
                 if readmission_discharge_date and readmission_date and readmission_discharge_date < readmission_date:
                     errors.append("再退院日が再入院日より前です")
-                if (
-                    readmission_day30_status == "再退院済み"
-                    and readmission_discharge_date
-                    and op_date
-                    and readmission_discharge_date > op_date + timedelta(days=30)
-                ):
-                    errors.append("『術後30日目時点：再退院済み』の場合、再退院日は術後30日以内である必要があります")
         if op_type == "その他（プロトコル逸脱）": warnings.append("術式が計画書規定（RNU/尿管部分切除術）外です")
         if unrecovered_g2_relevant == "あり": warnings.append("手術時点で手術手技に影響しうるGrade 2以上未回復AEあり：プロトコル適合性を確認してください")
 
@@ -509,25 +576,25 @@ def validate_all():
 
         if initial_hospital_outcome == "退院済み":
             for v, label in [
-                (discharge_sbp, "初回退院時 収縮期血圧"),
-                (discharge_dbp, "初回退院時 拡張期血圧"),
-                (discharge_pulse, "初回退院時 脈拍"),
-                (discharge_temp, "初回退院時 体温"),
+                (discharge_sbp, "退院時 収縮期血圧"),
+                (discharge_dbp, "退院時 拡張期血圧"),
+                (discharge_pulse, "退院時 脈拍"),
+                (discharge_temp, "退院時 体温"),
             ]:
                 if v is None:
                     missing.append(label)
-            errors.extend(validate_vitals(discharge_sbp, discharge_dbp, discharge_pulse, discharge_temp, "初回退院時バイタル"))
+            errors.extend(validate_vitals(discharge_sbp, discharge_dbp, discharge_pulse, discharge_temp, "退院時バイタル"))
             if discharge_lab_available is None:
-                missing.append("初回退院前最終採血の有無")
+                missing.append("退院前採血の有無")
             elif discharge_lab_available == "あり":
                 if discharge_lab_date is None:
-                    missing.append("初回退院前最終採血日")
+                    missing.append("退院前採血日")
                 if not any(text(v) for v in discharge_labs_raw.values()):
-                    missing.append("初回退院前最終採血結果")
+                    missing.append("退院前採血結果")
                 if discharge_lab_date and op_date and discharge_lab_date < op_date:
-                    errors.append("初回退院前最終採血日が手術日より前です")
+                    errors.append("退院前採血日が手術日より前です")
                 if discharge_lab_date and op_discharge_date and discharge_lab_date > op_discharge_date:
-                    errors.append("初回退院前最終採血日が初回退院日より後です")
+                    errors.append("退院前採血日が初回退院日より後です")
 
     if visit_date_30 is None: missing.append("30日評価日")
     if reference_date and visit_date_30:
@@ -590,14 +657,31 @@ def validate_all():
 missing, errors, warnings, discharge_labs_parsed, day30_parsed = validate_all()
 
 st.markdown('<div class="juog-header">5. 送信</div>', unsafe_allow_html=True)
-if missing:
-    st.warning("未入力：" + " / ".join(missing))
-if errors:
-    st.error("入力エラー：\n" + "\n".join([f"・{x}" for x in errors]))
-if warnings:
-    st.info("確認事項：\n" + "\n".join([f"・{x}" for x in warnings]))
+if missing or errors or warnings:
+    summary_parts = []
+    if missing:
+        summary_parts.append(f"未入力 {len(missing)}項目")
+    if errors:
+        summary_parts.append(f"エラー {len(errors)}件")
+    if warnings:
+        summary_parts.append(f"確認事項 {len(warnings)}件")
+    st.caption("入力状況：" + " / ".join(summary_parts))
+    with st.expander("入力状況の詳細を確認"):
+        if missing:
+            st.write("**未入力**")
+            st.write(" / ".join(missing))
+        if errors:
+            st.write("**入力エラー**")
+            for x in errors:
+                st.write(f"・{x}")
+        if warnings:
+            st.write("**確認事項**")
+            for x in warnings:
+                st.write(f"・{x}")
+else:
+    st.success("必須項目の入力と基本的な整合性チェックが完了しています。")
 
-if st.button("🚀 事務局へ確定送信", type="primary", use_container_width=True, disabled=L):
+if st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=L):
     if missing or errors:
         st.error("未入力または入力エラーを修正してください。")
     else:
@@ -689,7 +773,8 @@ JUOG登録番号: {registration_id}
 報告種別: {submission_kind}
 訂正理由: {text(correction_reason) or 'N/A'}
 手術実施: {surgery_performed}
-手術日/予定日: {date_str(planned_or_reference_date)}
+手術日: {date_str(op_date) if surgery_performed == '実施した' else 'N/A'}
+手術予定日: {date_str(planned_or_reference_date) if surgery_performed == '実施しなかった' else 'N/A'}
 実施術式: {op_type if surgery_performed == '実施した' else 'N/A'}
 手術完遂: {op_completed if surgery_performed == '実施した' else 'N/A'}
 EAUiaiC: {eau_grade if surgery_performed == '実施した' else 'N/A'}
