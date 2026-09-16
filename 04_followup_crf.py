@@ -54,7 +54,7 @@ def fetch_30d_linkage(registration_id: str):
 
 
 st.title("JUOG UTUC_Consolidative 定期経過報告CRF")
-st.caption("術後3か月毎（6〜24か月）の経過報告。基準日は周術期・30日CRFに記録された実手術日（未施行例は予定日）を使用します。尿一般検査は収集せず、尿細胞診を記録します。")
+st.caption("術後3か月毎（6〜24か月）の経過報告。基準日は周術期・30日CRFに記録された実手術日（未施行例は予定日）を使用します。")
 
 if "fu_sent" not in st.session_state:
     st.session_state.fu_sent = False
