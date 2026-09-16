@@ -1,22 +1,21 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import date
 
 import streamlit as st
 
 from juog_common import (
     CD_OPTIONS,
     POSTOP_TREATMENT_OPTIONS,
-    RECURRENCE_DRUG_OPTIONS,
     add_months,
     date_str,
     json_block,
     make_submission_metadata,
-    render_facility,
     render_lab_panel,
     render_submission_kind,
+    render_urine_panel,
+    registry_call,
     save_crf_payload,
-    render_cytology,
     send_email,
     text,
     today_jst,
@@ -25,9 +24,10 @@ from juog_common import (
     valid_registration_id,
     validate_lab_panel,
     validate_registry_id,
-    validate_cytology,
+    validate_urine_panel,
 )
 
+st.set_page_config(page_title="JUOG UTUC_Consolidative 定期経過CRF", layout="wide")
 st.markdown("""
 <style>
 .block-container {max-width:1180px!important;padding-top:1.3rem!important;padding-bottom:5rem!important;}
@@ -37,41 +37,145 @@ label {font-weight:600!important;color:#334155!important;}
 </style>
 """, unsafe_allow_html=True)
 
+def parse_iso_date(value):
+    if not value:
+        return None
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except Exception:
+        return None
+
+
+def fetch_30d_linkage(registration_id: str):
+    return registry_call(
+        "get_crf_linkage",
+        {"registration_id": registration_id.strip().upper(), "source_crf_type": "perioperative_30d"},
+        timeout=20,
+    )
+
+
 st.title("JUOG UTUC_Consolidative 定期経過報告CRF")
-st.caption("術後3か月毎（6〜24か月）の経過報告。尿細胞診・画像検査・膀胱鏡は各時点で必須、採血は3か月毎は必要に応じて、2年終了時は必須です。")
+st.caption("術後3か月毎（6〜24か月）の経過報告。基準日は周術期・30日CRFに記録された実手術日（未施行例は予定日）を使用します。")
 
 if "fu_sent" not in st.session_state:
     st.session_state.fu_sent = False
-L = st.session_state.fu_sent
-if L:
-    st.info("このセッションでは送信済みです。訂正時は再読み込みし『訂正報告』で送信してください。")
+if "fu_linkage" not in st.session_state:
+    st.session_state.fu_linkage = None
+if "fu_linkage_message" not in st.session_state:
+    st.session_state.fu_linkage_message = ""
+
+if st.session_state.fu_sent:
+    sent_id = st.session_state.get("fu_sent_registration_id", "")
+    sent_visit = st.session_state.get("fu_sent_visit", "")
+    sent_version = st.session_state.get("fu_sent_version", "")
+    st.success("送信が完了しました。")
+    if sent_id:
+        st.write(f"**JUOG登録番号：{sent_id}**")
+    if sent_visit:
+        st.write(f"**報告時期：{sent_visit}**")
+    if sent_version:
+        st.caption(f"定期経過CRFを保存しました（version {sent_version}）。")
+    else:
+        st.caption("定期経過CRFを保存しました。")
+    if st.session_state.get("fu_sent_had_warnings"):
+        st.info("確認事項も中央データに保存されています。")
+    if st.session_state.get("fu_sent_email_failed"):
+        st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
+    st.caption("訂正する場合はページを再読み込みし、『訂正報告』を選択して送信してください。")
+    st.stop()
+
+L = False
 
 st.markdown('<div class="juog-header">1. 基本情報・報告時期</div>', unsafe_allow_html=True)
-b1, b2 = st.columns(2)
-with b1:
-    facility_code, facility_name = render_facility(key="fu_facility", disabled=L)
-    registration_id = st.text_input("JUOG登録番号*", placeholder="JUOG-001", disabled=L).strip().upper()
-    reporter_email = st.text_input("担当者メールアドレス*", disabled=L)
-    surgery_performed = st.radio("Consolidative surgeryの実施*", ["実施した", "実施しなかった"], index=None, horizontal=True, disabled=L)
-    reference_date = st.date_input("手術日（未施行例は予定日）*", value=None, disabled=L)
-with b2:
+top1, top2 = st.columns(2)
+with top1:
+    registration_id = st.text_input(
+        "JUOG登録番号*",
+        placeholder="JUOG-001",
+        key="fu_registration_id",
+        disabled=L,
+    ).strip().upper()
+    reporter_email = st.text_input("担当者メールアドレス*", key="fu_reporter_email", disabled=L)
+with top2:
     submission_kind, correction_reason = render_submission_kind("fu", disabled=L)
-    visit_month = st.selectbox("今回の報告時期*", ["選択してください", "6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）"], disabled=L)
-    visit_date = st.date_input("今回の評価日*", value=None, disabled=L)
-    timing_note = ""
-    if reference_date and visit_month != "選択してください":
-        month_no = int(''.join(x for x in visit_month if x.isdigit()))
-        target_date = add_months(reference_date, month_no)
-        st.info(f"目安の評価日：{target_date:%Y/%m/%d}（計画書は『術後3か月毎』。この画面では日付を硬く制限しません）")
-        if visit_date:
-            delta = abs((visit_date - target_date).days)
-            if delta > 30:
-                st.warning(f"目安日から{delta}日ずれています。臨床上の事情があればそのまま入力できます。")
-                timing_note = st.text_area("評価時期がずれた理由（任意だが記録推奨）", disabled=L)
+
+fetch_disabled = not valid_registration_id(registration_id)
+if st.button("既存情報を取得", use_container_width=True, disabled=fetch_disabled or L):
+    result = fetch_30d_linkage(registration_id)
+    if result.get("ok") and result.get("source_found"):
+        st.session_state.fu_linkage = result
+        st.session_state.fu_linkage_message = ""
+        st.rerun()
+    else:
+        st.session_state.fu_linkage = None
+        st.session_state.fu_linkage_message = (
+            result.get("message")
+            or result.get("error")
+            or "周術期・30日CRFから手術情報を取得できませんでした。"
+        )
+        st.rerun()
+
+linkage = st.session_state.get("fu_linkage")
+if linkage and linkage.get("registration_id") != registration_id:
+    linkage = None
+    st.warning("JUOG登録番号が変更されています。『既存情報を取得』をもう一度押してください。")
+
+if not linkage:
+    msg = st.session_state.get("fu_linkage_message")
+    if msg:
+        st.error(msg)
+        st.caption("Follow-up CRFでは手術日を手入力せず、周術期・30日CRFの確定情報を基準にします。30日CRFを確認・訂正後、再度取得してください。")
+    else:
+        st.info("JUOG登録番号を入力し、『既存情報を取得』を押してください。")
+        if registration_id and not valid_registration_id(registration_id):
+            st.warning("JUOG登録番号は JUOG-001 のように3桁で入力してください。")
+    st.stop()
+
+facility_code = str(linkage.get("facility_code") or "")
+facility_name = str(linkage.get("facility_name") or "")
+surgery_performed = str(linkage.get("surgery_performed") or "")
+reference_date = parse_iso_date(linkage.get("reference_date"))
+source_30d_record_version = int(linkage.get("record_version") or 0)
+source_30d_submission_id = str(linkage.get("submission_id") or "")
+
+st.success("周術期・30日CRFの最新情報を取得しました。")
+c1, c2, c3, c4 = st.columns(4)
+c1.text_input("JUOG登録番号", value=registration_id, disabled=True)
+c2.text_input("施設", value=facility_name, disabled=True)
+c3.text_input("Consolidative surgery", value=surgery_performed, disabled=True)
+c4.text_input(
+    "実手術日" if surgery_performed == "実施した" else "手術予定日",
+    value=date_str(reference_date),
+    disabled=True,
+)
+st.caption(f"参照元：周術期・30日CRF version {source_30d_record_version}")
+
+if surgery_performed == "実施した":
+    st.caption("6〜24か月の評価時期は、30日CRFに記録された実手術日を基準に計算します。")
+else:
+    st.warning("Consolidative surgery未施行例です。30日CRFに記録された予定日を基準日として表示します。")
+
+visit_month = st.selectbox(
+    "今回の報告時期*",
+    ["選択してください", "6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）"],
+    disabled=L,
+)
+visit_date = st.date_input("今回の評価日*", value=None, disabled=L)
+timing_note = ""
+if reference_date and visit_month != "選択してください":
+    month_no = int(''.join(x for x in visit_month if x.isdigit()))
+    target_date = add_months(reference_date, month_no)
+    base_label = "実手術日" if surgery_performed == "実施した" else "手術予定日"
+    st.info(f"目安の評価日：{target_date:%Y/%m/%d}（{base_label} {reference_date:%Y/%m/%d} を基準）")
+    if visit_date:
+        delta = abs((visit_date - target_date).days)
+        if delta > 30:
+            st.warning(f"目安日から{delta}日ずれています。臨床上の事情があればそのまま入力できます。")
+            timing_note = st.text_area("評価時期がずれた理由（任意だが記録推奨）", disabled=L)
 
 # ---------------- surveillance ----------------
-st.markdown('<div class="juog-header">2. 定期検査（尿細胞診・画像・膀胱鏡）</div>', unsafe_allow_html=True)
-cytology = render_cytology("fu", required=True, disabled=L)
+st.markdown('<div class="juog-header">2. 定期検査（尿・画像・膀胱鏡）</div>', unsafe_allow_html=True)
+urine = render_urine_panel("fu", required=True, include_cytology=True, disabled=L)
 
 s1, s2 = st.columns(2)
 with s1:
@@ -120,9 +224,9 @@ else:
     st.caption("今回採血なし。")
 
 required_test_omission_reason = ""
-cytology_not_done_now = cytology == "未実施"
+urine_not_done_now = any(v == "未実施" for v in urine.values())
 lab_na_now = show_labs and any(str(v).strip().upper() in {"NA", "N/A", "未実施", "欠測"} for v in labs_raw.values())
-if cytology_not_done_now or (is_final and lab_na_now):
+if urine_not_done_now or (is_final and lab_na_now):
     required_test_omission_reason = st.text_area("必須検査の欠測/未実施理由*", placeholder="未実施またはNAとした項目の理由を記載してください", disabled=L)
 
 # ---------------- intraluminal recurrence ----------------
@@ -217,6 +321,10 @@ with o2:
 # ---------------- validation ----------------
 def validate_all():
     missing, errors, warnings = [], [], []
+    if not facility_code or not facility_name:
+        errors.append("30日CRFから施設情報を取得できていません")
+    if source_30d_record_version <= 0 or not source_30d_submission_id:
+        errors.append("30日CRFとの連携情報が不完全です。既存情報を再取得してください")
     if facility_name == "選択してください": missing.append("施設名")
     if not valid_registration_id(registration_id): errors.append("JUOG登録番号の形式が不正です（例：JUOG-001）")
     if not valid_email(reporter_email): errors.append("担当者メールアドレスが不正です")
@@ -228,9 +336,9 @@ def validate_all():
     if visit_date and visit_date > today_jst(): errors.append("評価日が未来日です")
     if reference_date and visit_date and visit_date < reference_date: errors.append("評価日が手術/予定日より前です")
 
-    missing.extend([f"定期{x}" for x in validate_cytology(cytology, required=True)])
-    if cytology_not_done_now and not text(required_test_omission_reason):
-        missing.append("必須尿細胞診の未実施理由")
+    missing.extend([f"定期{x}" for x in validate_urine_panel(urine, required=True)])
+    if urine_not_done_now and not text(required_test_omission_reason):
+        missing.append("必須尿検査/尿細胞診の未実施理由")
     if imaging_status is None: missing.append("画像検査実施有無")
     elif imaging_status == "実施":
         if imaging_date is None: missing.append("画像検査日")
@@ -323,64 +431,99 @@ if st.button("🚀 定期経過データを確定送信", type="primary", use_co
         if reg_ok is False:
             st.error(reg_msg)
         else:
-            if reg_ok is None: st.warning(reg_msg)
-            visit_key = visit_month.replace("ヶ月（終了）", "m").replace("ヶ月", "m")
-            meta = make_submission_metadata("followup", visit_key, registration_id, facility_code, facility_name, reporter_email, submission_kind, correction_reason)
-            data = {
-                "surgery_performed": surgery_performed,
-                "reference_date": date_str(reference_date),
-                "visit_month": visit_month,
-                "visit_date": date_str(visit_date),
-                "timing_note": text(timing_note),
-                "urine_cytology": cytology,
-                "required_test_omission_reason": text(required_test_omission_reason),
-                "imaging_status": imaging_status,
-                "imaging_date": date_str(imaging_date),
-                "imaging_not_done_reason": text(imaging_not_done_reason),
-                "recist_progression_status": recist_status,
-                "progression_date": date_str(progression_date),
-                "progression_sites": progression_sites,
-                "progression_detail": text(progression_detail),
-                "cystoscopy_status": cystoscopy_status,
-                "cystoscopy_date": date_str(cystoscopy_date),
-                "cystoscopy_result": cystoscopy_result,
-                "cystoscopy_detail": text(cystoscopy_detail),
-                "cystoscopy_not_done_reason": text(cystoscopy_not_done_reason),
-                "labs_performed": show_labs,
-                "labs": parsed_labs,
-                "intraluminal_recurrence_status": intra_status,
-                "intraluminal_recurrence_date": date_str(intra_date),
-                "intraluminal_sites": intra_sites,
-                "intraluminal_site_other": text(intra_site_other),
-                "intraluminal_treatment": intra_tx,
-                "intraluminal_treatment_other": text(intra_tx_other),
-                "intraluminal_treatment_status": intra_tx_status,
-                "intraluminal_procedure_date": date_str(intra_procedure_date),
-                "intraluminal_instillation_start": date_str(intra_instill_start),
-                "intraluminal_instillation_end": date_str(intra_instill_end),
-                "intraluminal_instillation_ongoing": intra_instill_ongoing,
-                "intraluminal_other_treatment_date": date_str(intra_other_date),
-                "intraluminal_pathology": text(intra_path),
-                "current_treatment": current_treatment,
-                "current_treatment_detail": text(current_treatment_detail),
-                "treatment_start": date_str(treatment_start),
-                "treatment_end": date_str(treatment_end),
-                "treatment_ongoing": treatment_ongoing,
-                "event_present": has_event,
-                "cd_grade": cd_grade,
-                "event_detail": text(ae_detail),
-                "vital_status": vital_status,
-                "last_alive_date": date_str(last_alive_date),
-                "death_date": date_str(death_date),
-                "death_cause": death_cause,
-            }
-            payload = {**meta, "data": data}
-            report = f"""【JUOG 定期経過報告】
+            if reg_ok is None:
+                st.warning(reg_msg)
+
+            # 送信直前に30日CRFを再照合。取得後に手術日等が訂正されていれば保存しない。
+            latest = fetch_30d_linkage(registration_id)
+            linkage_stale = False
+            if not latest.get("ok") or not latest.get("source_found"):
+                st.error("参照元の周術期・30日CRFを再確認できませんでした。『既存情報を取得』をやり直してください。")
+                linkage_stale = True
+            elif (
+                int(latest.get("record_version") or 0) != int(source_30d_record_version or 0)
+                or str(latest.get("submission_id") or "") != str(source_30d_submission_id or "")
+                or str(latest.get("facility_code") or "") != facility_code
+                or str(latest.get("surgery_performed") or "") != surgery_performed
+                or str(latest.get("reference_date") or "")[:10] != date_str(reference_date)
+            ):
+                st.error("参照元の周術期・30日CRFが更新されています。『既存情報を取得』を押して最新情報を再取得してください。")
+                linkage_stale = True
+
+            if not linkage_stale:
+                visit_key = visit_month.replace("ヶ月（終了）", "m").replace("ヶ月", "m")
+                meta = make_submission_metadata(
+                    "followup",
+                    visit_key,
+                    registration_id,
+                    facility_code,
+                    facility_name,
+                    reporter_email,
+                    submission_kind,
+                    correction_reason,
+                )
+                data = {
+                    "source_30d_linked": True,
+                    "source_30d_record_version": source_30d_record_version,
+                    "source_30d_submission_id": source_30d_submission_id,
+                    "surgery_performed": surgery_performed,
+                    "reference_date": date_str(reference_date),
+                    "visit_month": visit_month,
+                    "visit_date": date_str(visit_date),
+                    "timing_note": text(timing_note),
+                    "urinalysis": urine,
+                    "required_test_omission_reason": text(required_test_omission_reason),
+                    "imaging_status": imaging_status,
+                    "imaging_date": date_str(imaging_date),
+                    "imaging_not_done_reason": text(imaging_not_done_reason),
+                    "recist_progression_status": recist_status,
+                    "progression_date": date_str(progression_date),
+                    "progression_sites": progression_sites,
+                    "progression_detail": text(progression_detail),
+                    "cystoscopy_status": cystoscopy_status,
+                    "cystoscopy_date": date_str(cystoscopy_date),
+                    "cystoscopy_result": cystoscopy_result,
+                    "cystoscopy_detail": text(cystoscopy_detail),
+                    "cystoscopy_not_done_reason": text(cystoscopy_not_done_reason),
+                    "labs_performed": show_labs,
+                    "labs": parsed_labs,
+                    "intraluminal_recurrence_status": intra_status,
+                    "intraluminal_recurrence_date": date_str(intra_date),
+                    "intraluminal_sites": intra_sites,
+                    "intraluminal_site_other": text(intra_site_other),
+                    "intraluminal_treatment": intra_tx,
+                    "intraluminal_treatment_other": text(intra_tx_other),
+                    "intraluminal_treatment_status": intra_tx_status,
+                    "intraluminal_procedure_date": date_str(intra_procedure_date),
+                    "intraluminal_instillation_start": date_str(intra_instill_start),
+                    "intraluminal_instillation_end": date_str(intra_instill_end),
+                    "intraluminal_instillation_ongoing": intra_instill_ongoing,
+                    "intraluminal_other_treatment_date": date_str(intra_other_date),
+                    "intraluminal_pathology": text(intra_path),
+                    "current_treatment": current_treatment,
+                    "current_treatment_detail": text(current_treatment_detail),
+                    "treatment_start": date_str(treatment_start),
+                    "treatment_end": date_str(treatment_end),
+                    "treatment_ongoing": treatment_ongoing,
+                    "event_present": has_event,
+                    "cd_grade": cd_grade,
+                    "event_detail": text(ae_detail),
+                    "vital_status": vital_status,
+                    "last_alive_date": date_str(last_alive_date),
+                    "death_date": date_str(death_date),
+                    "death_cause": death_cause,
+                }
+                payload = {**meta, "data": data}
+                base_label = "実手術日" if surgery_performed == "実施した" else "手術予定日"
+                report = f"""【JUOG 定期経過報告】
 JUOG登録番号: {registration_id}
 施設: {facility_name}
 報告時期: {visit_month}
 評価日: {date_str(visit_date)}
 報告種別: {submission_kind}
+手術実施: {surgery_performed}
+{base_label}: {date_str(reference_date)}
+参照30日CRF: version {source_30d_record_version}
 RECIST進行状況: {recist_status}
 今回PD確認日: {date_str(progression_date) or 'N/A'}
 尿路内再発: {intra_status}
@@ -390,16 +533,24 @@ RECIST進行状況: {recist_status}
 
 {json_block(payload)}
 """
-            save_result = save_crf_payload(payload)
-            if not save_result.get("ok"):
-                st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
-            else:
-                st.session_state.fu_sent = True
-                sent, send_err = send_email(f"【JUOG CRF】【followup-{visit_key}】【{registration_id}】", report, reporter_email)
-                st.success(f"定期経過データを確定保存しました（version {save_result.get('record_version', '')}）。")
-                if not sent:
-                    st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
-                    print(f"[JUOG followup] email failed: {send_err}")
+                save_result = save_crf_payload(payload)
+                if not save_result.get("ok"):
+                    st.error(
+                        "中央Google Sheetへ保存できませんでした："
+                        + (save_result.get("message") or save_result.get("error") or "unknown error")
+                    )
                 else:
-                    st.balloons()
+                    sent, send_err = send_email(
+                        f"【JUOG CRF】【followup-{visit_key}】【{registration_id}】",
+                        report,
+                        reporter_email,
+                    )
+                    st.session_state.fu_sent = True
+                    st.session_state.fu_sent_registration_id = registration_id
+                    st.session_state.fu_sent_visit = visit_month
+                    st.session_state.fu_sent_version = str(save_result.get("record_version", "") or "")
+                    st.session_state.fu_sent_had_warnings = bool(warnings)
+                    st.session_state.fu_sent_email_failed = not sent
+                    if not sent:
+                        print(f"[JUOG followup] email failed: {send_err}")
                     st.rerun()
