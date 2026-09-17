@@ -40,7 +40,7 @@ st.markdown(
 )
 
 st.title("JUOG UTUC_Consolidative 中央MDT審査申請CRF")
-st.caption("研究計画書 第3版（2026/09/14）に基づく中央MDT審査申請用CRFです。")
+st.caption("研究計画書 第1版（2026/09/16）に基づく中央MDT審査申請用CRFです。")
 
 RECIST_HELP = """RECIST v1.1 補助計算：CT等の非リンパ節標的病変は長径、リンパ節は短径を入力します。\n
 標的病変は最大5個（1臓器最大2個）が原則です。この画面の自動計算は入力整合性確認用であり、中央放射線診断医によるRECIST総合判定を置き換えません。"""

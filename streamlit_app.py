@@ -7,6 +7,25 @@ from juog_common import FACILITY_NAMES, TZ, send_support_email, valid_email, val
 
 st.set_page_config(page_title="JUOG UTUC_Consolidative eCRF", layout="wide")
 
+# Make vertical scrollbars easier to grab without changing page content.
+st.markdown(
+    """
+    <style>
+    html { scrollbar-width: auto; }
+    ::-webkit-scrollbar { width: 14px; height: 14px; }
+    ::-webkit-scrollbar-thumb {
+        background: #94A3B8;
+        border-radius: 999px;
+        border: 3px solid transparent;
+        background-clip: content-box;
+        min-height: 44px;
+    }
+    ::-webkit-scrollbar-track { background: transparent; }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 pages = {
     "症例入力": [
         st.Page("01_registration_crf.py", title="中央MDT審査申請", default=True),
