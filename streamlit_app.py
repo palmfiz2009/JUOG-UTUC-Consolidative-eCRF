@@ -12,11 +12,11 @@ st.markdown(
     """
     <style>
     html { scrollbar-width: auto; }
-    ::-webkit-scrollbar { width: 14px; height: 14px; }
+    ::-webkit-scrollbar { width: 20px; height: 20px; }
     ::-webkit-scrollbar-thumb {
         background: #94A3B8;
         border-radius: 999px;
-        border: 3px solid transparent;
+        border: 2px solid transparent;
         background-clip: content-box;
         min-height: 44px;
     }
