@@ -434,23 +434,13 @@ if reference_date:
         if surgery_performed == "実施した" and op_date and visit_date_30 < op_date + timedelta(days=30):
             st.warning("術後30日より前の評価です。主要安全性評価期間がまだ完了していないため、術後30日までに新規合併症が生じた場合は訂正報告してください。")
 
-st.write("**30日評価 血液検査**")
+st.write("**30日評価 血液検査（必須）**")
 st.caption(
-    "30日±14日の期間内に通常診療として採血が実施された場合、その期間内で術後30日目に最も近い採血結果を入力してください。"
-    "研究目的の追加採血は不要です。"
+    "30日±14日の期間内で、術後30日目に最も近い採血結果を入力してください。"
 )
-day30_lab_available = st.radio(
-    "30日評価期間内の採血*",
-    ["あり", "なし"],
-    index=None,
-    horizontal=True,
-    disabled=L,
-)
-day30_lab_date = None
-day30_labs_raw = {}
-if day30_lab_available == "あり":
-    day30_lab_date = st.date_input("30日評価に用いた採血日*", value=None, disabled=L)
-    day30_labs_raw = render_optional_lab_panel("peri_day30_lab", disabled=L, columns=3)
+day30_lab_available = "あり"
+day30_lab_date = st.date_input("30日評価に用いた採血日*", value=None, disabled=L)
+day30_labs_raw = render_optional_lab_panel("peri_day30_lab", disabled=L, columns=3)
 
 cd_grade = "N/A"
 cd_date = None
@@ -647,17 +637,14 @@ def validate_all():
 
     day30_parsed, day30_errors = validate_optional_lab_panel(day30_labs_raw)
     errors.extend([f"30日血液検査：{x}" for x in day30_errors])
-    if day30_lab_available is None:
-        missing.append("30日評価期間内の採血有無")
-    elif day30_lab_available == "あり":
-        if day30_lab_date is None:
-            missing.append("30日評価に用いた採血日")
-        if not any(text(v) for v in day30_labs_raw.values()):
-            missing.append("30日評価採血結果")
-        if reference_date and day30_lab_date:
-            lab_wi = window_info(reference_date, 30, 14)
-            if not (lab_wi["min"] <= day30_lab_date <= lab_wi["max"]):
-                errors.append("30日評価に用いた採血日が30日±14日の許容期間外です")
+    if day30_lab_date is None:
+        missing.append("30日評価に用いた採血日")
+    if not any(text(v) for v in day30_labs_raw.values()):
+        missing.append("30日評価採血結果")
+    if reference_date and day30_lab_date:
+        lab_wi = window_info(reference_date, 30, 14)
+        if not (lab_wi["min"] <= day30_lab_date <= lab_wi["max"]):
+            errors.append("30日評価に用いた採血日が30日±14日の許容期間外です")
 
     if surgery_performed == "実施した":
         if cd_grade == "選択してください": missing.append("30日CD Grade")
