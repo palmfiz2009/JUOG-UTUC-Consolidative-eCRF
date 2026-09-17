@@ -48,6 +48,18 @@ RECIST_HELP = """RECIST v1.1 補助計算：CT等の非リンパ節標的病変�
 if "screening_sent" not in st.session_state:
     st.session_state.screening_sent = False
 
+
+def render_required_text_or_none(label: str, key: str, disabled: bool = False) -> str:
+    """Required free text with a one-click 'なし' option; keeps stored value backward-compatible."""
+    text_col, none_col = st.columns([5, 1])
+    none_selected = none_col.checkbox("なし", key=f"{key}_none", disabled=disabled)
+    value = text_col.text_area(
+        f"{label}*",
+        key=key,
+        disabled=(disabled or none_selected),
+    )
+    return "なし" if none_selected else value
+
 if st.session_state.screening_sent:
     sid = st.session_state.get("screening_id", "")
     st.success("中央MDT審査申請を送信しました。")
@@ -99,11 +111,11 @@ physical_detail = st.text_area("身体所見の詳細*" if physical_abnormal == 
 
 h1, h2 = st.columns(2)
 with h1:
-    past_history = st.text_area("既往歴（なしの場合は『なし』）*", disabled=L)
-    comorbidity = st.text_area("現在の合併症（なしの場合は『なし』）*", disabled=L)
+    past_history = render_required_text_or_none("既往歴", "reg_past_history", disabled=L)
+    comorbidity = render_required_text_or_none("現在の合併症", "reg_comorbidity", disabled=L)
 with h2:
-    concomitant_meds = st.text_area("現在の併用薬（なしの場合は『なし』）*", disabled=L)
-    concomitant_tx = st.text_area("現在の併用治療（なしの場合は『なし』）*", disabled=L)
+    concomitant_meds = render_required_text_or_none("現在の併用薬", "reg_concomitant_meds", disabled=L)
+    concomitant_tx = render_required_text_or_none("現在の併用治療", "reg_concomitant_tx", disabled=L)
 
 # -------------------- 2. Diagnosis --------------------
 st.markdown('<div class="juog-header">2. 原疾患・診断時Stage</div>', unsafe_allow_html=True)
