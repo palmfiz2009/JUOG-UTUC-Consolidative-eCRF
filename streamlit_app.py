@@ -1,4 +1,4 @@
-from urllib.parse import quote
+from urllib.parse import urlencode
 
 import streamlit as st
 
@@ -20,23 +20,23 @@ pages = {
 page = st.navigation(pages, position="sidebar")
 
 # ---------------- sidebar support ----------------
-support_subject = quote("JUOG UTUC eCRF 不具合報告")
-support_body = quote(
-    "画面名：\n"
-    "JUOG登録番号：\n"
-    "発生日時：\n"
-    "エラー内容：\n\n"
-    "※患者氏名、カルテ番号、生年月日などの個人情報は記載しないでください。"
-)
-support_mailto = (
-    "mailto:yoshida.tks@kmu.ac.jp"
-    f"?subject={support_subject}&body={support_body}"
-)
+support_query = urlencode({
+    "view": "cm",
+    "fs": "1",
+    "to": "yoshida.tks@kmu.ac.jp",
+    "su": "JUOG UTUC eCRF 不具合報告",
+    "body": (
+        "画面名：\n"
+        "受付番号／JUOG登録番号：\n"
+        "発生日時：\n"
+        "エラー内容：\n\n"
+        "※患者氏名、カルテ番号、生年月日などの個人情報は記載しないでください。"
+    ),
+})
+support_url = f"https://mail.google.com/mail/?{support_query}"
 
 st.sidebar.divider()
-st.sidebar.markdown("### サポート")
-st.sidebar.caption("eCRF操作中の不具合・エラー")
-st.sidebar.markdown(f"[📩 サポートに連絡]({support_mailto})")
-st.sidebar.caption("患者氏名・カルテ番号等の個人情報はメールに記載しないでください。")
+st.sidebar.link_button("✉ 不具合を連絡", support_url, use_container_width=True)
+st.sidebar.caption("※個人情報はメールに記載しないでください。")
 
 page.run()
