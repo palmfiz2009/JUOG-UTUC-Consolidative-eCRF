@@ -100,6 +100,18 @@ if st.session_state.get("draft30_loaded_at"):
     st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['draft30_loaded_at']}）。")
     st.session_state.pop("draft30_loaded_at", None)
 
+# Show the previous draft-save result next to the compact controls after rerun.
+# This makes it obvious whether the backend actually persisted the draft.
+_draft_flash = st.session_state.pop("draft30_flash", None)
+if isinstance(_draft_flash, dict):
+    _kind = _draft_flash.get("kind")
+    _message = str(_draft_flash.get("message") or "")
+    if _message:
+        if _kind == "success":
+            st.toast(_message, icon="✅")
+        else:
+            st.error(_message)
+
 draft_tool_col1, draft_tool_col2, _draft_tool_spacer = st.columns([0.9, 0.9, 6.2])
 with draft_tool_col1:
     draft_clicked = st.button("💾 仮保存", key="draft30_save_button", disabled=False)
@@ -800,10 +812,28 @@ if draft_clicked:
             reporter_email=reporter_email,
         )
         if draft_result.get("ok"):
-            saved_at = draft_result.get("updated_at") or ""
-            st.success("仮保存しました。ブラウザを閉じても『仮保存から再開』から読み込めます。" + (f"（{saved_at}）" if saved_at else ""))
+            # Read the row back immediately.  A save is reported as successful only
+            # when the draft can actually be retrieved from CRF_Drafts.
+            verify_result = get_crf_draft(registration_id, "perioperative_30d", "30d")
+            if verify_result.get("ok") and verify_result.get("source_found"):
+                saved_at = verify_result.get("updated_at") or draft_result.get("updated_at") or ""
+                st.session_state["draft30_flash"] = {
+                    "kind": "success",
+                    "message": "仮保存を確認しました。" + (f" 最終保存：{saved_at}" if saved_at else ""),
+                }
+            else:
+                st.session_state["draft30_flash"] = {
+                    "kind": "error",
+                    "message": "仮保存の書き込み確認ができませんでした。再度お試しください。"
+                    + (("（" + str(verify_result.get("message") or verify_result.get("error")) + "）") if (verify_result.get("message") or verify_result.get("error")) else ""),
+                }
+            st.rerun()
         else:
-            st.error("仮保存できませんでした：" + (draft_result.get("message") or draft_result.get("error") or "unknown error"))
+            st.session_state["draft30_flash"] = {
+                "kind": "error",
+                "message": "仮保存できませんでした：" + str(draft_result.get("message") or draft_result.get("error") or "unknown error"),
+            }
+            st.rerun()
 
 if submit_clicked:
     if missing or errors:
