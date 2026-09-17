@@ -221,14 +221,11 @@ if reference_date:
 # ---------------- surveillance ----------------
 st.markdown('<div class="juog-header">2. 90日検査</div>', unsafe_allow_html=True)
 st.subheader("血液検査")
-st.caption(
-    "90日±14日の期間内に通常診療として採血が実施された場合、その期間内で術後90日目に最も近い採血結果を入力してください。"
-    "研究目的の追加採血は不要です。"
-)
 lab_available = st.radio(
-    "90日評価期間内の採血*",
+    "今回の評価時における血液検査の実施（通常診療で実施された場合は検査結果を入力）*",
     ["あり", "なし"],
     index=None,
+    format_func=lambda x: "実施あり" if x == "あり" else "実施なし",
     horizontal=True,
     disabled=L,
 )

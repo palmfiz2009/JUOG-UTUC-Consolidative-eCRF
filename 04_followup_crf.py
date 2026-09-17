@@ -209,24 +209,26 @@ with s2:
 
 # ---------------- labs ----------------
 st.markdown('<div class="juog-header">3. 採血検査</div>', unsafe_allow_html=True)
-is_final = visit_month == "24ヶ月（終了）"
-if is_final:
-    st.info("2年終了時の採血は計画書上必須です。")
-    show_labs = True
-else:
-    show_labs = st.checkbox("今回の採血結果を入力する（3か月毎は必要に応じて）", disabled=L)
+lab_status = st.radio(
+    "今回の評価時における血液検査の実施（通常診療で実施された場合は検査結果を入力）*",
+    ["実施あり", "実施なし"],
+    index=None,
+    horizontal=True,
+    disabled=L,
+)
 
 labs_raw = {}
-if show_labs:
-    labs_raw = render_lab_panel("fu_lab", required=is_final, disabled=L, columns=3)
-else:
-    st.caption("今回採血なし。")
+if lab_status == "実施あり":
+    labs_raw = render_lab_panel("fu_lab", required=False, disabled=L, columns=3)
 
 required_test_omission_reason = ""
 cytology_not_done_now = cytology == "未実施"
-lab_na_now = show_labs and any(str(v).strip().upper() in {"NA", "N/A", "未実施", "欠測"} for v in labs_raw.values())
-if cytology_not_done_now or (is_final and lab_na_now):
-    required_test_omission_reason = st.text_area("必須検査の欠測/未実施理由*", placeholder="未実施またはNAとした項目の理由を記載してください", disabled=L)
+if cytology_not_done_now:
+    required_test_omission_reason = st.text_area(
+        "必須検査の欠測/未実施理由*",
+        placeholder="未実施とした理由を記載してください",
+        disabled=L,
+    )
 
 # ---------------- intraluminal recurrence ----------------
 st.markdown('<div class="juog-header">4. 尿路内再発</div>', unsafe_allow_html=True)
@@ -365,14 +367,16 @@ def validate_all():
                 warnings.append(f"{label}が{visit_month}の目安日から30日超ずれています")
 
     parsed_labs = {}
-    if show_labs:
-        parsed_labs, lab_errors, lab_warn = validate_lab_panel(labs_raw, required=is_final)
+    if lab_status is None:
+        missing.append("血液検査実施有無")
+    elif lab_status == "実施あり":
+        parsed_labs, lab_errors, lab_warn = validate_lab_panel(labs_raw, required=False)
         errors.extend([f"採血：{x}" for x in lab_errors])
         warnings.extend([f"採血：{x}" for x in lab_warn])
-        if is_final and lab_warn and not text(required_test_omission_reason):
-            missing.append("24ヶ月必須採血の欠測理由")
-    elif is_final:
-        missing.append("24ヶ月終了時採血")
+        if not any(text(v) for v in labs_raw.values()):
+            warnings.append(
+                "血液検査は実施されていますが、検査結果が未入力です。通常診療で実施された検査結果を入力してください。"
+            )
 
     if intra_status == "選択してください": missing.append("尿路内再発状況")
     if intra_status == "今回新規あり":
@@ -504,7 +508,7 @@ if st.button("🚀 定期経過データを確定送信", type="primary", use_co
                     "cystoscopy_result": cystoscopy_result,
                     "cystoscopy_detail": text(cystoscopy_detail),
                     "cystoscopy_not_done_reason": text(cystoscopy_not_done_reason),
-                    "labs_performed": show_labs,
+                    "labs_performed": lab_status == "実施あり",
                     "labs": parsed_labs,
                     "intraluminal_recurrence_status": intra_status,
                     "intraluminal_recurrence_date": date_str(intra_date),
