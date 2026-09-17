@@ -418,9 +418,29 @@ def validate_all():
 
 missing, errors, warnings, parsed_labs = validate_all()
 st.markdown('<div class="juog-header">8. 送信</div>', unsafe_allow_html=True)
-if missing: st.warning("未入力：" + " / ".join(missing))
-if errors: st.error("入力エラー：\n" + "\n".join([f"・{x}" for x in errors]))
-if warnings: st.info("確認事項：\n" + "\n".join([f"・{x}" for x in warnings]))
+if missing or errors or warnings:
+    summary_parts = []
+    if missing:
+        summary_parts.append(f"未入力 {len(missing)}項目")
+    if errors:
+        summary_parts.append(f"エラー {len(errors)}件")
+    if warnings:
+        summary_parts.append(f"確認事項 {len(warnings)}件")
+    st.caption("入力状況：" + " / ".join(summary_parts))
+    with st.expander("入力状況の詳細を確認"):
+        if missing:
+            st.write("**未入力**")
+            st.write(" / ".join(missing))
+        if errors:
+            st.write("**入力エラー**")
+            for x in errors:
+                st.write(f"・{x}")
+        if warnings:
+            st.write("**確認事項**")
+            for x in warnings:
+                st.write(f"・{x}")
+else:
+    st.success("必須項目の入力と基本的な整合性チェックが完了しています。")
 
 if st.button("🚀 定期経過データを確定送信", type="primary", use_container_width=True, disabled=L):
     if missing or errors:
