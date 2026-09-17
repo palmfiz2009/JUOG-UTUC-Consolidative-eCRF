@@ -419,6 +419,11 @@ def send_office_email(subject: str, content: str):
     return _smtp_send(subject, content, _office_email_addresses())
 
 
+def send_support_email(subject: str, content: str):
+    """Send an eCRF support request to the designated support address only."""
+    return _smtp_send(subject, content, ["yoshida.tks@kmu.ac.jp"])
+
+
 def send_email(subject: str, content: str, reporter_email: str | None = None):
     """Send an office notification, optionally also to the submitting facility."""
     to_addrs = _office_email_addresses()
