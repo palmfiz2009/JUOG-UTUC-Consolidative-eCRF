@@ -12,6 +12,13 @@ st.markdown(
     """
     <style>
     html { scrollbar-width: auto; }
+    /* Keep Streamlit subheaders visually below the blue section bars. */
+    h3, [data-testid="stHeadingWithActionElements"] h3 {
+        font-size: 18px !important;
+        line-height: 1.35 !important;
+        margin-top: 0.75rem !important;
+        margin-bottom: 0.5rem !important;
+    }
     ::-webkit-scrollbar { width: 20px; height: 20px; }
     ::-webkit-scrollbar-thumb {
         background: #94A3B8;
