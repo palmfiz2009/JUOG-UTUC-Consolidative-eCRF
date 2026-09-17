@@ -32,7 +32,7 @@ st.markdown(
     <style>
     .block-container {max-width: 1180px !important; padding-top: 1.3rem !important; padding-bottom: 5rem !important;}
     h1 {font-size: 27px !important; text-align:center; color:#0F172A; margin-bottom:30px !important;}
-    h2 {font-size:16px !important; color:white !important; background:#1E3A8A; padding:10px 18px; border-radius:8px; margin-top:24px !important;}
+    .juog-header {background:#1E3A8A;color:white;padding:10px 18px;border-radius:8px;font-weight:700;margin-top:24px;margin-bottom:14px;}
     label {font-weight:600 !important; color:#334155 !important;}
     </style>
     """,
@@ -62,7 +62,7 @@ if st.session_state.screening_sent:
 L = False
 
 # -------------------- 1. Basic / screening --------------------
-st.header("1. 患者背景・スクリーニング")
+st.markdown('<div class="juog-header">1. 患者背景・スクリーニング</div>', unsafe_allow_html=True)
 c1, c2 = st.columns(2)
 with c1:
     facility_code, facility_name = render_facility(key="reg_facility", disabled=L)
@@ -106,7 +106,7 @@ with h2:
     concomitant_tx = st.text_area("現在の併用治療（なしの場合は『なし』）*", disabled=L)
 
 # -------------------- 2. Diagnosis --------------------
-st.header("2. 原疾患・診断時Stage")
+st.markdown('<div class="juog-header">2. 原疾患・診断時Stage</div>', unsafe_allow_html=True)
 d1, d2 = st.columns(2)
 with d1:
     diagnosis_date = st.date_input("初回診断日*", value=None, disabled=L)
@@ -158,7 +158,7 @@ if screening_required_omission:
     screening_omission_reason = st.text_area("スクリーニング必須検査の欠測/未実施理由*", disabled=L)
 
 # -------------------- 3. EVP / RECIST --------------------
-st.header("3. EVP治療歴・術前画像評価")
+st.markdown('<div class="juog-header">3. EVP治療歴・術前画像評価</div>', unsafe_allow_html=True)
 e1, e2 = st.columns(2)
 with e1:
     evp_start = st.date_input("EVP初回投与日*", value=None, disabled=L)
@@ -227,7 +227,7 @@ if cm == "cM1":
             st.text_input("局所療法 その他詳細*", key="reg_cm1_other", disabled=L)
 
 # -------------------- 4. Exclusion / planned surgery --------------------
-st.header("4. 選択・除外基準、手術予定")
+st.markdown('<div class="juog-header">4. 選択・除外基準、手術予定</div>', unsafe_allow_html=True)
 x1, x2 = st.columns(2)
 with x1:
     g3_unrecovered = st.radio("EVP関連 Grade 3以上の未回復有害事象*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
@@ -502,7 +502,7 @@ def build_data(parsed_labs):
 missing, errors, ineligible, warnings, parsed_labs = collect_validation()
 eligible_candidate = not missing and not errors and not ineligible
 
-st.header("5. 中央MDT審査申請")
+st.markdown('<div class="juog-header">5. 中央MDT審査申請</div>', unsafe_allow_html=True)
 if missing or errors or ineligible or warnings:
     summary_parts = []
     if missing:
