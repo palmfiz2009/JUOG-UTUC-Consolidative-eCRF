@@ -9,11 +9,17 @@ from juog_common import (
     CD_OPTIONS,
     LAB_FIELDS,
     POSTOP_TREATMENT_OPTIONS,
+    capture_draft_state,
+    clear_session_state_prefixes,
     date_str,
+    delete_crf_draft,
+    get_crf_draft,
     json_block,
     make_submission_metadata,
     render_facility,
     render_submission_kind,
+    restore_draft_state,
+    save_crf_draft,
     save_crf_payload,
     send_email,
     text,
@@ -85,8 +91,39 @@ if st.session_state.peri_sent:
         st.info("確認事項も中央データに保存されています。")
     if st.session_state.get("peri_sent_email_failed"):
         st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
+    if st.session_state.get("peri_sent_draft_delete_failed"):
+        st.info("確定送信は完了していますが、仮保存データの削除確認ができませんでした。確定データには影響ありません。")
     st.caption("訂正する場合はページを再読み込みし、「訂正報告」を選択して送信してください。")
     st.stop()
+
+if st.session_state.get("draft30_loaded_at"):
+    st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['draft30_loaded_at']}）。")
+    st.session_state.pop("draft30_loaded_at", None)
+
+with st.expander("仮保存から再開", expanded=False):
+    draft_lookup_id = st.text_input(
+        "JUOG登録番号",
+        placeholder="JUOG-001",
+        key="draft30_lookup_id",
+        help="以前に仮保存した周術期・術後30日CRFを読み込みます。",
+    ).strip().upper()
+    if st.button("仮保存を読み込む", key="draft30_load_button", use_container_width=True):
+        if not valid_registration_id(draft_lookup_id):
+            st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
+        else:
+            draft_result = get_crf_draft(draft_lookup_id, "perioperative_30d", "30d")
+            if not draft_result.get("ok"):
+                st.error("仮保存データを取得できませんでした：" + (draft_result.get("message") or draft_result.get("error") or "unknown error"))
+            elif not draft_result.get("source_found"):
+                st.info("このJUOG登録番号の仮保存データはありません。")
+            else:
+                clear_session_state_prefixes(("peri_", "widget_peri_"))
+                restore_draft_state(draft_result.get("draft_state") or {})
+                if not st.session_state.get("peri_facility") and draft_result.get("facility_name"):
+                    st.session_state["peri_facility"] = draft_result.get("facility_name")
+                st.session_state["peri_registration_id"] = draft_lookup_id
+                st.session_state["draft30_loaded_at"] = draft_result.get("updated_at") or "時刻不明"
+                st.rerun()
 
 L = False
 
@@ -95,8 +132,8 @@ st.markdown('<div class="juog-header">1. 基本情報</div>', unsafe_allow_html=
 b1, b2 = st.columns(2)
 with b1:
     facility_code, facility_name = render_facility(key="peri_facility", disabled=L)
-    registration_id = st.text_input("JUOG登録番号*", placeholder="JUOG-001", disabled=L).strip().upper()
-    reporter_email = st.text_input("担当者メールアドレス*", disabled=L)
+    registration_id = st.text_input("JUOG登録番号*", placeholder="JUOG-001", key="peri_registration_id", disabled=L).strip().upper()
+    reporter_email = st.text_input("担当者メールアドレス*", key="peri_reporter_email", disabled=L)
 with b2:
     submission_kind, correction_reason = render_submission_kind("peri", disabled=L)
     surgery_performed = st.radio(
@@ -105,6 +142,7 @@ with b2:
         index=None,
         horizontal=True,
         disabled=L,
+        key="peri_surgery_performed",
     )
 
 # ---------------- perioperative ----------------
@@ -146,11 +184,11 @@ if surgery_performed == "実施した":
     st.markdown("#### 手術情報")
     d1, d2, d3 = st.columns(3)
     with d1:
-        last_evp_date = st.date_input("EVP最終投与日*", value=None, disabled=L)
+        last_evp_date = st.date_input("EVP最終投与日*", value=None, key="peri_last_evp_date", disabled=L)
     with d2:
-        op_admission_date = st.date_input("入院日*", value=None, disabled=L)
+        op_admission_date = st.date_input("入院日*", value=None, key="peri_op_admission_date", disabled=L)
     with d3:
-        op_date = st.date_input("手術実施日*", value=None, disabled=L)
+        op_date = st.date_input("手術実施日*", value=None, key="peri_op_date", disabled=L)
     planned_or_reference_date = op_date
 
     s1, s2 = st.columns(2)
@@ -158,6 +196,7 @@ if surgery_performed == "実施した":
         op_type = st.selectbox(
             "術式*",
             ["選択してください", "根治的腎尿管全摘除術", "尿管部分切除術", "その他（プロトコル逸脱）"],
+            key="peri_op_type",
             disabled=L,
         )
         if op_type == "その他（プロトコル逸脱）":
@@ -166,6 +205,7 @@ if surgery_performed == "実施した":
         approaches = st.multiselect(
             "実際の手術アプローチ*",
             ["開腹", "腹腔鏡", "ロボット支援"],
+            key="peri_approaches",
             disabled=L,
             help="使用したアプローチをすべて選択してください。例：腎側を腹腔鏡、尿管膀胱処理を開腹で行った場合は「腹腔鏡」「開腹」の両方を選択します。",
         )
@@ -175,11 +215,12 @@ if surgery_performed == "実施した":
                 ["予定されたハイブリッド", "予定外のアプローチ変更（conversion）"],
                 index=None,
                 horizontal=True,
+                key="peri_approach_pattern",
                 disabled=L,
                 help="予定どおり複数アプローチを併用した場合は「予定されたハイブリッド」。術中判断で予定外に変更した場合はconversionです。",
             )
             if approach_pattern == "予定外のアプローチ変更（conversion）":
-                conversion_reason = st.text_area("conversionの理由*", disabled=L)
+                conversion_reason = st.text_area("conversionの理由*", key="peri_conversion_reason", disabled=L)
         elif len(approaches) == 1:
             approach_pattern = "単一アプローチ"
 
@@ -188,18 +229,20 @@ if surgery_performed == "実施した":
             ["はい", "いいえ"],
             index=None,
             horizontal=True,
+            key="peri_op_completed",
             disabled=L,
         )
         if op_completed == "いいえ":
-            op_incomplete_detail = st.text_area("完遂不能理由*", disabled=L)
+            op_incomplete_detail = st.text_area("完遂不能理由*", key="peri_op_incomplete_detail", disabled=L)
 
     with s2:
-        op_time = st.number_input("手術時間 (分)*", min_value=0, value=None, step=1, disabled=L)
-        bleeding = st.number_input("出血量 (mL)*", min_value=0, value=None, step=1, disabled=L)
+        op_time = st.number_input("手術時間 (分)*", min_value=0, value=None, step=1, key="peri_op_time", disabled=L)
+        bleeding = st.number_input("出血量 (mL)*", min_value=0, value=None, step=1, key="peri_bleeding", disabled=L)
 
         eau_grade = st.selectbox(
             "術中合併症 (EAUiaiC)*",
             ["選択してください", "Grade 0", "Grade 1", "Grade 2", "Grade 3", "Grade 4A", "Grade 4B", "Grade 5A", "Grade 5B"],
+            key="peri_eau_grade",
             disabled=L,
             help=(
                 "EAU Intraoperative Adverse Incident Classification。\n"
@@ -214,19 +257,21 @@ if surgery_performed == "実施した":
             ),
         )
         if eau_grade not in ["選択してください", "Grade 0"]:
-            eau_detail = st.text_area("術中合併症の詳細*", disabled=L)
+            eau_detail = st.text_area("術中合併症の詳細*", key="peri_eau_detail", disabled=L)
 
         ln_dissection = st.radio(
             "リンパ節郭清*",
             ["実施した", "実施しなかった"],
             index=None,
             horizontal=True,
+            key="peri_ln_dissection",
             disabled=L,
         )
         if ln_dissection == "実施した":
             ln_range = st.multiselect(
                 "郭清範囲*",
                 ["腎門部", "下大静脈周囲", "大動脈周囲", "傍大動脈", "大動脈静脈間", "総腸骨", "外腸骨", "内腸骨", "閉鎖", "その他"],
+                key="peri_ln_range",
                 disabled=L,
             )
 
@@ -235,6 +280,7 @@ if surgery_performed == "実施した":
             ["なし", "あり"],
             index=None,
             horizontal=True,
+            key="peri_unrecovered_g2_relevant",
             disabled=L,
             help="脱毛・色素沈着など、手術手技に影響しない事象は除外します。",
         )
@@ -248,10 +294,10 @@ if surgery_performed == "実施した":
             st.success("原則4–8週の範囲内です。")
         elif 57 <= washout_days <= 84:
             st.warning("8週超〜12週以内です。理由を記録してください。")
-            protocol_deviation_reason = st.text_area("8週超となった理由*", disabled=L)
+            protocol_deviation_reason = st.text_area("8週超となった理由*", key="peri_protocol_deviation_reason", disabled=L)
         else:
             st.warning("4–12週の範囲外です。理由を記録してください。")
-            protocol_deviation_reason = st.text_area("手術時期の理由／プロトコル逸脱理由*", disabled=L)
+            protocol_deviation_reason = st.text_area("手術時期の理由／プロトコル逸脱理由*", key="peri_protocol_deviation_reason", disabled=L)
 
     st.markdown("#### 術後入院経過")
     h1, h2 = st.columns(2)
@@ -260,12 +306,13 @@ if surgery_performed == "実施した":
             "初回手術入院の転帰*",
             ["退院済み", "入院継続中", "初回入院中に死亡"],
             index=None,
+            key="peri_initial_hospital_outcome",
             disabled=L,
             help="このCRF入力時点での初回手術入院の転帰を選択してください。",
         )
     with h2:
         if initial_hospital_outcome == "退院済み":
-            op_discharge_date = st.date_input("初回退院日*", value=None, disabled=L)
+            op_discharge_date = st.date_input("初回退院日*", value=None, key="peri_op_discharge_date", disabled=L)
 
     if initial_hospital_outcome == "退院済み" and op_discharge_date:
         if op_date and op_discharge_date > op_date + timedelta(days=30):
@@ -277,15 +324,17 @@ if surgery_performed == "実施した":
                 ["なし", "あり"],
                 index=None,
                 horizontal=True,
+                key="peri_readmission_30d",
                 disabled=L,
             )
             if readmission_30d == "あり":
                 r1, r2 = st.columns(2)
                 with r1:
-                    readmission_date = st.date_input("最初の再入院日*", value=None, disabled=L)
+                    readmission_date = st.date_input("最初の再入院日*", value=None, key="peri_readmission_date", disabled=L)
                     readmission_reason = st.text_area(
                         "再入院理由*",
                         help="複数回の再入院がある場合は、理由欄にすべて記載してください。",
+                        key="peri_readmission_reason",
                         disabled=L,
                     )
                 with r2:
@@ -293,34 +342,35 @@ if surgery_performed == "実施した":
                         "再入院後の転帰*",
                         ["再退院済み", "再入院継続中", "再入院中に死亡"],
                         index=None,
+                        key="peri_readmission_day30_status",
                         disabled=L,
                     )
                     if readmission_day30_status == "再退院済み":
-                        readmission_discharge_date = st.date_input("再退院日*", value=None, disabled=L)
+                        readmission_discharge_date = st.date_input("再退院日*", value=None, key="peri_readmission_discharge_date", disabled=L)
 
     st.markdown("#### 術直後・退院時データ")
     st.caption("術直後バイタル：術後管理場所（病棟・HCU・ICU・PACU等）到着時の最初の記録値。")
     v1, v2, v3, v4 = st.columns(4)
     with v1:
-        day0_sbp = st.number_input("到着時 収縮期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+        day0_sbp = st.number_input("到着時 収縮期血圧", min_value=0, value=None, step=1, key="peri_day0_sbp", disabled=L, help="mmHg")
     with v2:
-        day0_dbp = st.number_input("到着時 拡張期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+        day0_dbp = st.number_input("到着時 拡張期血圧", min_value=0, value=None, step=1, key="peri_day0_dbp", disabled=L, help="mmHg")
     with v3:
-        day0_pulse = st.number_input("到着時 脈拍", min_value=0, value=None, step=1, disabled=L, help="/min")
+        day0_pulse = st.number_input("到着時 脈拍", min_value=0, value=None, step=1, key="peri_day0_pulse", disabled=L, help="/min")
     with v4:
-        day0_temp = st.number_input("到着時 体温", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L, help="℃")
+        day0_temp = st.number_input("到着時 体温", min_value=30.0, max_value=45.0, value=None, step=0.1, key="peri_day0_temp", disabled=L, help="℃")
 
     if initial_hospital_outcome == "退院済み":
         st.caption("退院時バイタル：初回退院当日または退院前24時間以内で、退院時に最も近い定時測定値。")
         d1, d2, d3, d4 = st.columns(4)
         with d1:
-            discharge_sbp = st.number_input("退院時 収縮期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+            discharge_sbp = st.number_input("退院時 収縮期血圧", min_value=0, value=None, step=1, key="peri_discharge_sbp", disabled=L, help="mmHg")
         with d2:
-            discharge_dbp = st.number_input("退院時 拡張期血圧", min_value=0, value=None, step=1, disabled=L, help="mmHg")
+            discharge_dbp = st.number_input("退院時 拡張期血圧", min_value=0, value=None, step=1, key="peri_discharge_dbp", disabled=L, help="mmHg")
         with d3:
-            discharge_pulse = st.number_input("退院時 脈拍", min_value=0, value=None, step=1, disabled=L, help="/min")
+            discharge_pulse = st.number_input("退院時 脈拍", min_value=0, value=None, step=1, key="peri_discharge_pulse", disabled=L, help="/min")
         with d4:
-            discharge_temp = st.number_input("退院時 体温", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L, help="℃")
+            discharge_temp = st.number_input("退院時 体温", min_value=30.0, max_value=45.0, value=None, step=0.1, key="peri_discharge_temp", disabled=L, help="℃")
 
         st.markdown("**退院前最終採血**")
         st.caption("手術後〜初回退院日の採血のうち、退院日に最も近い採血を入力してください。研究目的の追加採血は不要です。")
@@ -329,10 +379,11 @@ if surgery_performed == "実施した":
             ["あり", "なし"],
             index=None,
             horizontal=True,
+            key="peri_discharge_lab_available",
             disabled=L,
         )
         if discharge_lab_available == "あり":
-            discharge_lab_date = st.date_input("採血日*", value=None, disabled=L)
+            discharge_lab_date = st.date_input("採血日*", value=None, key="peri_discharge_lab_date", disabled=L)
             discharge_labs_raw = render_optional_lab_panel("peri_discharge_lab", disabled=L, columns=3)
     elif initial_hospital_outcome == "入院継続中":
         st.caption("入院継続中のため、退院時バイタル・退院前採血は未入力で構いません。")
@@ -343,12 +394,13 @@ elif surgery_performed == "実施しなかった":
     st.markdown("#### 手術未施行")
     n1, n2 = st.columns(2)
     with n1:
-        last_evp_date = st.date_input("EVP最終投与日*", value=None, disabled=L)
-        planned_or_reference_date = st.date_input("手術予定日*", value=None, disabled=L)
+        last_evp_date = st.date_input("EVP最終投与日*", value=None, key="peri_last_evp_date", disabled=L)
+        planned_or_reference_date = st.date_input("手術予定日*", value=None, key="peri_planned_or_reference_date", disabled=L)
     with n2:
         no_op_reason = st.selectbox(
             "手術未施行理由*",
             ["選択してください", "病勢進行", "EVP関連有害事象", "中央MDT/手術適応変更", "同意撤回", "患者希望", "その他"],
+            key="peri_no_op_reason",
             disabled=L,
         )
         if no_op_reason == "その他":
@@ -362,40 +414,42 @@ path = {}
 if surgery_performed == "実施した":
     p1, p2 = st.columns(2)
     with p1:
-        path["histology"] = st.selectbox("組織型*", ["選択してください", "Urothelial carcinoma", "Urothelial carcinoma（亜型・分化を含む）", "その他", "評価不能"], disabled=L)
+        path["histology"] = st.selectbox("組織型*", ["選択してください", "Urothelial carcinoma", "Urothelial carcinoma（亜型・分化を含む）", "その他", "評価不能"], key="peri_path_histology", disabled=L)
         if path["histology"] == "その他":
-            path["histology_other"] = st.text_input("組織型 その他詳細*", disabled=L)
+            path["histology_other"] = st.text_input("組織型 その他詳細*", key="peri_path_histology_other", disabled=L)
         else:
             path["histology_other"] = ""
-        path["subtype_presence"] = st.radio("亜型/分化の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
+        path["subtype_presence"] = st.radio("亜型/分化の有無*", ["なし", "あり"], index=None, horizontal=True, key="peri_path_subtype_presence", disabled=L)
         if path["subtype_presence"] == "あり":
-            path["subtypes"] = st.multiselect("亜型/分化*", ["Nested", "Micropapillary", "Plasmacytoid", "Sarcomatoid", "Squamous differentiation", "Glandular differentiation", "その他"], disabled=L)
+            path["subtypes"] = st.multiselect("亜型/分化*", ["Nested", "Micropapillary", "Plasmacytoid", "Sarcomatoid", "Squamous differentiation", "Glandular differentiation", "その他"], key="peri_path_subtypes", disabled=L)
         else:
             path["subtypes"] = []
-        path["size_mm"] = st.number_input("病理最大径 (mm)*", min_value=0.0, value=None, step=0.1, disabled=L)
-        path["locations"] = st.multiselect("病理部位*", ["腎盂", "上部尿管", "中部尿管", "下部尿管", "その他"], disabled=L)
+        path["size_mm"] = st.number_input("病理最大径 (mm)*", min_value=0.0, value=None, step=0.1, key="peri_path_size_mm", disabled=L)
+        path["locations"] = st.multiselect("病理部位*", ["腎盂", "上部尿管", "中部尿管", "下部尿管", "その他"], key="peri_path_locations", disabled=L)
     with p2:
-        path["ypt"] = st.selectbox("ypT*", ["選択してください", "ypT0", "ypTa", "ypTis", "ypT1", "ypT2", "ypT3", "ypT4", "評価不能"], disabled=L)
+        path["ypt"] = st.selectbox("ypT*", ["選択してください", "ypT0", "ypTa", "ypTis", "ypT1", "ypT2", "ypT3", "ypT4", "評価不能"], key="peri_path_ypt", disabled=L)
         if ln_dissection == "実施した":
             path["ypn"] = st.selectbox(
                 "ypN*",
                 ["選択してください", "ypN0", "ypN1", "ypN2", "ypNX（評価不能）"],
+                key="peri_path_ypn",
                 disabled=L,
             )
         else:
             path["ypn"] = "ypNX（郭清なし）"
             st.info("リンパ節郭清なしのためypNは ypNX として記録します。")
         if path["ypn"] in ["ypN1", "ypN2"]:
-            path["ypn_sites"] = st.multiselect("ypN陽性部位*", ["腎門部", "下大静脈周囲", "大動脈周囲", "傍大動脈", "大動脈静脈間", "総腸骨", "外腸骨", "内腸骨", "閉鎖", "その他"], disabled=L)
+            path["ypn_sites"] = st.multiselect("ypN陽性部位*", ["腎門部", "下大静脈周囲", "大動脈周囲", "傍大動脈", "大動脈静脈間", "総腸骨", "外腸骨", "内腸骨", "閉鎖", "その他"], key="peri_path_ypn_sites", disabled=L)
         else:
             path["ypn_sites"] = []
-        path["lvi"] = st.radio("LVI*", ["なし", "あり", "評価不能"], index=None, horizontal=True, disabled=L)
-        path["r0"] = st.radio("R0切除*", ["R0", "R1/R2", "評価不能"], index=None, horizontal=True, disabled=L)
+        path["lvi"] = st.radio("LVI*", ["なし", "あり", "評価不能"], index=None, horizontal=True, key="peri_path_lvi", disabled=L)
+        path["r0"] = st.radio("R0切除*", ["R0", "R1/R2", "評価不能"], index=None, horizontal=True, key="peri_path_r0", disabled=L)
         path["trg"] = st.radio(
             "原発巣 TRG*",
             ["TRG 1", "TRG 2", "TRG 3", "評価不能"],
             index=None,
             horizontal=True,
+            key="peri_path_trg",
             disabled=L,
             help=(
                 "TRG評価は病理部へ依頼してください。各施設の病理診断科でVoskuilen分類に基づき、原発巣を評価してください。\n"
@@ -405,7 +459,7 @@ if surgery_performed == "実施した":
             ),
         )
         if (path.get("ypn") == "ypNX（評価不能）" or "評価不能" in [path.get("histology"), path.get("ypt"), path.get("lvi"), path.get("r0"), path.get("trg")]):
-            path["eval_failed_reason"] = st.text_area("病理評価不能理由*", disabled=L)
+            path["eval_failed_reason"] = st.text_area("病理評価不能理由*", key="peri_path_eval_failed_reason", disabled=L)
         else:
             path["eval_failed_reason"] = ""
     # Main pCR endpoint accepts ypT0N0 and ypT0Nx.
@@ -419,7 +473,7 @@ else:
 
 # ---------------- 30d ----------------
 st.markdown('<div class="juog-header">4. 術後30日評価</div>', unsafe_allow_html=True)
-visit_date_30 = st.date_input("30日評価日*", value=None, disabled=L)
+visit_date_30 = st.date_input("30日評価日*", value=None, key="peri_visit_date_30", disabled=L)
 window_deviation_reason = ""
 reference_date = op_date if surgery_performed == "実施した" and op_date else planned_or_reference_date
 if reference_date:
@@ -430,7 +484,7 @@ if reference_date:
             st.success("評価日は30日±14日の範囲内です。")
         else:
             st.warning("評価日は30日±14日の範囲外です。データは入力できますが、理由を記録してください。")
-            window_deviation_reason = st.text_area("30日評価時期の逸脱理由*", disabled=L)
+            window_deviation_reason = st.text_area("30日評価時期の逸脱理由*", key="peri_window_deviation_reason", disabled=L)
         if surgery_performed == "実施した" and op_date and visit_date_30 < op_date + timedelta(days=30):
             st.warning("術後30日より前の評価です。主要安全性評価期間がまだ完了していないため、術後30日までに新規合併症が生じた場合は訂正報告してください。")
 
@@ -439,7 +493,7 @@ st.caption(
     "30日±14日の期間内で、術後30日目に最も近い採血結果を入力してください。"
 )
 day30_lab_available = "あり"
-day30_lab_date = st.date_input("30日評価に用いた採血日*", value=None, disabled=L)
+day30_lab_date = st.date_input("30日評価に用いた採血日*", value=None, key="peri_day30_lab_date", disabled=L)
 day30_labs_raw = render_optional_lab_panel("peri_day30_lab", disabled=L, columns=3)
 
 cd_grade = "N/A"
@@ -451,16 +505,17 @@ renal_exception_detail = ""
 if surgery_performed == "実施した":
     s1, s2 = st.columns(2)
     with s1:
-        cd_grade = st.selectbox("術後30日以内の最高Clavien-Dindo Grade*", CD_OPTIONS, disabled=L)
+        cd_grade = st.selectbox("術後30日以内の最高Clavien-Dindo Grade*", CD_OPTIONS, key="peri_cd_grade", disabled=L)
         if cd_grade not in ["選択してください", "Grade 0"]:
-            cd_date = st.date_input("当該合併症の発現日*", value=None, disabled=L)
-            cd_detail = st.text_area("手術関連合併症の詳細*", disabled=L)
+            cd_date = st.date_input("当該合併症の発現日*", value=None, key="peri_cd_date", disabled=L)
+            cd_detail = st.text_area("手術関連合併症の詳細*", key="peri_cd_detail", disabled=L)
     with s2:
         if cd_grade not in ["選択してください", "Grade 0"]:
-            cd_relation = st.selectbox("手術手技との因果関係*", ["選択してください", "関連する", "否定できない", "関連しない"], disabled=L)
+            cd_relation = st.selectbox("手術手技との因果関係*", ["選択してください", "関連する", "否定できない", "関連しない"], key="peri_cd_relation", disabled=L)
             renal_exception = st.checkbox(
                 "計画書の腎機能低下/透析除外規定に該当",
                 value=False,
+                key="peri_renal_exception",
                 disabled=L,
                 help="RNUに伴う生理的腎機能低下、または術前から予測され同意済みの不可避な透析導入は主要合併症集計から除外します。",
             )
@@ -468,40 +523,41 @@ if surgery_performed == "実施した":
                 renal_exception_detail = st.text_area(
                     "腎機能低下/透析除外規定に該当する根拠*",
                     placeholder="例：術前単腎・高度CKDで術後透析導入が予測され、術前説明・同意済み。",
+                    key="peri_renal_exception_detail",
                     disabled=L,
                 )
 
-has_ctcae = st.checkbox("術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある", disabled=L)
+has_ctcae = st.checkbox("術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある", key="peri_has_ctcae", disabled=L)
 ctcae_detail = ""
 if has_ctcae:
-    ctcae_detail = st.text_area("CTCAE有害事象詳細*", disabled=L)
+    ctcae_detail = st.text_area("CTCAE有害事象詳細*", key="peri_ctcae_detail", disabled=L)
 
 st.subheader("術後治療")
-adj_plan = st.selectbox("術後治療・今後の予定*", POSTOP_TREATMENT_OPTIONS, disabled=L)
+adj_plan = st.selectbox("術後治療・今後の予定*", POSTOP_TREATMENT_OPTIONS, key="peri_adj_plan", disabled=L)
 adj_detail = ""
 adj_start = adj_end = None
 adj_ongoing = False
 if adj_plan not in ["選択してください", "無治療（経過観察）"]:
     if adj_plan in ["治験（TROP2標的ADC、その他）", "その他"]:
-        adj_detail = st.text_input("治療詳細*", disabled=L)
+        adj_detail = st.text_input("治療詳細*", key="peri_adj_detail", disabled=L)
     a1, a2 = st.columns(2)
-    adj_start = a1.date_input("開始日/予定日*", value=None, disabled=L)
-    adj_ongoing = a2.checkbox("継続中", disabled=L)
+    adj_start = a1.date_input("開始日/予定日*", value=None, key="peri_adj_start", disabled=L)
+    adj_ongoing = a2.checkbox("継続中", key="peri_adj_ongoing", disabled=L)
     if not adj_ongoing:
-        adj_end = a2.date_input("終了日（予定なら空欄可）", value=None, disabled=L)
+        adj_end = a2.date_input("終了日（予定なら空欄可）", value=None, key="peri_adj_end", disabled=L)
 
 st.subheader("生存状況")
 os1, os2 = st.columns(2)
 with os1:
-    status_alive = st.radio("生存状況*", ["生存", "死亡"], index=None, horizontal=True, disabled=L)
+    status_alive = st.radio("生存状況*", ["生存", "死亡"], index=None, horizontal=True, key="peri_status_alive", disabled=L)
 with os2:
     final_visit_date = death_date = None
     death_cause = ""
     if status_alive == "生存":
-        final_visit_date = st.date_input("最終生存確認日*", value=None, disabled=L)
+        final_visit_date = st.date_input("最終生存確認日*", value=None, key="peri_final_visit_date", disabled=L)
     elif status_alive == "死亡":
-        death_date = st.date_input("死亡日*", value=None, disabled=L)
-        death_cause = st.selectbox("死因*", ["選択してください", "癌死 (原疾患による)", "治療関連死", "他病死", "不明"], disabled=L)
+        death_date = st.date_input("死亡日*", value=None, key="peri_death_date", disabled=L)
+        death_cause = st.selectbox("死因*", ["選択してください", "癌死 (原疾患による)", "治療関連死", "他病死", "不明"], key="peri_death_cause", disabled=L)
 
 # ---------------- validation ----------------
 def validate_all():
@@ -718,7 +774,38 @@ if missing or errors or warnings:
 else:
     st.success("必須項目の入力と基本的な整合性チェックが完了しています。")
 
-if st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=L):
+st.caption("仮保存は正式送信ではありません。必須項目が未入力でも保存でき、後からこの画面に戻って再開できます。")
+draft_col, submit_col = st.columns([1, 2])
+with draft_col:
+    draft_clicked = st.button("仮保存", use_container_width=True, disabled=L, key="draft30_save_button")
+with submit_col:
+    submit_clicked = st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=L, key="draft30_submit_button")
+
+if draft_clicked:
+    if not valid_registration_id(registration_id):
+        st.error("仮保存には正しいJUOG登録番号が必要です（例：JUOG-001）。")
+    else:
+        draft_state = capture_draft_state(
+            "peri_",
+            exclude_prefixes=("peri_sent",),
+            overrides={"peri_registration_id": registration_id},
+        )
+        draft_result = save_crf_draft(
+            registration_id,
+            "perioperative_30d",
+            "30d",
+            draft_state,
+            facility_code=facility_code,
+            facility_name=facility_name if facility_name != "選択してください" else "",
+            reporter_email=reporter_email,
+        )
+        if draft_result.get("ok"):
+            saved_at = draft_result.get("updated_at") or ""
+            st.success("仮保存しました。ブラウザを閉じても『仮保存から再開』から読み込めます。" + (f"（{saved_at}）" if saved_at else ""))
+        else:
+            st.error("仮保存できませんでした：" + (draft_result.get("message") or draft_result.get("error") or "unknown error"))
+
+if submit_clicked:
     if missing or errors:
         st.error("未入力または入力エラーを修正してください。")
     else:
@@ -832,6 +919,8 @@ ypT0N0: {'はい' if path.get('pcr_ypt0n0') else 'いいえ/N/A'}
             if not save_result.get("ok"):
                 st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
             else:
+                draft_delete = delete_crf_draft(registration_id, "perioperative_30d", "30d")
+                st.session_state.peri_sent_draft_delete_failed = not bool(draft_delete.get("ok"))
                 sent, send_err = send_email(
                     f"【JUOG CRF】【perioperative_30d】【{registration_id}】",
                     report,

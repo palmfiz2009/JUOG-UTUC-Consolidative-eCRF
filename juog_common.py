@@ -491,6 +491,115 @@ def save_crf_payload(payload: dict, timeout: int = 30):
     """
     return registry_call("save_crf", {"payload": payload}, timeout=timeout)
 
+
+def save_crf_draft(
+    registration_id: str,
+    crf_type: str,
+    visit: str,
+    draft_state: dict,
+    facility_code: str = "",
+    facility_name: str = "",
+    reporter_email: str = "",
+    timeout: int = 30,
+):
+    """Upsert a non-final eCRF draft. No formal CRF version or e-mail is created."""
+    return registry_call(
+        "save_draft",
+        {
+            "registration_id": (registration_id or "").strip().upper(),
+            "crf_type": crf_type,
+            "visit": visit,
+            "facility_code": facility_code or "",
+            "facility_name": facility_name or "",
+            "reporter_email": reporter_email or "",
+            "schema_version": SCHEMA_VERSION,
+            "draft_state": draft_state or {},
+        },
+        timeout=timeout,
+    )
+
+
+def get_crf_draft(registration_id: str, crf_type: str, visit: str, timeout: int = 30):
+    """Fetch the latest saved draft for one CRF visit."""
+    return registry_call(
+        "get_draft",
+        {
+            "registration_id": (registration_id or "").strip().upper(),
+            "crf_type": crf_type,
+            "visit": visit,
+        },
+        timeout=timeout,
+    )
+
+
+def delete_crf_draft(registration_id: str, crf_type: str, visit: str, timeout: int = 30):
+    """Delete a draft after the corresponding CRF has been formally submitted."""
+    return registry_call(
+        "delete_draft",
+        {
+            "registration_id": (registration_id or "").strip().upper(),
+            "crf_type": crf_type,
+            "visit": visit,
+        },
+        timeout=timeout,
+    )
+
+
+def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), overrides: dict | None = None):
+    """Serialize selected Streamlit session-state values with enough type data to restore widgets."""
+    import streamlit as st
+
+    out = {}
+    for key in list(st.session_state.keys()):
+        if not str(key).startswith(prefix):
+            continue
+        if any(str(key).startswith(x) for x in exclude_prefixes):
+            continue
+        value = st.session_state[key]
+        if isinstance(value, datetime):
+            out[str(key)] = {"type": "datetime", "value": value.isoformat()}
+        elif isinstance(value, date):
+            out[str(key)] = {"type": "date", "value": value.isoformat()}
+        elif value is None or isinstance(value, (str, int, float, bool, list, dict)):
+            out[str(key)] = {"type": "value", "value": value}
+
+    for key, value in (overrides or {}).items():
+        if isinstance(value, datetime):
+            out[str(key)] = {"type": "datetime", "value": value.isoformat()}
+        elif isinstance(value, date):
+            out[str(key)] = {"type": "date", "value": value.isoformat()}
+        else:
+            out[str(key)] = {"type": "value", "value": value}
+    return out
+
+
+def clear_session_state_prefixes(prefixes: tuple[str, ...] | list[str]):
+    """Clear form widget state before restoring a saved draft."""
+    import streamlit as st
+
+    for key in list(st.session_state.keys()):
+        if any(str(key).startswith(prefix) for prefix in prefixes):
+            del st.session_state[key]
+
+
+def restore_draft_state(draft_state: dict):
+    """Restore values produced by capture_draft_state into Streamlit session state."""
+    import streamlit as st
+
+    for key, item in (draft_state or {}).items():
+        if not isinstance(item, dict) or "value" not in item:
+            continue
+        kind = str(item.get("type") or "value")
+        value = item.get("value")
+        try:
+            if kind == "date" and value:
+                value = date.fromisoformat(str(value)[:10])
+            elif kind == "datetime" and value:
+                value = datetime.fromisoformat(str(value))
+        except Exception:
+            continue
+        st.session_state[str(key)] = value
+
 def validate_registry_id(registration_id: str, facility_code: str):
     if not valid_registration_id(registration_id):
         return False, "JUOG登録番号の形式が不正です（例：JUOG-001）"
