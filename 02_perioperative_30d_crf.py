@@ -100,30 +100,34 @@ if st.session_state.get("draft30_loaded_at"):
     st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['draft30_loaded_at']}）。")
     st.session_state.pop("draft30_loaded_at", None)
 
-with st.expander("仮保存から再開", expanded=False):
-    draft_lookup_id = st.text_input(
-        "JUOG登録番号",
-        placeholder="JUOG-001",
-        key="draft30_lookup_id",
-        help="以前に仮保存した周術期・術後30日CRFを読み込みます。",
-    ).strip().upper()
-    if st.button("仮保存を読み込む", key="draft30_load_button", use_container_width=True):
-        if not valid_registration_id(draft_lookup_id):
-            st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
-        else:
-            draft_result = get_crf_draft(draft_lookup_id, "perioperative_30d", "30d")
-            if not draft_result.get("ok"):
-                st.error("仮保存データを取得できませんでした：" + (draft_result.get("message") or draft_result.get("error") or "unknown error"))
-            elif not draft_result.get("source_found"):
-                st.info("このJUOG登録番号の仮保存データはありません。")
+draft_tool_col1, draft_tool_col2, _draft_tool_spacer = st.columns([0.9, 0.9, 6.2])
+with draft_tool_col1:
+    draft_clicked = st.button("💾 仮保存", key="draft30_save_button", disabled=False)
+with draft_tool_col2:
+    with st.popover("↩ 再開"):
+        st.caption("仮保存した内容を読み込みます。")
+        draft_lookup_id = st.text_input(
+            "JUOG登録番号",
+            placeholder="JUOG-001",
+            key="draft30_lookup_id",
+        ).strip().upper()
+        if st.button("読み込む", key="draft30_load_button", use_container_width=True):
+            if not valid_registration_id(draft_lookup_id):
+                st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
             else:
-                clear_session_state_prefixes(("peri_", "widget_peri_"))
-                restore_draft_state(draft_result.get("draft_state") or {})
-                if not st.session_state.get("peri_facility") and draft_result.get("facility_name"):
-                    st.session_state["peri_facility"] = draft_result.get("facility_name")
-                st.session_state["peri_registration_id"] = draft_lookup_id
-                st.session_state["draft30_loaded_at"] = draft_result.get("updated_at") or "時刻不明"
-                st.rerun()
+                draft_result = get_crf_draft(draft_lookup_id, "perioperative_30d", "30d")
+                if not draft_result.get("ok"):
+                    st.error("仮保存データを取得できませんでした：" + (draft_result.get("message") or draft_result.get("error") or "unknown error"))
+                elif not draft_result.get("source_found"):
+                    st.info("このJUOG登録番号の仮保存データはありません。")
+                else:
+                    clear_session_state_prefixes(("peri_", "widget_peri_"))
+                    restore_draft_state(draft_result.get("draft_state") or {})
+                    if not st.session_state.get("peri_facility") and draft_result.get("facility_name"):
+                        st.session_state["peri_facility"] = draft_result.get("facility_name")
+                    st.session_state["peri_registration_id"] = draft_lookup_id
+                    st.session_state["draft30_loaded_at"] = draft_result.get("updated_at") or "時刻不明"
+                    st.rerun()
 
 L = False
 
@@ -774,12 +778,8 @@ if missing or errors or warnings:
 else:
     st.success("必須項目の入力と基本的な整合性チェックが完了しています。")
 
-st.caption("仮保存は正式送信ではありません。必須項目が未入力でも保存でき、後からこの画面に戻って再開できます。")
-draft_col, submit_col = st.columns([1, 2])
-with draft_col:
-    draft_clicked = st.button("仮保存", use_container_width=True, disabled=L, key="draft30_save_button")
-with submit_col:
-    submit_clicked = st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=L, key="draft30_submit_button")
+st.caption("仮保存は正式送信ではありません。")
+submit_clicked = st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=L, key="draft30_submit_button")
 
 if draft_clicked:
     if not valid_registration_id(registration_id):
