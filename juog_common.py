@@ -424,6 +424,14 @@ def send_support_email(subject: str, content: str):
     return _smtp_send(subject, content, ["yoshida.tks@kmu.ac.jp"])
 
 
+def send_direct_email(to_addr: str, subject: str, content: str):
+    """Send an e-mail only to one explicitly specified recipient."""
+    addr = (to_addr or "").strip()
+    if not valid_email(addr):
+        return False, "INVALID_RECIPIENT"
+    return _smtp_send(subject, content, [addr])
+
+
 def send_email(subject: str, content: str, reporter_email: str | None = None):
     """Send an office notification, optionally also to the submitting facility."""
     to_addrs = _office_email_addresses()
@@ -502,7 +510,7 @@ def save_crf_draft(
     reporter_email: str = "",
     timeout: int = 30,
 ):
-    """Upsert a non-final eCRF draft. No formal CRF version or e-mail is created."""
+    """Upsert a non-final eCRF draft owned by the entered reporter e-mail."""
     return registry_call(
         "save_draft",
         {
@@ -511,7 +519,7 @@ def save_crf_draft(
             "visit": visit,
             "facility_code": facility_code or "",
             "facility_name": facility_name or "",
-            "reporter_email": reporter_email or "",
+            "reporter_email": (reporter_email or "").strip(),
             "schema_version": SCHEMA_VERSION,
             "draft_state": draft_state or {},
         },
@@ -519,14 +527,15 @@ def save_crf_draft(
     )
 
 
-def get_crf_draft(registration_id: str, crf_type: str, visit: str, timeout: int = 30):
-    """Fetch the latest saved draft for one CRF visit."""
+def get_crf_draft(registration_id: str, crf_type: str, visit: str, reporter_email: str, timeout: int = 30):
+    """Fetch a saved draft after matching the draft owner e-mail address."""
     return registry_call(
         "get_draft",
         {
             "registration_id": (registration_id or "").strip().upper(),
             "crf_type": crf_type,
             "visit": visit,
+            "reporter_email": (reporter_email or "").strip(),
         },
         timeout=timeout,
     )

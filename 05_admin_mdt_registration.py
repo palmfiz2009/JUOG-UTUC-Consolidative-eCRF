@@ -3,7 +3,7 @@ from __future__ import annotations
 import hmac
 import streamlit as st
 
-from juog_common import date_str, registry_call, send_email, text, today_jst
+from juog_common import date_str, registry_call, send_email, text, today_jst, valid_email, valid_registration_id
 
 ROLE_LABELS = {
     "radiology": "放射線診断専門医",
@@ -86,6 +86,46 @@ elif environment == "PRODUCTION":
 else:
     st.error(f"環境種別を判定できません：{environment} ｜ Backend {backend_version} ｜ Sheet: {spreadsheet_name}")
     st.stop()
+
+with st.expander("✉ 仮保存の担当者メールアドレスを変更"):
+    st.caption("担当者変更・メールアドレス変更時の救済用です。仮保存内容は消えません。")
+    reset_reg_id = st.text_input("JUOG登録番号", placeholder="JUOG-001", key="admin_draft_email_reg_id").strip().upper()
+    reset_new_email = st.text_input("新しい担当者メールアドレス*", key="admin_draft_new_email").strip()
+    reset_admin_user = st.text_input("記録者（事務局）*", key="admin_draft_email_user")
+    reset_confirm = st.checkbox(
+        "仮保存の再開用メールアドレスを変更することを確認しました。",
+        key="admin_draft_email_confirm",
+    )
+    if st.button("担当者メールアドレスを変更", key="admin_draft_email_button"):
+        reset_errors = []
+        if not valid_registration_id(reset_reg_id):
+            reset_errors.append("JUOG登録番号を正しく入力してください")
+        if not valid_email(reset_new_email):
+            reset_errors.append("新しい担当者メールアドレスを正しく入力してください")
+        if not text(reset_admin_user):
+            reset_errors.append("記録者（事務局）を入力してください")
+        if not reset_confirm:
+            reset_errors.append("変更の確認チェックが必要です")
+        if reset_errors:
+            st.error("\n".join(f"・{x}" for x in reset_errors))
+        else:
+            reset_result = registry_call(
+                "update_draft_email",
+                {
+                    "registration_id": reset_reg_id,
+                    "crf_type": "perioperative_30d",
+                    "visit": "30d",
+                    "new_reporter_email": reset_new_email,
+                    "admin_user": text(reset_admin_user),
+                },
+            )
+            if not reset_result.get("ok"):
+                st.error("担当者メールアドレスを変更できませんでした：" + str(reset_result.get("message") or reset_result.get("error") or "unknown error"))
+            elif not reset_result.get("source_found"):
+                st.info("このJUOG登録番号の30日CRF仮保存データはありません。")
+            else:
+                st.success("仮保存内容を保持したまま、再開用の担当者メールアドレスを変更しました。")
+                st.caption(f"以後は {reset_new_email} とJUOG登録番号の組み合わせで再開できます。")
 
 stats = registry_call("stats")
 if not stats.get("ok"):

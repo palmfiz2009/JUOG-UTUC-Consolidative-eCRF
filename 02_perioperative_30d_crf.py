@@ -100,15 +100,14 @@ if st.session_state.get("draft30_loaded_at"):
     st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['draft30_loaded_at']}）。")
     st.session_state.pop("draft30_loaded_at", None)
 
-# Show the previous draft-save result next to the compact controls after rerun.
-# This makes it obvious whether the backend actually persisted the draft.
+# Show the previous draft-save result after rerun.
 _draft_flash = st.session_state.pop("draft30_flash", None)
 if isinstance(_draft_flash, dict):
     _kind = _draft_flash.get("kind")
     _message = str(_draft_flash.get("message") or "")
     if _message:
         if _kind == "success":
-            st.toast(_message, icon="✅")
+            st.success(_message)
         else:
             st.error(_message)
 
@@ -117,19 +116,31 @@ with draft_tool_col1:
     draft_clicked = st.button("💾 仮保存", key="draft30_save_button", disabled=False)
 with draft_tool_col2:
     with st.popover("↩ 再開"):
-        st.caption("仮保存した内容を読み込みます。")
+        st.caption("JUOG登録番号と、仮保存時に入力した担当者メールアドレスを入力してください。")
         draft_lookup_id = st.text_input(
             "JUOG登録番号",
             placeholder="JUOG-001",
             key="draft30_lookup_id",
         ).strip().upper()
+        draft_lookup_email = st.text_input(
+            "担当者メールアドレス",
+            key="draft30_lookup_email",
+        ).strip()
         if st.button("読み込む", key="draft30_load_button", use_container_width=True):
             if not valid_registration_id(draft_lookup_id):
                 st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
+            elif not valid_email(draft_lookup_email):
+                st.error("仮保存時に入力した担当者メールアドレスを正しく入力してください。")
             else:
-                draft_result = get_crf_draft(draft_lookup_id, "perioperative_30d", "30d")
+                draft_result = get_crf_draft(
+                    draft_lookup_id, "perioperative_30d", "30d", draft_lookup_email
+                )
                 if not draft_result.get("ok"):
-                    st.error("仮保存データを取得できませんでした：" + (draft_result.get("message") or draft_result.get("error") or "unknown error"))
+                    error_code = str(draft_result.get("error") or "")
+                    if error_code in {"DRAFT_EMAIL_MISMATCH", "DRAFT_EMAIL_NOT_SET"}:
+                        st.error("JUOG登録番号または担当者メールアドレスが一致しません。")
+                    else:
+                        st.error("仮保存データを取得できませんでした：" + (draft_result.get("message") or error_code or "unknown error"))
                 elif not draft_result.get("source_found"):
                     st.info("このJUOG登録番号の仮保存データはありません。")
                 else:
@@ -138,6 +149,7 @@ with draft_tool_col2:
                     if not st.session_state.get("peri_facility") and draft_result.get("facility_name"):
                         st.session_state["peri_facility"] = draft_result.get("facility_name")
                     st.session_state["peri_registration_id"] = draft_lookup_id
+                    st.session_state["peri_reporter_email"] = draft_result.get("reporter_email") or draft_lookup_email
                     st.session_state["draft30_loaded_at"] = draft_result.get("updated_at") or "時刻不明"
                     st.rerun()
 
@@ -796,11 +808,13 @@ submit_clicked = st.button("事務局へ確定送信", type="primary", use_conta
 if draft_clicked:
     if not valid_registration_id(registration_id):
         st.error("仮保存には正しいJUOG登録番号が必要です（例：JUOG-001）。")
+    elif not valid_email(reporter_email):
+        st.error("仮保存には担当者メールアドレスを正しく入力してください。再開時にこのアドレスを使用します。")
     else:
         draft_state = capture_draft_state(
             "peri_",
             exclude_prefixes=("peri_sent",),
-            overrides={"peri_registration_id": registration_id},
+            overrides={"peri_registration_id": registration_id, "peri_reporter_email": reporter_email},
         )
         draft_result = save_crf_draft(
             registration_id,
@@ -812,14 +826,17 @@ if draft_clicked:
             reporter_email=reporter_email,
         )
         if draft_result.get("ok"):
-            # Read the row back immediately.  A save is reported as successful only
-            # when the draft can actually be retrieved from CRF_Drafts.
-            verify_result = get_crf_draft(registration_id, "perioperative_30d", "30d")
+            # Read the row back immediately. A save is reported as successful only
+            # when the draft can actually be retrieved with the same ID + e-mail.
+            verify_result = get_crf_draft(
+                registration_id, "perioperative_30d", "30d", reporter_email
+            )
             if verify_result.get("ok") and verify_result.get("source_found"):
                 saved_at = verify_result.get("updated_at") or draft_result.get("updated_at") or ""
                 st.session_state["draft30_flash"] = {
                     "kind": "success",
-                    "message": "仮保存を確認しました。" + (f" 最終保存：{saved_at}" if saved_at else ""),
+                    "message": "仮保存を確認しました。再開時はJUOG登録番号と担当者メールアドレスを入力してください。"
+                    + (f" 最終保存：{saved_at}" if saved_at else ""),
                 }
             else:
                 st.session_state["draft30_flash"] = {
@@ -829,10 +846,12 @@ if draft_clicked:
                 }
             st.rerun()
         else:
-            st.session_state["draft30_flash"] = {
-                "kind": "error",
-                "message": "仮保存できませんでした：" + str(draft_result.get("message") or draft_result.get("error") or "unknown error"),
-            }
+            error_code = str(draft_result.get("error") or "")
+            if error_code == "DRAFT_EMAIL_MISMATCH":
+                message = "このJUOG登録番号には別の担当者メールアドレスで仮保存されています。『↩ 再開』から仮保存時のメールアドレスで読み込んでください。"
+            else:
+                message = "仮保存できませんでした：" + str(draft_result.get("message") or error_code or "unknown error")
+            st.session_state["draft30_flash"] = {"kind": "error", "message": message}
             st.rerun()
 
 if submit_clicked:
