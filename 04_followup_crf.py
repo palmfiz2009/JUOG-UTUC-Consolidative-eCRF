@@ -6,6 +6,10 @@ import streamlit as st
 
 from juog_common import (
     CD_OPTIONS,
+    capture_draft_state,
+    clear_session_state_prefixes,
+    delete_crf_draft,
+    get_crf_draft,
     POSTOP_TREATMENT_OPTIONS,
     add_months,
     date_str,
@@ -16,6 +20,8 @@ from juog_common import (
     render_cytology,
     registry_call,
     save_crf_payload,
+    save_crf_draft,
+    restore_draft_state,
     send_email,
     text,
     today_jst,
@@ -80,8 +86,54 @@ if st.session_state.fu_sent:
         st.info("確認事項も中央データに保存されています。")
     if st.session_state.get("fu_sent_email_failed"):
         st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
+    if st.session_state.get("fu_sent_draft_delete_failed"):
+        st.info("確定送信は完了していますが、仮保存データの削除確認ができませんでした。確定データには影響ありません。")
     st.caption("訂正する場合はページを再読み込みし、『訂正報告』を選択して送信してください。")
     st.stop()
+
+if st.session_state.get("fu_draft_loaded_at"):
+    st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['fu_draft_loaded_at']}）。")
+    st.session_state.pop("fu_draft_loaded_at", None)
+_fu_flash = st.session_state.pop("fu_draft_flash", None)
+if isinstance(_fu_flash, dict):
+    getattr(st, _fu_flash.get("kind", "info"), st.info)(str(_fu_flash.get("message") or ""))
+
+fu_tool1, fu_tool2, _fu_spacer = st.columns([0.9, 0.9, 6.2])
+with fu_tool1:
+    fu_draft_clicked = st.button("💾 仮保存", key="draftfu_save_button")
+with fu_tool2:
+    with st.popover("↩ 再開"):
+        fu_lookup_id = st.text_input("JUOG登録番号*", placeholder="JUOG-001", key="draftfu_lookup_id")
+        fu_lookup_email = st.text_input("担当者メールアドレス*", key="draftfu_lookup_email")
+        if st.button("読み込む", key="draftfu_load_button", use_container_width=True):
+            _id = fu_lookup_id.strip().upper()
+            if not valid_registration_id(_id):
+                st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
+            elif not valid_email(fu_lookup_email):
+                st.error("仮保存時の担当者メールアドレスを正しく入力してください。")
+            else:
+                _res = get_crf_draft(_id, "followup", "followup", fu_lookup_email)
+                if not _res.get("ok"):
+                    if str(_res.get("error") or "") in {"DRAFT_EMAIL_MISMATCH", "DRAFT_EMAIL_NOT_SET"}:
+                        st.error("JUOG登録番号または担当者メールアドレスが一致しません。")
+                    else:
+                        st.error("仮保存データを取得できませんでした：" + str(_res.get("message") or _res.get("error") or "unknown error"))
+                elif not _res.get("source_found"):
+                    st.info("このJUOG登録番号の仮保存データはありません。")
+                else:
+                    clear_session_state_prefixes(("fu_", "widget_fu_"))
+                    restore_draft_state(_res.get("draft_state") or {})
+                    st.session_state["fu_registration_id"] = _id
+                    st.session_state["fu_reporter_email"] = _res.get("reporter_email") or fu_lookup_email
+                    _link = fetch_30d_linkage(_id)
+                    if _link.get("ok") and _link.get("source_found"):
+                        st.session_state["fu_linkage"] = _link
+                        st.session_state["fu_linkage_message"] = ""
+                    else:
+                        st.session_state["fu_linkage"] = None
+                        st.session_state["fu_linkage_message"] = _link.get("message") or _link.get("error") or "周術期・30日CRFから手術情報を取得できませんでした。"
+                    st.session_state["fu_draft_loaded_at"] = _res.get("updated_at") or "時刻不明"
+                    st.rerun()
 
 L = False
 
@@ -158,8 +210,8 @@ visit_month = st.selectbox(
     "今回の報告時期*",
     ["選択してください", "6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）"],
     disabled=L,
-)
-visit_date = st.date_input("今回の評価日*", value=None, disabled=L)
+ key="fu_visit_month")
+visit_date = st.date_input("今回の評価日*", value=None, disabled=L, key="fu_visit_date")
 timing_note = ""
 if reference_date and visit_month != "選択してください":
     month_no = int(''.join(x for x in visit_month if x.isdigit()))
@@ -170,7 +222,7 @@ if reference_date and visit_month != "選択してください":
         delta = abs((visit_date - target_date).days)
         if delta > 30:
             st.warning(f"目安日から{delta}日ずれています。臨床上の事情があればそのまま入力できます。")
-            timing_note = st.text_area("評価時期がずれた理由（任意だが記録推奨）", disabled=L)
+            timing_note = st.text_area("評価時期がずれた理由（任意だが記録推奨）", disabled=L, key="fu_timing_note")
 
 # ---------------- surveillance ----------------
 st.markdown('<div class="juog-header">2. 定期検査（尿細胞診・画像・膀胱鏡）</div>', unsafe_allow_html=True)
@@ -178,7 +230,7 @@ cytology = render_cytology("fu", required=True, disabled=L)
 
 s1, s2 = st.columns(2)
 with s1:
-    imaging_status = st.radio("画像検査（CT/MRI等）の実施*", ["実施", "未実施"], index=None, horizontal=True, disabled=L)
+    imaging_status = st.radio("画像検査（CT/MRI等）の実施*", ["実施", "未実施"], index=None, horizontal=True, disabled=L, key="fu_imaging_status")
     imaging_date = None
     imaging_not_done_reason = ""
     recist_status = "NE（未実施）"
@@ -186,26 +238,26 @@ with s1:
     progression_sites = []
     progression_detail = ""
     if imaging_status == "実施":
-        imaging_date = st.date_input("画像検査日*", value=None, disabled=L)
-        recist_status = st.selectbox("RECIST v1.1進行状況*", ["選択してください", "PDなし", "今回PDあり", "既報PD（今回新規PDなし）", "NE（評価不能）"], disabled=L)
+        imaging_date = st.date_input("画像検査日*", value=None, disabled=L, key="fu_imaging_date")
+        recist_status = st.selectbox("RECIST v1.1進行状況*", ["選択してください", "PDなし", "今回PDあり", "既報PD（今回新規PDなし）", "NE（評価不能）"], disabled=L, key="fu_recist_status")
         if recist_status == "今回PDあり":
-            progression_date = st.date_input("今回のPD確認日*", value=None, disabled=L)
-            progression_sites = st.multiselect("進行/新病変部位*", ["手術局所", "リンパ節", "肺", "肝", "骨", "その他"], disabled=L)
-            progression_detail = st.text_area("進行所見詳細*", disabled=L)
+            progression_date = st.date_input("今回のPD確認日*", value=None, disabled=L, key="fu_progression_date")
+            progression_sites = st.multiselect("進行/新病変部位*", ["手術局所", "リンパ節", "肺", "肝", "骨", "その他"], disabled=L, key="fu_progression_sites")
+            progression_detail = st.text_area("進行所見詳細*", disabled=L, key="fu_progression_detail")
     elif imaging_status == "未実施":
-        imaging_not_done_reason = st.text_area("画像検査未実施理由*", placeholder="例：死亡、全身状態不良、患者都合等", disabled=L)
+        imaging_not_done_reason = st.text_area("画像検査未実施理由*", placeholder="例：死亡、全身状態不良、患者都合等", disabled=L, key="fu_imaging_not_done_reason")
 with s2:
-    cystoscopy_status = st.radio("膀胱鏡の実施*", ["実施", "未実施"], index=None, horizontal=True, disabled=L)
+    cystoscopy_status = st.radio("膀胱鏡の実施*", ["実施", "未実施"], index=None, horizontal=True, disabled=L, key="fu_cystoscopy_status")
     cystoscopy_date = None
     cystoscopy_result = "未実施"
     cystoscopy_detail = ""
     cystoscopy_not_done_reason = ""
     if cystoscopy_status == "実施":
-        cystoscopy_date = st.date_input("膀胱鏡日*", value=None, disabled=L)
-        cystoscopy_result = st.selectbox("膀胱鏡所見*", ["選択してください", "腫瘍なし", "腫瘍あり", "評価不能"], disabled=L)
-        cystoscopy_detail = st.text_area("膀胱鏡所見詳細*" if cystoscopy_result in ["腫瘍あり", "評価不能"] else "膀胱鏡所見詳細", disabled=L)
+        cystoscopy_date = st.date_input("膀胱鏡日*", value=None, disabled=L, key="fu_cystoscopy_date")
+        cystoscopy_result = st.selectbox("膀胱鏡所見*", ["選択してください", "腫瘍なし", "腫瘍あり", "評価不能"], disabled=L, key="fu_cystoscopy_result")
+        cystoscopy_detail = st.text_area("膀胱鏡所見詳細*" if cystoscopy_result in ["腫瘍あり", "評価不能"] else "膀胱鏡所見詳細", disabled=L, key="fu_cystoscopy_detail")
     elif cystoscopy_status == "未実施":
-        cystoscopy_not_done_reason = st.text_area("膀胱鏡未実施理由*", placeholder="例：死亡、全身状態不良、患者拒否等", disabled=L)
+        cystoscopy_not_done_reason = st.text_area("膀胱鏡未実施理由*", placeholder="例：死亡、全身状態不良、患者拒否等", disabled=L, key="fu_cystoscopy_not_done_reason")
 
 # ---------------- labs ----------------
 st.markdown('<div class="juog-header">3. 採血検査</div>', unsafe_allow_html=True)
@@ -215,7 +267,7 @@ lab_status = st.radio(
     index=None,
     horizontal=True,
     disabled=L,
-)
+ key="fu_lab_status")
 
 labs_raw = {}
 if lab_status == "実施あり":
@@ -228,11 +280,11 @@ if cytology_not_done_now:
         "必須検査の欠測/未実施理由*",
         placeholder="未実施とした理由を記載してください",
         disabled=L,
-    )
+     key="fu_required_test_omission_reason")
 
 # ---------------- intraluminal recurrence ----------------
 st.markdown('<div class="juog-header">4. 尿路内再発</div>', unsafe_allow_html=True)
-intra_status = st.selectbox("尿路内再発状況*", ["選択してください", "なし", "今回新規あり", "既報あり（今回新規なし）"], disabled=L)
+intra_status = st.selectbox("尿路内再発状況*", ["選択してください", "なし", "今回新規あり", "既報あり（今回新規なし）"], disabled=L, key="fu_intra_status")
 intra_date = None
 intra_sites = []
 intra_site_other = ""
@@ -248,76 +300,76 @@ intra_path = ""
 if intra_status == "今回新規あり":
     i1, i2 = st.columns(2)
     with i1:
-        intra_date = st.date_input("再発診断日*", value=None, disabled=L)
-        intra_sites = st.multiselect("再発部位*", ["膀胱", "対側腎盂", "対側尿管", "同側残存尿管", "その他"], disabled=L)
+        intra_date = st.date_input("再発診断日*", value=None, disabled=L, key="fu_intra_date")
+        intra_sites = st.multiselect("再発部位*", ["膀胱", "対側腎盂", "対側尿管", "同側残存尿管", "その他"], disabled=L, key="fu_intra_sites")
         if "その他" in intra_sites:
-            intra_site_other = st.text_input("部位その他詳細*", disabled=L)
+            intra_site_other = st.text_input("部位その他詳細*", disabled=L, key="fu_intra_site_other")
     with i2:
-        intra_tx = st.multiselect("対応/治療*", ["経過観察", "TURBT", "BCG注入療法", "抗がん剤注入療法", "上部尿路内視鏡的治療", "手術（腎尿管全摘等）", "その他"], disabled=L)
+        intra_tx = st.multiselect("対応/治療*", ["経過観察", "TURBT", "BCG注入療法", "抗がん剤注入療法", "上部尿路内視鏡的治療", "手術（腎尿管全摘等）", "その他"], disabled=L, key="fu_intra_tx")
         if "その他" in intra_tx:
-            intra_tx_other = st.text_input("治療その他詳細*", disabled=L)
+            intra_tx_other = st.text_input("治療その他詳細*", disabled=L, key="fu_intra_tx_other")
         if intra_tx and "経過観察" not in intra_tx:
             intra_tx_status = st.radio(
                 "尿路内再発治療の状況*", ["実施済み・継続中", "今後の予定"],
                 index=None, horizontal=True, disabled=L,
-            )
+             key="fu_intra_tx_status")
 
     if intra_tx_status == "実施済み・継続中":
         if any(x in intra_tx for x in ["TURBT", "上部尿路内視鏡的治療", "手術（腎尿管全摘等）"]):
-            intra_procedure_date = st.date_input("処置/手術日*", value=None, disabled=L)
-            intra_path = st.text_area("組織型・Grade・pTNM等*", disabled=L)
+            intra_procedure_date = st.date_input("処置/手術日*", value=None, disabled=L, key="fu_intra_procedure_date")
+            intra_path = st.text_area("組織型・Grade・pTNM等*", disabled=L, key="fu_intra_path")
         if any(x in intra_tx for x in ["BCG注入療法", "抗がん剤注入療法"]):
             q1, q2 = st.columns(2)
-            intra_instill_start = q1.date_input("尿路内注入療法 開始日*", value=None, disabled=L)
-            intra_instill_ongoing = q2.checkbox("尿路内注入療法 継続中", disabled=L)
+            intra_instill_start = q1.date_input("尿路内注入療法 開始日*", value=None, disabled=L, key="fu_intra_instill_start")
+            intra_instill_ongoing = q2.checkbox("尿路内注入療法 継続中", disabled=L, key="fu_intra_instill_ongoing")
             if not intra_instill_ongoing:
-                intra_instill_end = q2.date_input("尿路内注入療法 終了日*", value=None, disabled=L)
+                intra_instill_end = q2.date_input("尿路内注入療法 終了日*", value=None, disabled=L, key="fu_intra_instill_end")
         if "その他" in intra_tx:
-            intra_other_date = st.date_input("その他治療 実施/開始日", value=None, disabled=L)
+            intra_other_date = st.date_input("その他治療 実施/開始日", value=None, disabled=L, key="fu_intra_other_date")
 
 # ---------------- systemic/local treatment after recurrence ----------------
 st.markdown('<div class="juog-header">5. 現在の治療・再発治療</div>', unsafe_allow_html=True)
 treatment_options = POSTOP_TREATMENT_OPTIONS + ["上記尿路内再発に対する治療を継続中", "転移巣切除", "緩和ケア"]
 # De-duplicate while preserving order.
 treatment_options = list(dict.fromkeys(treatment_options))
-current_treatment = st.selectbox("現在の主な治療状況*", treatment_options, disabled=L)
+current_treatment = st.selectbox("現在の主な治療状況*", treatment_options, disabled=L, key="fu_current_treatment")
 current_treatment_detail = ""
 treatment_start = treatment_end = None
 treatment_ongoing = False
 if current_treatment not in ["選択してください", "無治療（経過観察）", "上記尿路内再発に対する治療を継続中", "緩和ケア"]:
     if current_treatment in ["治験（TROP2標的ADC、その他）", "その他"]:
-        current_treatment_detail = st.text_area("治療詳細*", disabled=L)
+        current_treatment_detail = st.text_area("治療詳細*", disabled=L, key="fu_current_treatment_detail_other")
     t1, t2 = st.columns(2)
-    treatment_start = t1.date_input("治療開始日*", value=None, disabled=L)
-    treatment_ongoing = t2.checkbox("継続中", disabled=L)
+    treatment_start = t1.date_input("治療開始日*", value=None, disabled=L, key="fu_treatment_start")
+    treatment_ongoing = t2.checkbox("継続中", disabled=L, key="fu_treatment_ongoing")
     if not treatment_ongoing:
-        treatment_end = t2.date_input("治療終了日（継続予定なら空欄可）", value=None, disabled=L)
+        treatment_end = t2.date_input("治療終了日（継続予定なら空欄可）", value=None, disabled=L, key="fu_treatment_end")
 elif current_treatment in ["上記尿路内再発に対する治療を継続中", "緩和ケア"]:
-    current_treatment_detail = st.text_area("治療内容/状況の詳細", disabled=L)
+    current_treatment_detail = st.text_area("治療内容/状況の詳細", disabled=L, key="fu_current_treatment_detail_status")
 
 # ---------------- AE / complications ----------------
 st.markdown('<div class="juog-header">6. 有害事象・遅発性合併症</div>', unsafe_allow_html=True)
-has_event = st.checkbox("今回の期間に特記すべき薬剤関連AEまたは遅発性合併症がある", disabled=L)
+has_event = st.checkbox("今回の期間に特記すべき薬剤関連AEまたは遅発性合併症がある", disabled=L, key="fu_has_event")
 cd_grade = "N/A"
 ae_detail = ""
 if has_event:
     a1, a2 = st.columns(2)
-    cd_grade = a1.selectbox("Clavien-Dindo分類（手術関連の場合）", ["N/A"] + [x for x in CD_OPTIONS if x != "選択してください"], disabled=L)
-    ae_detail = a2.text_area("事象詳細（発現日・CTCAE Grade・処置・転帰・手術関連性等）*", disabled=L)
+    cd_grade = a1.selectbox("Clavien-Dindo分類（手術関連の場合）", ["N/A"] + [x for x in CD_OPTIONS if x != "選択してください"], disabled=L, key="fu_cd_grade")
+    ae_detail = a2.text_area("事象詳細（発現日・CTCAE Grade・処置・転帰・手術関連性等）*", disabled=L, key="fu_ae_detail")
 
 # ---------------- OS ----------------
 st.markdown('<div class="juog-header">7. 生存状況</div>', unsafe_allow_html=True)
 o1, o2 = st.columns(2)
 with o1:
-    vital_status = st.radio("生存状況*", ["生存", "死亡"], index=None, horizontal=True, disabled=L)
+    vital_status = st.radio("生存状況*", ["生存", "死亡"], index=None, horizontal=True, disabled=L, key="fu_vital_status")
 with o2:
     last_alive_date = death_date = None
     death_cause = ""
     if vital_status == "生存":
-        last_alive_date = st.date_input("最終生存確認日*", value=None, disabled=L)
+        last_alive_date = st.date_input("最終生存確認日*", value=None, disabled=L, key="fu_last_alive_date")
     elif vital_status == "死亡":
-        death_date = st.date_input("死亡日*", value=None, disabled=L)
-        death_cause = st.selectbox("死因*", ["選択してください", "癌死 (原疾患による)", "治療関連死", "他病死", "不明"], disabled=L)
+        death_date = st.date_input("死亡日*", value=None, disabled=L, key="fu_death_date")
+        death_cause = st.selectbox("死因*", ["選択してください", "癌死 (原疾患による)", "治療関連死", "他病死", "不明"], disabled=L, key="fu_death_cause")
 
 # ---------------- validation ----------------
 def validate_all():
@@ -446,6 +498,32 @@ if missing or errors or warnings:
 else:
     st.success("必須項目の入力と基本的な整合性チェックが完了しています。")
 
+if fu_draft_clicked:
+    if not valid_registration_id(registration_id):
+        st.error("仮保存には正しいJUOG登録番号が必要です（例：JUOG-001）。")
+    elif not valid_email(reporter_email):
+        st.error("仮保存には担当者メールアドレスを正しく入力してください。再開時にこのアドレスを使用します。")
+    else:
+        _state = capture_draft_state(
+            "fu_",
+            exclude_prefixes=("fu_sent", "fu_linkage", "fu_draft"),
+            overrides={"fu_registration_id":registration_id, "fu_reporter_email":reporter_email},
+        )
+        _save = save_crf_draft(registration_id, "followup", "followup", _state, facility_code=facility_code, facility_name=facility_name, reporter_email=reporter_email)
+        if _save.get("ok"):
+            _verify = get_crf_draft(registration_id, "followup", "followup", reporter_email)
+            if _verify.get("ok") and _verify.get("source_found"):
+                _at = _verify.get("updated_at") or _save.get("updated_at") or ""
+                st.session_state["fu_draft_flash"] = {"kind":"success", "message":"仮保存を確認しました。再開時はJUOG登録番号と担当者メールアドレスを入力してください。" + (f" 最終保存：{_at}" if _at else "")}
+            else:
+                st.session_state["fu_draft_flash"] = {"kind":"error", "message":"仮保存の書き込み確認ができませんでした。再度お試しください。"}
+            st.rerun()
+        else:
+            if str(_save.get("error") or "") == "DRAFT_EMAIL_MISMATCH":
+                st.error("このJUOG登録番号には別の担当者メールアドレスで仮保存されています。仮保存時のメールアドレスで再開してください。")
+            else:
+                st.error("仮保存できませんでした：" + str(_save.get("message") or _save.get("error") or "unknown error"))
+
 if st.button("🚀 定期経過データを確定送信", type="primary", use_container_width=True, disabled=L):
     if missing or errors:
         st.error("未入力または入力エラーを修正してください。")
@@ -568,6 +646,8 @@ RECIST進行状況: {recist_status}
                         report,
                         reporter_email,
                     )
+                    _draft_delete = delete_crf_draft(registration_id, "followup", "followup")
+                    st.session_state.fu_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
                     st.session_state.fu_sent = True
                     st.session_state.fu_sent_registration_id = registration_id
                     st.session_state.fu_sent_visit = visit_month

@@ -5,7 +5,13 @@ from datetime import date
 import streamlit as st
 
 from juog_common import (
+    FACILITY_NAMES,
+    FACILITY_NAME_TO_CODE,
     POSITIVE_CYTOLOGY,
+    capture_draft_state,
+    clear_session_state_prefixes,
+    delete_screening_draft,
+    get_screening_draft,
     add_months,
     age_on_date,
     date_str,
@@ -17,6 +23,8 @@ from juog_common import (
     render_lab_panel,
     render_cytology,
     send_email,
+    save_screening_draft,
+    restore_draft_state,
     text,
     today_jst,
     unique_messages,
@@ -68,8 +76,52 @@ if st.session_state.screening_sent:
     st.caption("正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。")
     if st.session_state.get("screening_email_failed"):
         st.warning("中央台帳への保存は完了していますが、通知メール送信に失敗しました。再申請はせず事務局へ連絡してください。")
+    if st.session_state.get("screening_sent_draft_delete_failed"):
+        st.info("中央MDT申請は完了していますが、仮保存データの削除確認ができませんでした。申請データには影響ありません。")
     st.caption("訂正が必要な場合はページを再読み込みして再入力してください。")
     st.stop()
+
+if st.session_state.get("reg_draft_loaded_at"):
+    st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['reg_draft_loaded_at']}）。")
+    st.session_state.pop("reg_draft_loaded_at", None)
+_reg_flash = st.session_state.pop("reg_draft_flash", None)
+if isinstance(_reg_flash, dict):
+    getattr(st, _reg_flash.get("kind", "info"), st.info)(str(_reg_flash.get("message") or ""))
+
+reg_tool1, reg_tool2, _reg_spacer = st.columns([0.9, 0.9, 6.2])
+with reg_tool1:
+    reg_draft_clicked = st.button("💾 仮保存", key="draftreg_save_button")
+with reg_tool2:
+    with st.popover("↩ 再開"):
+        st.caption("施設・施設内研究対象者識別コード・担当者メールアドレスを入力してください。")
+        reg_lookup_facility = st.selectbox("施設*", ["選択してください"] + FACILITY_NAMES, key="draftreg_lookup_facility")
+        reg_lookup_code = st.text_input("施設内研究対象者識別コード*", key="draftreg_lookup_code")
+        reg_lookup_email = st.text_input("担当者メールアドレス*", key="draftreg_lookup_email")
+        if st.button("読み込む", key="draftreg_load_button", use_container_width=True):
+            if reg_lookup_facility == "選択してください":
+                st.error("施設を選択してください。")
+            elif not text(reg_lookup_code):
+                st.error("施設内研究対象者識別コードを入力してください。")
+            elif not valid_email(reg_lookup_email):
+                st.error("担当者メールアドレスを正しく入力してください。")
+            else:
+                _fc = FACILITY_NAME_TO_CODE.get(reg_lookup_facility, "")
+                _res = get_screening_draft(_fc, reg_lookup_code, reg_lookup_email)
+                if not _res.get("ok"):
+                    if str(_res.get("error") or "") == "DRAFT_EMAIL_MISMATCH":
+                        st.error("施設・識別コードまたは担当者メールアドレスが一致しません。")
+                    else:
+                        st.error("仮保存データを取得できませんでした：" + str(_res.get("message") or _res.get("error") or "unknown error"))
+                elif not _res.get("source_found"):
+                    st.info("該当する仮保存データはありません。")
+                else:
+                    clear_session_state_prefixes(("reg_", "widget_reg_"))
+                    restore_draft_state(_res.get("draft_state") or {})
+                    st.session_state["reg_facility"] = reg_lookup_facility
+                    st.session_state["reg_local_subject_code"] = reg_lookup_code
+                    st.session_state["reg_reporter_email"] = _res.get("reporter_email") or reg_lookup_email
+                    st.session_state["reg_draft_loaded_at"] = _res.get("updated_at") or "時刻不明"
+                    st.rerun()
 
 L = False
 
@@ -82,32 +134,32 @@ with c1:
         "施設内研究対象者識別コード*",
         disabled=L,
         help="氏名・カルテ番号・生年月日そのものは入力しないでください。各施設の識別コードリストと照合可能な仮名コードです。",
-    )
-    reporter_email = st.text_input("担当者メールアドレス*", disabled=L)
-    consent_date = st.date_input("本人同意取得日*", value=None, disabled=L)
-    birth_date = st.date_input("生年月日*", value=None, min_value=date(1900, 1, 1), max_value=today_jst(), disabled=L, help="研究計画書 8.1.1 の患者背景項目。氏名・カルテ番号は入力しません。")
+     key="reg_local_subject_code")
+    reporter_email = st.text_input("担当者メールアドレス*", disabled=L, key="reg_reporter_email")
+    consent_date = st.date_input("本人同意取得日*", value=None, disabled=L, key="reg_consent_date")
+    birth_date = st.date_input("生年月日*", value=None, min_value=date(1900, 1, 1), max_value=today_jst(), disabled=L, help="研究計画書 8.1.1 の患者背景項目。氏名・カルテ番号は入力しません。", key="reg_birth_date")
     age = age_on_date(birth_date, consent_date)
     if age is not None:
         st.caption(f"同意取得時年齢（自動計算）：{age}歳")
 with c2:
-    sex = st.radio("性別*", ["男", "女"], index=None, horizontal=True, disabled=L)
-    height = st.number_input("身長 (cm)*", min_value=0.0, value=None, step=0.1, disabled=L)
-    weight = st.number_input("体重 (kg)*", min_value=0.0, value=None, step=0.1, disabled=L)
-    ecog = st.radio("ECOG PS*", ["0", "1", "2", "3", "4"], index=None, horizontal=True, disabled=L)
+    sex = st.radio("性別*", ["男", "女"], index=None, horizontal=True, disabled=L, key="reg_sex")
+    height = st.number_input("身長 (cm)*", min_value=0.0, value=None, step=0.1, disabled=L, key="reg_height")
+    weight = st.number_input("体重 (kg)*", min_value=0.0, value=None, step=0.1, disabled=L, key="reg_weight")
+    ecog = st.radio("ECOG PS*", ["0", "1", "2", "3", "4"], index=None, horizontal=True, disabled=L, key="reg_ecog")
     if sex == "女":
-        pregnancy = st.radio("妊娠中または妊娠の可能性*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-        breastfeeding = st.radio("授乳中*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
+        pregnancy = st.radio("妊娠中または妊娠の可能性*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_pregnancy")
+        breastfeeding = st.radio("授乳中*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_breastfeeding")
     else:
         pregnancy, breastfeeding = "該当なし", "該当なし"
 
 st.subheader("スクリーニング時バイタル・身体所見")
 v1, v2, v3, v4 = st.columns(4)
-sbp = v1.number_input("収縮期血圧 (mmHg)*", min_value=0, value=None, step=1, disabled=L)
-dbp = v2.number_input("拡張期血圧 (mmHg)*", min_value=0, value=None, step=1, disabled=L)
-pulse = v3.number_input("脈拍 (/min)*", min_value=0, value=None, step=1, disabled=L)
-temp = v4.number_input("体温 (℃)*", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L)
-physical_abnormal = st.radio("自覚症状・他覚所見の異常*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-physical_detail = st.text_area("身体所見の詳細*" if physical_abnormal == "あり" else "身体所見の詳細", disabled=L)
+sbp = v1.number_input("収縮期血圧 (mmHg)*", min_value=0, value=None, step=1, disabled=L, key="reg_sbp")
+dbp = v2.number_input("拡張期血圧 (mmHg)*", min_value=0, value=None, step=1, disabled=L, key="reg_dbp")
+pulse = v3.number_input("脈拍 (/min)*", min_value=0, value=None, step=1, disabled=L, key="reg_pulse")
+temp = v4.number_input("体温 (℃)*", min_value=30.0, max_value=45.0, value=None, step=0.1, disabled=L, key="reg_temp")
+physical_abnormal = st.radio("自覚症状・他覚所見の異常*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_physical_abnormal")
+physical_detail = st.text_area("身体所見の詳細*" if physical_abnormal == "あり" else "身体所見の詳細", disabled=L, key="reg_physical_detail")
 
 h1, h2 = st.columns(2)
 with h1:
@@ -121,10 +173,10 @@ with h2:
 st.markdown('<div class="juog-header">2. 原疾患・診断時Stage</div>', unsafe_allow_html=True)
 d1, d2 = st.columns(2)
 with d1:
-    diagnosis_date = st.date_input("初回診断日*", value=None, disabled=L)
-    laterality = st.radio("原発巣の左右*", ["右", "左", "両側"], index=None, horizontal=True, disabled=L)
-    primary_site = st.multiselect("原発巣部位*", ["腎盂", "上部尿管", "中部尿管", "下部尿管"], disabled=L)
-    biopsy_done = st.radio("組織生検*", ["実施", "生検困難のため未実施"], index=None, horizontal=True, disabled=L)
+    diagnosis_date = st.date_input("初回診断日*", value=None, disabled=L, key="reg_diagnosis_date")
+    laterality = st.radio("原発巣の左右*", ["右", "左", "両側"], index=None, horizontal=True, disabled=L, key="reg_laterality")
+    primary_site = st.multiselect("原発巣部位*", ["腎盂", "上部尿管", "中部尿管", "下部尿管"], disabled=L, key="reg_primary_site")
+    biopsy_done = st.radio("組織生検*", ["実施", "生検困難のため未実施"], index=None, horizontal=True, disabled=L, key="reg_biopsy_done")
     histology = ""
     biopsy_reason = ""
     if biopsy_done == "実施":
@@ -132,19 +184,19 @@ with d1:
             "病理組織型*",
             ["選択してください", "Urothelial carcinoma", "Urothelial carcinoma（亜型・分化を含む）", "その他"],
             disabled=L,
-        )
+         key="reg_histology")
         if histology == "その他":
             st.text_input("病理組織型 その他詳細*", key="reg_histology_other", disabled=L)
     elif biopsy_done == "生検困難のため未実施":
-        biopsy_reason = st.text_area("生検困難の理由*", disabled=L)
+        biopsy_reason = st.text_area("生検困難の理由*", disabled=L, key="reg_biopsy_reason")
 with d2:
-    ct = st.selectbox("診断時 cT*", ["選択してください", "cTa", "cTis", "cT1", "cT2", "cT3", "cT4"], disabled=L)
-    cn = st.selectbox("診断時 cN*", ["選択してください", "cN0", "cN1", "cN2"], disabled=L)
-    cm = st.selectbox("診断時 cM*", ["選択してください", "cM0", "cM1"], disabled=L)
-    screening_imaging_date = st.date_input("スクリーニング画像検査日（CT/MRI等）*", value=None, disabled=L)
-    imaging_utuc_compatible = st.radio("画像上UTUCに合致する所見*", ["あり", "なし"], index=None, horizontal=True, disabled=L)
-    cystoscopy_date = st.date_input("スクリーニング膀胱鏡日*", value=None, disabled=L)
-    cystoscopy_result = st.selectbox("膀胱鏡所見*", ["選択してください", "腫瘍なし", "腫瘍あり", "評価不能"], disabled=L)
+    ct = st.selectbox("診断時 cT*", ["選択してください", "cTa", "cTis", "cT1", "cT2", "cT3", "cT4"], disabled=L, key="reg_ct")
+    cn = st.selectbox("診断時 cN*", ["選択してください", "cN0", "cN1", "cN2"], disabled=L, key="reg_cn")
+    cm = st.selectbox("診断時 cM*", ["選択してください", "cM0", "cM1"], disabled=L, key="reg_cm")
+    screening_imaging_date = st.date_input("スクリーニング画像検査日（CT/MRI等）*", value=None, disabled=L, key="reg_screening_imaging_date")
+    imaging_utuc_compatible = st.radio("画像上UTUCに合致する所見*", ["あり", "なし"], index=None, horizontal=True, disabled=L, key="reg_imaging_utuc_compatible")
+    cystoscopy_date = st.date_input("スクリーニング膀胱鏡日*", value=None, disabled=L, key="reg_cystoscopy_date")
+    cystoscopy_result = st.selectbox("膀胱鏡所見*", ["選択してください", "腫瘍なし", "腫瘍あり", "評価不能"], disabled=L, key="reg_cystoscopy_result")
     if cystoscopy_result == "腫瘍あり":
         st.text_area("膀胱病変の詳細*", key="reg_cysto_detail", disabled=L)
 
@@ -158,7 +210,7 @@ screen_glucose_raw = st.text_input(
     value=st.session_state.get("reg_screen_glucose", ""),
     disabled=L,
     help="スクリーニング時のみ収集します。未測定の場合はNAと入力してください。",
-)
+ key="reg_screen_glucose_raw")
 st.session_state["reg_screen_glucose"] = screen_glucose_raw
 screening_required_omission = (
     any(str(v).strip().upper() in {"NA", "N/A", "未実施", "欠測"} for v in screen_labs_raw.values())
@@ -167,35 +219,35 @@ screening_required_omission = (
 )
 screening_omission_reason = ""
 if screening_required_omission:
-    screening_omission_reason = st.text_area("スクリーニング必須検査の欠測/未実施理由*", disabled=L)
+    screening_omission_reason = st.text_area("スクリーニング必須検査の欠測/未実施理由*", disabled=L, key="reg_screening_omission_reason")
 
 # -------------------- 3. EVP / RECIST --------------------
 st.markdown('<div class="juog-header">3. EVP治療歴・術前画像評価</div>', unsafe_allow_html=True)
 e1, e2 = st.columns(2)
 with e1:
-    evp_start = st.date_input("EVP初回投与日*", value=None, disabled=L)
-    evp_end = st.date_input("EVP最終投与日*", value=None, disabled=L)
-    courses = st.number_input("EVP総投与コース数*", min_value=0, value=None, step=1, disabled=L)
-    ev_initial_dose = st.number_input("EV初回量 (mg/kg)*", min_value=0.0, value=None, step=0.01, disabled=L)
-    reduction = st.radio("EV減量の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-    reduction_detail = st.text_area("EV減量の詳細*" if reduction == "あり" else "EV減量の詳細", disabled=L)
-    pembro_stop = st.radio("irAE等によるPembro中止の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-    pembro_stop_detail = st.text_area("Pembro中止の詳細*" if pembro_stop == "あり" else "Pembro中止の詳細", disabled=L)
+    evp_start = st.date_input("EVP初回投与日*", value=None, disabled=L, key="reg_evp_start")
+    evp_end = st.date_input("EVP最終投与日*", value=None, disabled=L, key="reg_evp_end")
+    courses = st.number_input("EVP総投与コース数*", min_value=0, value=None, step=1, disabled=L, key="reg_courses")
+    ev_initial_dose = st.number_input("EV初回量 (mg/kg)*", min_value=0.0, value=None, step=0.01, disabled=L, key="reg_ev_initial_dose")
+    reduction = st.radio("EV減量の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_reduction")
+    reduction_detail = st.text_area("EV減量の詳細*" if reduction == "あり" else "EV減量の詳細", disabled=L, key="reg_reduction_detail")
+    pembro_stop = st.radio("irAE等によるPembro中止の有無*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_pembro_stop")
+    pembro_stop_detail = st.text_area("Pembro中止の詳細*" if pembro_stop == "あり" else "Pembro中止の詳細", disabled=L, key="reg_pembro_stop_detail")
 with e2:
-    best_effect = st.selectbox("EVP最良総合効果*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
-    first_control_date = st.date_input("最初にCR/PR/SDが確認された画像検査日*", value=None, disabled=L)
-    central_recist = st.selectbox("施設判定 RECIST v1.1総合判定*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L)
-    preop_imaging_date = st.date_input("手術適応判定前の直近画像日*", value=None, disabled=L)
+    best_effect = st.selectbox("EVP最良総合効果*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L, key="reg_best_effect")
+    first_control_date = st.date_input("最初にCR/PR/SDが確認された画像検査日*", value=None, disabled=L, key="reg_first_control_date")
+    central_recist = st.selectbox("施設判定 RECIST v1.1総合判定*", ["選択してください", "CR", "PR", "SD", "PD", "NE"], disabled=L, key="reg_central_recist")
+    preop_imaging_date = st.date_input("手術適応判定前の直近画像日*", value=None, disabled=L, key="reg_preop_imaging_date")
     nadir_sum = st.number_input(
         "治療中の標的病変最小SLD（nadir, mm・分かる場合）",
         min_value=0.0, value=None, step=0.1, disabled=L,
         help="RECIST 1.1の標的病変PDはbaselineではなく治療中の最小和（nadir）との比較です。中央判定が主判定なので、不明なら空欄で構いません。",
-    )
-    new_lesion = st.radio("新病変の出現*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-    nontarget_pd = st.radio("非標的病変の明らかな増悪*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
+     key="reg_nadir_sum")
+    new_lesion = st.radio("新病変の出現*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_new_lesion")
+    nontarget_pd = st.radio("非標的病変の明らかな増悪*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_nontarget_pd")
     short_course_reason = ""
     if courses is not None and courses < 3:
-        short_course_reason = st.text_area("3コース未満となったやむを得ない理由*", disabled=L)
+        short_course_reason = st.text_area("3コース未満となったやむを得ない理由*", disabled=L, key="reg_short_course_reason")
 
 st.subheader("RECIST標的病変（補助計算）")
 st.caption(RECIST_HELP)
@@ -231,10 +283,10 @@ if cm == "cM1":
             ["EVPにより遠隔転移巣がCR", "局所療法後にcNEDとなり3か月以上維持"],
             index=None,
             disabled=L,
-        )
-        cned_date = st.date_input("cNED確認日", value=None, disabled=L)
+         key="reg_cm1_basis")
+        cned_date = st.date_input("cNED確認日", value=None, disabled=L, key="reg_cned_date")
     with m2:
-        cm1_local_tx = st.multiselect("遠隔転移に対する局所療法", ["転移巣切除", "放射線治療", "その他"], disabled=L)
+        cm1_local_tx = st.multiselect("遠隔転移に対する局所療法", ["転移巣切除", "放射線治療", "その他"], disabled=L, key="reg_cm1_local_tx")
         if "その他" in cm1_local_tx:
             st.text_input("局所療法 その他詳細*", key="reg_cm1_other", disabled=L)
 
@@ -242,14 +294,14 @@ if cm == "cM1":
 st.markdown('<div class="juog-header">4. 選択・除外基準、手術予定</div>', unsafe_allow_html=True)
 x1, x2 = st.columns(2)
 with x1:
-    g3_unrecovered = st.radio("EVP関連 Grade 3以上の未回復有害事象*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-    unresectable_vessel = st.radio("切除不能/危険な大血管浸潤*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-    unresectable_organ = st.radio("切除不能/危険な他臓器直接浸潤*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
-    other_cancer = st.radio("活動性重複がん*", ["なし", "ありだが計画書上の許容例", "あり（不適）"], index=None, disabled=L)
-    other_unsuitable = st.radio("その他、研究責任者が不適当と判断*", ["なし", "あり"], index=None, horizontal=True, disabled=L)
+    g3_unrecovered = st.radio("EVP関連 Grade 3以上の未回復有害事象*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_g3_unrecovered")
+    unresectable_vessel = st.radio("切除不能/危険な大血管浸潤*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_unresectable_vessel")
+    unresectable_organ = st.radio("切除不能/危険な他臓器直接浸潤*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_unresectable_organ")
+    other_cancer = st.radio("活動性重複がん*", ["なし", "ありだが計画書上の許容例", "あり（不適）"], index=None, disabled=L, key="reg_other_cancer")
+    other_unsuitable = st.radio("その他、研究責任者が不適当と判断*", ["なし", "あり"], index=None, horizontal=True, disabled=L, key="reg_other_unsuitable")
 with x2:
-    planned_surgery = st.selectbox("予定術式*", ["選択してください", "根治的腎尿管全摘除術", "尿管部分切除術", "その他（プロトコル外）"], disabled=L)
-    surgery_date = st.date_input("手術予定日*", value=None, disabled=L)
+    planned_surgery = st.selectbox("予定術式*", ["選択してください", "根治的腎尿管全摘除術", "尿管部分切除術", "その他（プロトコル外）"], disabled=L, key="reg_planned_surgery")
+    surgery_date = st.date_input("手術予定日*", value=None, disabled=L, key="reg_surgery_date")
     washout_extension_reason = ""
     if evp_end and surgery_date:
         washout_days = (surgery_date - evp_end).days
@@ -258,7 +310,7 @@ with x2:
             st.success("原則の4–8週内です。")
         elif 57 <= washout_days <= 84:
             st.warning("8週を超えていますが、計画書上は医学的理由等により最大12週まで許容されます。")
-            washout_extension_reason = st.text_area("8週超となる理由*", disabled=L)
+            washout_extension_reason = st.text_area("8週超となる理由*", disabled=L, key="reg_washout_extension_reason")
         elif washout_days < 28:
             st.error("4週未満です。手術予定時期を再確認してください。")
         else:
@@ -511,6 +563,38 @@ def build_data(parsed_labs):
         "washout_extension_reason": text(washout_extension_reason),
     }
 
+if reg_draft_clicked:
+    if facility_name == "選択してください":
+        st.error("仮保存には施設名が必要です。")
+    elif not text(local_subject_code):
+        st.error("仮保存には施設内研究対象者識別コードが必要です。")
+    elif not valid_email(reporter_email):
+        st.error("仮保存には担当者メールアドレスを正しく入力してください。再開時にこのアドレスを使用します。")
+    else:
+        _state = capture_draft_state(
+            "reg_",
+            exclude_prefixes=("reg_draft",),
+            overrides={
+                "reg_facility": facility_name,
+                "reg_local_subject_code": local_subject_code,
+                "reg_reporter_email": reporter_email,
+            },
+        )
+        _save = save_screening_draft(facility_code, facility_name, local_subject_code, reporter_email, _state)
+        if _save.get("ok"):
+            _verify = get_screening_draft(facility_code, local_subject_code, reporter_email)
+            if _verify.get("ok") and _verify.get("source_found"):
+                _at = _verify.get("updated_at") or _save.get("updated_at") or ""
+                st.session_state["reg_draft_flash"] = {"kind":"success", "message":"仮保存を確認しました。再開時は施設・識別コード・担当者メールアドレスを入力してください。" + (f" 最終保存：{_at}" if _at else "")}
+            else:
+                st.session_state["reg_draft_flash"] = {"kind":"error", "message":"仮保存の書き込み確認ができませんでした。再度お試しください。"}
+            st.rerun()
+        else:
+            if str(_save.get("error") or "") == "DRAFT_EMAIL_MISMATCH":
+                st.error("この施設・識別コードには別の担当者メールアドレスで仮保存されています。仮保存時のメールアドレスで再開してください。")
+            else:
+                st.error("仮保存できませんでした：" + str(_save.get("message") or _save.get("error") or "unknown error"))
+
 missing, errors, ineligible, warnings, parsed_labs = collect_validation()
 eligible_candidate = not missing and not errors and not ineligible
 
@@ -616,6 +700,8 @@ EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
             report,
             reporter_email,
         )
+        _draft_delete = delete_screening_draft(facility_code, local_subject_code)
+        st.session_state.screening_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
         st.session_state.screening_sent = True
         st.session_state.screening_id = screening_id
         st.session_state.screening_email_failed = not sent

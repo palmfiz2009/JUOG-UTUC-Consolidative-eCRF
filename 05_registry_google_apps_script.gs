@@ -21,6 +21,7 @@ const CRF_30D_SHEET = 'CRF_30d';
 const CRF_90D_SHEET = 'CRF_90d';
 const CRF_FOLLOWUP_SHEET = 'CRF_Followup';
 const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
+const CRF_DRAFT_SHEET = 'CRF_Drafts';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
 const BACKEND_VERSION = 'v2.2.7';
@@ -71,6 +72,13 @@ const CRF_AUDIT_HEADERS = [
   'submission_kind', 'registration_id', 'facility_code'
 ];
 
+const CRF_DRAFT_HEADERS = [
+  'draft_key', 'updated_at', 'registration_id', 'crf_type', 'visit',
+  'facility_code', 'facility_name', 'reporter_email', 'schema_version', 'draft_json',
+  'resume_code_hash', 'failed_attempts', 'locked_until',
+  'code_reset_at', 'code_reset_by', 'email_reset_at', 'email_reset_by'
+];
+
 function setupRegistry() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   if (!ss) throw new Error('Run setupRegistry from a script bound to the registry spreadsheet.');
@@ -79,6 +87,9 @@ function setupRegistry() {
   props.setProperty('SPREADSHEET_ID', ss.getId());
   if (!props.getProperty('JUOG_API_TOKEN')) {
     props.setProperty('JUOG_API_TOKEN', Utilities.getUuid() + Utilities.getUuid());
+  }
+  if (!props.getProperty('DRAFT_CODE_PEPPER')) {
+    props.setProperty('DRAFT_CODE_PEPPER', Utilities.getUuid() + Utilities.getUuid());
   }
 
   ensureSheetHeaders_(ss, REGISTRY_SHEET, REGISTRY_HEADERS);
@@ -90,6 +101,7 @@ function setupRegistry() {
   ensureSheetHeaders_(ss, CRF_90D_SHEET, CRF_BASE_HEADERS);
   ensureSheetHeaders_(ss, CRF_FOLLOWUP_SHEET, CRF_BASE_HEADERS);
   ensureSheetHeaders_(ss, CRF_AUDIT_SHEET, CRF_AUDIT_HEADERS);
+  ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
 
   // Migrate existing v2.1 screening rows to review round 1.
   const values = screening.getDataRange().getValues();
@@ -149,6 +161,15 @@ function doPost(e) {
     if (action === 'get_mdt_reviews') return jsonResponse_(getMdtReviews_(payload));
     if (action === 'finalize_mdt') return jsonResponse_(finalizeMdt_(payload));
     if (action === 'save_crf') return jsonResponse_(saveCrf_(payload));
+    if (action === 'save_screening_draft') return jsonResponse_(saveScreeningDraft_(payload));
+    if (action === 'get_screening_draft') return jsonResponse_(getScreeningDraft_(payload));
+    if (action === 'delete_screening_draft') return jsonResponse_(deleteScreeningDraft_(payload));
+    if (action === 'save_draft') return jsonResponse_(saveDraft_(payload));
+    if (action === 'get_draft') return jsonResponse_(getDraft_(payload));
+    if (action === 'delete_draft') return jsonResponse_(deleteDraft_(payload));
+    if (action === 'reset_draft_code') return jsonResponse_(resetDraftCode_(payload));
+    if (action === 'update_draft_email') return jsonResponse_(updateDraftEmail_(payload));
+    if (action === 'get_crf_linkage') return jsonResponse_(getCrfLinkage_(payload));
     if (action === 'validate') return jsonResponse_(validateSubject_(payload));
     if (action === 'backend_info') return jsonResponse_(getBackendInfo_());
     if (action === 'stats') return jsonResponse_(getStats_());
@@ -646,6 +667,562 @@ function validateCrfHardStops_(payload, registryInfo) {
   return {ok:true};
 }
 
+
+function getLatestCrfPayload_(sheetName, registrationId, crfType) {
+  const sh = getSpreadsheet_().getSheetByName(sheetName);
+  if (!sh) return {ok:false, error:'SOURCE_SHEET_NOT_FOUND'};
+
+  const values = sh.getDataRange().getValues();
+  if (!values || values.length < 2) return {ok:true, found:false};
+
+  const idx = headerIndex_(values[0]);
+  if (idx.registration_id === undefined || idx.payload_json === undefined) {
+    return {ok:false, error:'SOURCE_SHEET_SCHEMA_ERROR'};
+  }
+
+  let best = null;
+  for (let r = 1; r < values.length; r++) {
+    const row = values[r];
+    if (String(row[idx.registration_id] || '').trim().toUpperCase() !== String(registrationId || '').trim().toUpperCase()) continue;
+    if (idx.crf_type !== undefined && crfType && String(row[idx.crf_type] || '') !== String(crfType)) continue;
+
+    const version = idx.record_version !== undefined ? Number(row[idx.record_version] || 0) : 0;
+    const savedAt = idx.saved_at !== undefined && row[idx.saved_at] instanceof Date ? row[idx.saved_at].getTime() : 0;
+
+    if (!best || version > best.version || (version === best.version && savedAt > best.savedAt)) {
+      let payload = null;
+      try {
+        payload = JSON.parse(String(row[idx.payload_json] || '{}'));
+      } catch (err) {
+        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR', message:String(err)};
+      }
+      best = {
+        version: version,
+        savedAt: savedAt,
+        submissionId: idx.submission_id !== undefined ? String(row[idx.submission_id] || '') : '',
+        facilityCode: idx.facility_code !== undefined ? String(row[idx.facility_code] || '') : '',
+        facilityName: idx.facility_name !== undefined ? String(row[idx.facility_name] || '') : '',
+        payload: payload
+      };
+    }
+  }
+
+  if (!best) return {ok:true, found:false};
+  return {
+    ok:true,
+    found:true,
+    record_version:best.version,
+    submission_id:best.submissionId,
+    facility_code:best.facilityCode,
+    facility_name:best.facilityName,
+    payload:best.payload
+  };
+}
+
+
+function getCrfLinkage_(p) {
+  const id = String(p.registration_id || '').trim().toUpperCase();
+  const sourceType = String(p.source_crf_type || 'perioperative_30d').trim();
+
+  const registry = validateSubject_({registration_id:id, facility_code:''});
+  if (!registry.ok) return registry;
+
+  if (sourceType !== 'perioperative_30d') {
+    return {ok:false, error:'UNSUPPORTED_SOURCE_CRF_TYPE'};
+  }
+
+  const latest = getLatestCrfPayload_(CRF_30D_SHEET, id, 'perioperative_30d');
+  if (!latest.ok) return latest;
+
+  if (!latest.found) {
+    return {
+      ok:true,
+      source_found:false,
+      registration_id:id,
+      facility_code:String(registry.facility_code || ''),
+      facility_name:String(registry.facility_name || ''),
+      message:'周術期・30日CRFがまだ保存されていません。手術情報は手入力してください。'
+    };
+  }
+
+  // Hard consistency check: source CRF must belong to the same registered facility.
+  if (
+    String(latest.facility_code || '') &&
+    String(registry.facility_code || '') &&
+    String(latest.facility_code) !== String(registry.facility_code)
+  ) {
+    return {
+      ok:false,
+      error:'SOURCE_FACILITY_MISMATCH',
+      message:'周術期・30日CRFの施設情報が中央登録台帳と一致しません。事務局へ確認してください。'
+    };
+  }
+
+  const data = (latest.payload && latest.payload.data) || {};
+  const surgeryPerformed = String(data.surgery_performed || '');
+  let referenceDate = '';
+
+  if (surgeryPerformed === '実施した') {
+    referenceDate = String(data.operation_date || data.reference_date || '');
+  } else if (surgeryPerformed === '実施しなかった') {
+    referenceDate = String(data.reference_date || '');
+  }
+
+  if (!['実施した', '実施しなかった'].includes(surgeryPerformed) || !referenceDate) {
+    return {
+      ok:false,
+      error:'SOURCE_SURGERY_INFO_INCOMPLETE',
+      message:'周術期・30日CRFから手術実施有無または基準日を安全に取得できません。事務局へ確認してください。',
+      facility_code:String(registry.facility_code || ''),
+      facility_name:String(registry.facility_name || '')
+    };
+  }
+
+  return {
+    ok:true,
+    source_found:true,
+    registration_id:id,
+    facility_code:String(registry.facility_code || ''),
+    facility_name:String(registry.facility_name || ''),
+    surgery_performed:surgeryPerformed,
+    reference_date:referenceDate,
+    record_version:Number(latest.record_version || 0),
+    submission_id:String(latest.submission_id || '')
+  };
+}
+
+
+function validateDay90SourceLink_(payload) {
+  const data = payload.data || {};
+  if (String(payload.crf_type || '') !== 'day90') return {ok:true};
+  if (data.source_30d_linked !== true) return {ok:true};
+
+  const id = String(payload.registration_id || '').trim().toUpperCase();
+  const latest = getLatestCrfPayload_(CRF_30D_SHEET, id, 'perioperative_30d');
+  if (!latest.ok) return latest;
+  if (!latest.found) {
+    return {ok:false, error:'SOURCE_CRF_MISSING', message:'参照元の周術期・30日CRFが見つかりません。'};
+  }
+
+  const expectedVersion = Number(data.source_30d_record_version || 0);
+  const expectedSubmissionId = String(data.source_30d_submission_id || '');
+
+  if (
+    Number(latest.record_version || 0) !== expectedVersion ||
+    String(latest.submission_id || '') !== expectedSubmissionId
+  ) {
+    return {
+      ok:false,
+      error:'SOURCE_CRF_UPDATED',
+      message:'参照元の周術期・30日CRFが更新されています。90日CRFで「既存情報を取得」をやり直してください。'
+    };
+  }
+  return {ok:true};
+}
+
+
+function draftKey_(registrationId, crfType, visit) {
+  return [
+    String(registrationId || '').trim().toUpperCase(),
+    String(crfType || '').trim(),
+    String(visit || '').trim()
+  ].join('|');
+}
+
+function draftCodePepper_() {
+  const props = PropertiesService.getScriptProperties();
+  let pepper = props.getProperty('DRAFT_CODE_PEPPER');
+  if (!pepper) {
+    pepper = Utilities.getUuid() + Utilities.getUuid();
+    props.setProperty('DRAFT_CODE_PEPPER', pepper);
+  }
+  return pepper;
+}
+
+function draftCodeHash_(code) {
+  const value = String(code || '').trim();
+  if (!/^\d{6}$/.test(value)) return '';
+  const signature = Utilities.computeHmacSha256Signature(value, draftCodePepper_());
+  return Utilities.base64EncodeWebSafe(signature).replace(/=+$/g, '');
+}
+
+function generateDraftResumeCode_() {
+  const seed = Utilities.getUuid() + '|' + String(new Date().getTime()) + '|' + String(Math.random());
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, seed);
+  let n = 0;
+  for (let i = 0; i < 4; i++) n = n * 256 + (digest[i] & 0xff);
+  return ('000000' + String(n % 1000000)).slice(-6);
+}
+
+function normalizeDraftEmail_(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function validDraftEmail_(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeDraftEmail_(value));
+}
+
+function screeningDraftId_(facilityCode, localSubjectCode) {
+  const raw = String(facilityCode || '').trim().toUpperCase() + '|' + String(localSubjectCode || '').trim();
+  const digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, raw, Utilities.Charset.UTF_8);
+  const hex = digest.map(function(b) { const v = (b < 0 ? b + 256 : b); return ('0' + v.toString(16)).slice(-2); }).join('');
+  return 'PREMDT-' + hex.slice(0, 24).toUpperCase();
+}
+
+function saveScreeningDraft_(p) {
+  const facilityCode = String(p.facility_code || '').trim();
+  const facilityName = String(p.facility_name || '').trim();
+  const localCode = String(p.local_subject_code || '').trim();
+  const ownerEmail = normalizeDraftEmail_(p.reporter_email);
+  const draftState = p.draft_state;
+  if (!facilityCode || !facilityName || !localCode) return {ok:false, error:'MISSING_SCREENING_DRAFT_KEY'};
+  if (!validDraftEmail_(ownerEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
+  if (!draftState || typeof draftState !== 'object' || Array.isArray(draftState)) return {ok:false, error:'MISSING_DRAFT_STATE'};
+
+  const syntheticId = screeningDraftId_(facilityCode, localCode);
+  const key = draftKey_(syntheticId, 'screening', 'mdt_application');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    const idx = headerIndex_(values[0]);
+    let existingRow = -1;
+    let existingOwner = '';
+    for (let r = 1; r < values.length; r++) {
+      if (String(values[r][idx.draft_key] || '') === key) {
+        existingRow = r + 1;
+        existingOwner = normalizeDraftEmail_(values[r][idx.reporter_email]);
+        break;
+      }
+    }
+    if (existingRow > 0 && existingOwner && ownerEmail !== existingOwner) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
+    const now = new Date();
+    const rowObj = {
+      draft_key:key, updated_at:now, registration_id:syntheticId, crf_type:'screening', visit:'mdt_application',
+      facility_code:facilityCode, facility_name:facilityName, reporter_email:ownerEmail,
+      schema_version:String(p.schema_version || ''), draft_json:JSON.stringify(draftState)
+    };
+    if (existingRow > 0) setByHeader_(sh, existingRow, idx, rowObj);
+    else appendByHeaders_(sh, rowObj);
+    SpreadsheetApp.flush();
+    return {ok:true, existing:existingRow > 0, updated_at:Utilities.formatDate(now, TIMEZONE, "yyyy-MM-dd'T'HH:mm:ssXXX"), facility_code:facilityCode, facility_name:facilityName, reporter_email:ownerEmail};
+  } finally { lock.releaseLock(); }
+}
+
+function getScreeningDraft_(p) {
+  const facilityCode = String(p.facility_code || '').trim();
+  const localCode = String(p.local_subject_code || '').trim();
+  const suppliedEmail = normalizeDraftEmail_(p.reporter_email);
+  if (!facilityCode || !localCode) return {ok:false, error:'MISSING_SCREENING_DRAFT_KEY'};
+  if (!validDraftEmail_(suppliedEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
+  const syntheticId = screeningDraftId_(facilityCode, localCode);
+  const key = draftKey_(syntheticId, 'screening', 'mdt_application');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    if (values.length < 2) return {ok:true, source_found:false};
+    const idx = headerIndex_(values[0]);
+    for (let r = values.length - 1; r >= 1; r--) {
+      if (String(values[r][idx.draft_key] || '') !== key) continue;
+      const storedEmail = normalizeDraftEmail_(values[r][idx.reporter_email]);
+      if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
+      let draftState = {};
+      try { draftState = JSON.parse(String(values[r][idx.draft_json] || '{}')); }
+      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)}; }
+      return {ok:true, source_found:true, updated_at:isoDateTime_(values[r][idx.updated_at]), facility_code:String(values[r][idx.facility_code] || facilityCode), facility_name:String(values[r][idx.facility_name] || ''), reporter_email:storedEmail, schema_version:String(values[r][idx.schema_version] || ''), draft_state:draftState};
+    }
+    return {ok:true, source_found:false};
+  } finally { lock.releaseLock(); }
+}
+
+function deleteScreeningDraft_(p) {
+  const facilityCode = String(p.facility_code || '').trim();
+  const localCode = String(p.local_subject_code || '').trim();
+  if (!facilityCode || !localCode) return {ok:false, error:'MISSING_SCREENING_DRAFT_KEY'};
+  const syntheticId = screeningDraftId_(facilityCode, localCode);
+  const key = draftKey_(syntheticId, 'screening', 'mdt_application');
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    if (values.length < 2) return {ok:true, deleted:false};
+    const idx = headerIndex_(values[0]);
+    for (let r = values.length - 1; r >= 1; r--) {
+      if (String(values[r][idx.draft_key] || '') === key) { sh.deleteRow(r + 1); return {ok:true, deleted:true}; }
+    }
+    return {ok:true, deleted:false};
+  } finally { lock.releaseLock(); }
+}
+
+function saveDraft_(p) {
+  const id = String(p.registration_id || '').trim().toUpperCase();
+  const crfType = String(p.crf_type || '').trim();
+  const visit = String(p.visit || '').trim();
+  const draftState = p.draft_state;
+  const ownerEmail = normalizeDraftEmail_(p.reporter_email);
+  if (!id || !crfType || !visit) return {ok:false, error:'MISSING_DRAFT_KEY'};
+  if (!draftState || typeof draftState !== 'object' || Array.isArray(draftState)) {
+    return {ok:false, error:'MISSING_DRAFT_STATE'};
+  }
+  if (!validDraftEmail_(ownerEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
+
+  const registry = validateSubject_({registration_id:id, facility_code:String(p.facility_code || '').trim()});
+  if (!registry.ok) return registry;
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    const idx = headerIndex_(values[0]);
+    const key = draftKey_(id, crfType, visit);
+    const now = new Date();
+
+    let existingRow = -1;
+    let existingOwner = '';
+    for (let r = 1; r < values.length; r++) {
+      if (String(values[r][idx.draft_key] || '') === key) {
+        existingRow = r + 1;
+        existingOwner = normalizeDraftEmail_(values[r][idx.reporter_email]);
+        break;
+      }
+    }
+
+    // A saved draft belongs to the e-mail used when it was first saved.
+    // It cannot be overwritten with another address from the facility screen.
+    if (existingRow > 0 && existingOwner && ownerEmail !== existingOwner) {
+      return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
+    }
+
+    const rowObj = {
+      draft_key:key,
+      updated_at:now,
+      registration_id:id,
+      crf_type:crfType,
+      visit:visit,
+      facility_code:String(registry.facility_code || p.facility_code || ''),
+      facility_name:String(registry.facility_name || p.facility_name || ''),
+      reporter_email:ownerEmail,
+      schema_version:String(p.schema_version || ''),
+      draft_json:JSON.stringify(draftState)
+    };
+
+    if (existingRow > 0) setByHeader_(sh, existingRow, idx, rowObj);
+    else appendByHeaders_(sh, rowObj);
+    SpreadsheetApp.flush();
+    return {
+      ok:true,
+      existing:existingRow > 0,
+      updated_at:Utilities.formatDate(now, TIMEZONE, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+      registration_id:id,
+      facility_code:String(registry.facility_code || ''),
+      facility_name:String(registry.facility_name || ''),
+      reporter_email:ownerEmail
+    };
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function getDraft_(p) {
+  const id = String(p.registration_id || '').trim().toUpperCase();
+  const crfType = String(p.crf_type || '').trim();
+  const visit = String(p.visit || '').trim();
+  const suppliedEmail = normalizeDraftEmail_(p.reporter_email);
+  if (!id || !crfType || !visit) return {ok:false, error:'MISSING_DRAFT_KEY'};
+  if (!validDraftEmail_(suppliedEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
+
+  const registry = validateSubject_({registration_id:id, facility_code:''});
+  if (!registry.ok) return registry;
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    if (values.length < 2) return {ok:true, source_found:false, registration_id:id};
+    const idx = headerIndex_(values[0]);
+    const key = draftKey_(id, crfType, visit);
+
+    for (let r = values.length - 1; r >= 1; r--) {
+      if (String(values[r][idx.draft_key] || '') !== key) continue;
+      const storedEmail = normalizeDraftEmail_(values[r][idx.reporter_email]);
+      if (!storedEmail) return {ok:false, error:'DRAFT_EMAIL_NOT_SET'};
+      if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
+
+      let draftState = {};
+      try {
+        draftState = JSON.parse(String(values[r][idx.draft_json] || '{}'));
+      } catch (err) {
+        return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)};
+      }
+      return {
+        ok:true,
+        source_found:true,
+        registration_id:id,
+        crf_type:crfType,
+        visit:visit,
+        updated_at:isoDateTime_(values[r][idx.updated_at]),
+        facility_code:String(registry.facility_code || values[r][idx.facility_code] || ''),
+        facility_name:String(registry.facility_name || values[r][idx.facility_name] || ''),
+        reporter_email:storedEmail,
+        schema_version:String(values[r][idx.schema_version] || ''),
+        draft_state:draftState
+      };
+    }
+    return {ok:true, source_found:false, registration_id:id};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function resetDraftCode_(p) {
+  const id = String(p.registration_id || '').trim().toUpperCase();
+  const crfType = String(p.crf_type || '').trim();
+  const visit = String(p.visit || '').trim();
+  const adminUser = String(p.admin_user || '').trim();
+  if (!id || !crfType || !visit) return {ok:false, error:'MISSING_DRAFT_KEY'};
+  if (!adminUser) return {ok:false, error:'MISSING_ADMIN_USER'};
+
+  const registry = validateSubject_({registration_id:id, facility_code:''});
+  if (!registry.ok) return registry;
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    if (values.length < 2) return {ok:true, source_found:false, registration_id:id};
+    const idx = headerIndex_(values[0]);
+    const key = draftKey_(id, crfType, visit);
+
+    for (let r = values.length - 1; r >= 1; r--) {
+      if (String(values[r][idx.draft_key] || '') !== key) continue;
+      const row = r + 1;
+      const newCode = generateDraftResumeCode_();
+      const newHash = draftCodeHash_(newCode);
+      if (!newHash) return {ok:false, error:'DRAFT_CODE_GENERATION_FAILED'};
+      const now = new Date();
+      setByHeader_(sh, row, idx, {
+        resume_code_hash:newHash,
+        failed_attempts:0,
+        locked_until:'',
+        code_reset_at:now,
+        code_reset_by:adminUser
+      });
+      SpreadsheetApp.flush();
+      return {
+        ok:true,
+        source_found:true,
+        registration_id:id,
+        crf_type:crfType,
+        visit:visit,
+        resume_code:newCode,
+        reporter_email:String(values[r][idx.reporter_email] || ''),
+        facility_code:String(registry.facility_code || values[r][idx.facility_code] || ''),
+        facility_name:String(registry.facility_name || values[r][idx.facility_name] || ''),
+        updated_at:isoDateTime_(values[r][idx.updated_at]),
+        code_reset_at:Utilities.formatDate(now, TIMEZONE, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+        code_reset_by:adminUser
+      };
+    }
+    return {ok:true, source_found:false, registration_id:id};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+
+function updateDraftEmail_(p) {
+  const id = String(p.registration_id || '').trim().toUpperCase();
+  const crfType = String(p.crf_type || '').trim();
+  const visit = String(p.visit || '').trim();
+  const newEmail = normalizeDraftEmail_(p.new_reporter_email);
+  const adminUser = String(p.admin_user || '').trim();
+  if (!id || !crfType || !visit) return {ok:false, error:'MISSING_DRAFT_KEY'};
+  if (!validDraftEmail_(newEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
+  if (!adminUser) return {ok:false, error:'MISSING_ADMIN_USER'};
+
+  const registry = validateSubject_({registration_id:id, facility_code:''});
+  if (!registry.ok) return registry;
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    if (values.length < 2) return {ok:true, source_found:false, registration_id:id};
+    const idx = headerIndex_(values[0]);
+    const key = draftKey_(id, crfType, visit);
+    for (let r = values.length - 1; r >= 1; r--) {
+      if (String(values[r][idx.draft_key] || '') !== key) continue;
+      const row = r + 1;
+      const oldEmail = normalizeDraftEmail_(values[r][idx.reporter_email]);
+      const now = new Date();
+      setByHeader_(sh, row, idx, {
+        reporter_email:newEmail,
+        email_reset_at:now,
+        email_reset_by:adminUser
+      });
+      SpreadsheetApp.flush();
+      return {
+        ok:true,
+        source_found:true,
+        registration_id:id,
+        old_reporter_email:oldEmail,
+        reporter_email:newEmail,
+        email_reset_at:Utilities.formatDate(now, TIMEZONE, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+        email_reset_by:adminUser
+      };
+    }
+    return {ok:true, source_found:false, registration_id:id};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function deleteDraft_(p) {
+  const id = String(p.registration_id || '').trim().toUpperCase();
+  const crfType = String(p.crf_type || '').trim();
+  const visit = String(p.visit || '').trim();
+  if (!id || !crfType || !visit) return {ok:false, error:'MISSING_DRAFT_KEY'};
+
+  const registry = validateSubject_({registration_id:id, facility_code:''});
+  if (!registry.ok) return registry;
+
+  const lock = LockService.getScriptLock();
+  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
+  try {
+    const ss = getSpreadsheet_();
+    const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
+    const values = sh.getDataRange().getValues();
+    if (values.length < 2) return {ok:true, deleted:false};
+    const idx = headerIndex_(values[0]);
+    const key = draftKey_(id, crfType, visit);
+    for (let r = values.length - 1; r >= 1; r--) {
+      if (String(values[r][idx.draft_key] || '') === key) {
+        sh.deleteRow(r + 1);
+        SpreadsheetApp.flush();
+        return {ok:true, deleted:true};
+      }
+    }
+    return {ok:true, deleted:false};
+  } finally {
+    lock.releaseLock();
+  }
+}
+
 function saveCrf_(p) {
   const payload = p.payload;
   if (!payload || typeof payload !== 'object') return {ok: false, error: 'MISSING_PAYLOAD'};
@@ -655,6 +1232,10 @@ function saveCrf_(p) {
 
   const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
   if (!validation.ok) return validation;
+
+  const sourceCheck = validateDay90SourceLink_(payload);
+  if (!sourceCheck.ok) return sourceCheck;
+
   const hardCheck = validateCrfHardStops_(payload, validation);
   if (!hardCheck.ok) return hardCheck;
 

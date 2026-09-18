@@ -500,6 +500,54 @@ def save_crf_payload(payload: dict, timeout: int = 30):
     return registry_call("save_crf", {"payload": payload}, timeout=timeout)
 
 
+def save_screening_draft(
+    facility_code: str,
+    facility_name: str,
+    local_subject_code: str,
+    reporter_email: str,
+    draft_state: dict,
+    timeout: int = 30,
+):
+    """Upsert a pre-registration central-MDT application draft."""
+    return registry_call(
+        "save_screening_draft",
+        {
+            "facility_code": (facility_code or "").strip(),
+            "facility_name": facility_name or "",
+            "local_subject_code": (local_subject_code or "").strip(),
+            "reporter_email": (reporter_email or "").strip(),
+            "schema_version": SCHEMA_VERSION,
+            "draft_state": draft_state or {},
+        },
+        timeout=timeout,
+    )
+
+
+def get_screening_draft(facility_code: str, local_subject_code: str, reporter_email: str, timeout: int = 30):
+    """Fetch a pre-registration central-MDT application draft."""
+    return registry_call(
+        "get_screening_draft",
+        {
+            "facility_code": (facility_code or "").strip(),
+            "local_subject_code": (local_subject_code or "").strip(),
+            "reporter_email": (reporter_email or "").strip(),
+        },
+        timeout=timeout,
+    )
+
+
+def delete_screening_draft(facility_code: str, local_subject_code: str, timeout: int = 30):
+    """Delete a pre-registration draft after central-MDT application submission."""
+    return registry_call(
+        "delete_screening_draft",
+        {
+            "facility_code": (facility_code or "").strip(),
+            "local_subject_code": (local_subject_code or "").strip(),
+        },
+        timeout=timeout,
+    )
+
+
 def save_crf_draft(
     registration_id: str,
     crf_type: str,
