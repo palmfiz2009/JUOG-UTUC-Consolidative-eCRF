@@ -23,6 +23,7 @@ from juog_common import (
     render_lab_panel,
     render_cytology,
     send_email,
+    _smtp_send,
     save_screening_draft,
     restore_draft_state,
     text,
@@ -57,6 +58,59 @@ if "screening_sent" not in st.session_state:
     st.session_state.screening_sent = False
 
 
+def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
+    """Notify the three central MDT reviewers only for the first screening submission.
+
+    Reviewer addresses are kept in Streamlit Secrets and never in GitHub.
+    Clinical details are intentionally excluded from the message body.
+    """
+    role_labels = {
+        "radiology": "放射線診断専門医",
+        "medical_oncology": "腫瘍内科専門医",
+        "urology": "泌尿器科専門医",
+    }
+    try:
+        cfg = st.secrets["mdt_reviewers"]
+    except Exception:
+        return False, "Streamlit Secrets に [mdt_reviewers] が設定されていません"
+
+    try:
+        base_url = str(st.secrets.get("app", {}).get("base_url", "")).strip()
+    except Exception:
+        base_url = ""
+    if not base_url:
+        base_url = "https://juog-utuc-consolidative-ecrf-nefe6mkbnobhhwpjsgbdpe.streamlit.app"
+    review_url = base_url.rstrip("/") + "/mdt_reviewer"
+
+    failures = []
+    for role, label in role_labels.items():
+        key = f"{role}_email"
+        try:
+            address = str(cfg[key]).strip()
+        except Exception:
+            address = ""
+        if not address:
+            failures.append(f"{label}: メールアドレス未設定")
+            continue
+        subject = f"【JUOG 中央MDT審査依頼】【{screening_id}】{label}"
+        body = f"""JUOG UTUC_Consolidative 中央MDT審査の新規申請が届きました。
+
+MDT審査受付番号: {screening_id}
+申請施設: {facility_name}
+担当領域: {label}
+
+中央MDT判定者専用ページ:
+{review_url}
+
+※患者氏名・カルテ番号等の個人情報はメールには記載していません。
+※判定者専用ページでログイン後、受付番号 {screening_id} の症例を確認してください。
+"""
+        ok, err = _smtp_send(subject, body, [address])
+        if not ok:
+            failures.append(f"{label}: {err or '送信失敗'}")
+    return (not failures), " / ".join(failures)
+
+
 def render_required_text_or_none(label: str, key: str, disabled: bool = False) -> str:
     """Required free text with a one-click 'なし' option; keeps stored value backward-compatible."""
     text_col, none_col = st.columns([5, 1])
@@ -76,6 +130,11 @@ if st.session_state.screening_sent:
     st.caption("正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。")
     if st.session_state.get("screening_email_failed"):
         st.warning("中央台帳への保存は完了していますが、通知メール送信に失敗しました。再申請はせず事務局へ連絡してください。")
+    if st.session_state.get("screening_mdt_notify_failed"):
+        st.warning("中央MDT申請は保存済みですが、判定者への初回審査依頼メールの一部または全部を送信できませんでした。再申請はせず、事務局から判定者へ連絡してください。")
+        detail = st.session_state.get("screening_mdt_notify_error", "")
+        if detail:
+            st.caption("通知エラー: " + str(detail))
     if st.session_state.get("screening_sent_draft_delete_failed"):
         st.info("中央MDT申請は完了していますが、仮保存データの削除確認ができませんでした。申請データには影響ありません。")
     st.caption("訂正が必要な場合はページを再読み込みして再入力してください。")
@@ -700,11 +759,19 @@ EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
             report,
             reporter_email,
         )
+        # 3名への審査依頼は初回申請のみ。訂正・再申請では再送しない。
+        mdt_notify_ok, mdt_notify_err = True, ""
+        if not bool(reg_result.get("existing")):
+            mdt_notify_ok, mdt_notify_err = send_initial_mdt_review_requests(screening_id, facility_name)
         _draft_delete = delete_screening_draft(facility_code, local_subject_code)
         st.session_state.screening_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
         st.session_state.screening_sent = True
         st.session_state.screening_id = screening_id
         st.session_state.screening_email_failed = not sent
+        st.session_state.screening_mdt_notify_failed = not mdt_notify_ok
+        st.session_state.screening_mdt_notify_error = mdt_notify_err
         if not sent:
             print(f"[JUOG MDT screening] email failed: {err}")
+        if not mdt_notify_ok:
+            print(f"[JUOG MDT screening] reviewer notification failed: {mdt_notify_err}")
         st.rerun()
