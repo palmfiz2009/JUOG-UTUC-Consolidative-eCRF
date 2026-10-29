@@ -33,6 +33,8 @@ from juog_common import (
     window_info,
 )
 
+from juog_uat import apply_day30_uat, is_test_environment
+
 st.markdown("""
 <style>
 .block-container {max-width:1180px!important; padding-top:1.3rem!important; padding-bottom:5rem!important;}
@@ -111,7 +113,12 @@ if isinstance(_draft_flash, dict):
         else:
             st.error(_message)
 
-draft_tool_col1, draft_tool_col2, _draft_tool_spacer = st.columns([0.9, 0.9, 6.2])
+_uat_enabled = is_test_environment()
+if _uat_enabled:
+    draft_tool_col1, draft_tool_col2, draft_tool_col3, _draft_tool_spacer = st.columns([0.9, 0.9, 0.9, 5.3])
+else:
+    draft_tool_col1, draft_tool_col2, _draft_tool_spacer = st.columns([0.9, 0.9, 6.2])
+    draft_tool_col3 = None
 with draft_tool_col1:
     draft_clicked = st.button("💾 仮保存", key="draft30_save_button", disabled=False)
 with draft_tool_col2:
@@ -152,6 +159,24 @@ with draft_tool_col2:
                     st.session_state["peri_reporter_email"] = draft_result.get("reporter_email") or draft_lookup_email
                     st.session_state["draft30_loaded_at"] = draft_result.get("updated_at") or "時刻不明"
                     st.rerun()
+
+if _uat_enabled and draft_tool_col3 is not None:
+    with draft_tool_col3:
+        with st.popover("🧪 UAT"):
+            st.caption("TEST環境専用。正式登録後のJUOG番号を入力してください。")
+            _uat_reg_id = st.text_input("JUOG登録番号", placeholder="JUOG-001", key="uat_day30_reg_id").strip().upper()
+            if st.button("UATデータを入力", key="uat_day30_fill_button", use_container_width=True, type="secondary"):
+                try:
+                    clear_session_state_prefixes(("peri_", "widget_peri_"))
+                    apply_day30_uat(_uat_reg_id)
+                    st.session_state["uat_day30_notice"] = f"UATデータを入力しました（{_uat_reg_id}）。"
+                    st.rerun()
+                except ValueError as exc:
+                    st.error(str(exc))
+
+_uat_notice = st.session_state.pop("uat_day30_notice", None)
+if _uat_notice:
+    st.info(_uat_notice)
 
 L = False
 
@@ -466,6 +491,19 @@ if surgery_performed == "実施した":
         else:
             path["ypn"] = "ypNX（郭清なし）"
             st.info("リンパ節郭清なしのためypNは ypNX として記録します。")
+        # 病理報告書で確認されたリンパ節の総数を記録する（郭清未実施例はN/A）。
+        if ln_dissection == "実施した":
+            path["ln_count_examined"] = st.number_input(
+                "摘出リンパ節数（病理検索数・個）*",
+                min_value=0,
+                value=None,
+                step=1,
+                key="peri_path_ln_count_examined",
+                disabled=L,
+                help="病理報告書に記載された検索リンパ節の総数を入力してください。",
+            )
+        else:
+            path["ln_count_examined"] = None
         if path["ypn"] in ["ypN1", "ypN2"]:
             path["ypn_sites"] = st.multiselect("ypN陽性部位*", ["腎門部", "下大静脈周囲", "大動脈周囲", "傍大動脈", "大動脈静脈間", "総腸骨", "外腸骨", "内腸骨", "閉鎖", "その他"], key="peri_path_ypn_sites", disabled=L)
         else:
@@ -669,6 +707,8 @@ def validate_all():
         if path.get("size_mm") is None: missing.append("病理最大径")
         if not path.get("locations"): missing.append("病理部位")
         if path.get("ypn") in [None, "", "選択してください"]: missing.append("ypN")
+        if ln_dissection == "実施した" and path.get("ln_count_examined") is None:
+            missing.append("摘出リンパ節数（病理検索数）")
         if path.get("ypn") in ["ypN1", "ypN2"] and not path.get("ypn_sites"): missing.append("ypN陽性部位")
         if (path.get("ypn") == "ypNX（評価不能）" or "評価不能" in [path.get("histology"), path.get("ypt"), path.get("lvi"), path.get("r0"), path.get("trg")]) and not text(path.get("eval_failed_reason")): missing.append("病理評価不能理由")
     elif surgery_performed == "実施しなかった":
