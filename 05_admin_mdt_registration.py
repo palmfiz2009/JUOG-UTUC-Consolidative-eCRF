@@ -11,7 +11,7 @@ ROLE_LABELS = {
     "urology": "泌尿器科専門医",
 }
 DECISION_JP = {"ELIGIBLE": "適格", "INELIGIBLE": "不適格", "HOLD": "保留"}
-EXPECTED_BACKEND_VERSION = "v2.2.8-candidate"
+EXPECTED_BACKEND_VERSION = "v2.2.8"
 
 st.markdown(
     """
