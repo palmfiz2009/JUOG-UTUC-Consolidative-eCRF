@@ -1,5 +1,5 @@
 /**
- * JUOG UTUC_Consolidative central eCRF service (v2.2.7)
+ * JUOG UTUC_Consolidative central eCRF service (v2.2.8)
  * Google Apps Script Web App bound to a dedicated Google Sheet.
  *
  * Workflow:
@@ -24,7 +24,7 @@ const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
 const CRF_DRAFT_SHEET = 'CRF_Drafts';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
-const BACKEND_VERSION = 'v2.2.8-candidate';
+const BACKEND_VERSION = 'v2.2.8';
 
 const REVIEWER_ROLES = ['radiology', 'medical_oncology', 'urology'];
 
@@ -141,7 +141,7 @@ function rotateApiToken() {
   Logger.log('JUOG_API_TOKEN rotated (value hidden)');
 }
 
-// STAGING CANDIDATE: additional server-side action-level role authorization.
+// v2.2.8: server-side action-level role authorization (secret keys must be configured separately).
 // Role keys are set in GAS Script Properties, and NOT committed to GitHub.
 function authorizeJuogAction_(action, actor, payload, props) {
   const adminOnly = ['list_screenings', 'get_screening', 'finalize_mdt',
@@ -1426,7 +1426,7 @@ function getBackendInfo_() {
   };
 }
 
-// Candidate privacy safeguard. Review against approved CRF field dictionary before deployment.
+// Privacy safeguard: reject direct identifier keys in submitted payloads.
 function containsDirectIdentifier_(value) {
   const prohibited = ['full_patient_name', 'patient_name', 'patient_full_name', 'mrn',
     'medical_record_number', 'patient_address', 'personal_address', 'patient_phone',
