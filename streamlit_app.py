@@ -53,13 +53,16 @@ st.sidebar.divider()
 with st.sidebar.popover("✉ 不具合を連絡", use_container_width=True):
     st.caption("eCRFの不具合・エラーを研究事務局へ送信します。")
 
-    with st.form("juog_support_form", clear_on_submit=False):
-        id_kind = st.selectbox(
-            "症例識別*",
-            ["JUOG登録番号", "MDT受付番号", "未発番"],
-            key="support_id_kind",
-        )
+    # Outside st.form so selecting "未発番" immediately switches the required input.
+    # Streamlit batches form widgets until submit and cannot dynamically update
+    # the conditional field while the selectbox lives inside the form.
+    id_kind = st.selectbox(
+        "症例識別*",
+        ["JUOG登録番号", "MDT受付番号", "未発番"],
+        key="support_id_kind",
+    )
 
+    with st.form("juog_support_form", clear_on_submit=False):
         case_id = ""
         facility_name = ""
         if id_kind == "JUOG登録番号":
@@ -98,7 +101,7 @@ with st.sidebar.popover("✉ 不具合を連絡", use_container_width=True):
             errors.append("JUOG登録番号を正しい形式（例：JUOG-001）で入力してください。")
         elif id_kind == "MDT受付番号" and not re.fullmatch(r"JUOG-SCR-\d{3,4}", case_id):
             errors.append("MDT受付番号を正しい形式（例：JUOG-SCR-001）で入力してください。")
-        elif id_kind == "未発番" and facility_name == "選択してください":
+        elif id_kind == "未発番" and (not facility_name or facility_name == "選択してください"):
             errors.append("施設名を選択してください。")
 
         if not valid_email(reply_email):
