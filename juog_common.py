@@ -387,31 +387,13 @@ def _office_email_addresses():
 
 
 def _smtp_send(subject: str, content: str, to_addrs: list[str]):
-    import streamlit as st
-    try:
-        mail_user = st.secrets["email"]["user"]
-        mail_pass = st.secrets["email"]["pass"]
-        clean = []
-        for value in to_addrs:
-            addr = str(value).strip()
-            if addr and addr not in clean:
-                clean.append(addr)
-        if not clean:
-            return False, "NO_RECIPIENTS"
+    """Validation branch only: never connect to SMTP or send notifications.
 
-        msg = MIMEMultipart()
-        msg["From"] = mail_user
-        msg["To"] = ", ".join(clean)
-        msg["Subject"] = subject
-        msg.attach(MIMEText(content, "plain", "utf-8"))
-
-        import smtplib
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
-            server.login(mail_user, mail_pass)
-            server.send_message(msg)
-        return True, None
-    except Exception as exc:
-        return False, str(exc)
+    The UAT deployment must not deliver mail to participating institutions.
+    Return an explicit non-success so UI messages do not claim mail delivery.
+    Do not log message bodies, addresses, or credentials.
+    """
+    return False, "UAT_EMAIL_DISABLED"
 
 
 def send_office_email(subject: str, content: str):
