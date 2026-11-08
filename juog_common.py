@@ -442,6 +442,63 @@ def send_email(subject: str, content: str, reporter_email: str | None = None):
     return _smtp_send(subject, content, to_addrs)
 
 
+
+# Staging candidate: Streamlit Secrets carry server-only scoped bearer keys.
+# Never print, commit, or expose the actual keys in pages or logs.
+_JUOG_ADMIN_ONLY_ACTIONS = {
+    "list_screenings", "get_screening", "finalize_mdt",
+    "reset_draft_code", "update_draft_email", "stats",
+}
+_JUOG_REVIEWER_ONLY_ACTIONS = {
+    "list_review_cases", "get_screening_crf",
+    "get_own_review", "submit_mdt_review",
+}
+_JUOG_SHARED_PRIVILEGED_ACTIONS = {"get_mdt_reviews"}
+_JUOG_REVIEWER_ROLES = {"radiology", "medical_oncology", "urology"}
+
+def _juog_actor_auth(action: str, payload: dict, st):
+    """Fail closed on missing Streamlit page login or backend scoped key.
+
+    Role access is not individual identity attribution; site-specific authentication
+    and institution-level account controls still require separate UAT review.
+    """
+    privileged = (_JUOG_ADMIN_ONLY_ACTIONS | _JUOG_REVIEWER_ONLY_ACTIONS |
+                  _JUOG_SHARED_PRIVILEGED_ACTIONS)
+    if action not in privileged:
+        return None, None
+    admin = st.session_state.get("juog_admin_authenticated") is True
+    role = str(st.session_state.get("juog_reviewer_role") or "")
+    if action in _JUOG_ADMIN_ONLY_ACTIONS:
+        if not admin:
+            return None, "CLIENT_ADMIN_LOGIN_REQUIRED"
+        kind = "admin"
+    elif action in _JUOG_REVIEWER_ONLY_ACTIONS:
+        if role not in _JUOG_REVIEWER_ROLES:
+            return None, "CLIENT_REVIEWER_LOGIN_REQUIRED"
+        kind = "reviewer"
+    else:
+        if admin:
+            kind = "admin"
+        elif role in _JUOG_REVIEWER_ROLES:
+            kind = "reviewer"
+        else:
+            return None, "CLIENT_PRIVILEGED_LOGIN_REQUIRED"
+    try:
+        if kind == "admin":
+            key = str(st.secrets["registry_role_tokens"]["admin"])
+            actor = {"kind":"admin", "key":key}
+        else:
+            specified = str(payload.get("reviewer_role") or "")
+            if specified and specified != role:
+                return None, "CLIENT_REVIEWER_ROLE_MISMATCH"
+            key = str(st.secrets["registry_role_tokens"][role])
+            actor = {"kind":"reviewer", "role":role, "key":key}
+    except Exception:
+        return None, "ROLE_AUTH_NOT_CONFIGURED"
+    if not key.strip():
+        return None, "ROLE_AUTH_NOT_CONFIGURED"
+    return actor, None
+
 def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
     """Call the central registration service.
 
@@ -456,7 +513,12 @@ def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
         token = st.secrets["registry"]["token"]
     except Exception:
         return {"ok": False, "error": "REGISTRY_NOT_CONFIGURED"}
+    actor, err = _juog_actor_auth(action, payload or {}, st)
+    if err:
+        return {"ok": False, "error": err}
     body = {"action": action, "token": token, "payload": payload or {}}
+    if actor is not None:
+        body["actor_auth"] = actor
     req = urllib.request.Request(
         url,
         data=json.dumps(body, ensure_ascii=False, default=str).encode("utf-8"),

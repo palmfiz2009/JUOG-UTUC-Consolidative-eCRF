@@ -1,3 +1,4 @@
-JUOG UTUC Consolidative eCRF v2.2.2
-Build date: 2026-09-14
-Adds conservative hard-stop plausibility and chronology validation.
+JUOG UTUC Consolidative eCRF v2.2.8
+STATUS: PRODUCTION RELEASE CANDIDATE / NOT DEPLOYED
+Backend role authorization, cN1-only cap accounting, CRF integrity and privacy safeguards.
+DEPLOYMENT GATES: configure production-only role tokens, verify production sheet and GAS URL, validate outbound email with non-patient data, approve release and verify after deployment.

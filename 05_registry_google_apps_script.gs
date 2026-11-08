@@ -1,5 +1,5 @@
 /**
- * JUOG UTUC_Consolidative central eCRF service (v2.2.7)
+ * JUOG UTUC_Consolidative central eCRF service (v2.2.8)
  * Google Apps Script Web App bound to a dedicated Google Sheet.
  *
  * Workflow:
@@ -24,7 +24,7 @@ const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
 const CRF_DRAFT_SHEET = 'CRF_Drafts';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
-const BACKEND_VERSION = 'v2.2.7';
+const BACKEND_VERSION = 'v2.2.8';
 
 const REVIEWER_ROLES = ['radiology', 'medical_oncology', 'urology'];
 
@@ -132,13 +132,64 @@ function setupRegistry() {
 
   SpreadsheetApp.flush();
   Logger.log('SPREADSHEET_ID=' + ss.getId());
-  Logger.log('JUOG_API_TOKEN=' + props.getProperty('JUOG_API_TOKEN'));
+  Logger.log('JUOG_API_TOKEN configured (value hidden)');
 }
 
 function rotateApiToken() {
   const token = Utilities.getUuid() + Utilities.getUuid();
   PropertiesService.getScriptProperties().setProperty('JUOG_API_TOKEN', token);
-  Logger.log('JUOG_API_TOKEN=' + token);
+  Logger.log('JUOG_API_TOKEN rotated (value hidden)');
+}
+
+// v2.2.8: server-side action-level role authorization (secret keys must be configured separately).
+// Role keys are set in GAS Script Properties, and NOT committed to GitHub.
+function authorizeJuogAction_(action, actor, payload, props) {
+  const adminOnly = ['list_screenings', 'get_screening', 'finalize_mdt',
+    'reset_draft_code', 'update_draft_email', 'stats'];
+  const reviewerOnly = ['list_review_cases', 'get_screening_crf',
+    'get_own_review', 'submit_mdt_review'];
+  const both = ['get_mdt_reviews'];
+  if (adminOnly.indexOf(action) < 0 && reviewerOnly.indexOf(action) < 0 && both.indexOf(action) < 0) {
+    return {ok:true, kind:'facility'};
+  }
+  if (!actor || typeof actor !== 'object' || Array.isArray(actor)) {
+    return {ok:false, error:'ROLE_AUTH_REQUIRED'};
+  }
+  const kind = String(actor.kind || '');
+  const actualKey = String(actor.key || '');
+  let expectedKey = '';
+  if (kind === 'admin') {
+    if (reviewerOnly.indexOf(action) >= 0) return {ok:false, error:'ROLE_NOT_ALLOWED'};
+    expectedKey = String(props.getProperty('JUOG_ADMIN_ACTION_TOKEN') || '');
+  } else if (kind === 'reviewer') {
+    if (adminOnly.indexOf(action) >= 0) return {ok:false, error:'ROLE_NOT_ALLOWED'};
+    const role = String(actor.role || '');
+    if (REVIEWER_ROLES.indexOf(role) < 0) return {ok:false, error:'ROLE_NOT_ALLOWED'};
+    if (['list_review_cases', 'get_own_review', 'submit_mdt_review'].indexOf(action) >= 0 &&
+        String((payload || {}).reviewer_role || '') !== role) {
+      return {ok:false, error:'REVIEWER_ROLE_MISMATCH'};
+    }
+    expectedKey = String(props.getProperty('JUOG_REVIEWER_' + role.toUpperCase() + '_ACTION_TOKEN') || '');
+  } else {
+    return {ok:false, error:'ROLE_AUTH_REQUIRED'};
+  }
+  if (!expectedKey) return {ok:false, error:'ROLE_AUTH_NOT_CONFIGURED'};
+  if (!actualKey || actualKey !== expectedKey) return {ok:false, error:'ROLE_AUTH_FAILED'};
+  return {ok:true, kind:kind, role:kind === 'reviewer' ? String(actor.role) : ''};
+}
+
+// Reviewer notification screens may see submission counts, not other reviewers' clinical judgments.
+function reviewerMdtProgressOnly_(result) {
+  if (!result || !result.ok) return result;
+  const statuses = {};
+  REVIEWER_ROLES.forEach(function(role) {
+    statuses[role] = result.reviews && result.reviews[role] ? {submitted:true} : null;
+  });
+  return {
+    ok:true, screening_id:result.screening_id, review_round:result.review_round,
+    completed:result.completed, required:result.required,
+    all_complete:result.all_complete, reviews:statuses
+  };
 }
 
 function doPost(e) {
@@ -150,6 +201,8 @@ function doPost(e) {
     }
     const action = String(body.action || '');
     const payload = body.payload || {};
+    const scope = authorizeJuogAction_(action, body.actor_auth, payload, props);
+    if (!scope.ok) return jsonResponse_(scope);
 
     if (action === 'submit_screening') return jsonResponse_(submitScreening_(payload));
     if (action === 'list_screenings') return jsonResponse_(listScreenings_(payload));
@@ -158,7 +211,10 @@ function doPost(e) {
     if (action === 'get_screening_crf') return jsonResponse_(getScreeningCrf_(payload));
     if (action === 'get_own_review') return jsonResponse_(getOwnReview_(payload));
     if (action === 'submit_mdt_review') return jsonResponse_(submitMdtReview_(payload));
-    if (action === 'get_mdt_reviews') return jsonResponse_(getMdtReviews_(payload));
+    if (action === 'get_mdt_reviews') {
+      const result = getMdtReviews_(payload);
+      return jsonResponse_(scope.kind === 'reviewer' ? reviewerMdtProgressOnly_(result) : result);
+    }
     if (action === 'finalize_mdt') return jsonResponse_(finalizeMdt_(payload));
     if (action === 'save_crf') return jsonResponse_(saveCrf_(payload));
     if (action === 'save_screening_draft') return jsonResponse_(saveScreeningDraft_(payload));
@@ -191,6 +247,7 @@ function submitScreening_(p) {
   if (!p.crf_payload || typeof p.crf_payload !== 'object') {
     return {ok: false, error: 'MISSING_CRF_PAYLOAD', message: 'screening CRF snapshot is required'};
   }
+  if (containsDirectIdentifier_(p.crf_payload)) return {ok:false, error:'DIRECT_IDENTIFIER_NOT_ALLOWED'};
   const hardCheck = validateScreeningHardStops_(p);
   if (!hardCheck.ok) return hardCheck;
 
@@ -556,7 +613,7 @@ function finalizeMdt_(p) {
     }
 
     const activeRows = regValues.slice(1).filter(row => String(row[rIdx.status] || 'ACTIVE') !== 'VOID');
-    const cn1Count = activeRows.filter(row => String(row[rIdx.cN]) === 'cN1').length;
+    const cn1Count = countCn1OnlyRegistered_(activeRows, rIdx, found.values, found.idx);
     const sdCount = activeRows.filter(row => String(row[rIdx.best_effect]).toUpperCase() === 'SD').length;
     const settings = getSettings_();
     const totalMax = parseInt(settings.TOTAL_MAX || '42', 10);
@@ -567,7 +624,7 @@ function finalizeMdt_(p) {
     const bestEffect = String(found.row[found.idx.best_effect] || '').toUpperCase();
 
     if (activeRows.length >= totalMax && !allowTotalAfterMax) return {ok: false, error: 'TOTAL_CAP_REACHED', message: `目標登録数 ${totalMax} 例に到達しています`};
-    if (String(found.row[found.idx.cN]) === 'cN1' && cn1Count >= cn1Max) return {ok: false, error: 'CN1_CAP_REACHED', message: `cN1登録上限 ${cn1Max} 例に到達しています`};
+    if (isCn1Only_(found.row[found.idx.cT], found.row[found.idx.cN], found.row[found.idx.cM]) && cn1Count >= cn1Max) return {ok: false, error: 'CN1_CAP_REACHED', message: `cN1登録上限 ${cn1Max} 例に到達しています`};
     if (bestEffect === 'SD' && sdCount >= sdThreshold && !allowSdAfter) return {ok: false, error: 'SD_CAP_HOLD', message: `SD症例が ${sdThreshold} 例に到達しているため、新規SD登録は一時保留です`};
 
     let maxNo = 0;
@@ -593,7 +650,7 @@ function finalizeMdt_(p) {
       mdt_decision: 'ELIGIBLE', mdt_reason: '', consensus_note: consensusNote, registration_id: registrationId, admin_user: adminUser
     });
     SpreadsheetApp.flush();
-    return {ok: true, existing: false, screening_id: screeningId, status: 'REGISTERED', registration_id: registrationId, registration_date: Utilities.formatDate(now, TIMEZONE, 'yyyy-MM-dd'), site_recist: siteRecist, central_recist: centralRecist, recist_concordance: recistConcordance, counts_after: {total: activeRows.length + 1, cN1: cn1Count + (String(found.row[found.idx.cN]) === 'cN1' ? 1 : 0), SD: sdCount + (bestEffect === 'SD' ? 1 : 0)}};
+    return {ok: true, existing: false, screening_id: screeningId, status: 'REGISTERED', registration_id: registrationId, registration_date: Utilities.formatDate(now, TIMEZONE, 'yyyy-MM-dd'), site_recist: siteRecist, central_recist: centralRecist, recist_concordance: recistConcordance, counts_after: {total: activeRows.length + 1, cN1: cn1Count + (isCn1Only_(found.row[found.idx.cT], found.row[found.idx.cN], found.row[found.idx.cM]) ? 1 : 0), SD: sdCount + (bestEffect === 'SD' ? 1 : 0)}};
   } finally {
     lock.releaseLock();
   }
@@ -878,6 +935,7 @@ function saveScreeningDraft_(p) {
   if (!facilityCode || !facilityName || !localCode) return {ok:false, error:'MISSING_SCREENING_DRAFT_KEY'};
   if (!validDraftEmail_(ownerEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
   if (!draftState || typeof draftState !== 'object' || Array.isArray(draftState)) return {ok:false, error:'MISSING_DRAFT_STATE'};
+  if (containsDirectIdentifier_(draftState)) return {ok:false, error:'DIRECT_IDENTIFIER_NOT_ALLOWED'};
 
   const syntheticId = screeningDraftId_(facilityCode, localCode);
   const key = draftKey_(syntheticId, 'screening', 'mdt_application');
@@ -971,6 +1029,7 @@ function saveDraft_(p) {
   if (!draftState || typeof draftState !== 'object' || Array.isArray(draftState)) {
     return {ok:false, error:'MISSING_DRAFT_STATE'};
   }
+  if (containsDirectIdentifier_(draftState)) return {ok:false, error:'DIRECT_IDENTIFIER_NOT_ALLOWED'};
   if (!validDraftEmail_(ownerEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
 
   const registry = validateSubject_({registration_id:id, facility_code:String(p.facility_code || '').trim()});
@@ -1226,6 +1285,7 @@ function deleteDraft_(p) {
 function saveCrf_(p) {
   const payload = p.payload;
   if (!payload || typeof payload !== 'object') return {ok: false, error: 'MISSING_PAYLOAD'};
+  if (containsDirectIdentifier_(payload)) return {ok:false, error:'DIRECT_IDENTIFIER_NOT_ALLOWED'};
   const crfType = String(payload.crf_type || '');
   const sheetName = crfSheetForType_(crfType);
   if (!sheetName) return {ok: false, error: 'UNSUPPORTED_CRF_TYPE'};
@@ -1249,6 +1309,11 @@ function saveCrf_(p) {
 }
 
 function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
+  // Only for official CRFs: ensure the record key matches the actual study subject.
+  if (enforceVersionRules) {
+    const expectedKey = [String(payload.registration_id || ''), String(payload.crf_type || ''), String(payload.visit || '')].join('|');
+    if (String(payload.record_key || '') !== expectedKey) return {ok:false, error:'RECORD_KEY_MISMATCH'};
+  }
   const ss = getSpreadsheet_();
   const sh = ss.getSheetByName(sheetName);
   const submissionId = String(payload.submission_id || '').trim();
@@ -1263,6 +1328,13 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   for (let r = 1; r < values.length; r++) {
     const row = values[r];
     if (String(row[idx.submission_id] || '') === submissionId) {
+      if (enforceVersionRules) {
+        const isSameKey = String(row[idx.record_key] || '') === recordKey;
+        const isSameSubject = String(row[idx.registration_id] || '') === String(payload.registration_id || '');
+        const isSameSite = String(row[idx.facility_code] || '') === String(payload.facility_code || '');
+        const isSamePayload = String(row[idx.payload_json] || '') === JSON.stringify(payload);
+        if (!isSameKey || !isSameSubject || !isSameSite || !isSamePayload) return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
+      }
       return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId};
     }
     if (String(row[idx.record_key] || '') === recordKey) priorCount++;
@@ -1354,6 +1426,41 @@ function getBackendInfo_() {
   };
 }
 
+// Privacy safeguard: reject direct identifier keys in submitted payloads.
+function containsDirectIdentifier_(value) {
+  const prohibited = ['full_patient_name', 'patient_name', 'patient_full_name', 'mrn',
+    'medical_record_number', 'patient_address', 'personal_address', 'patient_phone',
+    'birth_date', 'full_dob', 'date_of_birth'];
+  if (!value || typeof value !== 'object') return false;
+  return Object.keys(value).some(key => {
+    if (prohibited.indexOf(String(key).trim().toLowerCase()) >= 0) return true;
+    return containsDirectIdentifier_(value[key]);
+  });
+}
+
+function isCn1Only_(cT, cN, cM) {
+  return ['cTa', 'cTis', 'cT1', 'cT2', 'cT3'].indexOf(String(cT || '').trim()) >= 0 &&
+    String(cN || '').trim() === 'cN1' && String(cM || '').trim() === 'cM0';
+}
+
+function countCn1OnlyRegistered_(activeRows, rIdx, screenValues, sIdx) {
+  const screeningById = {};
+  screenValues.slice(1).forEach(row => {
+    const id = String(row[sIdx.screening_id] || '').trim().toUpperCase();
+    if (id) screeningById[id] = row;
+  });
+  return activeRows.filter(row => {
+    if (String(row[rIdx.cN]) !== 'cN1') return false;
+    const id = String(row[rIdx.screening_id] || '').trim().toUpperCase();
+    const screening = screeningById[id];
+    if (!screening || !String(screening[sIdx.cT] || '').trim() || !String(screening[sIdx.cM] || '').trim() ||
+        String(screening[sIdx.cN] || '').trim() !== String(row[rIdx.cN] || '').trim()) {
+      throw new Error('CN1_ONLY_COUNT_UNVERIFIABLE: ' + String(row[rIdx.registration_id] || id));
+    }
+    return isCn1Only_(screening[sIdx.cT], screening[sIdx.cN], screening[sIdx.cM]);
+  }).length;
+}
+
 function getStats_() {
   const ss = getSpreadsheet_();
   const regSh = ss.getSheetByName(REGISTRY_SHEET);
@@ -1367,7 +1474,7 @@ function getStats_() {
   const screeningCounts = {PENDING: 0, HOLD: 0, INELIGIBLE: 0, REGISTERED: 0};
   screenValues.slice(1).forEach(row => { const status = String(row[sIdx.status] || 'PENDING').toUpperCase(); if (Object.prototype.hasOwnProperty.call(screeningCounts, status)) screeningCounts[status]++; });
 
-  return {ok: true, total: activeRows.length, cN1: activeRows.filter(row => String(row[rIdx.cN]) === 'cN1').length, SD: activeRows.filter(row => String(row[rIdx.best_effect]).toUpperCase() === 'SD').length, screenings: screeningCounts};
+  return {ok: true, total: activeRows.length, cN1: countCn1OnlyRegistered_(activeRows, rIdx, screenValues, sIdx), SD: activeRows.filter(row => String(row[rIdx.best_effect]).toUpperCase() === 'SD').length, screenings: screeningCounts};
 }
 
 function findScreening_(screeningIdRaw) {
