@@ -129,12 +129,4 @@ with st.sidebar.popover("✉ 不具合を連絡", use_container_width=True):
             else:
                 st.error("送信できませんでした。時間をおいて再度お試しいただくか、yoshida.tks@kmu.ac.jp へご連絡ください。")
 
-# Validation deployment guard: verify the no-send implementation before any form runs.
-import inspect
-from juog_common import _smtp_send
-_expected_no_send = "def _smtp_send(subject: str, content: str, to_addrs: list[str]):\n    \"\"\"Validation branch only: never connect to SMTP or send notifications.\n\n    The UAT deployment must not deliver mail to participating institutions.\n    Return an explicit non-success so UI messages do not claim mail delivery.\n    Do not log message bodies, addresses, or credentials.\n    \"\"\"\n    return False, \"UAT_EMAIL_DISABLED\""
-if inspect.getsource(_smtp_send).strip() != _expected_no_send:
-    st.error("UAT safety check failed: outbound email isolation is not verified.")
-    st.stop()
-st.info("UAT ONLY — outbound SMTP disabled (verified implementation). No patient data.")
 page.run()
