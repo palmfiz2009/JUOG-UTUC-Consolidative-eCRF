@@ -58,8 +58,8 @@ if "screening_sent" not in st.session_state:
     st.session_state.screening_sent = False
 
 
-def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
-    """Notify the three central MDT reviewers only for the first screening submission.
+def send_initial_mdt_review_requests(screening_id: str, facility_name: str, review_round: int = 1):
+    """Notify the three central MDT reviewers for each newly accepted review round.
 
     Reviewer addresses are kept in Streamlit Secrets and never in GitHub.
     Clinical details are intentionally excluded from the message body.
@@ -92,10 +92,12 @@ def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
         if not address:
             failures.append(f"{label}: メールアドレス未設定")
             continue
-        subject = f"【JUOG 中央MDT審査依頼】【{screening_id}】{label}"
-        body = f"""JUOG UTUC_Consolidative 中央MDT審査の新規申請が届きました。
+        subject_type = "中央MDT再審査依頼" if review_round > 1 else "中央MDT審査依頼"
+        subject = f"【JUOG {subject_type}】【{screening_id}】【第{review_round}ラウンド】{label}"
+        body = f"""JUOG UTUC_Consolidative 中央MDTの審査依頼が届きました。
 
 MDT審査受付番号: {screening_id}
+審査ラウンド: {review_round}
 申請施設: {facility_name}
 担当領域: {label}
 
@@ -745,24 +747,25 @@ MDT審査受付番号: {screening_id}
 担当者: {text(reporter_email)}
 申請ID: {submission_id}
 
-EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
-最良総合効果: {best_effect}
-最初の病勢制御確認日: {date_str(first_control_date)}
-施設判定RECIST: {central_recist}
-予定術式: {planned_surgery}
-手術予定日: {date_str(surgery_date)}
+審査ラウンド: {reg_result.get("review_round", 1)}
 
-{json_block(screening_payload)}
+臨床情報・CRFの詳細は、認証済みの中央MDT画面でご確認ください。
+※メールには詳細な診療データを含めていません。
 """
-        sent, err = send_email(
-            f"【JUOG MDT申請】【{screening_id}】【{facility_name}】",
-            report,
-            reporter_email,
-        )
-        # 3名への審査依頼は初回申請のみ。訂正・再申請では再送しない。
+        # Exactly one notification set per newly accepted screening round.
+        # Idempotent API replays return notification_required=False and must not resend.
+        should_notify = reg_result.get("notification_required") is True
+        sent, err = True, None
         mdt_notify_ok, mdt_notify_err = True, ""
-        if not bool(reg_result.get("existing")):
-            mdt_notify_ok, mdt_notify_err = send_initial_mdt_review_requests(screening_id, facility_name)
+        if should_notify:
+            sent, err = send_email(
+                f"【JUOG MDT申請】【{screening_id}】【{facility_name}】",
+                report,
+                reporter_email,
+            )
+            mdt_notify_ok, mdt_notify_err = send_initial_mdt_review_requests(
+                screening_id, facility_name, review_round=int(reg_result.get("review_round") or 1)
+            )
         _draft_delete = delete_screening_draft(facility_code, local_subject_code)
         st.session_state.screening_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
         st.session_state.screening_sent = True

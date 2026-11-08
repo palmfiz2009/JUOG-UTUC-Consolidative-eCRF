@@ -286,7 +286,7 @@ function submitScreening_(p) {
           const retrySave = savePayloadToSheet_(SCREENING_CRF_SHEET, retryPayload, false);
           if (!retrySave.ok) return {ok: false, error: 'SCREENING_CRF_SAVE_FAILED', message: retrySave.message || retrySave.error};
         }
-        return {ok: true, existing: true, screening_id: existingScreeningId, review_round: existingRound, status: String(row[idx.status]), registration_id: String(row[idx.registration_id] || '')};
+        return {ok: true, existing: true, notification_required: false, screening_id: existingScreeningId, review_round: existingRound, status: String(row[idx.status]), registration_id: String(row[idx.registration_id] || '')};
       }
     }
 
@@ -343,7 +343,7 @@ function submitScreening_(p) {
       facility_code: String(p.facility_code), local_subject_code: String(p.local_subject_code), submission_id: String(p.submission_id)
     });
     SpreadsheetApp.flush();
-    return {ok: true, existing: existingRow > 0, screening_id: screeningId, review_round: reviewRound, status: 'PENDING'};
+    return {ok: true, existing: existingRow > 0, notification_required: true, screening_id: screeningId, review_round: reviewRound, status: 'PENDING'};
   } finally {
     lock.releaseLock();
   }
