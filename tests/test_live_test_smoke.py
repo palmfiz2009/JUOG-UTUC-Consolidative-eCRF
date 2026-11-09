@@ -107,17 +107,24 @@ def run():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1400, "height": 900})
         page.set_default_timeout(18000)
-        network = {"ws": [], "ws_closed":0, "ws_errors":0,
-                   "failed_requests": [], "stcore_http_statuses": [],
+        network = {"ws": [], "ws_closed":0, "ws_errors":0, "ws_sent":0, "ws_received":0,
+                   "failed_requests": [], "stcore_http_statuses": [], "http_errors": [],
                    "js_errors":0, "console_errors":0, "console_categories":[]}
         def on_ws(ws):
             network["ws"].append(urlparse(ws.url).path[:80])
             ws.on("close", lambda _: network.__setitem__("ws_closed", network["ws_closed"]+1))
             ws.on("socketerror", lambda _: network.__setitem__("ws_errors", network["ws_errors"]+1))
+            ws.on("framesent", lambda _: network.__setitem__("ws_sent", network["ws_sent"]+1))
+            ws.on("framereceived", lambda _: network.__setitem__("ws_received", network["ws_received"]+1))
         def on_response(resp):
             if "_stcore" in urlparse(resp.url).path:
                 network["stcore_http_statuses"].append({
                     "path":urlparse(resp.url).path[:75], "status":resp.status})
+            if resp.status >= 400:
+                network["http_errors"].append({
+                    "host": urlparse(resp.url).netloc,
+                    "path": urlparse(resp.url).path[:100],
+                    "status": resp.status})
         def on_console(msg):
             if msg.type != "error": return
             network["console_errors"] += 1
