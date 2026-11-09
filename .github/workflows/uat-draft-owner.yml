@@ -5,6 +5,7 @@ on:
     paths:
       - '05_registry_google_apps_script.gs'
       - 'juog_common.py'
+      - '01_registration_crf.py'
       - '02_perioperative_30d_crf.py'
       - '03_day90_crf.py'
       - '04_followup_crf.py'
