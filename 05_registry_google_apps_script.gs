@@ -1308,6 +1308,59 @@ function saveCrf_(p) {
   }
 }
 
+/**
+ * Ensure exactly one matching audit record for a formally saved CRF row.
+ * Invoked under the same script lock as savePayloadToSheet_. The CRF sheet
+ * and audit sheet remain separate writes: a retry with the SAME submission_id
+ * can repair a failed audit append without changing the original CRF row.
+ */
+function ensureCrfAuditEntry_(ss, sheetName, payload, version) {
+  if (sheetName === SCREENING_CRF_SHEET) return {ok:true, existing:true};
+  const sh = ss.getSheetByName(CRF_AUDIT_SHEET);
+  if (!sh) return {ok:false, error:'CRF_AUDIT_SHEET_MISSING'};
+  const values = sh.getDataRange().getValues();
+  const headers = values[0] || [];
+  const idx = headerIndex_(headers);
+  const fields = ['sheet_name','record_key','record_version','submission_id',
+    'submission_kind','registration_id','facility_code'];
+  if (fields.some(k => idx[k] === undefined)) {
+    return {ok:false, error:'CRF_AUDIT_SCHEMA_MISMATCH'};
+  }
+  const want = {
+    sheet_name:sheetName,
+    record_key:String(payload.record_key || ''),
+    record_version:Number(version),
+    submission_id:String(payload.submission_id || ''),
+    submission_kind:String(payload.submission_kind || ''),
+    registration_id:String(payload.registration_id || ''),
+    facility_code:String(payload.facility_code || '')
+  };
+  let found = false;
+  for (let r = 1; r < values.length; r++) {
+    const row = values[r];
+    const sameSubmission = String(row[idx.submission_id] || '') === want.submission_id;
+    const sameSlot =
+      String(row[idx.sheet_name] || '') === want.sheet_name &&
+      String(row[idx.record_key] || '') === want.record_key &&
+      Number(row[idx.record_version] || 0) === want.record_version;
+    if (sameSubmission || sameSlot) {
+      const sameRecord = fields.every(k => (
+        k === 'record_version'
+          ? Number(row[idx[k]] || 0) === want[k]
+          : String(row[idx[k]] || '') === String(want[k])
+      ));
+      if (!sameRecord || found) {
+        return {ok:false, error:'CRF_AUDIT_CONFLICT'};
+      }
+      found = true;
+    }
+  }
+  if (found) return {ok:true, existing:true};
+  appendByHeaders_(sh, {saved_at:new Date(), ...want});
+  return {ok:true, existing:false};
+}
+
+
 function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   // Only for official CRFs: ensure the record key matches the actual study subject.
   if (enforceVersionRules) {
@@ -1316,6 +1369,15 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   }
   const ss = getSpreadsheet_();
   const sh = ss.getSheetByName(sheetName);
+  if (enforceVersionRules && sheetName !== SCREENING_CRF_SHEET) {
+    const auditSheet = ss.getSheetByName(CRF_AUDIT_SHEET);
+    if (!auditSheet) return {ok:false, error:'CRF_AUDIT_SHEET_MISSING'};
+    const auditHeaders = headerIndex_(auditSheet.getDataRange().getValues()[0] || []);
+    if (['sheet_name','record_key','record_version','submission_id','submission_kind',
+      'registration_id','facility_code'].some(k => auditHeaders[k] === undefined)) {
+      return {ok:false, error:'CRF_AUDIT_SCHEMA_MISMATCH'};
+    }
+  }
   const submissionId = String(payload.submission_id || '').trim();
   const recordKey = String(payload.record_key || '').trim();
   const kind = String(payload.submission_kind || (sheetName === SCREENING_CRF_SHEET ? '初回報告' : '')).trim();
@@ -1335,7 +1397,16 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
         const isSamePayload = String(row[idx.payload_json] || '') === JSON.stringify(payload);
         if (!isSameKey || !isSameSubject || !isSameSite || !isSamePayload) return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
       }
-      return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId};
+      const existingVersion = Number(row[idx.record_version] || 1);
+      let auditRepaired = false;
+      if (enforceVersionRules && sheetName !== SCREENING_CRF_SHEET) {
+        const audit = ensureCrfAuditEntry_(ss, sheetName, payload, existingVersion);
+        if (!audit.ok) return audit;
+        auditRepaired = !audit.existing;
+        SpreadsheetApp.flush();
+      }
+      return {ok:true, existing:true, record_version:existingVersion,
+        submission_id:submissionId, audit_repaired:auditRepaired};
     }
     if (String(row[idx.record_key] || '') === recordKey) priorCount++;
   }
@@ -1362,10 +1433,10 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   appendByHeaders_(sh, rowObj);
 
   if (sheetName !== SCREENING_CRF_SHEET) {
-    appendByHeaders_(ss.getSheetByName(CRF_AUDIT_SHEET), {
-      saved_at: new Date(), sheet_name: sheetName, record_key: recordKey, record_version: version,
-      submission_id: submissionId, submission_kind: kind, registration_id: String(payload.registration_id || ''), facility_code: String(payload.facility_code || '')
-    });
+    // If this append fails after the CRF append, retrying the same submission_id
+    // will enter the existing-CRF branch above and safely repair the audit only.
+    const audit = ensureCrfAuditEntry_(ss, sheetName, payload, version);
+    if (!audit.ok) return audit;
   }
   SpreadsheetApp.flush();
   return {ok: true, existing: false, record_version: version, submission_id: submissionId};
