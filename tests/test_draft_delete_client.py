@@ -53,5 +53,33 @@ class DraftDeleteClientTests(unittest.TestCase):
         self.assertEqual(len(args.defaults),1)  # timeout alone defaults, e-mail required
 
 
+    def test_pre_mdt_wrapper_sends_owner_email(self):
+        tree=module("juog_common.py")
+        fn=next(n for n in tree.body if isinstance(n,ast.FunctionDef)
+                and n.name=="delete_screening_draft")
+        calls=[]
+        def mock_registry(action,payload,timeout=30):
+            calls.append((action,payload,timeout))
+            return {"ok":True}
+        ns={"registry_call":mock_registry,"str":str}
+        exec(compile(ast.Module(body=[fn],type_ignores=[]),"juog_common.py","exec"),ns)
+        result=ns["delete_screening_draft"](" F11 "," LOCAL-999 ","owner@example.invalid",timeout=9)
+        self.assertTrue(result["ok"])
+        self.assertEqual(calls[0][0],"delete_screening_draft")
+        self.assertEqual(calls[0][1]["facility_code"],"F11")
+        self.assertEqual(calls[0][1]["local_subject_code"],"LOCAL-999")
+        self.assertEqual(calls[0][1]["reporter_email"],"owner@example.invalid")
+        self.assertEqual(calls[0][2],9)
+
+    def test_pre_mdt_form_passes_owner_email_to_delete(self):
+        calls=[n for n in ast.walk(module("01_registration_crf.py"))
+               if isinstance(n,ast.Call) and isinstance(n.func,ast.Name)
+               and n.func.id=="delete_screening_draft"]
+        self.assertEqual(len(calls),1)
+        self.assertEqual(len(calls[0].args),3)
+        self.assertIsInstance(calls[0].args[2],ast.Name)
+        self.assertEqual(calls[0].args[2].id,"reporter_email")
+
+
 if __name__=="__main__":
     unittest.main()
