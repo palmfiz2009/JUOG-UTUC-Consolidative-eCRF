@@ -1,0 +1,31 @@
+name: UAT registration caps (offline, no external writes)
+
+on:
+  push:
+    branches:
+      - uat-offline-quota-regression-20261109
+    paths:
+      - '05_registry_google_apps_script.gs'
+      - 'tests/test_registration_quota_offline.cjs'
+      - '.github/workflows/uat-registration-quotas.yml'
+  pull_request:
+    paths:
+      - '05_registry_google_apps_script.gs'
+      - 'tests/test_registration_quota_offline.cjs'
+      - '.github/workflows/uat-registration-quotas.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  registration-quotas:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Exercise real GAS quota code against synthetic in-memory sheets
+        run: node tests/test_registration_quota_offline.cjs
