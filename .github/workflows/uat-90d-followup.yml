@@ -5,6 +5,8 @@ on:
     paths:
       - '03_day90_crf.py'
       - '04_followup_crf.py'
+      - '05_registry_google_apps_script.gs'
+      - 'tests/test_90d_followup_source.cjs'
       - 'juog_common.py'
       - 'tests/test_90d_followup_drafts.py'
       - 'tests/mock_followup_registry.py'
@@ -26,6 +28,11 @@ jobs:
           python-version: '3.11'
       - name: Verify 90d and follow-up draft recovery and period keys
         run: python -m unittest discover -s tests -p 'test_90d_followup_drafts.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test server-side source linkage and visit month guards
+        run: node tests/test_90d_followup_source.cjs
 
   browser:
     runs-on: ubuntu-latest
