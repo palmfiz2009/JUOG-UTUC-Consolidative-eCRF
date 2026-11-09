@@ -58,6 +58,17 @@ def wait_loaded(page):
                 "login_required": "sign in" in visible or "log in" in visible,
                 "streamlit_error": page.locator('[data-testid="stException"]').count() > 0,
             }, ensure_ascii=False), flush=True)
+            diagnostic = body.inner_text(timeout=6000)[:700]
+            diagnostic = re.sub(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", "[EMAIL_REDACTED]", diagnostic)
+            diagnostic = re.sub(r"JUOG[-_][A-Za-z0-9-]+", "[ID_REDACTED]", diagnostic)
+            print("LIVE BODY PREVIEW SANITIZED", repr(diagnostic[:700]), flush=True)
+            print("LIVE DOM SIGNALS", json.dumps({
+                "text_length": len(body.inner_text(timeout=6000)),
+                "links": [x[:60] for x in page.get_by_role("link").all_text_contents()[:12]],
+                "headings": [x[:60] for x in page.get_by_role("heading").all_text_contents()[:8]],
+                "buttons_count": page.get_by_role("button").count(),
+                "streamlit_status_elements": page.locator('[data-testid^="st"]').count(),
+            }, ensure_ascii=False), flush=True)
             if "get this app back up" in visible or "gone to sleep" in visible:
                 for name in [re.compile("get this app back up", re.I),re.compile("wake", re.I)]:
                     button = page.get_by_role("button", name=name)
@@ -66,7 +77,7 @@ def wait_loaded(page):
                         button.first.click()
                         page.wait_for_timeout(7500)
                         break
-            page.get_by_text("UAT ONLY", exact=False).first.wait_for(timeout=30000)
+            page.get_by_text("UAT ONLY", exact=False).first.wait_for(timeout=18000)
             return
         except Exception as exc:
             print("LIVE TEST BANNER NOT FOUND", type(exc).__name__,
