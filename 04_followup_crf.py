@@ -51,6 +51,16 @@ def parse_iso_date(value):
         return None
 
 
+FOLLOWUP_DRAFT_MONTHS = ("6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）")
+
+
+def followup_visit_key(month: str) -> str:
+    """Stable, per-visit draft/CRF key. Unselected periods cannot be saved."""
+    if month not in FOLLOWUP_DRAFT_MONTHS:
+        return ""
+    return month.replace("ヶ月（終了）", "m").replace("ヶ月", "m")
+
+
 def fetch_30d_linkage(registration_id: str):
     return registry_call(
         "get_crf_linkage",
@@ -105,14 +115,27 @@ with fu_tool2:
     with st.popover("↩ 再開"):
         fu_lookup_id = st.text_input("JUOG登録番号*", placeholder="JUOG-001", key="draftfu_lookup_id")
         fu_lookup_email = st.text_input("担当者メールアドレス*", key="draftfu_lookup_email")
+        fu_lookup_month = st.selectbox("再開する報告時期*", ["選択してください", *FOLLOWUP_DRAFT_MONTHS], key="draftfu_lookup_month")
         if st.button("読み込む", key="draftfu_load_button", use_container_width=True):
             _id = fu_lookup_id.strip().upper()
             if not valid_registration_id(_id):
                 st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
             elif not valid_email(fu_lookup_email):
                 st.error("仮保存時の担当者メールアドレスを正しく入力してください。")
+            elif not followup_visit_key(fu_lookup_month):
+                st.error("再開する報告時期を選択してください。")
             else:
-                _res = get_crf_draft(_id, "followup", "followup", fu_lookup_email)
+                _res = get_crf_draft(_id, "followup", followup_visit_key(fu_lookup_month), fu_lookup_email)
+                _legacy_loaded = False
+                if _res.get("ok") and not _res.get("source_found"):
+                    # Backward compatibility for older single-key followup drafts.
+                    # Never mistake a 6-month legacy draft for a 9-month draft.
+                    _legacy = get_crf_draft(_id, "followup", "followup", fu_lookup_email)
+                    _legacy_state = _legacy.get("draft_state") or {}
+                    _legacy_month = (_legacy_state.get("fu_visit_month") or {}).get("value")
+                    if _legacy.get("ok") and _legacy.get("source_found") and _legacy_month == fu_lookup_month:
+                        _res = _legacy
+                        _legacy_loaded = True
                 if not _res.get("ok"):
                     if str(_res.get("error") or "") in {"DRAFT_EMAIL_MISMATCH", "DRAFT_EMAIL_NOT_SET"}:
                         st.error("JUOG登録番号または担当者メールアドレスが一致しません。")
@@ -122,9 +145,16 @@ with fu_tool2:
                     st.info("このJUOG登録番号の仮保存データはありません。")
                 else:
                     clear_session_state_prefixes(("fu_", "widget_fu_"))
-                    restore_draft_state(_res.get("draft_state") or {})
+                    restored_state = _res.get("draft_state") or {}
+                    restore_draft_state(restored_state)
+                    # Shared lab rendering uses widget_fu_lab_*; restore both
+                    # widget and backing keys to prevent stale blanks replacing values.
+                    for restored_key in restored_state:
+                        if restored_key.startswith("fu_lab_") and restored_key in st.session_state:
+                            st.session_state[f"widget_{restored_key}"] = st.session_state[restored_key]
                     st.session_state["fu_registration_id"] = _id
                     st.session_state["fu_reporter_email"] = _res.get("reporter_email") or fu_lookup_email
+                    st.session_state["fu_legacy_draft_visit_month"] = fu_lookup_month if _legacy_loaded else ""
                     _link = fetch_30d_linkage(_id)
                     if _link.get("ok") and _link.get("source_found"):
                         st.session_state["fu_linkage"] = _link
@@ -208,7 +238,7 @@ else:
 
 visit_month = st.selectbox(
     "今回の報告時期*",
-    ["選択してください", "6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）"],
+    ["選択してください", *FOLLOWUP_DRAFT_MONTHS],
     disabled=L,
  key="fu_visit_month")
 visit_date = st.date_input("今回の評価日*", value=None, disabled=L, key="fu_visit_date")
@@ -503,15 +533,17 @@ if fu_draft_clicked:
         st.error("仮保存には正しいJUOG登録番号が必要です（例：JUOG-001）。")
     elif not valid_email(reporter_email):
         st.error("仮保存には担当者メールアドレスを正しく入力してください。再開時にこのアドレスを使用します。")
+    elif not followup_visit_key(visit_month):
+        st.error("仮保存する報告時期（6〜24か月）を選択してください。")
     else:
         _state = capture_draft_state(
             "fu_",
-            exclude_prefixes=("fu_sent", "fu_linkage", "fu_draft"),
+            exclude_prefixes=("fu_sent", "fu_linkage", "fu_draft", "fu_legacy_draft_"),
             overrides={"fu_registration_id":registration_id, "fu_reporter_email":reporter_email},
         )
-        _save = save_crf_draft(registration_id, "followup", "followup", _state, facility_code=facility_code, facility_name=facility_name, reporter_email=reporter_email)
+        _save = save_crf_draft(registration_id, "followup", followup_visit_key(visit_month), _state, facility_code=facility_code, facility_name=facility_name, reporter_email=reporter_email)
         if _save.get("ok"):
-            _verify = get_crf_draft(registration_id, "followup", "followup", reporter_email)
+            _verify = get_crf_draft(registration_id, "followup", followup_visit_key(visit_month), reporter_email)
             if _verify.get("ok") and _verify.get("source_found"):
                 _at = _verify.get("updated_at") or _save.get("updated_at") or ""
                 st.session_state["fu_draft_flash"] = {"kind":"success", "message":"仮保存を確認しました。再開時はJUOG登録番号と担当者メールアドレスを入力してください。" + (f" 最終保存：{_at}" if _at else "")}
@@ -552,7 +584,7 @@ if st.button("🚀 定期経過データを確定送信", type="primary", use_co
                 linkage_stale = True
 
             if not linkage_stale:
-                visit_key = visit_month.replace("ヶ月（終了）", "m").replace("ヶ月", "m")
+                visit_key = followup_visit_key(visit_month)
                 meta = make_submission_metadata(
                     "followup",
                     visit_key,
@@ -646,7 +678,11 @@ RECIST進行状況: {recist_status}
                         report,
                         reporter_email,
                     )
-                    _draft_delete = delete_crf_draft(registration_id, "followup", "followup")
+                    _draft_delete = delete_crf_draft(registration_id, "followup", visit_key)
+                    if st.session_state.get("fu_legacy_draft_visit_month") == visit_month:
+                        _legacy_delete = delete_crf_draft(registration_id, "followup", "followup")
+                        if not _legacy_delete.get("ok"):
+                            _draft_delete = _legacy_delete
                     st.session_state.fu_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
                     st.session_state.fu_sent = True
                     st.session_state.fu_sent_registration_id = registration_id

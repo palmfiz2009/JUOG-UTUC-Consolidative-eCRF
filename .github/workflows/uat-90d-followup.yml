@@ -1,0 +1,66 @@
+name: UAT 90-day and follow-up draft recovery
+
+on:
+  pull_request:
+    paths:
+      - '03_day90_crf.py'
+      - '04_followup_crf.py'
+      - '05_registry_google_apps_script.gs'
+      - 'tests/test_90d_followup_source.cjs'
+      - 'juog_common.py'
+      - 'tests/test_90d_followup_drafts.py'
+      - 'tests/mock_followup_registry.py'
+      - 'tests/test_streamlit_90d_followup_browser.py'
+      - '.github/workflows/uat-90d-followup.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  draft-widget-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Verify 90d and follow-up draft recovery and period keys
+        run: python -m unittest discover -s tests -p 'test_90d_followup_drafts.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Test server-side source linkage and visit month guards
+        run: node tests/test_90d_followup_source.cjs
+
+  browser:
+    runs-on: ubuntu-latest
+    needs: draft-widget-regression
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Streamlit and Chromium for local-only UAT
+        run: |
+          python -m pip install -r requirements.txt 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Configure synthetic loopback-only registry
+        run: |
+          mkdir -p .streamlit tests/followup-ui-artifacts
+          cat > .streamlit/secrets.toml <<'EOF'
+          [registry]
+          url = "http://127.0.0.1:18661/"
+          token = "LOCAL-UAT-TOKEN-DO-NOT-USE-ELSEWHERE"
+          EOF
+      - name: Playwright 90-day and follow-up draft/restore/submit UAT
+        run: python tests/test_streamlit_90d_followup_browser.py
+      - name: Upload synthetic UAT logs and failure screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uat-90d-followup-local-only
+          path: tests/followup-ui-artifacts/
+          retention-days: 5
