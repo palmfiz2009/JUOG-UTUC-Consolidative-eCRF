@@ -145,5 +145,60 @@ check("direct patient identifiers rejected recursively", () => {
   assert.equal(context.containsDirectIdentifier_({data: {MRN: "TEST"}}), true);
   assert.equal(context.containsDirectIdentifier_({data: {stage: "cT3"}}), false);
 });
-console.log("Completed: " + passed + "/7 offline backend contract checks.");
-if (passed !== 7) process.exitCode = 1;
+
+check("role-gated actions reject missing or wrong-role credentials", () => {
+  const props = {getProperty: key => ({
+    JUOG_ADMIN_ACTION_TOKEN: "TEST_ADMIN_ONLY",
+    JUOG_REVIEWER_RADIOLOGY_ACTION_TOKEN: "TEST_RADIOLOGY_ONLY",
+  }[key] || "")};
+  assert.equal(context.authorizeJuogAction_("list_screenings", null, {}, props).error,
+    "ROLE_AUTH_REQUIRED");
+  assert.equal(context.authorizeJuogAction_("list_screenings",
+    {kind:"reviewer",role:"radiology",key:"TEST_RADIOLOGY_ONLY"}, {}, props).error,
+    "ROLE_NOT_ALLOWED");
+  assert.equal(context.authorizeJuogAction_("list_screenings",
+    {kind:"admin",key:"INVALID"}, {}, props).error,
+    "ROLE_AUTH_FAILED");
+  assert.equal(context.authorizeJuogAction_("list_screenings",
+    {kind:"admin",key:"TEST_ADMIN_ONLY"}, {}, props).ok, true);
+  assert.equal(context.authorizeJuogAction_("get_own_review",
+    {kind:"reviewer",role:"radiology",key:"TEST_RADIOLOGY_ONLY"},
+    {reviewer_role:"urology"}, props).error, "REVIEWER_ROLE_MISMATCH");
+});
+check("reviewer response hides other reviewers' clinical judgments", () => {
+  const result = context.reviewerMdtProgressOnly_({
+    ok:true, screening_id:"JUOG-SCR-999", review_round:1,
+    required:3, completed:1, all_complete:false,
+    reviews:{radiology:{decision:"ELIGIBLE",central_recist:"PR"},
+      urology:null,medical_oncology:null},
+  });
+  assert.equal(result.ok, true);
+  assert.equal(result.reviews.radiology.submitted, true);
+  assert.equal(result.reviews.urology, null);
+  assert.equal(JSON.stringify(result).includes("ELIGIBLE"), false);
+  assert.equal(JSON.stringify(result).includes("central_recist"), false);
+});
+check("cN1-only registered counting excludes cT4 and cM1, fails closed if unverifiable", () => {
+  const rIdx={registration_id:0,cN:1,screening_id:2};
+  const sIdx={screening_id:0,cT:1,cN:2,cM:3};
+  const activeRows=[
+    ["JUOG-901","cN1","JUOG-SCR-901"],
+    ["JUOG-902","cN1","JUOG-SCR-902"],
+    ["JUOG-903","cN1","JUOG-SCR-903"],
+    ["JUOG-904","cN0","JUOG-SCR-904"],
+  ];
+  const screened=[
+    ["screening_id","cT","cN","cM"],
+    ["JUOG-SCR-901","cT3","cN1","cM0"],
+    ["JUOG-SCR-902","cT4","cN1","cM0"],
+    ["JUOG-SCR-903","cT3","cN1","cM1"],
+    ["JUOG-SCR-904","cT3","cN0","cM0"],
+  ];
+  assert.equal(context.countCn1OnlyRegistered_(activeRows,rIdx,screened,sIdx),1);
+  assert.throws(() => context.countCn1OnlyRegistered_(
+    [["JUOG-905","cN1","JUOG-SCR-MISSING"]],rIdx,screened,sIdx),
+    /CN1_ONLY_COUNT_UNVERIFIABLE/);
+});
+
+console.log("Completed: " + passed + "/10 offline backend contract checks.");
+if (passed !== 10) process.exitCode = 1;
