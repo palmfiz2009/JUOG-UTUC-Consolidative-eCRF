@@ -35,6 +35,8 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 - Created isolated Python regression tests for restoration of facility and Hb/WBC, handling of stale widget state, and isolation from unrelated fields.
 - Three tests passed against a local reconstruction on 2026-11-09; **GitHub Actions on the exact PR checkout also passed all three tests** (run 42586660771, commit 0c532c83e003fd503146d5bbd4b0a4c44e3cb2aa). These are isolated regression tests, not full Streamlit/GAS integration tests.
 - A read-only GitHub Actions job is supplied on the review branch; it has no study credentials and performs no external registration or notification.
+- The PR also contains seven in-memory Apps Script storage-contract tests (initial submission, retry, append-only correction, malformed input, conflicting submission ID, cN1 eligibility, recursive identifier guard). All seven passed alongside the Python three on GitHub Actions run **42587274775** at commit **60ec5cf50fc3cef1fc2c7b6d66d7abb0cc303175**. This is a backend-mock unit test, not a deployed-Web-App integration test.
+
 
 ## Remaining release gates
 
@@ -46,4 +48,4 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 6. Validate TEST outbound SMTP remains disabled; confirm the production-deployed GAS build, its server-side role secrets and cN1-only behavior against the already-present main source **separately** before any release.
 7. Explicit review approval before merging. Do not merge `validation-v2.2.8` wholesale.
 
-**Result: isolated regression CI passed; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
+**Result: 10/10 offline regression/contract checks passed on exact PR checkout; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
