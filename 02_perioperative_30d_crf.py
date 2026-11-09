@@ -983,7 +983,7 @@ ypT0N0: {'はい' if path.get('pcr_ypt0n0') else 'いいえ/N/A'}
             if not save_result.get("ok"):
                 st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
             else:
-                draft_delete = delete_crf_draft(registration_id, "perioperative_30d", "30d")
+                draft_delete = delete_crf_draft(registration_id, "perioperative_30d", "30d", reporter_email)
                 st.session_state.peri_sent_draft_delete_failed = not bool(draft_delete.get("ok"))
                 sent, send_err = send_email(
                     f"【JUOG CRF】【perioperative_30d】【{registration_id}】",

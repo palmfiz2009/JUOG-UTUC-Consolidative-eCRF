@@ -598,13 +598,17 @@ def get_screening_draft(facility_code: str, local_subject_code: str, reporter_em
     )
 
 
-def delete_screening_draft(facility_code: str, local_subject_code: str, timeout: int = 30):
-    """Delete a pre-registration draft after central-MDT application submission."""
+def delete_screening_draft(
+    facility_code: str, local_subject_code: str,
+    reporter_email: str, timeout: int = 30,
+):
+    """Delete only the pre-registration draft owned by the reporter email."""
     return registry_call(
         "delete_screening_draft",
         {
             "facility_code": (facility_code or "").strip(),
             "local_subject_code": (local_subject_code or "").strip(),
+            "reporter_email": (reporter_email or "").strip(),
         },
         timeout=timeout,
     )
@@ -651,14 +655,21 @@ def get_crf_draft(registration_id: str, crf_type: str, visit: str, reporter_emai
     )
 
 
-def delete_crf_draft(registration_id: str, crf_type: str, visit: str, timeout: int = 30):
-    """Delete a draft after the corresponding CRF has been formally submitted."""
+def delete_crf_draft(
+    registration_id: str, crf_type: str, visit: str,
+    reporter_email: str, timeout: int = 30,
+):
+    """Delete only a draft associated with the submitting reporter email.
+
+    Email ownership matching is a minimal guard, not full user authentication.
+    """
     return registry_call(
         "delete_draft",
         {
             "registration_id": (registration_id or "").strip().upper(),
             "crf_type": crf_type,
             "visit": visit,
+            "reporter_email": (reporter_email or "").strip(),
         },
         timeout=timeout,
     )

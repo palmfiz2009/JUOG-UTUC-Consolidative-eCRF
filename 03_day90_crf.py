@@ -754,7 +754,7 @@ PD確認日: {date_str(progression_date) or 'N/A'}
                         report,
                         reporter_email,
                     )
-                    _draft_delete = delete_crf_draft(registration_id, "day90", "90d")
+                    _draft_delete = delete_crf_draft(registration_id, "day90", "90d", reporter_email)
                     st.session_state.d90_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
                     st.session_state.d90_sent = True
                     st.session_state.d90_sent_registration_id = registration_id

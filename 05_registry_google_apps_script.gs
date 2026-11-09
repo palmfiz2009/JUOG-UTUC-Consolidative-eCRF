@@ -1001,7 +1001,9 @@ function getScreeningDraft_(p) {
 function deleteScreeningDraft_(p) {
   const facilityCode = String(p.facility_code || '').trim();
   const localCode = String(p.local_subject_code || '').trim();
+  const suppliedEmail = normalizeDraftEmail_(p.reporter_email);
   if (!facilityCode || !localCode) return {ok:false, error:'MISSING_SCREENING_DRAFT_KEY'};
+  if (!validDraftEmail_(suppliedEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
   const syntheticId = screeningDraftId_(facilityCode, localCode);
   const key = draftKey_(syntheticId, 'screening', 'mdt_application');
   const lock = LockService.getScriptLock();
@@ -1012,8 +1014,17 @@ function deleteScreeningDraft_(p) {
     const values = sh.getDataRange().getValues();
     if (values.length < 2) return {ok:true, deleted:false};
     const idx = headerIndex_(values[0]);
+    if (idx.draft_key === undefined || idx.reporter_email === undefined) {
+      return {ok:false, error:'DRAFT_SHEET_SCHEMA_ERROR'};
+    }
     for (let r = values.length - 1; r >= 1; r--) {
-      if (String(values[r][idx.draft_key] || '') === key) { sh.deleteRow(r + 1); return {ok:true, deleted:true}; }
+      if (String(values[r][idx.draft_key] || '') !== key) continue;
+      const storedEmail = normalizeDraftEmail_(values[r][idx.reporter_email]);
+      if (!storedEmail) return {ok:false, error:'DRAFT_EMAIL_NOT_SET'};
+      if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
+      sh.deleteRow(r + 1);
+      SpreadsheetApp.flush();
+      return {ok:true, deleted:true};
     }
     return {ok:true, deleted:false};
   } finally { lock.releaseLock(); }
@@ -1255,7 +1266,11 @@ function deleteDraft_(p) {
   const id = String(p.registration_id || '').trim().toUpperCase();
   const crfType = String(p.crf_type || '').trim();
   const visit = String(p.visit || '').trim();
+  const suppliedEmail = normalizeDraftEmail_(p.reporter_email);
   if (!id || !crfType || !visit) return {ok:false, error:'MISSING_DRAFT_KEY'};
+  // Reuse the same ownership check as getDraft_(). A JUOG ID alone must
+  // never authorize deleting a draft owned by another reporter.
+  if (!validDraftEmail_(suppliedEmail)) return {ok:false, error:'INVALID_DRAFT_EMAIL'};
 
   const registry = validateSubject_({registration_id:id, facility_code:''});
   if (!registry.ok) return registry;
@@ -1268,9 +1283,15 @@ function deleteDraft_(p) {
     const values = sh.getDataRange().getValues();
     if (values.length < 2) return {ok:true, deleted:false};
     const idx = headerIndex_(values[0]);
+    if (idx.draft_key === undefined || idx.reporter_email === undefined) {
+      return {ok:false, error:'DRAFT_SHEET_SCHEMA_ERROR'};
+    }
     const key = draftKey_(id, crfType, visit);
     for (let r = values.length - 1; r >= 1; r--) {
       if (String(values[r][idx.draft_key] || '') === key) {
+        const storedEmail = normalizeDraftEmail_(values[r][idx.reporter_email]);
+        if (!storedEmail) return {ok:false, error:'DRAFT_EMAIL_NOT_SET'};
+        if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
         sh.deleteRow(r + 1);
         SpreadsheetApp.flush();
         return {ok:true, deleted:true};
