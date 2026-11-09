@@ -17,7 +17,7 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 - `Registry`: synthetic `JUOG-001`, facility `F11`, active, registered 2026-11-08; linked to `JUOG-SCR-001`.
 - `Screening`: `cT3 cN1 cM0`, PR; planned surgery 2026-12-06.
 - `CRF_30d`: `JUOG-001|perioperative_30d|30d`, v1 initial report and v2 correction retained, both saved 2026-11-08.
-- `CRFSubmissionAudit`: matching v1/v2 `record_key`, `record_version`, `submission_id`, `registration_id`, `facility_code`. No deletions or overwrites were made during this review.
+- `CRFSubmissionAudit`: matching v1/v2 `record_key`, `record_version`, `submission_id`, `registration_id`, `facility_code`. Additional read-only reconciliation on 2026-11-09 found 5 CRF records total (30d 2, 90d 2, followup 1), all 5 with corresponding audit rows, continuous per-key versions, no orphan audit entries and no payload key mismatches. No deletions or overwrites were made during this review.
 - `CRF_Drafts`: one 30-day draft updated 2026-11-09 15:19:09 JST. Selected facility and some 30-day lab fields are present in the snapshot.
 
 ## Chronology blocker — not an application success
@@ -35,7 +35,7 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 - Created isolated Python regression tests for restoration of facility and Hb/WBC, handling of stale widget state, and isolation from unrelated fields.
 - Three tests passed against a local reconstruction on 2026-11-09; **GitHub Actions on the exact PR checkout also passed all three tests** (run 42586660771, commit 0c532c83e003fd503146d5bbd4b0a4c44e3cb2aa). These are isolated regression tests, not full Streamlit/GAS integration tests.
 - A read-only GitHub Actions job is supplied on the review branch; it has no study credentials and performs no external registration or notification.
-- The PR also contains seven in-memory Apps Script storage-contract tests (initial submission, retry, append-only correction, malformed input, conflicting submission ID, cN1 eligibility, recursive identifier guard). All seven passed alongside the Python three on GitHub Actions run **42587274775** at commit **60ec5cf50fc3cef1fc2c7b6d66d7abb0cc303175**. This is a backend-mock unit test, not a deployed-Web-App integration test.
+- The PR also contains ten in-memory Apps Script contract tests: initial submission, retry, append-only correction, malformed input, conflicting submission ID, cN1 eligibility and count, recursive identifier guard, role authorization, and MDT judgment privacy. All ten passed alongside three Python tests on GitHub Actions run **42587647962** (commit **823957c2c8e4154c7773ed3273de4fbe5b99686c**). These use a backend-mock Google Sheet, not a deployed-Web-App integration test.
 
 
 ## Remaining release gates
@@ -45,7 +45,8 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 3. Date-valid end-to-end TEST (after elapsed window or within an explicitly isolated simulated clock and TEST backend): initial and/or correction via normal form, with valid full synthetic dates.
 4. Google Sheets after each approved submission: compare `submission_id`, `record_key`, `record_version` and audit append; verify prior versions unchanged and duplicate initial reports rejected.
 5. Examine backend integrity separately: `savePayloadToSheet_` appends CRF first and audit second; this is not a database transaction. Verify recovery if audit append fails.
+   Check whether server-side future visit-date validation should mirror the form, as `validateCrfHardStops_` currently guards before-reference dates but does not itself reject future evaluation dates.
 6. Validate TEST outbound SMTP remains disabled; confirm the production-deployed GAS build, its server-side role secrets and cN1-only behavior against the already-present main source **separately** before any release.
 7. Explicit review approval before merging. Do not merge `validation-v2.2.8` wholesale.
 
-**Result: 10/10 offline regression/contract checks passed on exact PR checkout; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
+**Result: 13/13 offline regression/contract checks passed on exact PR checkout; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
