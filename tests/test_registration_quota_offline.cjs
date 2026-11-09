@@ -187,4 +187,32 @@ check("SD threshold exception permits additional SD",()=>{
   const r=finalize(e);
   assert.equal(r.ok,true);assert.equal(r.counts_after.SD,13);
 });
+check("cT3N2M0 does not increment CN1-only count",()=>{
+  const e=prepare({cn1:20,target:{cT:"cT3",cN:"cN2",cM:"cM0"}});
+  const r=finalize(e);
+  assert.equal(r.ok,true);assert.equal(r.counts_after.cN1,20);
+});
+check("cTaN1M0 consumes CN1-only slot",()=>{
+  const e=prepare({cn1:19,target:{cT:"cTa",cN:"cN1",cM:"cM0"}});
+  const r=finalize(e);
+  assert.equal(r.ok,true);assert.equal(r.counts_after.cN1,20);
+});
+check("VOID registration excluded from total cap",()=>{
+  const e=prepare({extra:42,target:{cN:"cN0"}});
+  e.regRows[1][regIdx.status]="VOID";
+  const r=finalize(e);
+  assert.equal(r.ok,true);assert.equal(r.counts_after.total,42);
+});
+check("VOID CN1-only registration frees one CN1 slot",()=>{
+  const e=prepare({cn1:20});
+  e.regRows[1][regIdx.status]="VOID";
+  const r=finalize(e);
+  assert.equal(r.ok,true);assert.equal(r.counts_after.cN1,20);
+});
+check("VOID SD registration excluded from SD hold count",()=>{
+  const e=prepare({sd:12,target:{cN:"cN0",best_effect:"SD"}});
+  e.regRows[1][regIdx.status]="VOID";
+  const r=finalize(e);
+  assert.equal(r.ok,true);assert.equal(r.counts_after.SD,12);
+});
 console.log("Completed "+passed+" offline quota checks against source GAS, with no external writes.");
