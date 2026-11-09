@@ -144,6 +144,100 @@ class CurrentStreamlitSourceChecks(unittest.TestCase):
         probe("POST-05-partial-source-linkage-control", work)
 
 
+
+    def test_scr08_age_19_vs_20(self):
+        def work():
+            at = start()
+            at.get_by_key("reg_consent_date").set_value(date(2026, 9, 15)).run()
+            at.get_by_key("reg_birth_date").set_value(date(2007, 9, 1)).run()
+            underage = "\n".join(str(x.value) for x in list(at.markdown)+list(at.error))
+            assert "同意取得時年齢が20歳未満" in underage, underage[-500:]
+            at.get_by_key("reg_birth_date").set_value(date(2006, 9, 1)).run()
+            adult = "\n".join(str(x.value) for x in list(at.markdown)+list(at.error))
+            assert "同意取得時年齢が20歳未満" not in adult, adult[-500:]
+            return "Age 19 excluded, 20 not excluded on age (other fields remain blank)"
+        probe("SCR-08-partial-age-boundary", work)
+
+    def test_scr03_04_stageiv_routes(self):
+        def work():
+            at = start()
+            at.get_by_key("reg_ct").select("cT3").run()
+            at.get_by_key("reg_cn").select("cN0").run()
+            at.get_by_key("reg_cm").select("cM0").run()
+            def screen_text():
+                return "\n".join(str(x.value) for x in list(at.markdown)+list(at.error))
+            assert "診断時Stage IV" in screen_text(), "Non-Stage-IV guard missing"
+            at.get_by_key("reg_ct").select("cT4").run()
+            assert "診断時Stage IV" not in screen_text(), "T4N0M0 incorrectly excluded for stage"
+            at.get_by_key("reg_ct").select("cT3").run()
+            at.get_by_key("reg_cn").select("cN1").run()
+            assert "診断時Stage IV" not in screen_text(), "T3N1M0 incorrectly excluded for stage"
+            return "cT3N0M0 rejected; cT4N0M0 and cT3N1M0 pass Stage-IV-only check"
+        probe("SCR-03-04-partial-stageiv-eligibility", work)
+
+    def test_scr10_short_course_63_day_boundary(self):
+        def work():
+            at = start()
+            at.get_by_key("reg_courses").set_value(2).run()
+            at.get_by_key("reg_short_course_reason").set_value("Synthetic UAT reason").run()
+            at.get_by_key("reg_evp_start").set_value(date(2026, 10, 1)).run()
+            def screen_text():
+                return "\n".join(str(x.value) for x in list(at.markdown)+list(at.error))
+            assert "EVP 3コース未満かつ初回投与から63日未満" in screen_text(), "Short interval not rejected"
+            at.get_by_key("reg_evp_start").set_value(date(2026, 7, 1)).run()
+            assert "EVP 3コース未満かつ初回投与から63日未満" not in screen_text(), "Long interval still rejected"
+            return "<3 course UAT rejects 40d but not 132d; exception rationale supplied"
+        probe("SCR-10-partial-63day-boundary", work)
+
+    def test_scr07_cm1_cned_duration_under_3mo(self):
+        def work():
+            at = start()
+            at.get_by_key("reg_cm").select("cM1").run()
+            at.get_by_key("reg_cm1_basis").set_value("局所療法後にcNEDとなり3か月以上維持").run()
+            at.get_by_key("reg_cned_date").set_value(date(2026, 10, 1)).run()
+            def screen_text():
+                return "\n".join(str(x.value) for x in list(at.markdown)+list(at.error))
+            assert "cNEDの3か月維持期間不足" in screen_text(), "cNED too short not reported"
+            at.get_by_key("reg_cned_date").set_value(date(2026, 5, 1)).run()
+            assert "cNEDの3か月維持期間不足" not in screen_text(), "Mature cNED incorrectly rejected"
+            return "cM1 cNED duration <3 months rejected, >3 months not duration-rejected"
+        probe("SCR-07-partial-cned-duration", work)
+
+    def test_reg09_surgery_interval_4_8_12_week_screening(self):
+        def work():
+            at = start()
+            at.get_by_key("reg_evp_end").set_value(date(2026, 7, 1)).run()
+            def messages():
+                return "\n".join(str(x.value) for x in list(at.error)+list(at.warning)+list(at.success)+list(at.markdown))
+            at.get_by_key("reg_surgery_date").set_value(date(2026, 7, 22)).run()  # 3 weeks
+            assert "4週未満" in messages(), "3-week surgery window rejection missing"
+            at.get_by_key("reg_surgery_date").set_value(date(2026, 8, 26)).run()  # 8 weeks
+            assert "原則の4–8週内" in messages(), "8-week acceptance banner missing"
+            at.get_by_key("reg_surgery_date").set_value(date(2026, 9, 2)).run()  # 9 weeks
+            assert "8週を超えています" in messages(), "9-week extension warning missing"
+            assert any(x.label == "8週超となる理由*" for x in at.text_area)
+            at.get_by_key("reg_surgery_date").set_value(date(2026, 9, 30)).run()  # 13 weeks
+            assert "12週を超えています" in messages(), "13-week rejection missing"
+            return "3w rejected, 8w standard, 9w deviation reason required, 13w rejected"
+        probe("REG-09-partial-protocol-washout", work)
+
+    def test_scr12_glucose_zero_na_negative_values(self):
+        def work():
+            at = start()
+            at.get_by_key("reg_screen_glucose_raw").set_value("-1").run()
+            def messages():
+                return "\n".join(str(x.value) for x in list(at.error)+list(at.warning)+list(at.markdown))
+            assert "血糖に負の値は入力できません" in messages(), "negative glucose not rejected"
+            at.get_by_key("reg_screen_glucose_raw").set_value("0").run()
+            assert "血糖に負の値は入力できません" not in messages(), "0 should be real measurement"
+            at.get_by_key("reg_screen_glucose_raw").set_value("NA").run()
+            assert "スクリーニング血液検査：血糖：NA" in messages(), "NA not flagged"
+            assert any(x.label == "スクリーニング必須検査の欠測/未実施理由*" for x in at.text_area), (
+                "NA did not request omission reason")
+            return "Glucose -1 rejected, 0 treated as actual, NA demands documented reason"
+        probe("SCR-12-partial-glucose-NA", work)
+
+
 if __name__ == "__main__":
     try:
         unittest.main(verbosity=2)
