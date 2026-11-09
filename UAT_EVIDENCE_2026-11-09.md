@@ -6,8 +6,9 @@
 
 - Production `main` has diverged from TEST branch `validation-v2.2.8` (TEST ahead by 4 commits, behind by 2 at inspection).
 - TEST-vs-main changes concern six files: `02_perioperative_30d_crf.py`, `05_admin_mdt_registration.py`, `05_registry_google_apps_script.gs`, `VERSION.txt`, `juog_common.py`, `streamlit_app.py`.
+- In direct file-content comparison, `05_registry_google_apps_script.gs` differs only in release labels/comments, `05_admin_mdt_registration.py` in backend version label, and `VERSION.txt` in release status. `streamlit_app.py` differs in both UAT email guard and a `main`-only support form fix (`未発番`). Do not roll the latter back.
 - The isolated review branch contains only the 30-day draft widget restoration change, offline unit-test code, this evidence file, and a read-only GitHub Actions test workflow.
-- TEST-only email disabling, scoped role tokens, cN1-only counting, and Apps Script integrity guards have **not** been copied to production.
+- Actual file-by-file source comparison confirms that scoped role tokens, cN1-only accounting, and Apps Script integrity guards **already exist in main source** (v2.2.8 release candidate), although real production GAS deployment/configuration has **not** been verified. The TEST-only differences include disabled SMTP and an extra UAT startup guard. Do not merge TEST wholesale.
 
 ## Read-only TEST registry evidence
 
@@ -32,17 +33,17 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 
 - Extracted change: sync `widget_peri_facility`, `widget_peri_day30_lab_*` and `widget_peri_discharge_lab_*` to restored backing values before rerender.
 - Created isolated Python regression tests for restoration of facility and Hb/WBC, handling of stale widget state, and isolation from unrelated fields.
-- Three tests passed against a local reconstruction of the target functions on 2026-11-09; the exact GitHub Actions checkout must also execute those tests. An absence of CI status is **not** a test pass.
+- Three tests passed against a local reconstruction on 2026-11-09; **GitHub Actions on the exact PR checkout also passed all three tests** (run 42586660771, commit 0c532c83e003fd503146d5bbd4b0a4c44e3cb2aa). These are isolated regression tests, not full Streamlit/GAS integration tests.
 - A read-only GitHub Actions job is supplied on the review branch; it has no study credentials and performs no external registration or notification.
 
 ## Remaining release gates
 
-1. CI on exact checkout: three regression tests pass; code review of the submitted changes.
+1. [x] CI on exact checkout: three regression tests passed. [ ] Human code review/approval of the submitted changes.
 2. Deployed TEST Streamlit: restore draft and verify facility, Hb, WBC, Na, discharge labs, date values before and after rerun.
 3. Date-valid end-to-end TEST (after elapsed window or within an explicitly isolated simulated clock and TEST backend): initial and/or correction via normal form, with valid full synthetic dates.
 4. Google Sheets after each approved submission: compare `submission_id`, `record_key`, `record_version` and audit append; verify prior versions unchanged and duplicate initial reports rejected.
 5. Examine backend integrity separately: `savePayloadToSheet_` appends CRF first and audit second; this is not a database transaction. Verify recovery if audit append fails.
-6. Validate TEST outbound SMTP remains disabled; confirm production role authentication and cN1-only cap changes **separately** before any deployment.
+6. Validate TEST outbound SMTP remains disabled; confirm the production-deployed GAS build, its server-side role secrets and cN1-only behavior against the already-present main source **separately** before any release.
 7. Explicit review approval before merging. Do not merge `validation-v2.2.8` wholesale.
 
-**Result: engineering preparations completed; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
+**Result: isolated regression CI passed; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
