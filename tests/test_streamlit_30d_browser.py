@@ -98,10 +98,23 @@ def choose(page, label, option):
         ), flush=True)
         raise AssertionError("Could not open selectbox " + label)
     opt = page.get_by_role("option", name=option, exact=True)
+    txt = page.get_by_text(option, exact=True)
+    print("SELECT DEBUG", label,
+          "options", page.locator('[role="option"]').all_inner_texts()[:15],
+          "comboboxes", page.get_by_role("combobox").count(),
+          "text matches", txt.count(), flush=True)
     if opt.count():
         opt.first.click()
+    elif txt.count():
+        txt.last.click()
     else:
-        page.get_by_text(option, exact=True).last.click()
+        page.screenshot(path=str(ARTIFACTS / "select-debug.png"), full_page=True)
+        print("SELECT TARGET HTML", page.locator('[data-testid="stSelectbox"]').filter(has_text=label).all_text_contents(), flush=True)
+        # Virtualized dropdowns may not render all entries until searched.
+        page.keyboard.type(option, delay=10)
+        page.keyboard.press("Enter")
+        if option not in page.locator('[data-testid="stSelectbox"]').filter(has_text=label).first.inner_text():
+            raise AssertionError("Could not pick selectbox option: " + label + "=" + option)
 
 
 def radio(page, option):
