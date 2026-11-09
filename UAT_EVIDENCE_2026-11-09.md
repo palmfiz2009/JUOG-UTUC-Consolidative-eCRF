@@ -7,7 +7,7 @@
 - Production `main` has diverged from TEST branch `validation-v2.2.8` (TEST ahead by 4 commits, behind by 2 at inspection).
 - TEST-vs-main changes concern six files: `02_perioperative_30d_crf.py`, `05_admin_mdt_registration.py`, `05_registry_google_apps_script.gs`, `VERSION.txt`, `juog_common.py`, `streamlit_app.py`.
 - In direct file-content comparison, `05_registry_google_apps_script.gs` differs only in release labels/comments, `05_admin_mdt_registration.py` in backend version label, and `VERSION.txt` in release status. `streamlit_app.py` differs in both UAT email guard and a `main`-only support form fix (`未発番`). Do not roll the latter back.
-- The isolated review branch contains only the 30-day draft widget restoration change, offline unit-test code, this evidence file, and a read-only GitHub Actions test workflow.
+- The isolated review branch contains only the 30-day draft widget restoration change, offline Python/Node unit tests, a Playwright browser-test harness with a loopback-only fake registry, this evidence file, and a read-only GitHub Actions test workflow. No production/test backend credentials are needed.
 - Actual file-by-file source comparison confirms that scoped role tokens, cN1-only accounting, and Apps Script integrity guards **already exist in main source** (v2.2.8 release candidate), although real production GAS deployment/configuration has **not** been verified. The TEST-only differences include disabled SMTP and an extra UAT startup guard. Do not merge TEST wholesale.
 
 ## Read-only TEST registry evidence
@@ -38,10 +38,20 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 - The PR also contains ten in-memory Apps Script contract tests: initial submission, retry, append-only correction, malformed input, conflicting submission ID, cN1 eligibility and count, recursive identifier guard, role authorization, and MDT judgment privacy. All ten passed alongside three Python tests on GitHub Actions run **42587647962** (commit **823957c2c8e4154c7773ed3273de4fbe5b99686c**). These use a backend-mock Google Sheet, not a deployed-Web-App integration test.
 
 
+
+## Playwright UI validation (local isolated synthetic registry)
+
+- **PASS — GitHub Actions run 42591351052**, exact branch commit `07e7adbb047f83261d9769795b8ec6a113c1e145` (browser and offline regression jobs both succeeded).
+- Executed the **real Streamlit 30d form** in headless Chromium and used a local 127.0.0.1-only HTTP mock for registry requests. The browser never sent a request to real TEST or production Google Apps Script.
+- Synthetic fixture: `JUOG-999`, facility F11, fictitious registration 2026-08-01, EVP last dose 2026-08-10, planned surgery 2026-08-25 (not performed), 30d visit / blood test / last alive confirmation on 2026-09-24. All dates are in the past at test time and internally consistent.
+- Confirmed from the browser: form filled → save draft → open a new Streamlit browser session → reload draft by fake email/ID → restored facility, Hb, WBC, Na and 30d visit date → press formal submit.
+- Confirmed mock registry received the final CRF and appended synthetic version 1 plus one audit record with matching `record_key`, `record_version` and `submission_id`; draft was deleted after save. 30d lab Hb and Na were found in final payload.
+- No real TEST Google Sheets row was written. This is **UI + transport contract integration against a mock**, not a certified live-GAS/Google-Sheets E2E test. It does not resolve the real TEST registration-date chronology limitation or validate deployment configuration.
+- CI test program: `tests/test_streamlit_30d_browser.py` + `tests/mock_registry.py`; synthetic dummy-only registry URL is generated inside Actions, never committed as a real secret.
 ## Remaining release gates
 
 1. [x] CI on exact checkout: three regression tests passed. [ ] Human code review/approval of the submitted changes.
-2. Deployed TEST Streamlit: restore draft and verify facility, Hb, WBC, Na, discharge labs, date values before and after rerun.
+2. [x] Local Streamlit browser UI with mock backend: facility, Hb/WBC/Na, date restoration, formal submission and mock audit all pass. [ ] Independently verify discharge labs in a surgery-performed UI path and the deployed TEST Streamlit with real TEST GAS.
 3. Date-valid end-to-end TEST (after elapsed window or within an explicitly isolated simulated clock and TEST backend): initial and/or correction via normal form, with valid full synthetic dates.
 4. Google Sheets after each approved submission: compare `submission_id`, `record_key`, `record_version` and audit append; verify prior versions unchanged and duplicate initial reports rejected.
 5. Examine backend integrity separately: `savePayloadToSheet_` appends CRF first and audit second; this is not a database transaction. Verify recovery if audit append fails.
@@ -49,4 +59,4 @@ TEST spreadsheet: `TEST_JUOG_UTUC01_UAT_STAGING_20261108_DO_NOT_USE_FOR_PATIENTS
 6. Validate TEST outbound SMTP remains disabled; confirm the production-deployed GAS build, its server-side role secrets and cN1-only behavior against the already-present main source **separately** before any release.
 7. Explicit review approval before merging. Do not merge `validation-v2.2.8` wholesale.
 
-**Result: 13/13 offline regression/contract checks passed on exact PR checkout; real browser-driven TEST UAT, full release review and production deployment NOT completed.**
+**Result: 13/13 offline checks plus successful full browser workflow against loopback mock. Actual deployed TEST GAS/Google Sheets end-to-end UAT, release review and production deployment NOT completed.**
