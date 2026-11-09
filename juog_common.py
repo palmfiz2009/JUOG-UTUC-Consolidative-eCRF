@@ -598,13 +598,17 @@ def get_screening_draft(facility_code: str, local_subject_code: str, reporter_em
     )
 
 
-def delete_screening_draft(facility_code: str, local_subject_code: str, timeout: int = 30):
-    """Delete a pre-registration draft after central-MDT application submission."""
+def delete_screening_draft(
+    facility_code: str, local_subject_code: str,
+    reporter_email: str, timeout: int = 30,
+):
+    """Delete only the pre-registration draft owned by the reporter email."""
     return registry_call(
         "delete_screening_draft",
         {
             "facility_code": (facility_code or "").strip(),
             "local_subject_code": (local_subject_code or "").strip(),
+            "reporter_email": (reporter_email or "").strip(),
         },
         timeout=timeout,
     )
