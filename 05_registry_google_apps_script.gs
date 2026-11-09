@@ -1290,18 +1290,21 @@ function saveCrf_(p) {
   const sheetName = crfSheetForType_(crfType);
   if (!sheetName) return {ok: false, error: 'UNSUPPORTED_CRF_TYPE'};
 
-  const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
-  if (!validation.ok) return validation;
-
-  const sourceCheck = validateDay90SourceLink_(payload);
-  if (!sourceCheck.ok) return sourceCheck;
-
-  const hardCheck = validateCrfHardStops_(payload, validation);
-  if (!hardCheck.ok) return hardCheck;
-
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(30000)) return {ok: false, error: 'LOCK_TIMEOUT'};
   try {
+    // Keep registry, latest 30-day source version and CRF append in ONE lock.
+    // Otherwise a source correction may arrive between linkage validation
+    // and the save, leaving a formally submitted stale-source CRF.
+    const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
+    if (!validation.ok) return validation;
+
+    const sourceCheck = validateDay90SourceLink_(payload);
+    if (!sourceCheck.ok) return sourceCheck;
+
+    const hardCheck = validateCrfHardStops_(payload, validation);
+    if (!hardCheck.ok) return hardCheck;
+
     return savePayloadToSheet_(sheetName, payload, true);
   } finally {
     lock.releaseLock();
