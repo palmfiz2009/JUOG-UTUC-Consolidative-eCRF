@@ -46,7 +46,8 @@ def backend_probe():
                 "body_len":len(body)
             }),flush=True)
     except Exception as exc:
-        print("TEST BACKEND HEALTH FAILED",type(exc).__name__,flush=True)
+        print("TEST BACKEND HEALTH FAILED", type(exc).__name__,
+              "http_status", getattr(exc, "code", None), flush=True)
 
 def wait_loaded(page):
     """Wake a hibernating Streamlit Community Cloud app when necessary.
@@ -106,13 +107,32 @@ def run():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1400, "height": 900})
         page.set_default_timeout(18000)
-        network = {"ws": [], "failed_requests": [], "js_errors":0, "console_errors":0}
-        page.on("websocket", lambda ws: network["ws"].append(urlparse(ws.url).path[:80]))
+        network = {"ws": [], "ws_closed":0, "ws_errors":0,
+                   "failed_requests": [], "stcore_http_statuses": [],
+                   "js_errors":0, "console_errors":0, "console_categories":[]}
+        def on_ws(ws):
+            network["ws"].append(urlparse(ws.url).path[:80])
+            ws.on("close", lambda _: network.__setitem__("ws_closed", network["ws_closed"]+1))
+            ws.on("socketerror", lambda _: network.__setitem__("ws_errors", network["ws_errors"]+1))
+        def on_response(resp):
+            if "_stcore" in urlparse(resp.url).path:
+                network["stcore_http_statuses"].append({
+                    "path":urlparse(resp.url).path[:75], "status":resp.status})
+        def on_console(msg):
+            if msg.type != "error": return
+            network["console_errors"] += 1
+            lowered = msg.text.lower()
+            category = next((k for k in (
+                "websocket", "403", "404", "429", "502", "503", "failed to fetch",
+                "connection", "blocked", "uncaught", "content security policy"
+            ) if k in lowered), "other")
+            network["console_categories"].append(category)
+        page.on("websocket", on_ws)
+        page.on("response", on_response)
         page.on("requestfailed", lambda req: network["failed_requests"].append({
             "host":urlparse(req.url).netloc,"path":urlparse(req.url).path[:70]}))
         page.on("pageerror", lambda _: network.__setitem__("js_errors", network["js_errors"]+1))
-        page.on("console", lambda msg: network.__setitem__(
-            "console_errors",network["console_errors"]+(1 if msg.type=="error" else 0)))
+        page.on("console", on_console)
         try:
             try:
                 wait_loaded(page)
