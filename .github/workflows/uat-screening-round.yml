@@ -1,0 +1,24 @@
+name: UAT central MDT screening round consistency
+
+on:
+  pull_request:
+    paths:
+      - '05_registry_google_apps_script.gs'
+      - 'tests/test_screening_crf_round.cjs'
+      - '.github/workflows/uat-screening-round.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-current-review-round:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reject stale/absent ScreeningCRF when review round changes
+        run: node tests/test_screening_crf_round.cjs

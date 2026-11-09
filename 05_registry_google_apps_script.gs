@@ -416,6 +416,17 @@ function getScreeningCrf_(p) {
     }
   }
   if (!best) return {ok: false, error: 'SCREENING_CRF_NOT_FOUND'};
+  // The central-MDT case list is linked to the current screening round.
+  // A failed resubmission can update Screening to round N while the new
+  // ScreeningCRF snapshot is not yet persisted. Never show round N-1
+  // clinical details under the round N heading.
+  const screening = findScreening_(screeningId);
+  if (!screening) return {ok:false, error:'SCREENING_NOT_FOUND'};
+  const currentRound = Number(screening.row[screening.idx.review_round] || 1);
+  if (Number(best.review_round || 0) !== currentRound) {
+    return {ok:false, error:'SCREENING_CRF_ROUND_MISMATCH',
+      message:'申請CRFと現在の中央MDT審査ラウンドが一致しません。事務局に保存状況の確認を依頼してください。'};
+  }
   return {ok: true, payload: best, record_version: bestVersion};
 }
 
