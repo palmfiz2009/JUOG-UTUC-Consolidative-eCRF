@@ -122,7 +122,13 @@ with fu_tool2:
                     st.info("このJUOG登録番号の仮保存データはありません。")
                 else:
                     clear_session_state_prefixes(("fu_", "widget_fu_"))
-                    restore_draft_state(_res.get("draft_state") or {})
+                    restored_state = _res.get("draft_state") or {}
+                    restore_draft_state(restored_state)
+                    # Shared lab rendering uses widget_fu_lab_*; restore both
+                    # widget and backing keys to prevent stale blanks replacing values.
+                    for restored_key in restored_state:
+                        if restored_key.startswith("fu_lab_") and restored_key in st.session_state:
+                            st.session_state[f"widget_{restored_key}"] = st.session_state[restored_key]
                     st.session_state["fu_registration_id"] = _id
                     st.session_state["fu_reporter_email"] = _res.get("reporter_email") or fu_lookup_email
                     _link = fetch_30d_linkage(_id)
