@@ -543,7 +543,7 @@ if fu_draft_clicked:
         )
         _save = save_crf_draft(registration_id, "followup", followup_visit_key(visit_month), _state, facility_code=facility_code, facility_name=facility_name, reporter_email=reporter_email)
         if _save.get("ok"):
-            _verify = get_crf_draft(registration_id, "followup", "followup", reporter_email)
+            _verify = get_crf_draft(registration_id, "followup", followup_visit_key(visit_month), reporter_email)
             if _verify.get("ok") and _verify.get("source_found"):
                 _at = _verify.get("updated_at") or _save.get("updated_at") or ""
                 st.session_state["fu_draft_flash"] = {"kind":"success", "message":"仮保存を確認しました。再開時はJUOG登録番号と担当者メールアドレスを入力してください。" + (f" 最終保存：{_at}" if _at else "")}
