@@ -1,0 +1,149 @@
+/* Offline integrity tests for Google Apps Script CRF storage.
+ * Uses the real script in a Node VM with an in-memory Sheet implementation.
+ * No network, Apps Script deployment, email or patient data involved.
+ */
+"use strict";
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const vm = require("node:vm");
+const path = require("node:path");
+
+class FakeSheet {
+  constructor(headers) { this.rows = [[...headers]]; }
+  getLastColumn() { return this.rows[0].length; }
+  getLastRow() { return this.rows.length; }
+  getDataRange() { return { getValues: () => this.rows.map(r => [...r]) }; }
+  getRange(r, c, countRows = 1, countCols = 1) {
+    return {
+      getValues: () => Array.from({length: countRows}, (_, i) =>
+        Array.from({length: countCols}, (_, j) =>
+          (this.rows[r - 1 + i] || [])[c - 1 + j] ?? "")),
+      setValues: values => values.forEach((line, i) => {
+        const index = r - 1 + i;
+        if (!this.rows[index]) this.rows[index] = [];
+        line.forEach((value, j) => { this.rows[index][c - 1 + j] = value; });
+      }),
+    };
+  }
+  appendRow(row) { this.rows.push([...row]); }
+  asObjects() {
+    const headers = this.rows[0];
+    return this.rows.slice(1).map(row =>
+      Object.fromEntries(headers.map((h, i) => [h, row[i]])));
+  }
+}
+const appScriptPath = path.resolve(__dirname, "..", "05_registry_google_apps_script.gs");
+const code = fs.readFileSync(appScriptPath, "utf8");
+let workbook;
+const context = vm.createContext({
+  PropertiesService: { getScriptProperties: () => ({getProperty: () => "offline-synthetic-test"}) },
+  SpreadsheetApp: { openById: () => workbook, flush: () => {} },
+  Logger: { log: () => {} },
+});
+vm.runInContext(code, context, { filename: appScriptPath, timeout: 5000 });
+function backendConst(expr) { return vm.runInContext(expr, context); }
+function fresh() {
+  const crf = new FakeSheet(backendConst("CRF_BASE_HEADERS"));
+  const audit = new FakeSheet(backendConst("CRF_AUDIT_HEADERS"));
+  workbook = {getSheetByName: name => {
+    if (name === "CRF_30d") return crf;
+    if (name === "CRFSubmissionAudit") return audit;
+    throw new Error("Unknown test sheet " + name);
+  }};
+  return {crf, audit};
+}
+function p(id, kind = "初回報告", reason = "") {
+  return {
+    registration_id: "JUOG-999", crf_type: "perioperative_30d", visit: "30d",
+    record_key: "JUOG-999|perioperative_30d|30d",
+    submission_id: id, submission_kind: kind, correction_reason: reason,
+    facility_code: "F11", facility_name: "TEST FACILITY",
+    reporter_email: "test@example.invalid", schema_version: "test",
+    submitted_at: "2026-11-09T12:00:00+09:00", study_code: "JUOG_TEST",
+    data: {surgery_performed: "実施しなかった"},
+  };
+}
+let passed = 0;
+function check(name, fn) {
+  try { fn(); console.log("PASS " + name); passed++; }
+  catch (e) { console.error("FAIL " + name + ": " + e.stack); process.exitCode = 1; }
+}
+check("initial report creates version 1 and identical audit linkage", () => {
+  const {crf, audit} = fresh();
+  const first = p("SYNTHETIC-INITIAL-1");
+  const result = context.savePayloadToSheet_("CRF_30d", first, true);
+  assert.equal(result.ok, true);
+  assert.equal(result.record_version, 1);
+  assert.equal(crf.rows.length, 2);
+  assert.equal(audit.rows.length, 2);
+  assert.equal(audit.asObjects()[0].submission_id, first.submission_id);
+  assert.equal(audit.asObjects()[0].record_version, 1);
+  assert.equal(crf.asObjects()[0].record_key, first.record_key);
+});
+check("same initial submission is idempotent; new initial ID rejected", () => {
+  const {crf, audit} = fresh();
+  const first = p("SYNTHETIC-1");
+  context.savePayloadToSheet_("CRF_30d", first, true);
+  const again = context.savePayloadToSheet_("CRF_30d", first, true);
+  assert.equal(again.ok, true);
+  assert.equal(again.existing, true);
+  const rejected = context.savePayloadToSheet_("CRF_30d", p("SYNTHETIC-2"), true);
+  assert.equal(rejected.ok, false);
+  assert.equal(rejected.error, "INITIAL_ALREADY_EXISTS");
+  assert.equal(crf.rows.length, 2);
+  assert.equal(audit.rows.length, 2);
+});
+check("correction appends version 2 preserving initial row", () => {
+  const {crf, audit} = fresh();
+  context.savePayloadToSheet_("CRF_30d", p("SYNTHETIC-1"), true);
+  const corrected = p("SYNTHETIC-2", "訂正報告", "Synthetic UAT correction");
+  const result = context.savePayloadToSheet_("CRF_30d", corrected, true);
+  assert.equal(result.ok, true);
+  assert.equal(result.record_version, 2);
+  assert.equal(crf.rows.length, 3);
+  assert.equal(audit.rows.length, 3);
+  assert.deepEqual(crf.asObjects().map(r => r.record_version), [1, 2]);
+  assert.deepEqual(audit.asObjects().map(r => r.record_version), [1, 2]);
+  assert.deepEqual(audit.asObjects().map(r => r.submission_id),
+    ["SYNTHETIC-1", "SYNTHETIC-2"]);
+});
+check("invalid correction or mismatched key is rejected without writing", () => {
+  const {crf, audit} = fresh();
+  assert.equal(context.savePayloadToSheet_("CRF_30d",
+    p("NO-PRIOR", "訂正報告", "test"), true).error,
+    "NO_PRIOR_RECORD_FOR_CORRECTION");
+  const malformed = p("BAD-KEY");
+  malformed.record_key = "JUOG-888|perioperative_30d|30d";
+  assert.equal(context.savePayloadToSheet_("CRF_30d", malformed, true).error,
+    "RECORD_KEY_MISMATCH");
+  context.savePayloadToSheet_("CRF_30d", p("SYNTHETIC-1"), true);
+  assert.equal(context.savePayloadToSheet_("CRF_30d",
+    p("MISSING-REASON", "訂正報告"), true).error,
+    "MISSING_CORRECTION_REASON");
+  assert.equal(crf.rows.length, 2);
+  assert.equal(audit.rows.length, 2);
+});
+check("conflicting reuse of submission ID fails closed", () => {
+  const {crf, audit} = fresh();
+  context.savePayloadToSheet_("CRF_30d", p("SYNTHETIC-1"), true);
+  const tampered = p("SYNTHETIC-1");
+  tampered.data.surgery_performed = "実施した";
+  const result = context.savePayloadToSheet_("CRF_30d", tampered, true);
+  assert.equal(result.error, "SUBMISSION_ID_CONFLICT");
+  assert.equal(crf.rows.length, 2);
+  assert.equal(audit.rows.length, 2);
+});
+check("cN1 cap counts only cT<=3 cN1 cM0", () => {
+  assert.equal(context.isCn1Only_("cT3", "cN1", "cM0"), true);
+  assert.equal(context.isCn1Only_("cT4", "cN1", "cM0"), false);
+  assert.equal(context.isCn1Only_("cT3", "cN1", "cM1"), false);
+  assert.equal(context.isCn1Only_("cT3", "cN2", "cM0"), false);
+  assert.equal(context.isCn1Only_("cT1", "cN1", "cM0"), true);
+});
+check("direct patient identifiers rejected recursively", () => {
+  assert.equal(context.containsDirectIdentifier_({data: {patient_name: "TEST"}}), true);
+  assert.equal(context.containsDirectIdentifier_({data: {MRN: "TEST"}}), true);
+  assert.equal(context.containsDirectIdentifier_({data: {stage: "cT3"}}), false);
+});
+console.log("Completed: " + passed + "/7 offline backend contract checks.");
+if (passed !== 7) process.exitCode = 1;
