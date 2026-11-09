@@ -763,7 +763,7 @@ EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
         mdt_notify_ok, mdt_notify_err = True, ""
         if not bool(reg_result.get("existing")):
             mdt_notify_ok, mdt_notify_err = send_initial_mdt_review_requests(screening_id, facility_name)
-        _draft_delete = delete_screening_draft(facility_code, local_subject_code)
+        _draft_delete = delete_screening_draft(facility_code, local_subject_code, reporter_email)
         st.session_state.screening_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
         st.session_state.screening_sent = True
         st.session_state.screening_id = screening_id
