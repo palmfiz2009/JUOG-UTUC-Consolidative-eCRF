@@ -849,10 +849,17 @@ function getCrfLinkage_(p) {
 }
 
 
-function validateDay90SourceLink_(payload) {
+function validateCrfSourceLink_(payload) {
+  const crfType = String(payload.crf_type || '');
+  if (crfType !== 'day90' && crfType !== 'followup') return {ok:true};
   const data = payload.data || {};
-  if (String(payload.crf_type || '') !== 'day90') return {ok:true};
-  if (data.source_30d_linked !== true) return {ok:true};
+  // The 90-day form retains a documented, explicit manual fallback when
+  // a source cannot be retrieved. Follow-up has NO such fallback.
+  if (data.source_30d_linked !== true) {
+    return crfType === 'followup'
+      ? {ok:false, error:'SOURCE_CRF_REQUIRED', message:'定期経過CRFには30日CRFとの連携が必要です。'}
+      : {ok:true};
+  }
 
   const id = String(payload.registration_id || '').trim().toUpperCase();
   const latest = getLatestCrfPayload_(CRF_30D_SHEET, id, 'perioperative_30d');
@@ -860,7 +867,6 @@ function validateDay90SourceLink_(payload) {
   if (!latest.found) {
     return {ok:false, error:'SOURCE_CRF_MISSING', message:'参照元の周術期・30日CRFが見つかりません。'};
   }
-
   const expectedVersion = Number(data.source_30d_record_version || 0);
   const expectedSubmissionId = String(data.source_30d_submission_id || '');
 
@@ -869,14 +875,43 @@ function validateDay90SourceLink_(payload) {
     String(latest.submission_id || '') !== expectedSubmissionId
   ) {
     return {
-      ok:false,
-      error:'SOURCE_CRF_UPDATED',
-      message:'参照元の周術期・30日CRFが更新されています。90日CRFで「既存情報を取得」をやり直してください。'
+      ok:false, error:'SOURCE_CRF_UPDATED',
+      message:'参照元の周術期・30日CRFが更新されています。最新情報を取得し直してください。'
     };
+  }
+
+  // The source version alone cannot prove that the submitted surgery status,
+  // reference date or facility still match the source record.
+  const sourceData = (latest.payload && latest.payload.data) || {};
+  const surgeryPerformed = String(sourceData.surgery_performed || '');
+  const sourceReferenceDate = String(
+    surgeryPerformed === '実施した'
+      ? (sourceData.operation_date || sourceData.reference_date || '')
+      : (sourceData.reference_date || '')
+  ).slice(0, 10);
+  if (
+    !sourceReferenceDate ||
+    String(data.surgery_performed || '') !== surgeryPerformed ||
+    String(data.reference_date || '').slice(0, 10) !== sourceReferenceDate ||
+    String(payload.facility_code || '') !== String(latest.facility_code || '')
+  ) {
+    return {ok:false, error:'SOURCE_CRF_CONTENT_MISMATCH',
+      message:'30日CRFの手術情報・施設情報と一致しません。最新情報を再取得してください。'};
+  }
+
+  if (crfType === 'followup') {
+    const monthByVisit = {
+      '6m':'6ヶ月', '9m':'9ヶ月', '12m':'12ヶ月', '15m':'15ヶ月',
+      '18m':'18ヶ月', '21m':'21ヶ月', '24m':'24ヶ月（終了）'
+    };
+    const visit = String(payload.visit || '');
+    if (!monthByVisit[visit] || String(data.visit_month || '') !== monthByVisit[visit]) {
+      return {ok:false, error:'FOLLOWUP_VISIT_MISMATCH',
+        message:'定期経過CRFの報告時期と保存キーが一致しません。'};
+    }
   }
   return {ok:true};
 }
-
 
 function draftKey_(registrationId, crfType, visit) {
   return [
@@ -1293,7 +1328,7 @@ function saveCrf_(p) {
   const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
   if (!validation.ok) return validation;
 
-  const sourceCheck = validateDay90SourceLink_(payload);
+  const sourceCheck = validateCrfSourceLink_(payload);
   if (!sourceCheck.ok) return sourceCheck;
 
   const hardCheck = validateCrfHardStops_(payload, validation);
