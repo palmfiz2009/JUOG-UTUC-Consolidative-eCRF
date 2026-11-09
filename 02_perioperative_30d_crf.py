@@ -145,7 +145,17 @@ with draft_tool_col2:
                     st.info("このJUOG登録番号の仮保存データはありません。")
                 else:
                     clear_session_state_prefixes(("peri_", "widget_peri_"))
-                    restore_draft_state(draft_result.get("draft_state") or {})
+                    restored_state = draft_result.get("draft_state") or {}
+                    restore_draft_state(restored_state)
+                    # Sync the actual widget keys as well as the backing values.
+                    # Otherwise existing frontend widgets can replace restored
+                    # lab/facility values with their pre-load empty selections.
+                    for restored_key in restored_state:
+                        if restored_key == "peri_facility" or restored_key.startswith(
+                            ("peri_day30_lab_", "peri_discharge_lab_")
+                        ):
+                            if restored_key in st.session_state:
+                                st.session_state[f"widget_{restored_key}"] = st.session_state[restored_key]
                     if not st.session_state.get("peri_facility") and draft_result.get("facility_name"):
                         st.session_state["peri_facility"] = draft_result.get("facility_name")
                     st.session_state["peri_registration_id"] = draft_lookup_id

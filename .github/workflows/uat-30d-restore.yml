@@ -1,0 +1,66 @@
+name: UAT 30-day draft restore (offline)
+
+on:
+  pull_request:
+    paths:
+      - '02_perioperative_30d_crf.py'
+      - 'juog_common.py'
+      - '05_registry_google_apps_script.gs'
+      - 'streamlit_app.py'
+      - 'tests/test_30d_draft_restore.py'
+      - 'tests/test_crf_backend.cjs'
+      - 'tests/mock_registry.py'
+      - 'tests/test_streamlit_30d_browser.py'
+      - '.github/workflows/uat-30d-restore.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run offline Python restore regression (no external services)
+        run: python -m unittest discover -s tests -p 'test_30d_draft_restore.py' -v
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run Apps Script storage contract tests in memory
+        run: node tests/test_crf_backend.cjs
+
+  browser:
+    runs-on: ubuntu-latest
+    needs: regression
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install local browser UAT dependencies
+        run: |
+          python -m pip install -r requirements.txt 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Configure synthetic loopback-only registry (never connect to real GAS)
+        run: |
+          mkdir -p .streamlit tests/ui-artifacts
+          cat > .streamlit/secrets.toml <<'EOF'
+          [registry]
+          url = "http://127.0.0.1:18651/"
+          token = "LOCAL-UAT-TOKEN-DO-NOT-USE-ELSEWHERE"
+          EOF
+      - name: Playwright - genuine Streamlit UI + mocked registry, save/restore/submit
+        run: python tests/test_streamlit_30d_browser.py
+      - name: Upload failure screenshots and local application logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uat-30d-browser-artifacts
+          path: tests/ui-artifacts/
+          retention-days: 5
