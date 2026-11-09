@@ -227,7 +227,7 @@ def run_case():
             assert control(page, "Hb (g/dL)").input_value() == "13.4"
             assert control(page, "WBC (/μL)").input_value() == "6200"
             assert "2026" in control(page, "30日評価日*").inner_text()
-            assert "関西医科大学" in page.locator('[data-testid="stSelectbox"]').filter(has_text="施設名*").first.inner_text()
+            assert page.get_by_role("combobox", name="施設名*", exact=True).input_value() == "関西医科大学"
             print("PASS browser draft restore after fresh session", flush=True)
 
             page.get_by_role("button", name="事務局へ確定送信").click()
