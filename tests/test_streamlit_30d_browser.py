@@ -93,9 +93,12 @@ def choose(page, label, option):
         except Exception as exc:
             print("Select candidate failed:", label, type(exc).__name__, flush=True)
     if not did_open:
+        page.screenshot(path=str(ARTIFACTS / "select-failure.png"), full_page=True)
         print("SELECTBOX DEBUG", page.locator('[data-testid="stSelectbox"]').evaluate_all(
             "(els) => els.map(e => e.outerHTML.slice(0, 1000))"
         ), flush=True)
+        print("PAGE BODY", page.locator("body").inner_text()[-8500:], flush=True)
+        print("STREAMLIT EXCEPTION", page.locator('[data-testid="stException"]').all_text_contents(), flush=True)
         raise AssertionError("Could not open selectbox " + label)
     opt = page.get_by_role("option", name=option, exact=True)
     txt = page.get_by_text(option, exact=True)
