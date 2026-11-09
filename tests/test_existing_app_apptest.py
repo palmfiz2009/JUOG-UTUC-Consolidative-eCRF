@@ -114,7 +114,7 @@ class CurrentStreamlitSourceChecks(unittest.TestCase):
             login = by_label(at.button, "ログイン")
             login.click().run()
             assert not at.exception, repr(at.exception)
-            msgs = [str(x.message) for x in at.error]
+            msgs = [str(x.value) for x in at.error]
             assert any("パスワードが違います" in m for m in msgs), msgs
             assert not any(getattr(x, "label", "") == "ログアウト" for x in at.button), (
                 "Authenticated controls unexpectedly visible")
@@ -129,7 +129,7 @@ class CurrentStreamlitSourceChecks(unittest.TestCase):
             by_label(at.text_input, "判定者パスワード").set_value("WRONG-REVIEWER-PASSWORD")
             by_label(at.button, "ログイン").click().run()
             assert not at.exception, repr(at.exception)
-            errors = [str(x.message) for x in at.error]
+            errors = [str(x.value) for x in at.error]
             assert any("パスワードが違います" in e for e in errors), errors
             return "Radiology invalid credential rejected without registry requests"
         probe("AUTH-02-partial-invalid-reviewer", work)
