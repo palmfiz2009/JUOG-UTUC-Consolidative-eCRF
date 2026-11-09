@@ -7,6 +7,7 @@ from __future__ import annotations
 import json
 import re
 import time
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
@@ -36,13 +37,24 @@ def nav(page, label):
     ex = page.locator('[data-testid="stException"]')
     require(ex.count() == 0, "page_no_streamlit_exception_"+label, "no stException")
 
+def backend_probe():
+    try:
+        with urllib.request.urlopen(BASE+"/_stcore/health", timeout=12) as resp:
+            body = resp.read(80).decode("utf-8", "replace").strip()
+            print("TEST BACKEND HEALTH",json.dumps({
+                "status":resp.status,"body_is_ok":body.lower() == "ok",
+                "body_len":len(body)
+            }),flush=True)
+    except Exception as exc:
+        print("TEST BACKEND HEALTH FAILED",type(exc).__name__,flush=True)
+
 def wait_loaded(page):
     """Wake a hibernating Streamlit Community Cloud app when necessary.
 
     Print only public page health signals (no page text, form values, email or IDs).
     Never proceed with UI actions unless the UAT-only banner is visible.
     """
-    for attempt in range(2):
+    for attempt in range(1):
         try:
             response = page.goto(BASE, wait_until="domcontentloaded", timeout=45000)
             page.wait_for_timeout(5000)
@@ -83,18 +95,30 @@ def wait_loaded(page):
             print("LIVE TEST BANNER NOT FOUND", type(exc).__name__,
                   "url_host", urlparse(page.url).netloc,
                   "page_title", page.title()[:120], flush=True)
-            if attempt == 1:
+            if attempt == 0:
                 raise
             print("TEST app retry",attempt+1,flush=True)
             time.sleep(5)
 
 def run():
+    backend_probe()
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page(viewport={"width": 1400, "height": 900})
         page.set_default_timeout(18000)
+        network = {"ws": [], "failed_requests": [], "js_errors":0, "console_errors":0}
+        page.on("websocket", lambda ws: network["ws"].append(urlparse(ws.url).path[:80]))
+        page.on("requestfailed", lambda req: network["failed_requests"].append({
+            "host":urlparse(req.url).netloc,"path":urlparse(req.url).path[:70]}))
+        page.on("pageerror", lambda _: network.__setitem__("js_errors", network["js_errors"]+1))
+        page.on("console", lambda msg: network.__setitem__(
+            "console_errors",network["console_errors"]+(1 if msg.type=="error" else 0)))
         try:
-            wait_loaded(page)
+            try:
+                wait_loaded(page)
+            except Exception:
+                print("TEST BROWSER NETWORK HEALTH", json.dumps(network,ensure_ascii=False)[:1500],flush=True)
+                raise
             require(urlparse(page.url).netloc == "juog-utuc01-uat.streamlit.app",
                     "test_host_exact", "Connected to known TEST host")
             require("UAT ONLY" in page.locator("body").inner_text(),
