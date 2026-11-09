@@ -69,11 +69,23 @@ def set_text(page, label, value):
 
 def set_date(page, label, iso):
     element = control(page, label)
+    intended = [int(n) for n in iso.split("-")]
+    if element.get_attribute("role") == "group":
+        # Streamlit/React Aria date widgets contain three distinct contenteditable
+        # spinbuttons (year/month/day). Filling the outer group is invalid.
+        for part, value in zip(("year", "month", "day"), intended):
+            part_input = element.locator(f'[data-type="{part}"][contenteditable="true"]').first
+            part_input.click()
+            part_input.press("ControlOrMeta+A")
+            part_input.type(str(value), delay=35)
+        element.locator('[data-type="day"][contenteditable="true"]').first.press("Tab")
+        visible = element.inner_text()
+        digits = [int(n) for n in re.findall(r"\d+", visible)]
+        print("SEGMENTED DATE", label, repr(visible), digits, flush=True)
+        if digits != intended:
+            raise AssertionError("Segmented date mismatch: " + label + " wanted " + iso + " got " + visible)
+        return
     placeholder = element.get_attribute("placeholder") or ""
-    input_type = element.get_attribute("type") or ""
-    print("DATE INPUT", label, element.evaluate("(e) => e.outerHTML.slice(0, 800)"), flush=True)
-    # React date input implementations differ: native input[type=date] uses ISO;
-    # textual date controls may use YYYY/MM/DD or MM/DD/YYYY.
     formats = [iso, iso.replace("-", "/"), iso[5:7] + "/" + iso[8:10] + "/" + iso[:4]]
     if "YYYY/MM/DD" in placeholder.upper():
         formats = [formats[1], formats[0], formats[2]]
@@ -83,19 +95,14 @@ def set_date(page, label, iso):
         try:
             element.fill(formatted, timeout=4500)
             element.press("Tab")
-            time.sleep(0.18)
             value = element.input_value()
-            print("DATE ATTEMPT", label, formatted, repr(value), flush=True)
             digits = [int(n) for n in re.findall(r"\d+", value)]
-            intended = [int(n) for n in iso.split("-")]
             if digits == intended or digits == intended[1:] + intended[:1]:
+                print("TEXT DATE", label, repr(value), flush=True)
                 return
-            if value == formatted:
-                return
-        except Exception as exc:
-            print("DATE ATTEMPT ERROR", label, formatted, type(exc).__name__, str(exc)[:220], flush=True)
-    raise AssertionError("Date entry failed: " + label + " / type=" + input_type + " placeholder=" + placeholder)
-
+        except Exception:
+            continue
+    raise AssertionError("Date entry failed: " + label + " / placeholder=" + placeholder)
 
 def choose(page, label, option):
     # Streamlit 1.x releases use different internal selectbox markup.
@@ -219,7 +226,7 @@ def run_case():
             page.get_by_text("仮保存データを読み込みました", exact=False).wait_for(timeout=20000)
             assert control(page, "Hb (g/dL)").input_value() == "13.4"
             assert control(page, "WBC (/μL)").input_value() == "6200"
-            assert control(page, "30日評価日*").input_value()
+            assert "2026" in control(page, "30日評価日*").inner_text()
             assert "関西医科大学" in page.locator('[data-testid="stSelectbox"]').filter(has_text="施設名*").first.inner_text()
             print("PASS browser draft restore after fresh session", flush=True)
 
