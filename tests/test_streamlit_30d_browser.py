@@ -165,6 +165,7 @@ def fill_form(page):
     set_date(page, "30日評価に用いた採血日*", "2026-09-24")
     set_text(page, "Hb (g/dL)", "13.4")
     set_text(page, "WBC (/μL)", "6200")
+    set_text(page, "Na (mEq/L)", "140")
     choose(page, "術後治療・今後の予定*", "無治療（経過観察）")
     radio(page, "生存")
     set_date(page, "最終生存確認日*", "2026-09-24")
@@ -226,6 +227,7 @@ def run_case():
             page.get_by_text("仮保存データを読み込みました", exact=False).wait_for(timeout=20000)
             assert control(page, "Hb (g/dL)").input_value() == "13.4"
             assert control(page, "WBC (/μL)").input_value() == "6200"
+            assert control(page, "Na (mEq/L)").input_value() == "140"
             assert "2026" in control(page, "30日評価日*").inner_text()
             assert page.get_by_role("combobox", name="施設名*", exact=True).input_value() == "関西医科大学"
             print("PASS browser draft restore after fresh session", flush=True)
@@ -242,6 +244,7 @@ def run_case():
             assert stored["submission_id"] == audit["submission_id"]
             assert stored["record_key"] == audit["record_key"]
             assert stored["data"]["day30_labs"]["Hb"] is not None
+            assert str(stored["data"]["day30_labs"]["Na"]) in ("140", "140.0")
             assert str(stored["data"]["day30_labs"]["Hb"]) in ("13.4", "13.40")
             assert stored["facility_code"] == "F11"
             assert result["draft"] is None
