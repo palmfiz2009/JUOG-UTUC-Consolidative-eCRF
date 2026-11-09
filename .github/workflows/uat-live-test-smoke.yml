@@ -1,0 +1,39 @@
+name: Live TEST Streamlit browser UAT (no write)
+on:
+  push:
+    branches:
+      - uat-live-browser-connect-20261109
+    paths:
+      - 'tests/test_live_test_smoke.py'
+      - '.github/workflows/uat-live-test-smoke.yml'
+  pull_request:
+    paths:
+      - 'tests/test_live_test_smoke.py'
+      - '.github/workflows/uat-live-test-smoke.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  live-test-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install Playwright and Chromium
+        run: |
+          python -m pip install 'playwright>=1.55,<2'
+          python -m playwright install --with-deps chromium
+      - name: Connect Chromium to existing TEST Streamlit and run non-writing checks
+        run: python tests/test_live_test_smoke.py
+      - name: Upload structured result
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uat-live-test-ui-sanitized-results
+          path: tests/live-uat-artifacts/results.json
+          retention-days: 7
