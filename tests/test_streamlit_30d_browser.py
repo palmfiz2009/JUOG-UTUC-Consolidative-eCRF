@@ -42,6 +42,19 @@ def open_form(page):
     page.goto(APP, wait_until="domcontentloaded", timeout=45000)
     page.get_by_text("周術期・術後30日", exact=True).first.click()
     page.get_by_role("heading", name=re.compile("周術期・術後30日CRF")).wait_for(timeout=30000)
+    # Streamlit can render the text delta before client-side widget mounting.
+    try:
+        page.locator('[data-testid="stSelectbox"]').first.wait_for(timeout=18000)
+    except Exception:
+        print("RENDER DEBUG: no stSelectbox after 18s; testids", page.locator("[data-testid]").evaluate_all(
+            "(els) => [...new Set(els.map(e=>e.getAttribute('data-testid')))].slice(0,150)"
+        ), flush=True)
+        print("RENDER DEBUG roles", {
+            "combobox": page.get_by_role("combobox").count(),
+            "textbox": page.get_by_role("textbox").count(),
+            "inputs": page.locator("input").count(),
+            "frames": [f.url for f in page.frames],
+        }, flush=True)
 
 
 def control(page, label):
