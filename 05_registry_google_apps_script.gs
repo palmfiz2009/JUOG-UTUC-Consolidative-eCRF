@@ -718,6 +718,18 @@ function validateCrfHardStops_(payload, registryInfo) {
   if (evpEnd && opDate && evpEnd > opDate) errors.push('EVP最終投与日が手術実施日より後です');
   if (visitDate && refDate && visitDate < refDate) errors.push('評価日が手術日/予定日より前です');
 
+  // Match the frontend's no-future clinical assessment rule in GAS as well.
+  // Sheet writes must not rely on clients to validate submitted dates.
+  const todayJst = Utilities.formatDate(new Date(), TIMEZONE, 'yyyy-MM-dd');
+  [
+    [visitDate, '評価日'],
+    [dateOnly_(data.lab_date || data.day30_lab_date), '評価採血日'],
+    [dateOnly_(data.last_alive_date || data.final_visit_date), '最終生存確認日'],
+    [deathDate, '死亡日']
+  ].forEach(([d, label]) => {
+    if (d && d > todayJst) errors.push(label + 'が未来日です');
+  });
+
   validateVitalBlockHardStops_(data.day0_vitals, 'Day0バイタル', errors);
   validateVitalBlockHardStops_(data.inpatient_vitals, '入院中バイタル', errors);
   if (errors.length) return {ok:false, error:'HARD_VALIDATION_FAILED', message:errors.join(' / ')};
