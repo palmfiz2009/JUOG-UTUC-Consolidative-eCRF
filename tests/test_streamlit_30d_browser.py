@@ -86,7 +86,7 @@ def set_date(page, label, iso):
             time.sleep(0.18)
             value = element.input_value()
             print("DATE ATTEMPT", label, formatted, repr(value), flush=True)
-            digits = [int(n) for n in re.findall(r"\\d+", value)]
+            digits = [int(n) for n in re.findall(r"\d+", value)]
             intended = [int(n) for n in iso.split("-")]
             if digits == intended or digits == intended[1:] + intended[:1]:
                 return
