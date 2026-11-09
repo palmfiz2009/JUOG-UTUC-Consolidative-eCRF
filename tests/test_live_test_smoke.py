@@ -104,7 +104,9 @@ def wait_loaded(page):
 def run():
     backend_probe()
     with sync_playwright() as p:
-        browser = p.chromium.launch(headless=True)
+        # Run genuine visible Chromium inside Xvfb; prior headless CI did not mount
+        # Streamlit's frontend, while an unauthenticated normal Chrome did.
+        browser = p.chromium.launch(headless=False)
         page = browser.new_page(viewport={"width": 1400, "height": 900})
         page.set_default_timeout(18000)
         network = {"ws": [], "ws_closed":0, "ws_errors":0, "ws_sent":0, "ws_received":0,
