@@ -104,5 +104,53 @@ check("draft with unset owner cannot be deleted",()=>{
   assert.equal(result.error,"DRAFT_EMAIL_NOT_SET");
   assert.equal(draft.getLastRow(),2);
 });
-console.log("Completed "+pass+"/7 isolated draft ownership tests.");
-if(pass!==7)process.exitCode=1;
+
+ctx.screeningDraftId_ = (facility,code) => "PREMDT-" + facility + "-" + code;
+function addScreeningDraft(owner="owner@example.invalid", facility="F11", code="LOCAL-999"){
+  const draftKey=ctx.screeningDraftId_(facility,code)+"|screening|mdt_application";
+  const item={draft_key:draftKey,registration_id:ctx.screeningDraftId_(facility,code),
+    crf_type:"screening",visit:"mdt_application",facility_code:facility,
+    reporter_email:owner,draft_json:'{"synthetic":true}'};
+  draft.appendRow(draft.rows[0].map(h=>item[h]??""));
+}
+function removeScreening(email,facility="F11",code="LOCAL-999"){
+  return ctx.deleteScreeningDraft_({facility_code:facility,
+    local_subject_code:code,reporter_email:email});
+}
+check("pre-MDT delete without reporter email is rejected",()=>{
+  draft.rows.splice(1);addScreeningDraft();
+  assert.equal(removeScreening("").error,"INVALID_DRAFT_EMAIL");
+  assert.equal(draft.getLastRow(),2);
+});
+check("pre-MDT another reporter cannot delete screening draft",()=>{
+  assert.equal(removeScreening("other@example.invalid").error,"DRAFT_EMAIL_MISMATCH");
+  assert.equal(draft.getLastRow(),2);
+});
+check("pre-MDT correct owner removes only its one screening draft",()=>{
+  addScreeningDraft("owner@example.invalid","F11","LOCAL-998");
+  const result=removeScreening(" OWNER@EXAMPLE.INVALID ");
+  assert.equal(result.ok,true);
+  assert.equal(result.deleted,true);
+  assert.equal(draft.getLastRow(),2);
+  assert.equal(draft.rows[1][draft.rows[0].indexOf("draft_key")],
+    "PREMDT-F11-LOCAL-998|screening|mdt_application");
+});
+check("pre-MDT repeated delete is idempotent and other site key is isolated",()=>{
+  addScreeningDraft("owner@example.invalid","F12","LOCAL-999");
+  const repeat=removeScreening("owner@example.invalid");
+  assert.equal(repeat.ok,true);
+  assert.equal(repeat.deleted,false);
+  const other=removeScreening("owner@example.invalid","F12","LOCAL-999");
+  assert.equal(other.ok,true);
+  assert.equal(other.deleted,true);
+  assert.equal(draft.getLastRow(),2);
+});
+check("pre-MDT draft with no owner fails closed",()=>{
+  const emailIndex=draft.rows[0].indexOf("reporter_email");
+  draft.rows[1][emailIndex]="";
+  const result=removeScreening("owner@example.invalid","F11","LOCAL-998");
+  assert.equal(result.error,"DRAFT_EMAIL_NOT_SET");
+  assert.equal(draft.getLastRow(),2);
+});
+console.log("Completed "+pass+"/12 isolated draft ownership tests.");
+if(pass!==12)process.exitCode=1;
