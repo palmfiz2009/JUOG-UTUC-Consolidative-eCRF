@@ -1,0 +1,24 @@
+name: UAT CRF source-version locking (offline)
+
+on:
+  pull_request:
+    paths:
+      - '05_registry_google_apps_script.gs'
+      - 'tests/test_crf_source_lock.cjs'
+      - '.github/workflows/uat-source-lock.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  source-lock:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Confirm source-version checks and append share script lock
+        run: node tests/test_crf_source_lock.cjs
