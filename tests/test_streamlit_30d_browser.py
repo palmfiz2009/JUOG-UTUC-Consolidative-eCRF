@@ -142,7 +142,7 @@ def choose(page, label, option):
     else:
         # Streamlit's 40-facility menu is virtualized. Searching the combobox
         # explicitly is required before the non-visible option exists in DOM.
-        combobox = page.get_by_role("combobox").first
+        combobox = page.get_by_role("combobox", name=label, exact=True).first
         print("COMBOBOX HTML", combobox.evaluate("(e) => e.outerHTML.slice(0, 900)"), flush=True)
         combobox.fill(option)
         page.get_by_role("option", name=option, exact=True).wait_for(timeout=7500)
