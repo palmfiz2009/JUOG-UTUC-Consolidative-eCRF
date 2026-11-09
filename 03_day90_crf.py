@@ -150,7 +150,14 @@ with d90_tool2:
                     st.info("このJUOG登録番号の仮保存データはありません。")
                 else:
                     clear_session_state_prefixes(("d90_", "widget_d90_"))
-                    restore_draft_state(_res.get("draft_state") or {})
+                    restored_state = _res.get("draft_state") or {}
+                    restore_draft_state(restored_state)
+                    # Lab values and manual-fallback facility are backed by separate
+                    # widget_ keys; restore both before the next widget render.
+                    for restored_key in restored_state:
+                        if restored_key == "d90_facility" or restored_key.startswith("d90_lab_"):
+                            if restored_key in st.session_state:
+                                st.session_state[f"widget_{restored_key}"] = st.session_state[restored_key]
                     st.session_state["d90_registration_id"] = _id
                     st.session_state["d90_reporter_email"] = _res.get("reporter_email") or d90_lookup_email
                     _link = fetch_30d_linkage(_id)
