@@ -76,11 +76,30 @@ def set_date(page, label, iso):
 
 
 def choose(page, label, option):
-    selectbox = page.locator('[data-testid="stSelectbox"]').filter(has_text=label).first
-    selectbox.locator('[data-baseweb="select"]').click()
-    match = page.get_by_role("option", name=option, exact=True)
-    if match.count():
-        match.first.click()
+    # Streamlit 1.x releases use different internal selectbox markup.
+    # Prefer accessible names rather than assumptions about BaseWeb internals.
+    candidates = [
+        page.get_by_role("combobox", name=label, exact=True).first,
+        page.get_by_label(label, exact=True).first,
+        page.locator('[data-testid="stSelectbox"]').filter(has_text=label).first,
+    ]
+    did_open = False
+    for selector in candidates:
+        try:
+            if selector.count():
+                selector.click(timeout=2500)
+                did_open = True
+                break
+        except Exception as exc:
+            print("Select candidate failed:", label, type(exc).__name__, flush=True)
+    if not did_open:
+        print("SELECTBOX DEBUG", page.locator('[data-testid="stSelectbox"]').evaluate_all(
+            "(els) => els.map(e => e.outerHTML.slice(0, 1000))"
+        ), flush=True)
+        raise AssertionError("Could not open selectbox " + label)
+    opt = page.get_by_role("option", name=option, exact=True)
+    if opt.count():
+        opt.first.click()
     else:
         page.get_by_text(option, exact=True).last.click()
 
