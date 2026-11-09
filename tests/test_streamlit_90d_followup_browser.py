@@ -198,8 +198,14 @@ def open_new_page(browser, label, title):
 def verify_new_session_restore(browser, kind, nav, title):
     page = open_new_page(browser, nav, title)
     page.get_by_role("button", name=re.compile("再開")).click()
-    set_text(page, "JUOG登録番号", SYNTHETIC_ID)
-    set_text(page, "担当者メールアドレス", SYNTHETIC_EMAIL)
+    # Popover and main form share the starred labels; the popover inputs
+    # are mounted last in the DOM after opening the popover.
+    id_field = page.get_by_label("JUOG登録番号*", exact=True).last
+    id_field.fill(SYNTHETIC_ID)
+    id_field.press("Tab")
+    email_field = page.get_by_label("担当者メールアドレス*", exact=True).last
+    email_field.fill(SYNTHETIC_EMAIL)
+    email_field.press("Tab")
     if kind == "followup":
         choose(page, "再開する報告時期*", "6ヶ月")
     page.get_by_role("button", name="読み込む").click()
