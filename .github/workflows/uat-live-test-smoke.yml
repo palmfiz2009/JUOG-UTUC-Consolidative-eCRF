@@ -6,10 +6,6 @@ on:
     paths:
       - 'tests/test_live_test_smoke.py'
       - '.github/workflows/uat-live-test-smoke.yml'
-  pull_request:
-    paths:
-      - 'tests/test_live_test_smoke.py'
-      - '.github/workflows/uat-live-test-smoke.yml'
   workflow_dispatch:
 
 permissions:
