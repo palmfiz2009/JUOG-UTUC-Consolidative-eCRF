@@ -70,22 +70,31 @@ def set_text(page, label, value):
 def set_date(page, label, iso):
     element = control(page, label)
     placeholder = element.get_attribute("placeholder") or ""
-    # DateInput defaults to YYYY/MM/DD on supported Streamlit releases.
-    formats = [iso.replace("-", "/"), iso, iso[5:7] + "/" + iso[8:10] + "/" + iso[:4]]
+    input_type = element.get_attribute("type") or ""
+    print("DATE INPUT", label, element.evaluate("(e) => e.outerHTML.slice(0, 800)"), flush=True)
+    # React date input implementations differ: native input[type=date] uses ISO;
+    # textual date controls may use YYYY/MM/DD or MM/DD/YYYY.
+    formats = [iso, iso.replace("-", "/"), iso[5:7] + "/" + iso[8:10] + "/" + iso[:4]]
+    if "YYYY/MM/DD" in placeholder.upper():
+        formats = [formats[1], formats[0], formats[2]]
     if "MM/DD/YYYY" in placeholder.upper():
-        formats = [formats[-1], formats[0], formats[1]]
+        formats = [formats[2], formats[0], formats[1]]
     for formatted in formats:
         try:
-            element.fill(formatted, timeout=5000)
+            element.fill(formatted, timeout=4500)
             element.press("Tab")
-            time.sleep(0.15)
-            v = element.input_value()
-            if (iso[:4] in v and iso[5:7] in v and iso[8:10] in v) or v == formatted:
-                print("DATE_FIELD", label, repr(v), "placeholder", repr(placeholder), flush=True)
+            time.sleep(0.18)
+            value = element.input_value()
+            print("DATE ATTEMPT", label, formatted, repr(value), flush=True)
+            digits = [int(n) for n in re.findall(r"\\d+", value)]
+            intended = [int(n) for n in iso.split("-")]
+            if digits == intended or digits == intended[1:] + intended[:1]:
                 return
-        except Exception:
-            continue
-    raise AssertionError("Date entry failed: " + label + " / placeholder=" + placeholder)
+            if value == formatted:
+                return
+        except Exception as exc:
+            print("DATE ATTEMPT ERROR", label, formatted, type(exc).__name__, str(exc)[:220], flush=True)
+    raise AssertionError("Date entry failed: " + label + " / type=" + input_type + " placeholder=" + placeholder)
 
 
 def choose(page, label, option):
