@@ -1,0 +1,25 @@
+name: UAT 30-day draft restore (offline)
+
+on:
+  pull_request:
+    paths:
+      - '02_perioperative_30d_crf.py'
+      - 'juog_common.py'
+      - 'tests/test_30d_draft_restore.py'
+      - '.github/workflows/uat-30d-restore.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Run offline regression tests (no secrets or external services)
+        run: python -m unittest discover -s tests -p 'test_30d_draft_restore.py' -v
