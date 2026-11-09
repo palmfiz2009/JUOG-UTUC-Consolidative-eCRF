@@ -104,9 +104,11 @@ def wait_loaded(page):
 def run():
     backend_probe()
     with sync_playwright() as p:
-        # Try independent Firefox engine: Chromium headless AND headed on CI could not
-        # mount Streamlit; ordinary incognito Chrome succeeds outside CI.
-        browser = p.firefox.launch(headless=True)
+        # Use installed stable Chrome on Windows GitHub runner as an OS-specific
+        # isolation test. Ordinary incognito Chrome on Windows succeeds.
+        # Prefer installed stable Chrome on Windows runner, matching the validated
+        # interactive browser family (not a Linux headless/Firefox comparison).
+        browser = p.chromium.launch(channel="chrome", headless=True)
         page = browser.new_page(viewport={"width": 1400, "height": 900})
         page.set_default_timeout(18000)
         network = {"ws": [], "ws_closed":0, "ws_errors":0, "ws_sent":0, "ws_received":0,
