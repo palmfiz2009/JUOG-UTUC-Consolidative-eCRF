@@ -646,7 +646,7 @@ RECIST進行状況: {recist_status}
                         report,
                         reporter_email,
                     )
-                    _draft_delete = delete_crf_draft(registration_id, "followup", "followup")
+                    _draft_delete = delete_crf_draft(registration_id, "followup", "followup", reporter_email)
                     st.session_state.fu_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
                     st.session_state.fu_sent = True
                     st.session_state.fu_sent_registration_id = registration_id
