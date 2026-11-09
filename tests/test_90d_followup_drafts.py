@@ -88,6 +88,9 @@ class RestoreTests(unittest.TestCase):
         })
         self.sync_90 = widget_sync_from_file("03_day90_crf.py", "d90")
         self.sync_fu = widget_sync_from_file("04_followup_crf.py", "fu")
+        self.visit_key = function_from_file("04_followup_crf.py", "followup_visit_key", {
+            "FOLLOWUP_DRAFT_MONTHS": ("6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）")
+        })
 
     def load(self, prefix, saved, code):
         self.clear((prefix + "_", "widget_" + prefix + "_"))
@@ -148,6 +151,34 @@ class RestoreTests(unittest.TestCase):
         self.load("fu", saved, self.sync_fu)
         self.assertEqual(self.st.session_state["widget_fu_lab_Hb"], "12.4")
         self.assertNotIn("widget_fu_registration_id", self.st.session_state)
+
+
+    def test_followup_visit_specific_keys_do_not_collide(self):
+        months = ["6ヶ月", "9ヶ月", "12ヶ月", "15ヶ月", "18ヶ月", "21ヶ月", "24ヶ月（終了）"]
+        keys = [self.visit_key(month) for month in months]
+        self.assertEqual(keys, ["6m", "9m", "12m", "15m", "18m", "21m", "24m"])
+        self.assertEqual(len(keys), len(set(keys)))
+        self.assertEqual(self.visit_key("選択してください"), "")
+        self.assertEqual(self.visit_key("followup"), "")
+
+    def test_followup_draft_save_verify_and_delete_use_visit_key(self):
+        tree = ast.parse((ROOT / "04_followup_crf.py").read_text(encoding="utf-8"))
+        call_keys = {"save_crf_draft": 2, "get_crf_draft": 2, "delete_crf_draft": 2}
+        for function, index in call_keys.items():
+            calls = [n for n in ast.walk(tree)
+                     if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)
+                     and n.func.id == function]
+            visit_calls = [n for n in calls
+                           if len(n.args) > index
+                           and isinstance(n.args[index], ast.Call)
+                           and isinstance(n.args[index].func, ast.Name)
+                           and n.args[index].func.id == "followup_visit_key"]
+            if function == "delete_crf_draft":
+                # Submission-specific value is already in visit_key variable.
+                visit_calls = [n for n in calls if len(n.args) > index
+                               and isinstance(n.args[index], ast.Name)
+                               and n.args[index].id == "visit_key"]
+            self.assertTrue(visit_calls, f"{function} lacks the period-specific draft key")
 
 
 if __name__ == "__main__":
