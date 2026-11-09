@@ -82,4 +82,35 @@ check("missing source CRF is rejected",()=>{
   ctx.mockLatest={ok:true,found:false};
   assert.equal(ctx.validateCrfSourceLink_(payload()).error,"SOURCE_CRF_MISSING");
 });
-console.log("Completed "+passes+"/11 source-integrity checks.");
+
+// Hard validation uses the GAS Asia/Tokyo clock. It must independently reject
+// future assessments even if a caller bypasses Streamlit's form validator.
+ctx.Utilities = {formatDate: () => "2026-11-09"};
+function validateDate(data) {
+  const p = payload();
+  p.data = {...p.data,...data};
+  return ctx.validateCrfHardStops_(p,{
+    registration_date:"2026-02-01", consent_date:"2026-02-01"
+  });
+}
+check("valid past visit accepted by backend chronology hard stop",()=>{
+  assert.equal(validateDate({visit_date:"2026-09-01",lab_date:"2026-09-01"}).ok,true);
+});
+check("future visit blocked at GAS boundary",()=>{
+  const x=validateDate({visit_date:"2027-06-06"});
+  assert.equal(x.error,"HARD_VALIDATION_FAILED");
+  assert(x.message.includes("評価日が未来日"));
+});
+check("future clinical lab date blocked at GAS boundary",()=>{
+  const x=validateDate({visit_date:"2026-09-01",lab_date:"2027-02-01"});
+  assert.equal(x.error,"HARD_VALIDATION_FAILED");
+  assert(x.message.includes("採血日が未来日"));
+});
+check("future death or last-alive date blocked at GAS boundary",()=>{
+  for(const field of ["death_date","last_alive_date"]){
+    const x=validateDate({visit_date:"2026-09-01",[field]:"2027-01-01"});
+    assert.equal(x.error,"HARD_VALIDATION_FAILED",field);
+  }
+});
+
+console.log("Completed "+passes+"/15 source-and-date-integrity checks.");
