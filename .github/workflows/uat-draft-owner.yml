@@ -1,0 +1,34 @@
+name: UAT CRF draft deletion owner guard (offline)
+
+on:
+  pull_request:
+    paths:
+      - '05_registry_google_apps_script.gs'
+      - 'juog_common.py'
+      - '02_perioperative_30d_crf.py'
+      - '03_day90_crf.py'
+      - '04_followup_crf.py'
+      - 'tests/test_draft_delete_owner.cjs'
+      - 'tests/test_draft_delete_client.py'
+      - '.github/workflows/uat-draft-owner.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  draft-owner:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Reject another reporter's draft deletion in real GAS code (mock Sheets)
+        run: node tests/test_draft_delete_owner.cjs
+      - name: Verify Python wrapper and all CRF form call sites
+        run: python -m unittest discover -s tests -p 'test_draft_delete_client.py' -v
