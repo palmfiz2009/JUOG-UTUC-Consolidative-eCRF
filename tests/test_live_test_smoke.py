@@ -37,15 +37,45 @@ def nav(page, label):
     require(ex.count() == 0, "page_no_streamlit_exception_"+label, "no stException")
 
 def wait_loaded(page):
-    for i in range(3):
+    """Wake a hibernating Streamlit Community Cloud app when necessary.
+
+    Print only public page health signals (no page text, form values, email or IDs).
+    Never proceed with UI actions unless the UAT-only banner is visible.
+    """
+    for attempt in range(2):
         try:
-            page.goto(BASE, wait_until="domcontentloaded", timeout=90000)
-            page.get_by_text("UAT ONLY", exact=False).first.wait_for(timeout=95000)
+            response = page.goto(BASE, wait_until="domcontentloaded", timeout=45000)
+            page.wait_for_timeout(5000)
+            body = page.locator("body")
+            visible = body.inner_text(timeout=6000).lower()
+            print("LIVE URL HEALTH", json.dumps({
+                "host": urlparse(page.url).netloc, "path": urlparse(page.url).path,
+                "status": response.status if response else None,
+                "title": page.title()[:120],
+                "uat_only": "uat only" in visible,
+                "sleeping": "gone to sleep" in visible or "get this app back up" in visible,
+                "not_found": "does not exist" in visible or "cannot find" in visible,
+                "login_required": "sign in" in visible or "log in" in visible,
+                "streamlit_error": page.locator('[data-testid="stException"]').count() > 0,
+            }, ensure_ascii=False), flush=True)
+            if "get this app back up" in visible or "gone to sleep" in visible:
+                for name in [re.compile("get this app back up", re.I),re.compile("wake", re.I)]:
+                    button = page.get_by_role("button", name=name)
+                    if button.count():
+                        print("Streamlit sleeping: click wake-up button", flush=True)
+                        button.first.click()
+                        page.wait_for_timeout(7500)
+                        break
+            page.get_by_text("UAT ONLY", exact=False).first.wait_for(timeout=30000)
             return
         except Exception as exc:
-            if i == 2: raise
-            print("TEST app wake-up retry", i+1, type(exc).__name__, flush=True)
-            time.sleep(8)
+            print("LIVE TEST BANNER NOT FOUND", type(exc).__name__,
+                  "url_host", urlparse(page.url).netloc,
+                  "page_title", page.title()[:120], flush=True)
+            if attempt == 1:
+                raise
+            print("TEST app retry",attempt+1,flush=True)
+            time.sleep(5)
 
 def run():
     with sync_playwright() as p:
