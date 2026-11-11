@@ -1,0 +1,68 @@
+{
+  "source_commit": "76421e5",
+  "method": "Executed actual JuogUnifiedDomainV3.authorize in V8 with synthetic tables and mocked assignment provider; no HTTP or live Sheets. Not an OIDC or persistence test.",
+  "results": [
+    {
+      "name": "own_facility",
+      "expected": "ALLOW",
+      "actual": "ALLOW",
+      "passed": true
+    },
+    {
+      "name": "other_facility",
+      "expected": "SUBJECT_FORBIDDEN",
+      "actual": "SUBJECT_FORBIDDEN",
+      "passed": true
+    },
+    {
+      "name": "empty_facility",
+      "expected": "FACILITY_FORBIDDEN",
+      "actual": "FACILITY_FORBIDDEN",
+      "passed": true
+    },
+    {
+      "name": "escalation",
+      "expected": "ROLE_NOT_ALLOWED",
+      "actual": "ROLE_NOT_ALLOWED",
+      "passed": true
+    },
+    {
+      "name": "disabled",
+      "expected": "AUTH_REQUIRED",
+      "actual": "AUTH_REQUIRED",
+      "passed": true
+    },
+    {
+      "name": "unregistered",
+      "expected": "AUTH_REQUIRED",
+      "actual": "AUTH_REQUIRED",
+      "passed": true
+    },
+    {
+      "name": "spoofed_actor",
+      "expected": "CALLER_ACTOR_FORBIDDEN",
+      "actual": "CALLER_ACTOR_FORBIDDEN",
+      "passed": true
+    },
+    {
+      "name": "review_unassigned",
+      "expected": "REVIEW_ASSIGNMENT_REQUIRED",
+      "actual": "REVIEW_ASSIGNMENT_REQUIRED",
+      "passed": true
+    }
+  ],
+  "remaining_dependencies": [
+    "privacy_revision2.gs",
+    "clinical_contract.gs",
+    "text_contract.gs",
+    "field_catalog.gs",
+    "legacy_shadow_planner.gs",
+    "shadow_spreadsheet.gs",
+    "transaction_core.gs"
+  ],
+  "limitations": [
+    "Dependency list derived from inspected calls and known files; transitive dependency closure not yet verified",
+    "End-to-end authentication, storage, audit and recovery not yet verified",
+    "No deployment or official UAT change"
+  ]
+}
