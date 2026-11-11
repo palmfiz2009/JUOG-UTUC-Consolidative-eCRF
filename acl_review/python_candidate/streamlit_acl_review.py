@@ -34,8 +34,9 @@ def run():
         st.error("サーバー側の個人ACLを確認できません。業務操作は停止しています。")
         st.stop()
     if result["role"] == "facility":
-        site = result.get("facility_code")
-        if not isinstance(site, str) or not site.strip():
+        sites = result.get("facilities")
+        if (not isinstance(sites, list) or not sites
+                or any(not isinstance(site, str) or not site.strip() for site in sites)):
             st.error("施設権限を確認できません。業務操作は停止しています。")
             st.stop()
     # Do not echo identifiers, response payloads, tokens, secrets or exceptions.
