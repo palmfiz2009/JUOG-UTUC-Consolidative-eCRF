@@ -1,0 +1,107 @@
+{
+  "scope": "In-memory JavaScript execution of the supplied GAS ACL reader with synthetic Sheets mocks; not GAS, OIDC, Python or formal UAT",
+  "source_library_id": "libfile_c1d10de1996c8191b3831a4afd7eb5ed",
+  "tests": [
+    {
+      "name": "valid",
+      "before": {
+        "id": "fixture-user",
+        "enabled": true,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      },
+      "after": {
+        "id": "fixture-user",
+        "enabled": true,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      }
+    },
+    {
+      "name": "empty_operator",
+      "before": {
+        "id": "",
+        "enabled": true,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      },
+      "after": {
+        "error": "ACL_INVALID"
+      }
+    },
+    {
+      "name": "duplicate_header",
+      "before": {
+        "id": "other-user",
+        "enabled": true,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      },
+      "after": {
+        "error": "ACL_SCHEMA"
+      }
+    },
+    {
+      "name": "disabled",
+      "before": {
+        "id": "fixture-user",
+        "enabled": false,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      },
+      "after": {
+        "id": "fixture-user",
+        "enabled": false,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      }
+    },
+    {
+      "name": "expired",
+      "before": {
+        "id": "fixture-user",
+        "enabled": false,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      },
+      "after": {
+        "id": "fixture-user",
+        "enabled": false,
+        "role": "facility",
+        "facilities": [
+          "FIXTURE-ONLY"
+        ]
+      }
+    },
+    {
+      "name": "unregistered",
+      "before": null,
+      "after": null
+    }
+  ],
+  "limitations": [
+    "Callers must still enforce null and enabled=false; end-to-end bypass not established",
+    "No deployment, live ACL provisioning, external requests or business writes",
+    "Streamlit connection not completed; integration archive still requires accessible execution environment"
+  ],
+  "uat": {
+    "pass": 32,
+    "fail": 1,
+    "blocked": 29,
+    "not_run": 5
+  }
+}
