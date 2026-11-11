@@ -38,7 +38,7 @@ def authentication_time_status(user, now):
 
 def auth_time_request_configured(config):
     try:
-        claims = config.get("client_kwargs", {}).get("claims", {})
+        claims = config.get("authorize_params", {}).get("claims", {})
         if isinstance(claims, str):
             claims = json.loads(claims)
         return isinstance(claims, dict) and "auth_time" in claims.get("id_token", {})
@@ -50,9 +50,13 @@ def run():
     st.set_page_config(page_title="JUOG UAT — Google認証確認", layout="centered")
     st.title("JUOG UAT：Google認証確認")
     st.info("隔離環境・認証確認のみ。CRF保存、GAS送信、メール送信は停止しています。")
-    st.caption("Build: oidc-preflight-20261111-02")
+    st.caption("Build: oidc-preflight-20261111-03")
     try:
-        config = st.secrets["auth"]
+        root_config = st.secrets["auth"]
+        named_google = "google" in root_config
+        config = dict(root_config["google"]) if named_google else dict(root_config)
+        config["redirect_uri"] = root_config.get("redirect_uri")
+        config["cookie_secret"] = root_config.get("cookie_secret")
         ready = (
             config.get("redirect_uri") == REDIRECT
             and config.get("server_metadata_url") == METADATA
@@ -70,7 +74,7 @@ def run():
         st.write("Googleで本人認証してください。認証だけでは施設・ロール権限は付与されません。")
         if st.button("Googleでログイン", type="primary"):
             try:
-                st.login()
+                st.login("google" if named_google else None)
             except Exception:
                 st.error("認証を開始できませんでした。設定・依存ライブラリを確認してください。")
         st.stop()
