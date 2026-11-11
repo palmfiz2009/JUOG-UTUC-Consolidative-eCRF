@@ -77,8 +77,12 @@ def runtime_parameter_check():
 
 
 def run():
+    from uat_public_notice import render_public_notice
+    if render_public_notice(st):
+        return
     st.set_page_config(page_title="JUOG UAT — Google認証確認", layout="centered")
     st.title("JUOG UAT：Google認証確認")
+    st.markdown("[プライバシーポリシー草案（未承認）](?page=privacy)")
     st.info("隔離環境・認証確認のみ。CRF保存、GAS送信、メール送信は停止しています。")
     st.caption("Build: oidc-preflight-20261111-05")
     try:
