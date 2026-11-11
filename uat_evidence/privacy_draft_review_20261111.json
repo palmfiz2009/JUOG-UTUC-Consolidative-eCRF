@@ -1,0 +1,28 @@
+{
+  "status": "DRAFT_NOT_DEPLOYED",
+  "scope": "Isolation preflight only",
+  "tests": [
+    "Python syntax passed",
+    "Fake Streamlit privacy route renders and stops without secrets/auth/business access",
+    "Other query value leaves normal route intact"
+  ],
+  "limitations": [
+    "Real unauthenticated browser accessibility not yet tested",
+    "Hosting/domain ownership verification unresolved",
+    "Operator identity, retention and deletion policy need approval",
+    "No production, live isolated branch, Google settings or UAT counts changed"
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "sources": [
+    "https://developers.google.com/identity/protocols/oauth2/production-readiness/brand-verification"
+  ],
+  "sha256": {
+    "uat_public_notice.py": "ed3e24881f79306db9951ec1557952947d97400e53933ac4936303f4f091bcf6",
+    "uat_oidc_preflight.py": "49cac4d044e2c2c5c4d5a4e703e9a856f65eea435f5c866b254bde7f2b7f672a"
+  }
+}
