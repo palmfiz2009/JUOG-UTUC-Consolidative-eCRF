@@ -1,0 +1,103 @@
+{
+  "finding": "ui_context with no case returns facilities and null facility_code; review UI now checks facilities, not absent selected-case code",
+  "approval_checks": [
+    {
+      "field": "backupVerified",
+      "value": "false",
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "backupVerified",
+      "value": "true",
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "backupVerified",
+      "value": 1,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "backupVerified",
+      "value": false,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "backupVerified",
+      "value": null,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "qaApproved",
+      "value": "false",
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "qaApproved",
+      "value": "true",
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "qaApproved",
+      "value": 1,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "qaApproved",
+      "value": false,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "qaApproved",
+      "value": null,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "fictionalBaselineVerified",
+      "value": "false",
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "fictionalBaselineVerified",
+      "value": "true",
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "fictionalBaselineVerified",
+      "value": 1,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "fictionalBaselineVerified",
+      "value": false,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    },
+    {
+      "field": "fictionalBaselineVerified",
+      "value": null,
+      "result": "ISOLATION_NOT_APPROVED",
+      "passed": true
+    }
+  ],
+  "scope": "JavaScript endpoint early rejection tests only. No Google, GAS or Sheets access. Python UI fix not yet executed.",
+  "remaining": [
+    "Signed real OIDC identity",
+    "Approved ACL provisioning",
+    "Safety review and limited live execution approval",
+    "Python differential regression"
+  ],
+  "formalUatUnchanged": true
+}
