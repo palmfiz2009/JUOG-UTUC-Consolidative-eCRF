@@ -1,0 +1,16 @@
+{
+  "scope": "real candidate signed gateway and chunk-journal adapters, local substitute Sheets/Lock/Utilities; NOT real GAS",
+  "result": "PASS",
+  "checks": [
+    "signed prepare/execute/status/list",
+    "durable chunk roundtrip",
+    "audit fault no success or code",
+    "same ID recovery",
+    "direct writes refused",
+    "revocation denied",
+    "baseline preserved",
+    "signed expired assertion distinguished"
+  ],
+  "live_gas": false,
+  "independent_qa": false
+}
