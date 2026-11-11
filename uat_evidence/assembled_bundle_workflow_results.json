@@ -1,0 +1,160 @@
+{
+  "scope": "Unified server domain source, inherited fixture/principals, local Google service substitution. Clock controlled locally. No live API, real IdP or formal UAT.",
+  "flow": "Screening -> three MDT + correction -> registration -> 30d CRF v1 -> correction v2 -> read -> audit comparison",
+  "results": [
+    {
+      "case": "submit_screening",
+      "ok": true,
+      "revision": 1
+    },
+    {
+      "case": "submit_mdt_review",
+      "ok": true,
+      "revision": 2
+    },
+    {
+      "case": "submit_mdt_review",
+      "ok": true,
+      "revision": 3
+    },
+    {
+      "case": "submit_mdt_review",
+      "ok": true,
+      "revision": 4
+    },
+    {
+      "case": "submit_mdt_review",
+      "ok": true,
+      "revision": 5
+    },
+    {
+      "case": "finalize_mdt",
+      "ok": true,
+      "revision": 6
+    },
+    {
+      "case": "save_crf",
+      "ok": true,
+      "revision": 7
+    },
+    {
+      "case": "save_crf",
+      "ok": true,
+      "revision": 8
+    },
+    {
+      "case": "read_crf",
+      "ok": true,
+      "revision": 8
+    },
+    {
+      "case": "get_mdt_reviews",
+      "ok": true,
+      "revision": 8
+    },
+    {
+      "case": "save_screening_draft",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "get_screening_draft",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "get_screening_draft",
+      "ok": false,
+      "error": "DRAFT_OWNER_REQUIRED"
+    },
+    {
+      "case": "list_review_cases",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "get_screening_crf",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "get_own_review",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "list_screenings",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "get_screening",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "stats",
+      "ok": true,
+      "revision": 9
+    },
+    {
+      "case": "delete_screening_draft",
+      "ok": true,
+      "revision": 10
+    },
+    {
+      "case": "save_draft",
+      "ok": true,
+      "revision": 11
+    },
+    {
+      "case": "get_draft",
+      "ok": true,
+      "revision": 11
+    },
+    {
+      "case": "validate",
+      "ok": true,
+      "revision": 11
+    },
+    {
+      "case": "get_crf_linkage",
+      "ok": true,
+      "revision": 11
+    },
+    {
+      "case": "reset_draft_code",
+      "ok": true,
+      "revision": 12
+    },
+    {
+      "case": "update_draft_email",
+      "ok": true,
+      "revision": 13
+    },
+    {
+      "case": "get_draft",
+      "ok": true,
+      "revision": 13
+    },
+    {
+      "case": "delete_draft",
+      "ok": true,
+      "revision": 14
+    },
+    {
+      "case": "void_registration",
+      "ok": true,
+      "revision": 15
+    },
+    {
+      "case": "stats",
+      "ok": true,
+      "revision": 15
+    }
+  ],
+  "formal_uat_changed": false,
+  "projected_crf_rows": 2,
+  "projected_crf_audits": 2,
+  "baseline_unchanged": true
+}
