@@ -1,0 +1,35 @@
+{
+  "scope": "Isolation authentication UI only; no business API calls",
+  "date_jst": "2026-11-11",
+  "app_url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/",
+  "implementation_commit": "407dfbc0b9c65d50e5731481fbcc34dd7d4708f4",
+  "original_entry_blob": "06cb95b1b463f8dfab0506b6655add168d456302",
+  "original_requirements_blob": "0f514ca02b79214a6cb07e441d109b0570bdb505",
+  "offline_checks": [
+    "syntax pass",
+    "valid claims accepted by preflight checker",
+    "nine invalid or missing claim variations rejected",
+    "logged-in and logged-out states both stop before legacy business code"
+  ],
+  "observed_live": [
+    "Build oidc-preflight-20261111-01",
+    "Google login button visible",
+    "fresh reload shows no business navigation or forms",
+    "required auth configuration and exact isolation redirect passed structural checks"
+  ],
+  "not_verified": [
+    "actual Google login callback",
+    "real issuer/subject/audience/expiry/auth_time",
+    "individual ACL",
+    "GAS integration",
+    "AUTH-04 tests"
+  ],
+  "secrets": "not retrieved or recorded",
+  "rollback": "Restore streamlit_app.py and requirements.txt from their pre-change Git revisions only after approval; this restores legacy UI rather than validating its safety. Keep business writes prohibited.",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  }
+}
