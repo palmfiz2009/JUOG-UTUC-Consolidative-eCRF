@@ -4,7 +4,8 @@
   "tests": [
     "Python syntax passed",
     "Fake Streamlit privacy route renders and stops without secrets/auth/business access",
-    "Other query value leaves normal route intact"
+    "Other query value leaves normal route intact",
+    "Streamlit 1.67.0 AppTest actual candidate privacy route: 2 markdown blocks, 0 login buttons, 0 tables, 0 exceptions, no secrets provided; local only"
   ],
   "limitations": [
     "Real unauthenticated browser accessibility not yet tested",
@@ -19,10 +20,24 @@
     "NOT_RUN": 5
   },
   "sources": [
-    "https://developers.google.com/identity/protocols/oauth2/production-readiness/brand-verification"
+    "https://developers.google.com/identity/protocols/oauth2/production-readiness/brand-verification",
+    "https://docs.streamlit.io/develop/concepts/connections/authentication",
+    "https://support.google.com/webmasters/answer/9008080",
+    "https://www.snowflake.com/en/legal/privacy/privacy-policy/"
   ],
   "sha256": {
-    "uat_public_notice.py": "ed3e24881f79306db9951ec1557952947d97400e53933ac4936303f4f091bcf6",
+    "uat_public_notice.py": "218bde65649019a6a7ed897ee92728e4ce6222353bc3c20cecdea00af18a5b9f",
     "uat_oidc_preflight.py": "49cac4d044e2c2c5c4d5a4e703e9a856f65eea435f5c866b254bde7f2b7f672a"
-  }
+  },
+  "revision": 2,
+  "source_findings": {
+    "cookie": "Streamlit 1.67.0 source sets user and token cookies; Max-Age 30 days, HttpOnly, SameSite=lax, signed not described as encrypted.",
+    "provider_logs": "Snowflake policy gives purpose-based retention; no uniform fixed log lifetime established.",
+    "domain": "Search Console requires DNS control or supported file/head insertion etc. Community Cloud settings document subdomain configuration, not ownership verification. Current app domain verification remains unproven. No bypass or claim of impossibility."
+  },
+  "approval_needed": [
+    "PI confirmation of operator/contact and retention/deletion policy",
+    "Explicit approval for publication to isolated app (no business functionality)",
+    "Administrator ownership verification of application domain; Google verification and Session age claims enabled only after appropriate authorization"
+  ]
 }
