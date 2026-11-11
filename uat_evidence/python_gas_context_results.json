@@ -1,0 +1,14 @@
+{
+  "scope": "Actual Python signed_request -> actual GAS decoder/ACL/ui_context; in-memory Sheets/Utilities/Lock. No live OIDC/GAS/HTTP",
+  "checks": [
+    "unselected case facility list",
+    "own case context",
+    "foreign facility denied",
+    "revoked principal denied",
+    "tampered signed request denied",
+    "journal byte-for-byte unchanged",
+    "lock released"
+  ],
+  "result": "PASS",
+  "formal_uat_changed": false
+}
