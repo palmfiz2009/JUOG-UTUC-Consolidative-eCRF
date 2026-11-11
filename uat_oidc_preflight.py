@@ -46,11 +46,26 @@ def auth_time_request_configured(config):
         return False
 
 
+def runtime_parameter_check():
+    """Inspect parameter presence only; never output credentials or claim values."""
+    try:
+        from importlib.metadata import version
+        from streamlit.web.server.starlette.starlette_auth_routes import _create_oauth_client
+        client, _ = _create_oauth_client("google")
+        params = client.authorize_params or {}
+        raw = params.get("claims")
+        parsed = json.loads(raw) if isinstance(raw, str) else raw
+        forwarded = isinstance(parsed, dict) and parsed.get("id_token", {}).get("auth_time", {}).get("essential") is True
+        return "Streamlit " + version("streamlit") + " / Authlib " + version("authlib") + " / AUTH_TIME_PARAMETER_" + ("READY" if forwarded else "MISSING")
+    except Exception:
+        return "AUTH_TIME_PARAMETER_CHECK_UNAVAILABLE（秘密値・例外内容は非表示）"
+
+
 def run():
     st.set_page_config(page_title="JUOG UAT — Google認証確認", layout="centered")
     st.title("JUOG UAT：Google認証確認")
     st.info("隔離環境・認証確認のみ。CRF保存、GAS送信、メール送信は停止しています。")
-    st.caption("Build: oidc-preflight-20261111-03")
+    st.caption("Build: oidc-preflight-20261111-04")
     try:
         root_config = st.secrets["auth"]
         named_google = "google" in root_config
@@ -70,6 +85,7 @@ def run():
         st.error("認証設定が未完了、または隔離URLと一致していません。秘密値は共有せず管理者が確認してください。")
         st.stop()
     st.caption("auth_time要求設定：" + ("あり（送信・返却は未証明）" if auth_time_request_configured(config) else "なし・設定形式を確認"))
+    st.caption(runtime_parameter_check())
     if not st.user.is_logged_in:
         st.write("Googleで本人認証してください。認証だけでは施設・ロール権限は付与されません。")
         if st.button("Googleでログイン", type="primary"):
