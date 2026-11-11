@@ -56,7 +56,22 @@ def runtime_parameter_check():
         raw = params.get("claims")
         parsed = json.loads(raw) if isinstance(raw, str) else raw
         forwarded = isinstance(parsed, dict) and parsed.get("id_token", {}).get("auth_time", {}).get("essential") is True
-        return "Streamlit " + version("streamlit") + " / Authlib " + version("authlib") + " / AUTH_TIME_PARAMETER_" + ("READY" if forwarded else "MISSING")
+        import asyncio
+        from urllib.parse import urlparse, parse_qs
+        async def serialize_only():
+            # Build a URL locally using the configured client. No HTTP request,
+            # token exchange, persistent state or business operation is performed.
+            async with client._get_oauth_client() as session:
+                session.redirect_uri = REDIRECT
+                return client._create_oauth2_authorization_url(
+                    session, "https://accounts.google.com/o/oauth2/v2/auth",
+                    **params)
+        generated = asyncio.run(serialize_only())
+        query = parse_qs(urlparse(generated["url"]).query)
+        actual_claims = json.loads(query.get("claims", ["{}"])[0])
+        serialized = actual_claims.get("id_token", {}).get("auth_time", {}).get("essential") is True
+        status = " / AUTH_TIME_URL_" + ("READY（送信前の生成検査）" if serialized else "MISSING")
+        return status + " / Streamlit " + version("streamlit") + " / Authlib " + version("authlib") + " / AUTH_TIME_PARAMETER_" + ("READY" if forwarded else "MISSING")
     except Exception:
         return "AUTH_TIME_PARAMETER_CHECK_UNAVAILABLE（秘密値・例外内容は非表示）"
 
@@ -65,7 +80,7 @@ def run():
     st.set_page_config(page_title="JUOG UAT — Google認証確認", layout="centered")
     st.title("JUOG UAT：Google認証確認")
     st.info("隔離環境・認証確認のみ。CRF保存、GAS送信、メール送信は停止しています。")
-    st.caption("Build: oidc-preflight-20261111-04")
+    st.caption("Build: oidc-preflight-20261111-05")
     try:
         root_config = st.secrets["auth"]
         named_google = "google" in root_config
@@ -95,6 +110,11 @@ def run():
             except Exception:
                 st.error("認証を開始できませんでした。設定・依存ライブラリを確認してください。")
         st.stop()
+    cookie_provider = st.user.get("provider")
+    provider_label = cookie_provider if cookie_provider in ("google", "default") else "不明"
+    st.caption("現在のログイン結果のプロバイダー：" + provider_label)
+    if cookie_provider == "default" and named_google:
+        st.warning("旧default設定のログイン結果が残っています。新しいgoogle設定のログイン結果はまだ未確認です。")
     checks = claim_checks(st.user, config["client_id"], int(time.time()))
     st.write("Googleログインから復帰しました。以下は属性の照合結果です。")
     labels = {
