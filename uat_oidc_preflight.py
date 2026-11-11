@@ -85,6 +85,7 @@ def run():
         st.error("認証設定が未完了、または隔離URLと一致していません。秘密値は共有せず管理者が確認してください。")
         st.stop()
     st.caption("auth_time要求設定：" + ("あり（送信・返却は未証明）" if auth_time_request_configured(config) else "なし・設定形式を確認"))
+    st.caption("選択中の認証プロバイダー：" + ("google" if named_google else "default（auth.googleがありません）"))
     st.caption(runtime_parameter_check())
     if not st.user.is_logged_in:
         st.write("Googleで本人認証してください。認証だけでは施設・ロール権限は付与されません。")
