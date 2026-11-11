@@ -1,3 +1,7 @@
+# Isolation authentication preflight: stops before all legacy business code.
+from uat_oidc_preflight import run as _run_oidc_preflight
+_run_oidc_preflight()
+
 import re
 from datetime import datetime
 
