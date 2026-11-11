@@ -1,0 +1,15 @@
+{
+  "source": "User-provided PowerShell output",
+  "commit": "fe3527ced3f279e37e6c47cde725949c33f9bf85",
+  "command": "python acl_review/test_acl_screen_offline.py",
+  "tests": 5,
+  "seconds": 0.013,
+  "result": "OK",
+  "scope": "Mocked Streamlit and transport. No live authentication, server ACL or persistence validation.",
+  "uat": {
+    "pass": 32,
+    "fail": 1,
+    "blocked": 29,
+    "not_run": 5
+  }
+}
