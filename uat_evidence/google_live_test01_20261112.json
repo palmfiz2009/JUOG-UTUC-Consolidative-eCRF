@@ -1,0 +1,56 @@
+{
+  "date_jst": "2026-11-12",
+  "type": "live_browser_observation",
+  "build": "oidc-preflight-20261111-05",
+  "origin": "https://juog-utuc01-fixture-uat-20261109.streamlit.app",
+  "google_request_observed": {
+    "max_age": 0,
+    "auth_time_essential": true,
+    "redirect_uri_matches": true
+  },
+  "user_completed_google_device_confirmation": true,
+  "app_returned_from_google": true,
+  "ui_checks": {
+    "issuer": "confirmed",
+    "subject_presence": "confirmed",
+    "client_id": "confirmed",
+    "authorized_party": "confirmed",
+    "expiry": "confirmed",
+    "issued_at": "confirmed",
+    "auth_time": "AUTH_TIME_MISSING"
+  },
+  "limits": [
+    "UI observation does not independently prove JWT signature verification",
+    "Raw ID token and subject were not retrieved",
+    "ACL is not connected; no business requests sent"
+  ],
+  "pi_acl_scope": {
+    "facility_code": "TEST01",
+    "facility_name": "架空施設（隔離UAT専用）",
+    "person_count": 1,
+    "valid_until": "2026-11-19T23:59:00+09:00",
+    "valid_until_utc": "2026-11-19T14:59:00Z",
+    "production_access": false,
+    "existing_test_access": false,
+    "subject": null,
+    "enabled": false
+  },
+  "fixture_review": {
+    "source": "integrated_core/unified_e2e_steps.json",
+    "existing_facility_code": "T1",
+    "approved_facility_code": "TEST01",
+    "match": false,
+    "action": "Prepare separate candidate; preserve original and protected environments"
+  },
+  "formal_uat": {
+    "pass": 32,
+    "fail": 1,
+    "blocked": 29,
+    "not_run": 5
+  },
+  "remaining": [
+    "auth_time policy unsatisfied",
+    "Verified issuer+subject transfer and ACL provisioning",
+    "Safety review and separate execution approval"
+  ]
+}
