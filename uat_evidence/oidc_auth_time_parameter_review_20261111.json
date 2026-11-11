@@ -5,18 +5,48 @@
       "Streamlit 1.67.0",
       "Authlib 1.9.5"
     ],
-    "live_package_versions": "not yet verified",
+    "live_package_versions": "Observed preflight display: Streamlit 1.67.0 / Authlib 1.9.5",
     "finding": "Authlib OAuth2Client EXTRA_AUTHORIZE_PARAMS excludes claims. client_kwargs metadata does not propagate claims. Named Streamlit provider preserves authorize_params.",
     "offline_result": "PASS: claims absent via metadata, exact JSON present via explicit authorization parameter",
     "test_data": "synthetic client, example.invalid authorization URL; no network calls",
     "harness_note": "Initial harness missing required session argument; corrected session=None and passed."
   },
   "change": "named google provider support; auth_time diagnostic inspects authorize_params",
-  "live_result": "pending administrator config and new login",
+  "live_result": "PI supplied build 05 output: google selected and login provider google; six checks confirmed; auth_time absent. AUTH_TIME_URL_READY is local URL generation only, not proof of actual outbound request or raw Google response.",
   "formal_uat": {
     "PASS": 32,
     "FAIL": 1,
     "BLOCKED": 29,
     "NOT_RUN": 5
+  },
+  "received_claim_review": {
+    "date": "2026-11-11",
+    "sources": [
+      "Authlib 1.9.5 async_openid.py parse_id_token",
+      "Authlib 1.9.5 starlette_client/apps.py authorize_access_token",
+      "Streamlit 1.67.0 starlette_auth_routes.py OAuth callback",
+      "Streamlit 1.67.0 user_info.py _get_user_info"
+    ],
+    "finding": "Reviewed parser passes validated claims into UserInfo; callback copies UserInfo into auth cookie; st.user accessor copies session user info. No auth_time removal found in these reviewed paths. This does not prove the actual remote token content.",
+    "additional_offline_test": {
+      "method": "Synthetic locally signed RSA JWT validated through Authlib AsyncOpenIDMixin.parse_id_token with local public JWKS. No HTTP or live credentials.",
+      "results": [
+        "auth_time present: preserved exactly",
+        "auth_time absent: remains absent"
+      ],
+      "formal_uat_pass_added": 0
+    },
+    "remaining": [
+      "Actual outbound request parameter delivery remains unproven",
+      "Actual Google response auth_time presence remains unproven",
+      "Individual facility/role ACL is not connected"
+    ],
+    "safety": "No auth_time fabrication or iat substitution; no business save, GAS send, configuration change, or weakened authentication."
+  },
+  "uat_reassessment": {
+    "source": "outputs/integrated_core/final_uat_review/UAT67_current.json",
+    "reviewed_uncompleted": 35,
+    "new_pass": 0,
+    "note": "Existing Stage 1 evidence is not full screen/authorization/restore evidence for the remaining criteria. CAP03/04/05 require distinct original cT/cN/cM scenarios; CAP01/02 evidence cannot replace them."
   }
 }
