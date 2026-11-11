@@ -48,5 +48,41 @@
     "reviewed_uncompleted": 35,
     "new_pass": 0,
     "note": "Existing Stage 1 evidence is not full screen/authorization/restore evidence for the remaining criteria. CAP03/04/05 require distinct original cT/cN/cM scenarios; CAP01/02 evidence cannot replace them."
+  },
+  "google_provider_prerequisite_review": {
+    "date": "2026-11-11",
+    "official_source": "https://developers.google.com/identity/siwg/security-bundle",
+    "official_source_updated": "2026-06-15",
+    "verified_documented_requirements": [
+      "App publishing status In production",
+      "Verification Status Verified",
+      "Settings > Advanced Settings > Session age claims enabled"
+    ],
+    "documented_behavior": "Google Account authentication and application login are different sessions; Google does not support Google Account reauth requests.",
+    "assessment": "Prior user setup used External/Testing. Missing provider feature prerequisites are a concrete likely explanation for absent auth_time, not yet a confirmed current console configuration or inspected raw token.",
+    "console_read_attempt": {
+      "project": "hardy-portal-514413-u8",
+      "url": "https://console.cloud.google.com/auth/settings?project=hardy-portal-514413-u8",
+      "result": "Site Unavailable / Unable to access this site",
+      "changes": false
+    },
+    "correction": "Do not repeat max_age edits or user re-logins as an assumed solution. Do not publish app or enable settings without approval. iat/current time cannot replace Google auth_time.",
+    "next_human_read": "Open project Google Auth Platform: Settings/Advanced Settings Session age claims, Audience publishing status, Verification Center status. Inspect only; no credentials or tokens required.",
+    "alternative_requires_design_approval": "If provider cannot supply usable authentication freshness, retain Google signature/issuer/audience/expiry/nonce validation and add an independently verified fresh step-up factor bound to issuer+subject and the application session (for example WebAuthn with user verification), or use an approved IdP with supported fresh authentication. Neither is implemented or approved; absence of auth_time must not silently allow business access."
+  },
+  "acl_readiness_review": {
+    "source": "outputs/integrated_core/auth_bridge.gs",
+    "required_acl_fields": [
+      "issuer",
+      "subject",
+      "user_id",
+      "enabled",
+      "role",
+      "facility_ids_json",
+      "valid_until"
+    ],
+    "required_principal": "Verified issuer+subject; never inferred from email",
+    "readiness": "Source implementation present. No actual individual ACL provisioning or live ACL tests performed in this turn. Bridge signing configuration and administrator-approved user/role/facility/expiry mapping remain prerequisites.",
+    "business_operations": 0
   }
 }
