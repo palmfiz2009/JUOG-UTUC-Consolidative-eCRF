@@ -1,0 +1,22 @@
+{
+  "deployment": "NOT_DEPLOYED",
+  "configuration": "NO_SECRETS_OR_APPROVAL_VALUES_ADDED",
+  "files": {
+    "text_contract.gs": "358527ce3d86bb92e729d6adcf4fbeef5f9ef782da24c3c717aaca2e4884bd47",
+    "auth_bridge.gs": "bb1298161d420ce7d7b15753e6c5032cc210c65af4261b016a5f39c1461f4361",
+    "privacy_revision2.gs": "c6ca1f6c4fc1d99a9cd9c0b90596401a232c598387925b8e81cec7aa47983507",
+    "field_catalog.gs": "6a34cd166babe36586f0e695cb60c1f184c2e8df74d078de4a6864f1e34f295b",
+    "clinical_contract.gs": "d73548758534a1fcf854effd599120a19cc4401ab0db80bed84772636936c96c",
+    "transaction_core.gs": "e9e5f7314ae4b175b7c89e051d6cbdb8fdd8e8f304164ecedcbba55604948197",
+    "domain_transaction.gs": "e21a5b28d6543ab0795c2b3ee500d9b3cdd329776cbc48e2000e8f1737ded246",
+    "domain_sheets_store.gs": "b612585f853d194150d93c9338e6a6c6a68f46bfe42e42cc2a7e3f80d23690dd",
+    "shadow_spreadsheet.gs": "4f5a351b9ac62c7bdd08c16b8ee9171970f3649725d2c90376641987e41ad263",
+    "legacy_shadow_planner.gs": "a7e64a513815473394edf33bd00cd93a8ef630b42b874bb460b135a6ce0b0d5c",
+    "admin_routes.gs": "6113abb8d0bcb5a3756e4594f56f702114dd5bf16fd8654d24edf36f4e5e5912",
+    "unified_domain_service.gs": "9fdedab418472052344b792be7b1d4f7619df26a87f94ef57295cb7c57731254",
+    "request_lifecycle.gs": "30c31ff91b58a0cd8529ee50b53ca557e2ce90d43079c5e32679232f83841f4b",
+    "unified_isolation_endpoint.gs": "364f0096170fb96fa7abaefbe2f55bb46d7aad06c24b3c301d4984183477f832",
+    "isolation_unified_webapp.gs": "4f7698d967f865dea4d62a6ac8db4d4dac5a356d63d092ee4ff88a1151bf9791"
+  },
+  "bundle_sha256": "107478619171019fabcc264a731c3b6539cc93e321d3eb9b685fef51984a529b"
+}
