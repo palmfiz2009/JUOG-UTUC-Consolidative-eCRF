@@ -1,0 +1,24 @@
+{
+  "commit_under_test": "eb76ce28b8565fc852374053433df9dad7d53fb0",
+  "provenance": "User supplied Windows PowerShell execution output; not executed or independently verified by assistant",
+  "command": "python acl_review/test_python_connection_offline.py",
+  "result": {
+    "tests": 7,
+    "duration_seconds": 0.005,
+    "status": "OK"
+  },
+  "prior_compile_exit_code": 0,
+  "scope": "Synthetic identity and mocked urllib transport. No live Google, GAS, Sheets, or ACL provisioning.",
+  "remaining": [
+    "GAS dispatcher and ui_context implementation must be inspected and connected",
+    "Live OIDC freshness requirement unresolved",
+    "Approved real principal/facility/role ACL mapping absent",
+    "Live test safety review and execution approval pending"
+  ],
+  "formal_uat": {
+    "pass": 32,
+    "fail": 1,
+    "blocked": 29,
+    "not_run": 5
+  }
+}
