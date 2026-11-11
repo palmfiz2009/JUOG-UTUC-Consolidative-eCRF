@@ -1,0 +1,60 @@
+{
+  "scope": "In-memory JavaScript gate tests; decoder and ACL reader mocked. Does not verify cryptography, live GAS, or integration.",
+  "results": [
+    {
+      "name": "allowed",
+      "expected": "ALLOW",
+      "actual": "ALLOW",
+      "pass": true
+    },
+    {
+      "name": "unregistered",
+      "expected": "ACCESS_DENIED",
+      "actual": "ACCESS_DENIED",
+      "pass": true
+    },
+    {
+      "name": "revoked",
+      "expected": "ACCESS_DENIED",
+      "actual": "ACCESS_DENIED",
+      "pass": true
+    },
+    {
+      "name": "other_facility",
+      "expected": "FACILITY_DENIED",
+      "actual": "FACILITY_DENIED",
+      "pass": true
+    },
+    {
+      "name": "wrong_role",
+      "expected": "ROLE_DENIED",
+      "actual": "ROLE_DENIED",
+      "pass": true
+    },
+    {
+      "name": "unknown_resource",
+      "expected": "RESOURCE_UNVERIFIED",
+      "actual": "RESOURCE_UNVERIFIED",
+      "pass": true
+    },
+    {
+      "name": "auth_failed",
+      "expected": "AUTH_REQUIRED",
+      "actual": "AUTH_REQUIRED",
+      "pass": true
+    },
+    {
+      "name": "unapproved_action",
+      "expected": "ACTION_DENIED",
+      "actual": "ACTION_DENIED",
+      "pass": true
+    }
+  ],
+  "limitations": [
+    "No approved action-to-role mapping configured",
+    "No actual resource resolver connected",
+    "No Streamlit wiring or deployment",
+    "No audit or persistence test",
+    "Formal UAT unchanged: 32 PASS / 1 FAIL / 29 BLOCKED / 5 NOT RUN"
+  ]
+}
