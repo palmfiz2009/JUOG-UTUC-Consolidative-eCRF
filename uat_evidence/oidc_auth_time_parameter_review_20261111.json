@@ -1,0 +1,22 @@
+{
+  "observation": "PI reports six claim checks pass, auth_time missing, config claims present",
+  "analysis": {
+    "reviewed_packages": [
+      "Streamlit 1.67.0",
+      "Authlib 1.9.5"
+    ],
+    "live_package_versions": "not yet verified",
+    "finding": "Authlib OAuth2Client EXTRA_AUTHORIZE_PARAMS excludes claims. client_kwargs metadata does not propagate claims. Named Streamlit provider preserves authorize_params.",
+    "offline_result": "PASS: claims absent via metadata, exact JSON present via explicit authorization parameter",
+    "test_data": "synthetic client, example.invalid authorization URL; no network calls",
+    "harness_note": "Initial harness missing required session argument; corrected session=None and passed."
+  },
+  "change": "named google provider support; auth_time diagnostic inspects authorize_params",
+  "live_result": "pending administrator config and new login",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  }
+}
