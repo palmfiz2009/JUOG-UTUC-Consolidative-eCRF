@@ -108,7 +108,9 @@ def write_once(ui,action,payload):
     ui.session_state.setdefault('auth04_operation_ids',[]).append(op)
     ui.session_state['auth04_pending']=op
     result=call(ui,'execute_request',{'operation_id':op})
+    record_execution_diagnostic(ui,'EXECUTE',result)
     status=call(ui,'request_status',{'operation_id':op})
+    record_execution_diagnostic(ui,'STATUS',status)
     if status.get('ok') is True and status.get('state') in ('SAVED','FAILED'):
         ui.session_state['auth04_pending']=None
     if result.get('ok') is True and (result.get('state')!='SAVED' or status.get('state')!='SAVED'):
@@ -178,6 +180,54 @@ def save_expected_crf(ui,index,version):
     verify_history(ui,index)
     return r
 
+def resume_observed_90d(ui):
+    """Explicit recovery of this supervised run's observed unfinished 90d v1.
+    No new preparation, arbitrary operation ID, or automatic retry is available.
+    """
+    op=ui.session_state.get('auth04_pending')
+    if (not isinstance(op,str) or not op or op not in ui.session_state.get('auth04_operation_ids',[]) or
+        ui.session_state.get('auth04_preparation_uncertain') or
+        ui.session_state.get('auth04_expected_versions',{}).get(0)!=2 or
+        ui.session_state.get('auth04_expected_versions',{}).get(1) is not None):
+        raise PermissionError('RECOVERY_CONTEXT_NOT_VERIFIED')
+    ui.session_state['auth04_halted']=True
+    expected=linked_crf_payload(ui,1,1)
+    if expected.get('data',{}).get('source_30d_record_version')!=2:
+        raise PermissionError('RECOVERY_SOURCE_VERSION_CHANGED')
+    status=call(ui,'request_status',{'operation_id':op})
+    record_execution_diagnostic(ui,'RECOVERY_STATUS',status)
+    if status.get('ok') is not True or status.get('action')!='save_crf' or status.get('state') not in ('UNFINISHED','SAVED'):
+        raise PermissionError('RECOVERY_STATUS_NOT_VERIFIED')
+    if status['state']=='UNFINISHED':
+        if status.get('phase')!='AUDIT_OR_COMMIT_PENDING':
+            raise PermissionError('RECOVERY_INTENT_NOT_VERIFIED')
+        result=call(ui,'execute_request',{'operation_id':op})
+        record_execution_diagnostic(ui,'RECOVERY_EXECUTE',result)
+        status=call(ui,'request_status',{'operation_id':op})
+        record_execution_diagnostic(ui,'RECOVERY_STATUS',status)
+    if status.get('ok') is not True or status.get('state')!='SAVED' or status.get('action')!='save_crf':
+        raise PermissionError('RECOVERY_SAVE_NOT_CONFIRMED')
+    r,records=read_records(ui,1)
+    if len(records)!=1 or records[0].get('record_version')!=1 or records[0].get('payload')!=expected:
+        raise PermissionError('RECOVERY_PAYLOAD_MISMATCH')
+    old_versions=copy.deepcopy(ui.session_state.get('auth04_expected_versions',{}))
+    old_payloads=copy.deepcopy(ui.session_state.get('auth04_expected_payloads',{}))
+    old_hashes=copy.deepcopy(ui.session_state.get('auth04_v1_hashes',{}))
+    ui.session_state.setdefault('auth04_expected_versions',{})[1]=1
+    ui.session_state.setdefault('auth04_expected_payloads',{})['1:1']=expected
+    try:verify_history(ui,1)
+    except Exception:
+        ui.session_state['auth04_expected_versions']=old_versions
+        ui.session_state['auth04_expected_payloads']=old_payloads
+        ui.session_state['auth04_v1_hashes']=old_hashes
+        raise
+    ui.session_state['auth04_pending']=None
+    ui.session_state['auth04_last_saved_operation']=op
+    ui.session_state['auth04_halted']=False
+    ui.session_state.pop('auth04_last_exception_category',None)
+    ui.session_state.setdefault('auth04_results',[]).append({'check':'90日CRF同一操作の復旧・読取照合',**summarize(status)})
+    return status
+
 def semantic_json_strings(value):
     if isinstance(value,str) and value.lstrip().startswith(('{','[')):
         try:return semantic_json_strings(json.loads(value))
@@ -218,9 +268,13 @@ def other_owner_read_denied(ui):
 
 def summarize(result):
     # Never render raw result, error message/details, actor, data, or operation ID.
-    known={'DIRECT_IDENTIFIER_NOT_ALLOWED','ACL_DENIED','DRAFT_OWNER_REQUIRED','STALE_VERSION','CORRECTION_REASON_REQUIRED','INITIAL_ALREADY_EXISTS','NO_PRIOR_RECORD','VALIDATION_FAILED','REQUEST_NOT_VISIBLE','STATUS_UNVERIFIABLE','AUTH_EXPIRED','SESSION_REVOKED','AUTH_REQUIRED','UNIFIED_TRANSACTION_INCOMPLETE','UNFINISHED_REQUEST_BLOCKS_NEW_OPERATION','UNKNOWN_REQUEST_BLOCKS_NEW_OPERATION','AUTH_INVALID','SESSION_INVALID','SESSION_STORE_INVALID','SESSION_STORE_UNAVAILABLE','ASSERTION_REPLAY','LOCK_TIMEOUT','PREPARATION_UNCERTAIN','AUTH04_SCOPE_DENIED','AUTH04_SCOPE_NOT_APPROVED','AUTH04_EXECUTION_NOT_APPROVED'}
+    known={'DIRECT_IDENTIFIER_NOT_ALLOWED','ACL_DENIED','DRAFT_OWNER_REQUIRED','STALE_VERSION','CORRECTION_REASON_REQUIRED','INITIAL_ALREADY_EXISTS','NO_PRIOR_RECORD','VALIDATION_FAILED','REQUEST_NOT_VISIBLE','STATUS_UNVERIFIABLE','AUTH_EXPIRED','SESSION_REVOKED','AUTH_REQUIRED','UNIFIED_TRANSACTION_INCOMPLETE','UNFINISHED_REQUEST_BLOCKS_NEW_OPERATION','UNKNOWN_REQUEST_BLOCKS_NEW_OPERATION','AUTH_INVALID','SESSION_INVALID','SESSION_STORE_INVALID','SESSION_STORE_UNAVAILABLE','ASSERTION_REPLAY','LOCK_TIMEOUT','PREPARATION_UNCERTAIN','AUTH04_SCOPE_DENIED','AUTH04_SCOPE_NOT_APPROVED','AUTH04_EXECUTION_NOT_APPROVED','DOMAIN_INCOMPLETE','DOMAIN_RECOVERY_REQUIRED','EXECUTION_UNCERTAIN','RECONCILIATION_REQUIRED','AUDIT_NOT_CONFIRMED'}
     error=result.get('error');state=result.get('state')
     return {'ok':result.get('ok') is True,'state':state if isinstance(state,str) and state in ('SAVED','FAILED','UNKNOWN','UNFINISHED') else None,'error':error if isinstance(error,str) and error in known else ('UNCLASSIFIED' if error else None)}
+
+def record_execution_diagnostic(ui,phase,result):
+    if phase not in ('EXECUTE','STATUS','RECOVERY_EXECUTE','RECOVERY_STATUS'):raise ValueError('DIAGNOSTIC_PHASE')
+    ui.session_state.setdefault('auth04_execution_diagnostics',[]).append({'phase':phase,**summarize(result)})
 
 def safe_exception_category(exc):
     # Classify without formatting exception messages, URLs, bodies or arguments.
@@ -269,6 +323,7 @@ def privacy_probe_once(ui):
 def render_progress(ui):
     if ui.session_state.get('auth04_results'):ui.table(ui.session_state['auth04_results'])
     if ui.session_state.get('auth04_privacy_progress'):ui.table(ui.session_state['auth04_privacy_progress'])
+    if ui.session_state.get('auth04_execution_diagnostics'):ui.table(ui.session_state['auth04_execution_diagnostics'])
     if ui.session_state.get('auth04_last_exception_category'):ui.caption(ui.session_state['auth04_last_exception_category'])
 
 def run():
@@ -293,8 +348,17 @@ def run():
         if st.button('保存状態を照合'):
             try:
                 r=call(st,'request_status',{'operation_id':pending});st.json(summarize(r))
-                if r.get('ok') is True and r.get('state') in ('SAVED','FAILED'):st.session_state['auth04_pending']=None
+                record_execution_diagnostic(st,'RECOVERY_STATUS',r)
             except Exception:st.error('状態不明。新しい要求は送信しません。')
+        if st.button('未完了の90日CRFを同じ操作IDで一度だけ再開'):
+            try:
+                resume_observed_90d(st)
+                st.success('90日CRFの保存・読取照合が完了しました。次の操作は画面の再実行後に選択できます。')
+            except Exception as exc:
+                st.session_state['auth04_halted']=True
+                st.session_state['auth04_last_exception_category']=safe_exception_category(exc)
+                st.error('復旧を確認できないため停止しました。新規prepare・自動再送はしません。')
+            render_progress(st)
         st.stop()
     if st.session_state.get('auth04_halted'):
         st.error('検証不一致により停止中です。サーバー台帳を照合してください。');st.stop()

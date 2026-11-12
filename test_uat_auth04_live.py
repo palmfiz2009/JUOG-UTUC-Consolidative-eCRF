@@ -106,6 +106,51 @@ class Tests(unittest.TestCase):
    with self.assertRaises(Stop):h.run()
    send.assert_not_called()
   self.assertIn(ui.session_state['auth04_privacy_progress'],ui.shown);self.assertIn(ui.session_state['auth04_results'],ui.shown)
+ def recovery_ui_and_payload(self):
+  ui=self.ui();ui.session_state={'auth04_pending':'observed90','auth04_operation_ids':['observed90'],'auth04_expected_versions':{0:2},'auth04_halted':True}
+  p=h.crf_payload(1);p['data']['source_30d_record_version']=2;p['data']['source_30d_submission_id']='synthetic30v2'
+  return ui,p
+ def test_recovery_only_same_observed_id_no_prepare_and_exact_read(self):
+  ui,p=self.recovery_ui_and_payload();rec={'record_key':p['record_key'],'record_version':1,'payload':p,'accepted_at':'synthetic'}
+  responses=[{'ok':True,'action':'save_crf','state':'UNFINISHED','phase':'AUDIT_OR_COMMIT_PENDING'},{'ok':True,'state':'SAVED'},{'ok':True,'action':'save_crf','state':'SAVED'}]
+  with patch.object(h,'linked_crf_payload',return_value=p),patch.object(h,'call',side_effect=responses) as call,patch.object(h,'read_records',return_value=({'ok':True},[rec])):
+   self.assertEqual(h.resume_observed_90d(ui)['state'],'SAVED')
+   self.assertEqual([c.args[1] for c in call.call_args_list],['request_status','execute_request','request_status'])
+   self.assertTrue(all(c.args[2]=={'operation_id':'observed90'} for c in call.call_args_list))
+  self.assertIsNone(ui.session_state['auth04_pending']);self.assertFalse(ui.session_state['auth04_halted'])
+  self.assertEqual(ui.session_state['auth04_expected_versions'][1],1)
+ def test_recovery_unknown_or_prepared_without_intent_never_executes(self):
+  for status in ({'ok':True,'action':'save_crf','state':'UNKNOWN'}, {'ok':True,'action':'save_crf','state':'UNFINISHED','phase':'PREPARED'},{'ok':True,'action':'save_draft','state':'UNFINISHED','phase':'AUDIT_OR_COMMIT_PENDING'}):
+   ui,p=self.recovery_ui_and_payload()
+   with patch.object(h,'linked_crf_payload',return_value=p),patch.object(h,'call',return_value=status) as call:
+    with self.assertRaises(PermissionError):h.resume_observed_90d(ui)
+    call.assert_called_once()
+   self.assertEqual(ui.session_state['auth04_pending'],'observed90');self.assertTrue(ui.session_state['auth04_halted'])
+ def test_recovery_wrong_record_keeps_halt_and_pending(self):
+  for change in ('payload','version','extra_record'):
+   ui,p=self.recovery_ui_and_payload();rec={'record_key':p['record_key'],'record_version':1,'payload':copy.deepcopy(p)}
+   if change=='payload':rec['payload']['data']['source_30d_record_version']=1
+   if change=='version':rec['record_version']=2
+   records=[rec,copy.deepcopy(rec)] if change=='extra_record' else [rec]
+   with patch.object(h,'linked_crf_payload',return_value=p),patch.object(h,'call',return_value={'ok':True,'action':'save_crf','state':'SAVED'}),patch.object(h,'read_records',return_value=({'ok':True},records)):
+    with self.assertRaises(PermissionError):h.resume_observed_90d(ui)
+   self.assertEqual(ui.session_state['auth04_pending'],'observed90');self.assertTrue(ui.session_state['auth04_halted']);self.assertNotIn(1,ui.session_state['auth04_expected_versions'])
+ def test_recovery_timeout_no_automatic_retry(self):
+  ui,p=self.recovery_ui_and_payload()
+  with patch.object(h,'linked_crf_payload',return_value=p),patch.object(h,'call',side_effect=[{'ok':True,'action':'save_crf','state':'UNFINISHED','phase':'AUDIT_OR_COMMIT_PENDING'},TimeoutError('hidden')]) as call:
+   with self.assertRaises(TimeoutError):h.resume_observed_90d(ui)
+   self.assertEqual(call.call_count,2)
+  self.assertEqual(ui.session_state['auth04_pending'],'observed90');self.assertTrue(ui.session_state['auth04_halted'])
+ def test_recovery_failed_readback_rolls_back_expectations(self):
+  ui,p=self.recovery_ui_and_payload();rec={'record_key':p['record_key'],'record_version':1,'payload':p}
+  with patch.object(h,'linked_crf_payload',return_value=p),patch.object(h,'call',return_value={'ok':True,'action':'save_crf','state':'SAVED'}),patch.object(h,'read_records',return_value=({'ok':True},[rec])),patch.object(h,'verify_history',side_effect=PermissionError):
+   with self.assertRaises(PermissionError):h.resume_observed_90d(ui)
+  self.assertEqual(ui.session_state['auth04_expected_versions'],{0:2});self.assertTrue(ui.session_state['auth04_halted']);self.assertEqual(ui.session_state['auth04_pending'],'observed90')
+ def test_execution_diagnostic_retains_safe_failure_before_status(self):
+  ui=self.ui()
+  with patch.object(h,'context'),patch.object(h,'call',side_effect=[{'ok':True,'operation_id':'secret_op'},{'ok':False,'error':'DOMAIN_INCOMPLETE','state':'UNFINISHED','raw':'secret'},TimeoutError]):
+   with self.assertRaises(TimeoutError):h.write_once(ui,'save_crf',h.crf_payload(1))
+  self.assertEqual(ui.session_state['auth04_execution_diagnostics'],[{'phase':'EXECUTE','ok':False,'state':'UNFINISHED','error':'DOMAIN_INCOMPLETE'}])
  def test_fixture_payloads_pinned(self):
   for i in range(3):h.check_payload('save_crf',h.crf_payload(i))
   self.assertEqual(h.crf_payload(0,2)['expected_record_version'],1)
