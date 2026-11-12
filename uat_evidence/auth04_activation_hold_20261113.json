@@ -1,0 +1,28 @@
+{
+  "status": "AUTH04_ACTIVATION_HELD",
+  "date_jst": "2026-11-13",
+  "reason": "During assistant UI inspection, two isolated application authentication secret values were accidentally emitted into tool output. Values are deliberately omitted from this record.",
+  "affected_setting_names": [
+    "cookie_secret",
+    "client_secret"
+  ],
+  "actions_completed": [
+    "Secrets panel closed without saving",
+    "No AUTH04 activation or clinical business requests performed",
+    "User informed; no secret value copied to GitHub"
+  ],
+  "required_remediation": [
+    "Administrator rotates existing isolated OAuth client secret and updates isolated Streamlit secret",
+    "Administrator replaces isolated Streamlit cookie secret, invalidating prior app cookies",
+    "Verify OAuth client is isolation-specific before changing; if shared with production, do not change protected settings without new approval",
+    "Verify old credentials invalid, new login and isolation pins, before resuming AUTH04"
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "new_formal_pass": 0,
+  "credential_rotation_completed": false
+}
