@@ -1,0 +1,26 @@
+{
+  "status": "REVIEWED_CANDIDATE_NOT_DEPLOYED",
+  "scope": "Same observed pending JUOG-970 day90 operation recovery only",
+  "frontend_sha256": "8b2fa3880ffdc172dfa6ec01ac97db421f7feec0b1e3054068637693826c305a",
+  "frontend_tests_sha256": "dba84ecfa0f4620397d42f0da22d69b3c23fd4e4fcaff34be19040aa6b3ae7b9",
+  "frontend_tests": 43,
+  "frontend_result": "PASS",
+  "changes": [
+    "Retain allowlisted execute/status diagnostics before caller validation",
+    "Explicit button resumes existing observed operation ID only; no prepare or arbitrary ID input",
+    "Require observed 30d version2 and pending state AUDIT_OR_COMMIT_PENDING; current auth/session/ACL validation unchanged",
+    "Fresh signed execute and status once per explicit click; unknown keeps pending and halt",
+    "Only saved90d singleversion1 exactpayload+history validation clears pending/halt; expectation rollback on verification failure"
+  ],
+  "backend_change": false,
+  "signature_expiry_seconds": 15,
+  "helper_sha256": "14ecf61585813fb7611f08421be41cf6526ac3298495ce2d695dcb8767c0ce1a",
+  "helper_review": "Diff limited to helper names, exact postfailure journal hash, approval reference and comment. Same isolation/ACL/readback/rollback gates; only nonsecret config property writes. No credential access or journal mutation.",
+  "helper_offline_tests": 24,
+  "helper_test_limitations": [
+    "Journal hash substituted in synthetic harness; does not independently verify live44row snapshot",
+    "Synthetic principal hash substituted; no actual identity used"
+  ],
+  "required_before_enable": "Root independently verified44row pin and live helper dry-run must match; preserve deployedversion4 and exacttarget",
+  "formal_uat_delta": 0
+}

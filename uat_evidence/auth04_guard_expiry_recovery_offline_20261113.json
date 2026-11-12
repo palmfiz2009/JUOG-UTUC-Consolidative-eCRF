@@ -1,0 +1,29 @@
+{
+  "scope": "Offline exact deployed B4 source with synthetic clock/Sheets and planner stub",
+  "bundle_sha256": "b4b8ef029e27cd208bcf6b56f86e15add998c15e43d5ffa2ca149a44645c597d",
+  "injection": "Advance clock16seconds immediately after intent SEALED; all original15second guards maintained",
+  "interrupted_result": {
+    "ok": false,
+    "state": "UNFINISHED",
+    "error": "DOMAIN_INCOMPLETE"
+  },
+  "after_interruption": {
+    "requests": 1,
+    "intents": 1,
+    "audits": 0,
+    "commits": 0,
+    "committed_view_unchanged": true
+  },
+  "fresh_same_operation_recovery": "SAVED",
+  "after_recovery": {
+    "requests": 1,
+    "intents": 1,
+    "audits": 1,
+    "commits": 1
+  },
+  "repeat_same_operation_no_journal_write": true,
+  "expired_original_envelope_rejected": true,
+  "revoked_session_rejects_preissued_envelope": true,
+  "conclusion": "Confirms a possible failure and safe recovery mechanism; does not establish live failure cause",
+  "formal_uat_delta": 0
+}

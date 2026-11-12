@@ -1,0 +1,29 @@
+{
+  "rows": 44,
+  "journal_sha256": "10ce07ef859fe6d14b3f8522c2e14153ce47b26d131f64ba0d89f9186c813399",
+  "pending_intents": 1,
+  "pending_action": "save_crf",
+  "registration_id": "JUOG-970",
+  "facility_code": "TEST01",
+  "crf_type": "day90",
+  "visit": "90d",
+  "request_matches_intent": true,
+  "revision": 6,
+  "actor_consistent": true,
+  "request_fingerprint_present": true,
+  "committed_prefix_preserved": true,
+  "latest_intent_after_changed_tables": [
+    "CRF_90d",
+    "CRFSubmissionAudit",
+    "V3_CrfState"
+  ],
+  "audit_or_commit_exists": false,
+  "all_hashes_valid": true,
+  "frontend_failure_category": "LOCAL_CHECK_FAILED",
+  "gas_restricted_stage": "AUTH_CONNECT",
+  "gas_disable_readback_jst": "2026-11-13T07:36:00+09:00",
+  "confirmed_cause": null,
+  "recovery_frontend_commit": "05cbf75b608e9eb03a5afd56bdfbe5b16e3d25f6",
+  "editor_sha256": "f90087d0d30f302adb5fe75d8f0f8987649446bc45e021163418b6bb2d030431",
+  "deployed_webapp_version_unchanged": 4
+}
