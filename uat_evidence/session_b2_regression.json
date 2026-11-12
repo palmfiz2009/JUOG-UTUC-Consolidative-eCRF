@@ -16,12 +16,13 @@
     "concurrent request cannot enter while lock held",
     "missing store denied",
     "truncated store rejected against independent head",
+    "generation mismatch denied",
     "v1 downgrade rejected in B2 mode",
     "session deadline never extends on restart",
     "expiry during chunk write prevents seal",
     "uncertain store append closes subsequent requests"
   ],
-  "count": 19,
+  "count": 20,
   "result": "PASS",
   "formal_uat_delta": 0
 }

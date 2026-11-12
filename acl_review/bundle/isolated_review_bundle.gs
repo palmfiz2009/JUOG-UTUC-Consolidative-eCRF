@@ -33,7 +33,7 @@ function juogV3DecodeBridge_(envelope,config) {
   if(!request||typeof request!=='object'||Array.isArray(request)||Object.keys(request).some(k=>!['action','payload'].includes(k))||typeof request.action!=='string')throw Error('REQUEST_INVALID');
   let session=null;
   if(config.sessionPolicy==='isolated_gas_session_b2'){
-    if(c.v!==2||c.exp-c.iat>15||c.iat>now||!c.session||!/^[a-f0-9]{64}$/.test(c.session.sid)||!/^[a-f0-9]{32}$/.test(c.session.jti)||!Number.isInteger(c.session.token_iat)||!Number.isInteger(c.session.deadline)||c.session.token_iat>now||c.session.token_iat<0||c.session.deadline>c.session.token_iat+3600||c.session.deadline<=now||c.exp>c.session.deadline)throw Error('SESSION_INVALID');
+    if(c.v!==2||!c.session||c.session.generation!==config.sessionStoreGeneration||c.exp-c.iat>15||c.iat>now||!c.session||!/^[a-f0-9]{64}$/.test(c.session.sid)||!/^[a-f0-9]{32}$/.test(c.session.jti)||!Number.isInteger(c.session.token_iat)||!Number.isInteger(c.session.deadline)||c.session.token_iat>now||c.session.token_iat<0||c.session.deadline>c.session.token_iat+3600||c.session.deadline<=now||c.exp>c.session.deadline)throw Error('SESSION_INVALID');
     session=c.session;
   }else if(c.v!==1)throw Error('AUTH_INVALID');
   return {request,principal:{issuer:c.oidc_issuer,subject:c.sub},expires:c.exp,version:c.v,session};
@@ -3529,6 +3529,7 @@ function doPost(e){
   const props=PropertiesService.getScriptProperties(),raw=props.getProperty('UNIFIED_ISOLATION_CONFIG');
   if(!raw)return ContentService.createTextOutput(JSON.stringify({ok:false,error:'ISOLATION_NOT_APPROVED'})).setMimeType(ContentService.MimeType.JSON);
   const c=JSON.parse(raw);
+  if(c.sessionPolicy!=='isolated_gas_session_b2'||!['AUTH_CONNECT','AUTH04_APPROVED'].includes(c.sessionExecutionStage))throw Error('B2_CONFIGURATION_REQUIRED');
   c.signingKey=props.getProperty('ADMIN_BRIDGE_SIGNING_KEY');
   c.resumeDerivationKey=props.getProperty('ADMIN_RESUME_DERIVATION_KEY');
   c.draftPepper=props.getProperty('ADMIN_DRAFT_PEPPER');

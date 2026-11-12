@@ -16,7 +16,7 @@ function context(){class Clock extends Date{constructor(...a){super(...(a.length
  const x=vm.createContext({ScriptApp:{getScriptId:()=>'11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy'},Date:Clock,JSON,Object,Array,String,Number,Error,Math,Set,PropertiesService:{getScriptProperties:()=>({getProperty:k=>props.get(k),setProperty:(k,v)=>props.set(k,v)})},SpreadsheetApp:{openById:()=>ss,flush:()=>{}},LockService:{getScriptLock:()=>({tryLock:()=>{if(locked||lockFail)return false;locked=true;return true;},releaseLock:()=>locked=false})},Utilities:{getUuid:()=>crypto.randomUUID(),formatDate:()=>new Date(now*1000).toISOString().slice(0,10),Charset:{UTF_8:'utf8'},DigestAlgorithm:{SHA_256:'sha256'},computeDigest:(_,s)=>[...crypto.createHash('sha256').update(s).digest()],computeHmacSha256Signature:(s,k)=>[...crypto.createHmac('sha256',k).update(s).digest()],base64EncodeWebSafe:b=>Buffer.from(b).toString('base64url'),base64DecodeWebSafe:s=>[...Buffer.from(s,'base64url')],newBlob:b=>({getDataAsString:()=>Buffer.from(b).toString('utf8')})}});vm.runInContext(source,x);return x;}
 let x=context(),sid=hash('synthetic-token'),origin=now;
 function env(action='ui_context',payload={id:'context',action:'ui_context',payload:{registration_id:'JUOG-001'}},changes={}){
- const request_json=JSON.stringify({action,payload}),claims={v:2,iss:c.bridgeIssuer,aud:c.audience,oidc_issuer:c.oidcIssuer,sub:'SYNTHETIC',iat:now,exp:now+15,request_hash:hash(request_json),session:{sid,jti:crypto.randomUUID().replaceAll('-',''),token_iat:origin,deadline:origin+3600},...changes};
+ const request_json=JSON.stringify({action,payload}),claims={v:2,iss:c.bridgeIssuer,aud:c.audience,oidc_issuer:c.oidcIssuer,sub:'SYNTHETIC',iat:now,exp:now+15,request_hash:hash(request_json),session:{sid,generation:c.sessionStoreGeneration,jti:crypto.randomUUID().replaceAll('-',''),token_iat:origin,deadline:origin+3600},...changes};
  const encoded=Buffer.from(JSON.stringify(claims)).toString('base64url');return {request_json,identity_assertion:encoded+'.'+crypto.createHmac('sha256',c.signingKey).update(encoded).digest('base64url')};}
 const call=e=>x.juogUnifiedIsolationEntryV3_(e,c),checks=[];
 function test(name,f){f();checks.push(name);}
@@ -42,7 +42,7 @@ test('revocation rejects already-issued valid envelope',()=>{const pending=env()
 test('revoked token cannot reopen after restart',()=>{x=context();assert.equal(call(env()).error,'SESSION_REVOKED');});
 sid=hash('new-token');
 test('new verified token can start a separate session',()=>assert.equal(call(env()).ok,true));
-test('unregistered identity denied without business writes',()=>assert.equal(call(env(undefined,undefined,{sub:'UNKNOWN',session:{sid:hash('unknown-token'),jti:crypto.randomUUID().replaceAll('-',''),token_iat:origin,deadline:origin+3600}})).error,'ACL_DENIED'));
+test('unregistered identity denied without business writes',()=>assert.equal(call(env(undefined,undefined,{sub:'UNKNOWN',session:{sid:hash('unknown-token'),generation:c.sessionStoreGeneration,jti:crypto.randomUUID().replaceAll('-',''),token_iat:origin,deadline:origin+3600}})).error,'ACL_DENIED'));
 test('other facility denied',()=>{acl[1][5]='["OTHER"]';assert.equal(call(env()).error,'ACL_DENIED');acl[1][5]='["TEST01"]';});
 test('invalid role denied',()=>{acl[1][4]='owner';assert.equal(call(env()).ok,false);acl[1][4]='facility';});
 test('revoked ACL immediate denial',()=>{acl[1][3]=false;assert.equal(call(env()).error,'ACL_DENIED');acl[1][3]=true;});
@@ -52,6 +52,7 @@ test('delayed expired envelope rejected',()=>{const e=env();now+=15;assert.equal
 test('concurrent request cannot enter while lock held',()=>{locked=true;assert.equal(call(env()).error,'LOCK_TIMEOUT');locked=false;});
 test('missing store denied',()=>{const saved=events;events=null;assert.equal(call(env()).error,'SESSION_STORE_UNAVAILABLE');events=saved;});
 test('truncated store rejected against independent head',()=>{const row=events.pop();assert.equal(call(env()).error,'SESSION_STORE_INVALID');events.push(row);});
+test('generation mismatch denied',()=>{const g=c.sessionStoreGeneration;c.sessionStoreGeneration='mismatch';const e=env();c.sessionStoreGeneration=g;assert.equal(call(e).error,'SESSION_INVALID');});
 test('v1 downgrade rejected in B2 mode',()=>assert.equal(call(env(undefined,undefined,{v:1})).error,'SESSION_INVALID'));
 test('session deadline never extends on restart',()=>{now=origin+3600;assert.equal(call(env()).error,'SESSION_INVALID');now=origin+30;});
 test('expiry during chunk write prevents seal',()=>{const auth=x.juogV3DecodeBridge_(env(),c),who=x.juogV3ReadIndividualAcl_(ss,c.oidcIssuer,'SYNTHETIC');locked=true;try{const g=x.juogSessionGateB2_(ss,c,auth,who),st=x.juogDomainSheetsStoreV3_(ss,hash,()=>crypto.randomUUID(),g.guard);delay=16;assert.throws(()=>st.appendRequest({id:'delayed'}),/AUTH_EXPIRED/);assert.notEqual(journal[journal.length-1][2],'SEALED');}finally{locked=false;delay=0;}});

@@ -44,7 +44,7 @@ def signed_request(st, action, payload):
         session_expiry = min(st.user['iat'] + 3600, expiry)
         if session_expiry <= now:
             raise PermissionError('APP_SESSION_EXPIRED')
-        session_claim = dict(sid=sid, jti=uuid.uuid4().hex,
+        session_claim = dict(sid=sid, jti=uuid.uuid4().hex, generation=cfg['session_store_generation'],
                              token_iat=st.user['iat'], deadline=session_expiry)
     elif mode == 'isolated_app_session_b':
         from app_session_b import check
