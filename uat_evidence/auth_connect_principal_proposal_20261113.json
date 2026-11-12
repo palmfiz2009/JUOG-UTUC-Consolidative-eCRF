@@ -1,0 +1,56 @@
+{
+  "observed_date_jst": "2026-11-13",
+  "phase": "READ_ONLY_PRINCIPAL_PROPOSAL",
+  "app_commit": "e0bfa0a6a2373b78a71629137a767b3f027936fc",
+  "app_build": "oidc-acl-proposal-20261113-01",
+  "google_oidc": {
+    "return_to_app_observed": true,
+    "issuer_subject_audience_azp_exp_iat_checks": true,
+    "native_user_nonce_present": true,
+    "auth_time": "MISSING",
+    "raw_subject_tokens_exported": false
+  },
+  "principal_fingerprint": "f0ea0ddb132e96bbd08cba4e37dc38609b73db5740530a05225c5acb6cab798f",
+  "proposal": {
+    "role": "facility",
+    "facilities": [
+      "TEST01"
+    ],
+    "valid_until": "2026-11-19T23:59:00+09:00",
+    "stage": "AUTH_CONNECT",
+    "business_writes_allowed": false,
+    "requires_pi_principal_approval": true
+  },
+  "gas": {
+    "version": 1,
+    "source_sha256": "154b14d5513a95fded38045b8c87b3c90cf194088968a968aefc0f36406c65bd",
+    "source_verification": "prior deployed evidence reused; current local artifact hash identical",
+    "config_absent": true,
+    "keys_absent": true,
+    "head_genesis_match": true,
+    "session_event_rows": 0,
+    "principal_acl_rows": 0
+  },
+  "offline_proposal_checks": 15,
+  "secret_scan": {
+    "scope": "isolated app tracked current tree; private-key/GitHub-token/Google-client-secret patterns",
+    "matches": [],
+    "full_history_audit": false
+  },
+  "live_signed_requests_sent": 0,
+  "live_revocation_test": "NOT_RUN",
+  "auth04": "NOT_AUTHORIZED_NOT_RUN",
+  "remaining": [
+    "PI approval for this principal fingerprint and facility role",
+    "Secure signing/business-support key provisioning and matching Python/GAS config",
+    "Safety review and AUTH_CONNECT activation approval",
+    "Authenticated denial/replay/revocation tests with unchanged business journal"
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "delta_PASS": 0
+  }
+}
