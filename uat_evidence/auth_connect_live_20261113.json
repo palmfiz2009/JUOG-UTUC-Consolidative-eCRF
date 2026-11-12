@@ -1,0 +1,92 @@
+{
+  "date_jst": "2026-11-13",
+  "phase": "AUTH_CONNECT_LIVE",
+  "gas_version": 2,
+  "gas_sha256": "cc6b536b84209c01f71aaab20748c450ab669f150e014e13215320809c83e05c",
+  "frontend_commit": "25f7500a7ad6ab4c2edd4f451f48224635ec1058",
+  "signing_key": {
+    "origin": "PI generated with Windows .NET CSPRNG",
+    "both_secret_stores_saved": true,
+    "values_equal": true,
+    "values_recorded": false
+  },
+  "activation": {
+    "stage": "AUTH_CONNECT",
+    "allRoutesReviewed": false,
+    "schemaParityApproved": false,
+    "auth04_approval": null
+  },
+  "live_checks": [
+    {
+      "name": "unauthenticated denial",
+      "result": "PASS",
+      "expected": "AUTH_REQUIRED"
+    },
+    {
+      "name": "invalid signature denial",
+      "result": "PASS",
+      "expected": "AUTH_INVALID"
+    },
+    {
+      "name": "native OIDC principal TEST01 facility ACL",
+      "result": "PASS"
+    },
+    {
+      "name": "identical signed envelope replay",
+      "result": "PASS",
+      "expected": "ASSERTION_REPLAY"
+    },
+    {
+      "name": "signed save_crf denial",
+      "result": "PASS",
+      "expected": "AUTH04_EXECUTION_NOT_APPROVED"
+    },
+    {
+      "name": "15-second assertion expiry after 16-second delay",
+      "result": "PASS",
+      "expected": "AUTH_EXPIRED"
+    },
+    {
+      "name": "durable revoke, then pending issued envelope denial, then cookie logout",
+      "result": "PASS",
+      "expected": "SESSION_REVOKED",
+      "verification": "Logout screen observed; handler reaches st.logout only after confirmed revoke and SESSION_REVOKED response"
+    }
+  ],
+  "session_events": {
+    "count": 4,
+    "kinds": [
+      "OPEN",
+      "USE",
+      "USE",
+      "REVOKE"
+    ],
+    "same_session": true,
+    "same_owner": true,
+    "constant_deadline": true,
+    "chain_valid": true,
+    "independent_head_match": true
+  },
+  "business_journal_unchanged": true,
+  "not_yet_live_tested": [
+    "Full 60-minute session boundary elapsed in real time",
+    "Other facility/unregistered/role/disabled ACL negatives (prior offline checks only)"
+  ],
+  "auth04": {
+    "business_write_approval": false,
+    "executed": false
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "delta_PASS": 0
+  },
+  "uat_mapping": {
+    "AUTH-02": "Supplemental live TEST01 facility ACL; existing formal result retained",
+    "AUTH-03": "Supplemental signed/unsigned/replay/revocation and denied-save evidence; existing formal result retained",
+    "AUTH-04": "FAIL retained; business save tests not authorized"
+  },
+  "residual_identity_download": "Operator deletion pending; not included in this evidence"
+}
