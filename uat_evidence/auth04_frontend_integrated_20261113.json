@@ -1,0 +1,25 @@
+{
+  "status": "LOCAL_INTEGRATED_NOT_DEPLOYED",
+  "base_sha256": "9a4b27853c9cd1f958eb897f325bcc81f85c8d39b60224b8a8016b5946ce1704",
+  "integrated_sha256": "2c420f1ebf5ae056846b6d500df69fd44dd8101d1973b2ee4b27209eb78e8f62",
+  "gas_privacy_revision3_sha256": "079d17a219ad026400bfeec354950fdc7a2a002a1b31e933a52c02560fa9d110",
+  "changed_functions": [
+    "capture_draft_state",
+    "restore_draft_state",
+    "is_direct_identifier_key",
+    "redact_draft_identifiers"
+  ],
+  "offline_tests_pass": 12,
+  "original_fixtures": 12,
+  "additional_japanese_nested_fixtures": 4,
+  "actual_caller_clear_before_restore_paths": 4,
+  "new_gap_fixed": "Japanese dictionary keys were dropped by ASCII normalization before matching; fixed in Python and GAS candidate",
+  "formal_uat_delta": 0,
+  "deployment_performed": false,
+  "limits": [
+    "Unlabeled free-text names cannot be reliably classified; not claimed as fully solved",
+    "Entire matched string redacted; mixed clinical free text requires operator review",
+    "No legacy persisted row deletion or rewrite",
+    "AUTH04 signed harness and fixture prerequisite not yet active"
+  ]
+}

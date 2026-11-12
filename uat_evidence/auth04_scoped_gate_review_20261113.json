@@ -1,0 +1,70 @@
+{
+  "status": "REVIEWED_CANDIDATE_NOT_DEPLOYED",
+  "scope": "Strict AUTH04 case/action/actor pins; role-only deployment artifact remains separate",
+  "bundle_sha256": "b4b8ef029e27cd208bcf6b56f86e15add998c15e43d5ffa2ca149a44645c597d",
+  "role_only_bundle_sha256": "9df4860a8a6a575f639ffa5203242f6ed1aa450b5646cce7b3d242c2ff851837",
+  "fixture_manifest_sha256": "0747f9ac3f59a6e230cc6cc6debaebde3138578ec82741567e995ab1e2d0d126",
+  "fixed_case": "JUOG-970",
+  "facility": "TEST01",
+  "role": "facility",
+  "local_user_id": "UAT_TEST01_PI_01",
+  "fixed_records": [
+    "JUOG-970|perioperative_30d|30d",
+    "JUOG-970|day90|90d",
+    "JUOG-970|followup|6m"
+  ],
+  "validation": {
+    "scope_tests": 17,
+    "key_provision_tests": 7,
+    "auth_connect_regression": 15,
+    "existing_workflow_operations": 30,
+    "existing_expected_rejections": 1,
+    "result": "PASS",
+    "live_requests": 0,
+    "formal_pass_delta": 0,
+    "scope_regression_adaptation": "AUTH04 transition without scope approval now fails earlier with AUTH04_SCOPE_NOT_APPROVED; fixture expected error updated in isolated runner only.",
+    "fixture_core_tests": 6,
+    "fixture_guard_tests": 7,
+    "independent_frontend_harness_tests": 19,
+    "migration_fixture_final_bundle": "PASS: idempotent, baseline preserved, owned90d scrub retains clinical fields, same verifieduser6m reservednonlogin owner denied, both reads business journal unchanged, missingRegistry denies, interruptedaudit resumes without duplicate"
+  },
+  "risks": [
+    "Fixture reservation/provisioning and hash confirmation required before activation; no guessed principal used in real requests.",
+    "All tests use synthetic identity, with explicitly documented digest substitution for approved-principal pin.",
+    "HMAC purpose separation has shared root with bridge key: compromise affects both derived business keys.",
+    "Editor-only key helper requires AUTH_CONNECT; never exposed as doPost action; no overriding existing values.",
+    "Privacy revision3 included in this AUTH04 candidate only; separate role-only artifact does not change privacy.",
+    "Server scope gates do not replace actual OIDC, ACL, record ownership, semantic validation, audit and live independent evidence.",
+    "Synthetic migration fixture deliberately stores labeled fictional identifiers under a separately audited editor-only transaction; no real principal/ACL created, no deletion of append-only history."
+  ],
+  "required_config": [
+    "auth04ScopeReviewed=true with review ref",
+    "auth04FixtureProvisioned=true only after verified fixture",
+    "auth04FixtureManifestSha256 exact approved manifest",
+    "auth04ExecutionApprovalRef nonempty",
+    "Keep general allRoutesReviewed/schemaParityApproved false; scoped branch alone bypasses these broad gates"
+  ],
+  "artifacts": {
+    "unified_isolation_endpoint.gs": "5823b577d932fc87e2d951a6b46ee5e83822e8ca343b97f7181ef48a1f05a955",
+    "run_regression.cjs": "2a3fdab6b662e8b3114c3250dfe3ab58d0876ff251114e17b6ccd5739bbf4987",
+    "auth04_scope.gs": "ea1232c9d19c843de51776ed3c4c72b83639c1f7cecc68af267dd8fa428f4cf2",
+    "provision_auth04_keys.gs": "77ba8dc15e8d8c6d21c4726fbda99b1d960890c4a46b2ec1b77b11383f57ec73",
+    "scope_results.json": "bba0f194a6b322008e1a8d80c0f0a35dcb16fac7e3efc0e0bce7907bc6abc37c",
+    "test_scope.cjs": "04096808d4cc0be76532642c3632ea60039efdafbfcabde565b28b4e8a2db322",
+    "isolated_review_bundle.gs": "b4b8ef029e27cd208bcf6b56f86e15add998c15e43d5ffa2ca149a44645c597d",
+    "test_keys.cjs": "ab2a7f1f3e9a6eb49b27bd64e541c759ec001e3aec6ddf490996df3f204b848c",
+    "STOP_AND_RECONCILE.md": "a38287acf730dd18c94f3415825a943bd1e01818af07d5fcdf0704000aba43c9",
+    "run_legacy_validation.cjs": "99dd59b391c80179d972c81b824721d11bcbb3acf35b11a32e028c3b90bb98e5",
+    "build_candidate.py": "e9bda9b946edcb28190cb2436628f1d91794e26d735d34e9c24d7e450cbce335"
+  },
+  "fixture_helper_sha256": "5df0549d3341f9e8ad511e02c567efbee2c1602620caa4530ac585ec8c58d3ad",
+  "editor_functions": [
+    "provisionIsolatedAuth04KeysReview",
+    "juogRunAuth04Fixture970",
+    "juogRunAuth04LegacyFixture970"
+  ],
+  "frontend_peer_review": "Final login/expired-cookie, exact-negative-error, positive-SAVED/readback, minimal-shape and raw-output fixes reviewed; supervised operation only.",
+  "migration_fixture_manifest_sha256": "79c1405d00e9488d5585855963d20c9bfdcdea17fcdf75970ae03a8cf9139dd7",
+  "migration_fixture_helper_sha256": "1bfbf673d3e68021cb9d9b3c4f043d21196009ec6f010ab9b243d7b60c62289b",
+  "stop_protocol": "STOP_AND_RECONCILE.md"
+}

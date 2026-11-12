@@ -1,0 +1,11 @@
+{
+  "gas_version": 3,
+  "source_sha256": "9df4860a8a6a575f639ffa5203242f6ed1aa450b5646cce7b3d242c2ff851837",
+  "deployment_id": "AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ",
+  "invalid_role_response": "ACL_DENIED",
+  "acl_restored_exact": true,
+  "boundary": "SAME_SESSION_WAITING",
+  "deadline_jst": "2026-11-13T02:03:09+09:00",
+  "business_stage": "AUTH_CONNECT",
+  "formal_pass_delta": 0
+}

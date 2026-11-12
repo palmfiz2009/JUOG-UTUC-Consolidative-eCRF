@@ -1,0 +1,38 @@
+{
+  "reviewer": "independent fixture_diagnostic_review agent",
+  "review_type": "Recorded independent technical risk assessment; not formal independent QA or production release approval",
+  "decision": "BOUNDARY_EVIDENCE_GAP_DOES_NOT_BLOCK_SUPERVISED_FICTIONAL_AUTH04_IF_ALL_OTHER_PREREQUISITES_PASS",
+  "authorization_basis": "PI integrated execution instruction permits remaining authentication items to be formally evaluated with reasons and risks before isolated fictional AUTH04 testing",
+  "uncompleted_item": "Original same-OIDC-session real-time 60-minute near-boundary observation",
+  "evidence_limit": {
+    "original_deadline_jst": "2026-11-13T02:03:09+09:00",
+    "near_boundary_ui_result": "Not recovered after browser/session interruption",
+    "old_cookie_later_reopened": "Parent observed zero remaining seconds and refused connection",
+    "durable_session_events": "Parent observed same deadline and no new OPEN for the old session; events contain no trusted observation timestamps",
+    "not_proven": ["Actual near-deadline permission", "Immediate deadline rejection timing", "Old pending signed-envelope GAS response at the deadline"],
+    "forbidden_substitution": "A later fresh login must never be attributed to the original boundary experiment"
+  },
+  "risk_assessment": {
+    "issue_type": "Unresolved live validation evidence, not an observed authorization bypass",
+    "residual_risk": "Timing/race defects exactly at expiry remain insufficiently evidenced on the deployed live path",
+    "existing_controls": ["Server-side deadline and envelope-expiry checks remain unchanged", "GAS guard runs before each business append", "Durable generation, revocation and replay protections remain unchanged", "Individual ACL is rechecked for each operation", "Fixed verified principal, facility TEST01, facility role, case JUOG-970 and narrow action/record allowlists"],
+    "supporting_tests": "Existing offline boundary tests and live replay/revocation/logout evidence support limited experimentation but cannot establish missing live boundary PASS",
+    "potential_impact_under_limited_test": "Only explicitly approved fictional case data in the isolated workbook; production and real patient data remain inaccessible by scope",
+    "security_relaxation_required": false
+  },
+  "mandatory_execution_limits": [
+    "Keep all existing auth/ACL/replay/deadline controls and fixed-case API scope unchanged",
+    "Use a fresh independently identified OIDC session for AUTH04 after recording the old-session evidence gap",
+    "Supervise every operation and do not initiate ordinary business tests near the session deadline; use a conservative 15-minute margin",
+    "When the margin is reached, reconcile any in-flight operation, stop new writes and logout; never extend or modify token/session timestamps",
+    "Re-login for a later distinct AUTH04 session is allowed only after prior operation state is certain; it is not continuation evidence for the old boundary experiment",
+    "Confirm all other prerequisites independently: deployed hashes, frontend privacy validation, migration fixture, exact ACL, safe backup, notification/upload stop and key configuration",
+    "Capture before/after journal snapshots, request/intent/audit/commit and old-version comparisons for every business test group",
+    "On unexpected permission, uncertain write, privacy leak or audit mismatch, stop requests and disable isolated AUTH04 routes using reviewed stop procedure",
+    "Do not claim the 60-minute live test complete, waive it for release, or increment formal UAT from this assessment"
+  ],
+  "remaining_release_requirement": "Recover trustworthy original near-boundary evidence or run a new separately identified complete real-time experiment; independent formal QA and release approval remain outstanding",
+  "fixture_initialization_note": "Parent reports 06:25:22 JST diagnostic run succeeded with revision1 and exact3-to9-row append. Prior zero-append cause remains unknown and must not be described as a diagnosed/fixed root cause.",
+  "formal_uat_delta": 0,
+  "formal_uat_unchanged": {"PASS":32,"FAIL":1,"BLOCKED":29,"NOT_RUN":5}
+}
