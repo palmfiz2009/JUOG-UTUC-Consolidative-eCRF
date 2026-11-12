@@ -1,5 +1,5 @@
 """Server-only Streamlit OIDC identity bridge. No network or secret defaults."""
-import base64, hashlib, hmac, json, time
+import base64, hashlib, hmac, json, time, uuid
 
 def _b64(data):
     return base64.urlsafe_b64encode(data).rstrip(b'=').decode('ascii')
@@ -31,7 +31,22 @@ def signed_request(st, action, payload):
         raise PermissionError('OIDC_TOKEN_EXPIRED_OR_MISSING')
     session_expiry = expiry
     mode = cfg.get('session_policy', 'google_auth_time')
-    if mode == 'isolated_app_session_b':
+    session_claim = None
+    if mode == 'isolated_gas_session_b2':
+        from app_session_b import session_key
+        if (cfg.get('session_environment') != 'JUOG_AUTH04_ISOLATED_TEST01' or
+                cfg.get('session_b_safety_review_approved') is not True or
+                cfg.get('session_b_limited_execution_approved') is not True or
+                not isinstance(cfg.get('session_store_generation'), str) or
+                not cfg['session_store_generation']):
+            raise PermissionError('SESSION_B_NOT_APPROVED')
+        sid = session_key(st.user, cfg['session_environment'] + '|' + cfg['session_store_generation'], now)
+        session_expiry = min(st.user['iat'] + 3600, expiry)
+        if session_expiry <= now:
+            raise PermissionError('APP_SESSION_EXPIRED')
+        session_claim = dict(sid=sid, jti=uuid.uuid4().hex,
+                             token_iat=st.user['iat'], deadline=session_expiry)
+    elif mode == 'isolated_app_session_b':
         from app_session_b import check
         session_expiry = check(st.user, cfg, now)
     elif mode == 'google_auth_time':
@@ -50,6 +65,8 @@ def signed_request(st, action, payload):
     claims = {'v': 1, 'iss': cfg['bridge_issuer'], 'aud': cfg['audience'],
               'oidc_issuer': issuer, 'sub': sub, 'iat': now, 'exp': min(now + 60, session_expiry),
               'request_hash': hashlib.sha256(request.encode('utf-8')).hexdigest()}
+    if session_claim is not None:
+        claims.update(v=2, session=session_claim, exp=min(now + 15, session_expiry))
     encoded = _b64(json.dumps(claims, ensure_ascii=False, separators=(',', ':')).encode('utf-8'))
     signature = _b64(hmac.new(key, encoded.encode('ascii'), hashlib.sha256).digest())
     # Never print/log this envelope or include it in evidence.

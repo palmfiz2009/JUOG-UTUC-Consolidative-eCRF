@@ -81,7 +81,19 @@ def revoke_and_logout(st):
 
 
 def policy_logout(st):
-    if st.secrets['juog_identity_bridge'].get('session_policy') == 'isolated_app_session_b':
+    if st.secrets['juog_identity_bridge'].get('session_policy') == 'isolated_gas_session_b2':
+        import time
+        now = int(time.time())
+        iat, expiry = st.user.get('iat'), st.user.get('exp')
+        if type(iat) is int and type(expiry) is int and now >= min(iat + 3600, expiry):
+            st.logout()
+            return
+        from streamlit_unified_client import _post
+        result = _post(st, 'session_revoke', {}, 30)
+        if result.get('ok') is not True or result.get('revoked') is not True:
+            raise PermissionError('SESSION_REVOCATION_NOT_CONFIRMED')
+        st.logout()
+    elif st.secrets['juog_identity_bridge'].get('session_policy') == 'isolated_app_session_b':
         revoke_and_logout(st)
     else:
         st.logout()

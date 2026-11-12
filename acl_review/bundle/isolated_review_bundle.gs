@@ -25,13 +25,18 @@ function juogV3DecodeBridge_(envelope,config) {
   let diff=signature.length^supplied.length;for(let i=0;i<signature.length;i++)diff|=(signature[i]&255)^((supplied[i]||0)&255);if(diff!==0)throw Error('AUTH_INVALID');
   const c=JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString('UTF-8'));
   const now=Math.floor(Date.now()/1000);
-  if(c.v!==1||c.iss!==config.bridgeIssuer||c.aud!==config.audience||c.oidc_issuer!==config.oidcIssuer||typeof c.sub!=='string'||!c.sub||!Number.isInteger(c.iat)||!Number.isInteger(c.exp)||c.iat>now+5||c.exp-c.iat>60||c.exp<=c.iat)throw Error('AUTH_INVALID');
+  if(![1,2].includes(c.v)||c.iss!==config.bridgeIssuer||c.aud!==config.audience||c.oidc_issuer!==config.oidcIssuer||typeof c.sub!=='string'||!c.sub||!Number.isInteger(c.iat)||!Number.isInteger(c.exp)||c.iat>now+5||c.exp-c.iat>60||c.exp<=c.iat)throw Error('AUTH_INVALID');
   if(c.exp<=now)throw Error('AUTH_EXPIRED');
   const digest=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,envelope.request_json,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');
   if(digest!==c.request_hash)throw Error('REQUEST_SIGNATURE_MISMATCH');
   const request=JSON.parse(envelope.request_json);
   if(!request||typeof request!=='object'||Array.isArray(request)||Object.keys(request).some(k=>!['action','payload'].includes(k))||typeof request.action!=='string')throw Error('REQUEST_INVALID');
-  return {request,principal:{issuer:c.oidc_issuer,subject:c.sub},expires:c.exp};
+  let session=null;
+  if(config.sessionPolicy==='isolated_gas_session_b2'){
+    if(c.v!==2||c.exp-c.iat>15||c.iat>now||!c.session||!/^[a-f0-9]{64}$/.test(c.session.sid)||!/^[a-f0-9]{32}$/.test(c.session.jti)||!Number.isInteger(c.session.token_iat)||!Number.isInteger(c.session.deadline)||c.session.token_iat>now||c.session.token_iat<0||c.session.deadline>c.session.token_iat+3600||c.session.deadline<=now||c.exp>c.session.deadline)throw Error('SESSION_INVALID');
+    session=c.session;
+  }else if(c.v!==1)throw Error('AUTH_INVALID');
+  return {request,principal:{issuer:c.oidc_issuer,subject:c.sub},expires:c.exp,version:c.v,session};
 }
 function juogV3ReadIndividualAcl_(ss,issuer,subject) {
   const sh=ss.getSheetByName('V3_Users');if(!sh)throw Error('ACL_NOT_CONFIGURED');
@@ -51,8 +56,6 @@ function juogV3ReadIndividualAcl_(ss,issuer,subject) {
   if(!id)throw Error('ACL_INVALID');
   return {id,enabled,role:r[idx.role],facilities};
 }
-
-
 // SOURCE: privacy_revision2.gs
 function directIdentifierKey_(key) {
   const normalized = String(key || '').normalize('NFKC').replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2').replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
@@ -1593,12 +1596,13 @@ function JuogDomainServiceV3(deps){
  * Precreated sheet D3_Journal: batch_id,kind,part,total,sha256,data.
  * No create/delete/overwrite. Incomplete chunk batches remain uncommitted evidence.
  * Must run under the same project-wide ScriptLock for every reader and writer. */
-function juogDomainSheetsStoreV3_(ss,hash,uuid) {
+function juogDomainSheetsStoreV3_(ss,hash,uuid,beforeWrite) {
+ const guard=beforeWrite||(()=>{});
  const sh=ss.getSheetByName('D3_Journal'),header=['batch_id','kind','part','total','sha256','data'];
  if(!sh||JSON.stringify(sh.getRange(1,1,1,6).getValues()[0])!==JSON.stringify(header))throw Error('DOMAIN_STORE_SCHEMA');
  function append(kind,value){const text=JSON.stringify(value);if(text.length>4000000)throw Error('DOMAIN_SIZE_LIMIT');const id=uuid(),n=Math.max(1,Math.ceil(text.length/20000)),digest=hash(text);
-  for(let k=0;k<n;k++)sh.appendRow([id,kind,k,n,digest,text.slice(k*20000,(k+1)*20000)]);
-  SpreadsheetApp.flush();sh.appendRow([id,kind,'SEALED',n,digest,'']);SpreadsheetApp.flush();
+  for(let k=0;k<n;k++){guard();sh.appendRow([id,kind,k,n,digest,text.slice(k*20000,(k+1)*20000)]);}
+  SpreadsheetApp.flush();guard();sh.appendRow([id,kind,'SEALED',n,digest,'']);SpreadsheetApp.flush();
  }
  function read(){const rows=sh.getDataRange().getValues().slice(1),groups={};
   for(const row of rows){const id=String(row[0]);if(!groups[id])groups[id]=[];groups[id].push(row);}
@@ -3451,16 +3455,25 @@ function JuogRequestLifecycleV3(d){
 function juogUnifiedIsolationEntryV3_(envelope,c) {
  const forbidden=['1R1a55w19qfS7XTa6Ran7EnuTNZpFkGoXIFfqesv7zoc','1XEKihUvJBHP4BZNf8WMf14__zsiiZgY8ozFnhw_NZNE','1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs'];
  if(!c||c.environment!=='ISOLATED_TEST'||!c.approvalRef||c.backupVerified!==true||c.qaApproved!==true||c.fictionalBaselineVerified!==true||c.notificationsDisabled!==true||!c.spreadsheetId||c.spreadsheetId!==c.approvedSpreadsheetId||forbidden.includes(c.spreadsheetId))return {ok:false,error:'ISOLATION_NOT_APPROVED'};
+ if(c.sessionPolicy==='isolated_gas_session_b2'&&(c.spreadsheetId!=='1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU'||ScriptApp.getScriptId()!=='11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy'))return {ok:false,error:'ISOLATION_NOT_APPROVED'};
  const lock=LockService.getScriptLock();if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
  try {
   const auth=juogV3DecodeBridge_(envelope,c),req=auth.request;
   if(c.allRoutesReviewed!==true||c.schemaParityApproved!==true)return {ok:false,error:'INTEGRATION_NOT_APPROVED'};
-  const control=['prepare_request','request_status','list_requests','execute_request'];
+  const control=['session_revoke','prepare_request','request_status','list_requests','execute_request'];
   let op=req.payload;if(!op||(!control.includes(req.action)&&op.action!==req.action))return {ok:false,error:'ACTION_MISMATCH'};
   const ss=SpreadsheetApp.openById(c.spreadsheetId),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
-  if(!who || who.enabled!==true || typeof who.id!=='string' || !who.id.trim() || !Array.isArray(who.facilities))return {ok:false,error:'AUTH_REQUIRED'};
+  const gate=c.sessionPolicy==='isolated_gas_session_b2'?juogSessionGateB2_(ss,c,auth,who):null;
+  if(gate&&gate.response)return gate.response;
+  if(gate&&c.sessionExecutionStage!=='AUTH04_APPROVED'&&req.action!=='ui_context')return {ok:false,error:'AUTH04_EXECUTION_NOT_APPROVED'};
+  if(gate&&c.sessionExecutionStage==='AUTH04_APPROVED'&&!c.auth04ExecutionApprovalRef)return {ok:false,error:'AUTH04_EXECUTION_NOT_APPROVED'};
   const hash=s=>Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,s,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');
-  const store=juogDomainSheetsStoreV3_(ss,hash,()=>Utilities.getUuid());
+  const store=juogDomainSheetsStoreV3_(ss,hash,()=>Utilities.getUuid(),gate?gate.guard:null);
+  if(gate){
+   for(const name of ['appendIntent','appendAudit','appendCommit','appendRequest','appendRequestEvent']){
+    const original=store[name];store[name]=function(value){gate.guard();return original(value);};
+   }
+  }
   if(req.action==='execute_request'){
    const found=store.read().requests.filter(r=>r.id===req.payload.operation_id&&who&&r.actor===who.id);
    if(found.length!==1)return {ok:false,state:'UNKNOWN',error:'REQUEST_NOT_VISIBLE'};
@@ -3504,10 +3517,8 @@ function juogUnifiedIsolationEntryV3_(envelope,c) {
    else response.code_delivery='SUPERSEDED';
   }
   return response;
- }catch(e){const safe=['AUTH_REQUIRED','AUTH_INVALID','AUTH_EXPIRED','REQUEST_SIGNATURE_MISMATCH'];return {ok:false,error:safe.includes(e.message)?e.message:'UNIFIED_TRANSACTION_INCOMPLETE'};}finally{lock.releaseLock();}
+ }catch(e){const safe=['AUTH_REQUIRED','AUTH_INVALID','AUTH_EXPIRED','REQUEST_SIGNATURE_MISMATCH','SESSION_REQUIRED','SESSION_INVALID','SESSION_REVOKED','ASSERTION_REPLAY','SESSION_STORE_UNAVAILABLE','SESSION_STORE_INVALID','SESSION_STORE_FULL','ACL_DENIED','ACL_CHANGED'];return {ok:false,error:safe.includes(e.message)?e.message:'UNIFIED_TRANSACTION_INCOMPLETE'};}finally{lock.releaseLock();}
 }
-
-
 
 // SOURCE: isolation_unified_webapp.gs
 /* Dedicated isolation project ONLY. Never add this doPost alongside legacy doPost.
@@ -3524,4 +3535,72 @@ function doPost(e){
   const result=juogUnifiedIsolationEntryV3_(JSON.parse(e.postData.contents),c);
   return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
  }catch(_){return ContentService.createTextOutput(JSON.stringify({ok:false,error:'REQUEST_REJECTED'})).setMimeType(ContentService.MimeType.JSON);}
+}
+
+// SOURCE: session_store_b2.gs
+/* Review-only durable session/replay guard. Called ONLY inside the unified ScriptLock.
+ * Exactly one GAS project owns this store. No direct Sheets/alternate-project writers.
+ * Provision header and head property separately; NEVER recreate at runtime.
+ */
+function juogSessionStoreB2_(ss,c) {
+ const header=['sequence','event_json','chain_sha256'];
+ const sh=ss.getSheetByName('V3_SessionEvents');
+ if(!sh||!c.sessionStoreGeneration||c.sessionStoreApproved!==true)throw Error('SESSION_STORE_UNAVAILABLE');
+ const props=PropertiesService.getScriptProperties(),key='JUOG_B2_HEAD_'+c.spreadsheetId;
+ const hash=s=>Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,s,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');
+ const genesis=hash('JUOG-B2|'+c.spreadsheetId+'|'+c.sessionStoreGeneration);
+ function read(){
+  const rows=sh.getDataRange().getValues();
+  if(JSON.stringify(rows[0])!==JSON.stringify(header)||rows.length>10001)throw Error('SESSION_STORE_INVALID');
+  let chain=genesis;const events=[];
+  for(let i=1;i<rows.length;i++){
+   const r=rows[i];if(r.length!==3||r[0]!==i||typeof r[1]!=='string')throw Error('SESSION_STORE_INVALID');
+   chain=hash(chain+'|'+i+'|'+r[1]);if(chain!==r[2])throw Error('SESSION_STORE_INVALID');
+   const e=JSON.parse(r[1]);
+   if(!e||!['OPEN','USE','REVOKE'].includes(e.kind)||!/^[a-f0-9]{64}$/.test(e.sid)||!/^[a-f0-9]{64}$/.test(e.owner)||!Number.isInteger(e.deadline)||typeof e.jti!=='string')throw Error('SESSION_STORE_INVALID');
+   events.push(e);
+  }
+  if(props.getProperty(key)!==(events.length+':'+chain))throw Error('SESSION_STORE_INVALID');
+  return {events,chain};
+ }
+ function append(e){
+  const old=read(),seq=old.events.length+1,json=JSON.stringify(e),chain=hash(old.chain+'|'+seq+'|'+json);
+  if(seq>10000)throw Error('SESSION_STORE_FULL');
+  // Reserve the expected head BEFORE the append. An uncertain write permanently
+  // closes the gate until an explicit administrator recovery, never permits reuse.
+  props.setProperty(key,seq+':'+chain);
+  sh.appendRow([seq,json,chain]);SpreadsheetApp.flush();read();
+ }
+ return {read,append,hash};
+}
+function juogSessionGateB2_(ss,c,auth,who) {
+ const a=auth.session,now=()=>Math.floor(Date.now()/1000);
+ if(!a||auth.version!==2||c.sessionPolicy!=='isolated_gas_session_b2')throw Error('SESSION_REQUIRED');
+ const store=juogSessionStoreB2_(ss,c),owner=store.hash(JSON.stringify([auth.principal.issuer,auth.principal.subject]));
+ const events=store.read().events.filter(e=>e.sid===a.sid);
+ if(events.some(e=>e.owner!==owner||e.deadline!==a.deadline))throw Error('SESSION_INVALID');
+ if(events.filter(e=>e.kind==='OPEN').length>1)throw Error('SESSION_STORE_INVALID');
+ const revoke=auth.request.action==='session_revoke';
+ if(events.some(e=>e.jti===a.jti))throw Error('ASSERTION_REPLAY');
+ if(events.some(e=>e.kind==='REVOKE')){
+  if(revoke)return {response:{ok:true,revoked:true},guard:()=>{throw Error('SESSION_REVOKED');}};
+  throw Error('SESSION_REVOKED');
+ }
+ function checkAcl(){
+  const u=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
+  if(!u||!u.enabled||!['facility','admin','recovery_admin','radiology','medical_oncology','urology'].includes(u.role)||u.facilities.length!==1||u.facilities[0]!=='TEST01')throw Error('ACL_DENIED');
+  return u;
+ }
+ if(!revoke)checkAcl();
+ if(!events.length)store.append({kind:'OPEN',sid:a.sid,owner,deadline:a.deadline,jti:''});
+ store.append({kind:revoke?'REVOKE':'USE',sid:a.sid,owner,deadline:a.deadline,jti:a.jti});
+ function guard(){
+  if(now()>=a.deadline||now()>=auth.expires)throw Error('AUTH_EXPIRED');
+  const current=store.read().events.filter(e=>e.sid===a.sid);
+  if(!current.some(e=>e.kind==='OPEN')||current.some(e=>e.kind==='REVOKE'))throw Error('SESSION_REVOKED');
+  const u=checkAcl();
+  if(!who||u.id!==who.id||u.role!==who.role||JSON.stringify(u.facilities)!==JSON.stringify(who.facilities))throw Error('ACL_CHANGED');
+ }
+ if(revoke)return {response:{ok:true,revoked:true},guard};
+ guard();return {guard};
 }

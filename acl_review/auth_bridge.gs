@@ -11,13 +11,18 @@ function juogV3DecodeBridge_(envelope,config) {
   let diff=signature.length^supplied.length;for(let i=0;i<signature.length;i++)diff|=(signature[i]&255)^((supplied[i]||0)&255);if(diff!==0)throw Error('AUTH_INVALID');
   const c=JSON.parse(Utilities.newBlob(Utilities.base64DecodeWebSafe(parts[0])).getDataAsString('UTF-8'));
   const now=Math.floor(Date.now()/1000);
-  if(c.v!==1||c.iss!==config.bridgeIssuer||c.aud!==config.audience||c.oidc_issuer!==config.oidcIssuer||typeof c.sub!=='string'||!c.sub||!Number.isInteger(c.iat)||!Number.isInteger(c.exp)||c.iat>now+5||c.exp-c.iat>60||c.exp<=c.iat)throw Error('AUTH_INVALID');
+  if(![1,2].includes(c.v)||c.iss!==config.bridgeIssuer||c.aud!==config.audience||c.oidc_issuer!==config.oidcIssuer||typeof c.sub!=='string'||!c.sub||!Number.isInteger(c.iat)||!Number.isInteger(c.exp)||c.iat>now+5||c.exp-c.iat>60||c.exp<=c.iat)throw Error('AUTH_INVALID');
   if(c.exp<=now)throw Error('AUTH_EXPIRED');
   const digest=Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,envelope.request_json,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');
   if(digest!==c.request_hash)throw Error('REQUEST_SIGNATURE_MISMATCH');
   const request=JSON.parse(envelope.request_json);
   if(!request||typeof request!=='object'||Array.isArray(request)||Object.keys(request).some(k=>!['action','payload'].includes(k))||typeof request.action!=='string')throw Error('REQUEST_INVALID');
-  return {request,principal:{issuer:c.oidc_issuer,subject:c.sub},expires:c.exp};
+  let session=null;
+  if(config.sessionPolicy==='isolated_gas_session_b2'){
+    if(c.v!==2||c.exp-c.iat>15||c.iat>now||!c.session||!/^[a-f0-9]{64}$/.test(c.session.sid)||!/^[a-f0-9]{32}$/.test(c.session.jti)||!Number.isInteger(c.session.token_iat)||!Number.isInteger(c.session.deadline)||c.session.token_iat>now||c.session.token_iat<0||c.session.deadline>c.session.token_iat+3600||c.session.deadline<=now||c.exp>c.session.deadline)throw Error('SESSION_INVALID');
+    session=c.session;
+  }else if(c.v!==1)throw Error('AUTH_INVALID');
+  return {request,principal:{issuer:c.oidc_issuer,subject:c.sub},expires:c.exp,version:c.v,session};
 }
 function juogV3ReadIndividualAcl_(ss,issuer,subject) {
   const sh=ss.getSheetByName('V3_Users');if(!sh)throw Error('ACL_NOT_CONFIGURED');

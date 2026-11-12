@@ -1,0 +1,27 @@
+{
+  "scope": "Offline actual GAS decoder, endpoint and persistent-store adapter with synthetic Sheets/clock/lock; no Google login or live GAS execution",
+  "checks": [
+    "actual Python signer to GAS session and individual ACL",
+    "replay rejected across a fresh GAS process",
+    "revocation rejects already-issued valid envelope",
+    "revoked token cannot reopen after restart",
+    "new verified token can start a separate session",
+    "unregistered identity denied without business writes",
+    "other facility denied",
+    "invalid role denied",
+    "revoked ACL immediate denial",
+    "signed business request blocked before separate AUTH04 approval",
+    "unsigned save API denied",
+    "delayed expired envelope rejected",
+    "concurrent request cannot enter while lock held",
+    "missing store denied",
+    "truncated store rejected against independent head",
+    "v1 downgrade rejected in B2 mode",
+    "session deadline never extends on restart",
+    "expiry during chunk write prevents seal",
+    "uncertain store append closes subsequent requests"
+  ],
+  "count": 19,
+  "result": "PASS",
+  "formal_uat_delta": 0
+}

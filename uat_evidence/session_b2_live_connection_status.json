@@ -1,0 +1,60 @@
+{
+  "base_commit": "0c413c08786b40deba7db4c77a70a49e9195df30",
+  "status": "REVIEW_CANDIDATE_NOT_DEPLOYED",
+  "runtime_storage_decision": {
+    "sqlite": "Not suitable for Community Cloud durability",
+    "candidate": "Dedicated isolated Sheets V3_SessionEvents; one owning GAS ScriptLock and independent Properties head",
+    "actual_provisioned": false
+  },
+  "browser_observation": {
+    "project_id": "11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy",
+    "title": "JUOG_AUTH04_INTEGRATION_DISABLED_20261111",
+    "deployments_active": 0,
+    "deployments_archived": 0,
+    "text": "このプロジェクトはまだデプロイされていません",
+    "endpoint": null,
+    "execution_identity": null,
+    "active_version": null,
+    "signing_properties_verified": false
+  },
+  "live_acl": {
+    "sheet_id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+    "V3_Users": "7 expected headers; A2:G3 empty",
+    "principal_registered": false
+  },
+  "new_offline_checks": {
+    "gas": 19,
+    "python": 6,
+    "previous_28_reexecuted": false
+  },
+  "uat_mapping": {
+    "AUTH-02": "Role/facility/ACL checks regression only; existing formal PASS retained",
+    "AUTH-03": "Unsigned save and revoked-session denial regression only; existing formal PASS retained",
+    "AUTH-04": "FAIL retained; business API blocked until separate approval",
+    "ENV-02": "New candidate has no deployed version; cannot inherit source/deployment evidence"
+  },
+  "semantics": [
+    "Revocation is effective after durable GAS acknowledgement; serialized operation already in progress may finish before that acknowledgement",
+    "Every request is single-use; lost response requires fresh signed status query, not replay",
+    "Signature lifetime 15 seconds and capped by session deadline; timeout may fail closed",
+    "All Streamlit processes target same GAS project; different projects and manual Sheet writers are outside lock",
+    "Store missing/truncated/uncertain append denies access; no automatic resets or pruning",
+    "Role/facility/expiry checked each request and each journal write boundary; no guaranteed cancellation of remote write already sent"
+  ],
+  "release_blockers": [
+    "Independent safety review not completed",
+    "Store generation/header and head property require controlled provisioning",
+    "GAS new deployment/execution identity/access settings require administrator approval",
+    "Real OIDC iat/nonce and issuer+subject must be captured server-side and principal ACL approved",
+    "No claim of actual concurrent Google executions or restart test yet",
+    "AUTH04 requires separate limited execution approval"
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT RUN": 5,
+    "delta_PASS": 0
+  },
+  "bundle_sha256": "13ad8c48fdac3d0bf0dc584ae871e15035126c35aac314a250994b3f060775e6"
+}
