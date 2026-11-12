@@ -1,0 +1,525 @@
+{
+  "scope": "REVIEW ONLY: synthetic TEST01 candidate. Not approved for live execution; required role grants and business clock policy unresolved.",
+  "steps": [
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op1",
+        "action": "submit_screening",
+        "payload": {
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "local_subject_code": "FICTIONAL-1",
+          "reporter_email": "fictional@example.invalid",
+          "submission_id": "local-submission-1",
+          "consent_date": "2026-11-01",
+          "ct": "cT3",
+          "cn": "cN1",
+          "cm": "cM0",
+          "best_effect": "SD",
+          "site_recist": "SD",
+          "planned_surgery": "実施予定",
+          "planned_surgery_date": "2026-12-06",
+          "crf_payload": {
+            "crf_type": "screening",
+            "submission_id": "local-submission-1",
+            "record_key": "TEST01|FICTIONAL-1",
+            "data": {}
+          }
+        },
+        "expected_revision": 0
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "radiology",
+      "operation": {
+        "id": "op2",
+        "action": "submit_mdt_review",
+        "payload": {
+          "screening_id": "JUOG-SCR-001",
+          "review_round": 1,
+          "decision": "ELIGIBLE",
+          "reviewer_role": "radiology",
+          "central_recist": "SD",
+          "organ_invasion": "なし",
+          "vessel_invasion": "なし",
+          "cm1_status": "cM0"
+        },
+        "expected_revision": 1
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "medical_oncology",
+      "operation": {
+        "id": "op3",
+        "action": "submit_mdt_review",
+        "payload": {
+          "screening_id": "JUOG-SCR-001",
+          "review_round": 1,
+          "decision": "ELIGIBLE",
+          "reviewer_role": "medical_oncology",
+          "g3_ae_recovered": "はい",
+          "ecog_0_1": "はい",
+          "medical_safety": "はい"
+        },
+        "expected_revision": 2
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "urology",
+      "operation": {
+        "id": "op4",
+        "action": "submit_mdt_review",
+        "payload": {
+          "screening_id": "JUOG-SCR-001",
+          "review_round": 1,
+          "decision": "ELIGIBLE",
+          "reviewer_role": "urology",
+          "technically_resectable": "はい",
+          "surgery_appropriate": "はい"
+        },
+        "expected_revision": 3
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "urology",
+      "operation": {
+        "id": "op5",
+        "action": "submit_mdt_review",
+        "payload": {
+          "screening_id": "JUOG-SCR-001",
+          "review_round": 1,
+          "decision": "ELIGIBLE",
+          "reviewer_role": "urology",
+          "technically_resectable": "はい",
+          "surgery_appropriate": "はい",
+          "is_correction": true,
+          "correction_reason": "完全架空の訂正機能検証"
+        },
+        "expected_revision": 4
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op6",
+        "action": "finalize_mdt",
+        "payload": {
+          "screening_id": "JUOG-SCR-001",
+          "decision": "ELIGIBLE",
+          "mdt_date": "2026-11-11",
+          "consensus_confirmed": true
+        },
+        "expected_revision": 5
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op7",
+        "action": "save_crf",
+        "payload": {
+          "study_code": "JUOG_UTUC_Consolidative",
+          "schema_version": "review-v3-unapproved",
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "reporter_email": "fictional@example.invalid",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "record_key": "JUOG-001|perioperative_30d|30d",
+          "submission_id": "s-perioperative_30d",
+          "submission_kind": "初回報告",
+          "expected_record_version": 0,
+          "data": {
+            "surgery_performed": "実施しなかった",
+            "reference_date": "2026-12-06",
+            "vital_status": "生存",
+            "last_alive_date": "2027-01-05",
+            "last_evp_date": "2026-11-08",
+            "day30_visit_date": "2027-01-05",
+            "day30_lab_date": "2027-01-05",
+            "day30_labs": {
+              "CRP": 0
+            },
+            "postop_treatment": "無治療（経過観察）",
+            "no_operation_reason": "患者希望"
+          }
+        },
+        "expected_revision": 6
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op8",
+        "action": "save_crf",
+        "payload": {
+          "study_code": "JUOG_UTUC_Consolidative",
+          "schema_version": "review-v3-unapproved",
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "reporter_email": "fictional@example.invalid",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "record_key": "JUOG-001|perioperative_30d|30d",
+          "submission_id": "s-perioperative_30d-correction",
+          "submission_kind": "訂正報告",
+          "expected_record_version": 1,
+          "data": {
+            "surgery_performed": "実施しなかった",
+            "reference_date": "2026-12-06",
+            "vital_status": "生存",
+            "last_alive_date": "2027-01-05",
+            "last_evp_date": "2026-11-08",
+            "day30_visit_date": "2027-01-05",
+            "day30_lab_date": "2027-01-05",
+            "day30_labs": {
+              "CRP": 0
+            },
+            "postop_treatment": "無治療（経過観察）",
+            "no_operation_reason": "患者希望"
+          },
+          "correction_reason": "完全架空の追記型訂正"
+        },
+        "expected_revision": 7
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op9",
+        "action": "read_crf",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "record_key": "JUOG-001|perioperative_30d|30d"
+        },
+        "expected_revision": 8
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "radiology",
+      "operation": {
+        "id": "op10",
+        "action": "get_mdt_reviews",
+        "payload": {
+          "screening_id": "JUOG-SCR-001"
+        },
+        "expected_revision": 8
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op11",
+        "action": "save_screening_draft",
+        "payload": {
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "local_subject_code": "DRAFT-NEW",
+          "reporter_email": "fictional@example.invalid",
+          "draft_state": {
+            "reg_height_cm": 170
+          }
+        },
+        "expected_revision": 8
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op12",
+        "action": "get_screening_draft",
+        "payload": {
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "local_subject_code": "DRAFT-NEW",
+          "reporter_email": "fictional@example.invalid",
+          "draft_state": {
+            "reg_height_cm": 170
+          }
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "second",
+      "operation": {
+        "id": "op13",
+        "action": "get_screening_draft",
+        "payload": {
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "local_subject_code": "DRAFT-NEW",
+          "reporter_email": "fictional@example.invalid",
+          "draft_state": {
+            "reg_height_cm": 170
+          }
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": false
+    },
+    {
+      "role": "radiology",
+      "operation": {
+        "id": "op14",
+        "action": "list_review_cases",
+        "payload": {},
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "radiology",
+      "operation": {
+        "id": "op15",
+        "action": "get_screening_crf",
+        "payload": {
+          "screening_id": "JUOG-SCR-001"
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "radiology",
+      "operation": {
+        "id": "op16",
+        "action": "get_own_review",
+        "payload": {
+          "screening_id": "JUOG-SCR-001"
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op17",
+        "action": "list_screenings",
+        "payload": {
+          "statuses": "REGISTERED"
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op18",
+        "action": "get_screening",
+        "payload": {
+          "screening_id": "JUOG-SCR-001"
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op19",
+        "action": "stats",
+        "payload": {},
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op20",
+        "action": "delete_screening_draft",
+        "payload": {
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "local_subject_code": "DRAFT-NEW",
+          "reporter_email": "fictional@example.invalid",
+          "draft_state": {
+            "reg_height_cm": 170
+          }
+        },
+        "expected_revision": 9
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op21",
+        "action": "save_draft",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "reporter_email": "fictional@example.invalid",
+          "draft_state": {
+            "height_cm": 170
+          }
+        },
+        "expected_revision": 10
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op22",
+        "action": "get_draft",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "reporter_email": "fictional@example.invalid",
+          "draft_state": {
+            "height_cm": 170
+          }
+        },
+        "expected_revision": 11
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op23",
+        "action": "validate",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01"
+        },
+        "expected_revision": 11
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op24",
+        "action": "get_crf_linkage",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01"
+        },
+        "expected_revision": 11
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op25",
+        "action": "reset_draft_code",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "reason": "完全架空の運用試験"
+        },
+        "expected_revision": 11
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op26",
+        "action": "update_draft_email",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "reason": "完全架空の運用試験",
+          "new_reporter_email": "updated@example.invalid"
+        },
+        "expected_revision": 12
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op27",
+        "action": "get_draft",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "reporter_email": "updated@example.invalid",
+          "draft_state": {
+            "height_cm": 170
+          }
+        },
+        "expected_revision": 13
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "facility",
+      "operation": {
+        "id": "op28",
+        "action": "delete_draft",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "facility_code": "TEST01",
+          "facility_name": "完全架空施設",
+          "crf_type": "perioperative_30d",
+          "visit": "30d",
+          "reporter_email": "updated@example.invalid",
+          "draft_state": {
+            "height_cm": 170
+          }
+        },
+        "expected_revision": 13
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op29",
+        "action": "void_registration",
+        "payload": {
+          "registration_id": "JUOG-001",
+          "reason": "完全架空の取消機能試験",
+          "approval_ref": "LOCAL-TEST-ONLY"
+        },
+        "expected_revision": 14
+      },
+      "expected_ok": true
+    },
+    {
+      "role": "admin",
+      "operation": {
+        "id": "op30",
+        "action": "stats",
+        "payload": {},
+        "expected_revision": 15
+      },
+      "expected_ok": true
+    }
+  ]
+}
