@@ -1,0 +1,109 @@
+{
+  "date_jst": "2026-11-12",
+  "status": "DIAGNOSIS_AND_CHANGE_PROPOSAL_NOT_IMPLEMENTED",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "google": {
+    "project_from_prior_evidence": "hardy-portal-514413-u8",
+    "project_client_binding_independently_verified": false,
+    "console_attempt": "Site Unavailable / Unable to access this site",
+    "publishing_status": "NOT_OBSERVED",
+    "verification_status": "NOT_OBSERVED",
+    "session_age_claims": "NOT_OBSERVED",
+    "settings_changed": false,
+    "raw_google_token_inspected": false,
+    "confirmed_request_evidence": "uat_evidence/google_live_test01_20261112.json",
+    "missing_claim_reason": "Provider feature prerequisites are a documented likely cause; project/client settings and raw response not observed, so exact provider cause remains unconfirmed."
+  },
+  "requirements": {
+    "documents_read": [
+      {
+        "id": "libfile_31fe8e295d908191a2581b264950135b",
+        "name": "JUOG_UTUC01_追加リスク検証・是正案_20261108.docx",
+        "scope": "full 2 pages; Draft1.0 unapproved"
+      },
+      {
+        "id": "libfile_2de839e8c10c8191a12d8199a9fb08bb",
+        "name": "JUOG-UTUC01_EDC_Validation_総合記録_20261108.docx",
+        "scope": "full 17 pages; unsigned technical assessment"
+      }
+    ],
+    "explicit_one_hour_approved_requirement_found": false,
+    "limitation": "No authoritative signed URS establishing this threshold was located; absence in reviewed sources is not proof no such requirement exists.",
+    "documented_risks": [
+      "role impersonation with shared token",
+      "administrator identity binding",
+      "individual and facility authorization"
+    ],
+    "implementation_origins": [
+      "uat_oidc_preflight.py: claim_checks and authentication_time_status hardcode 3600 seconds; introduced in eb031a31c9bae13860832c379f7fc41ff74ad48a",
+      "acl_review/python_candidate/auth_bridge.py: max_auth_age_seconds configuration used before every signed request",
+      "integrated_core/test_identity_session.py: synthetic 3600-second test setting",
+      "integrated_core/cloud_candidate_build/test_oidc_audience.py: synthetic 300-second setting"
+    ],
+    "interpretation": "One-hour freshness is evidenced as an implementation/test parameter, not as a traced approved URS requirement. Existing explicit instruction not to disable auth_time remains binding."
+  },
+  "acl_live_read": {
+    "spreadsheet_id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+    "title": "JUOG_AUTH04_INTEGRATION_DISABLED_20261111",
+    "observed_tabs": [
+      "D3_Journal"
+    ],
+    "v3_users_exists": false,
+    "consequence": "Configured individual directory cannot be read by juogV3ReadIndividualAcl_ on this candidate spreadsheet: missing sheet throws ACL_NOT_CONFIGURED.",
+    "verified_subject_available": false,
+    "acl_rows_created": 0,
+    "signed_http_requests": 0,
+    "scope": {
+      "facility": "TEST01",
+      "person_count": 1,
+      "valid_until": "2026-11-19T14:59:00Z",
+      "permissions": "isolated facility only"
+    }
+  },
+  "change_proposals": [
+    {
+      "id": "A",
+      "condition": "Recent active human authentication remains mandatory",
+      "design": "Keep Google for identity; add a separately verified user-verifying step-up factor bound to issuer+subject+application session with one-time server challenge, origin/RP validation, replay prevention, and server verification timestamp; or adopt an approved IdP with documented forced reauthentication support.",
+      "risk": "New authentication factor enrollment, recovery and verifier implementation require review; Google auth_time availability alone does not guarantee reauthentication on request.",
+      "implemented": false
+    },
+    {
+      "id": "B",
+      "condition": "PI and security review approve bounded application-session assurance instead of recent Google-account reauthentication",
+      "design": "Retain signature/issuer/audience/azp/expiry/nonce/state validation and per-request ACL. Establish a server-controlled application session only at successful OIDC callback; maximum proposed 60 minutes capped by token expiry, revocation checked per request. Do not renew on page reload, st.user cookie reload or new tabs; do not use iat as auth_time. Treat auth_time as optional contextual evidence under the explicitly versioned new policy. No automatic fallback from current strict policy.",
+      "risk": "Does not prove password/passkey entry within the last hour; an existing Google session may complete login. Session theft and administrator operations need risk acceptance and additional controls. Streamlit session_state alone is not sufficient for the proposed server session.",
+      "approval": "NOT_OBTAINED",
+      "implemented": false
+    }
+  ],
+  "separation": {
+    "identity": "Google return and claim presence previously observed; no new login performed.",
+    "authorization": "Live candidate Sheet metadata independently inspected; ACL table absent. No attempt to infer subject or grant roles.",
+    "business": "Strict auth_time gate, execution flags and protected environment exclusions unchanged."
+  },
+  "pi_one_time_read_steps": [
+    "Open Google Cloud Console and select project hardy-portal-514413-u8; confirm project ID.",
+    "Google Auth Platform > Clients: open the existing Web OAuth client used by the isolated app. Confirm callback https://juog-utuc01-fixture-uat-20261109.streamlit.app/oauth2callback and that client ID matches the app's configured auth.google client_id. Do not display/copy client_secret or full Secrets.",
+    "Audience: record Publishing status.",
+    "Verification Center: record Verification status.",
+    "Settings > Advanced Settings: record Session age claims enabled/disabled/not displayed. Change nothing.",
+    "Return project match, client/callback match and the three statuses together; report an existing approved one-hour requirement reference if known, otherwise select proposal A or B for review. Do not send subject, tokens or secrets in chat."
+  ],
+  "auth04_start_prerequisites": [
+    "Approve the explicit authentication assurance policy and implement/review its exact diff; no silent auth_time bypass.",
+    "On the identified isolated candidate only, securely bind validated issuer+subject to one TEST01 principal with the exact expiry; provision V3_Users and test read-only ACL via signed endpoint. Administrative owner identity does not automatically imply global admin or recovery permissions; AUTH04 facility-form operations require the corresponding limited tested capability.",
+    "Verify exact GAS deployed version/endpoint, separate Sheet ID, source hash, disabled mail/uploads, fictional data, rollback and safety review; the older build evidence had no deployed HTTP endpoint.",
+    "Approve bounded AUTH04 execution IDs/cases: identifier save rejection with no persistence, restored legacy draft redaction without mutation, valid age/birth-month retention, normal save/read/audit, and no identifying data in logs/notifications. Do not require replay of all 30 already evidenced local operations."
+  ],
+  "sources": [
+    "https://developers.google.com/identity/siwg/security-bundle",
+    "https://docs.streamlit.io/develop/concepts/connections/authentication"
+  ],
+  "protected_changes": false
+}
