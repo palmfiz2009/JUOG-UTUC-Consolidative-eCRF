@@ -1,6 +1,6 @@
 {
   "scope": "TEST01/JUOG-970 fully fictional data only",
-  "status": "AWAITING_PI_GOOGLE_DEVICE_VERIFICATION",
+  "status": "PAUSED_FOR_PI_GOOGLE_DEVICE_CONFIRMATION_BUSINESS_DISABLED",
   "frontend_commit": "ccf42cb7b870f051ddb7e3b79e3ea6c92b648135",
   "gas_version": 5,
   "privacy": {
@@ -178,13 +178,45 @@
     "new_requests": 0,
     "gas_version": 5
   },
-  "logout": {
-    "verified_revocation_then_logged_out": true,
-    "new_google_login_requires_device_approval": true
+  "final_business_consistency": {
+    "request_count": 5,
+    "unique_operation_ids": true,
+    "intent_audit_commit_one_to_one": true,
+    "versions": {
+      "day30": [
+        1,
+        2
+      ],
+      "day90": [
+        1
+      ],
+      "month6": [
+        1
+      ]
+    },
+    "all_target_case_and_facility": true,
+    "linked_to_latest30": true,
+    "clinical_tables_unchanged_except_authorized": true,
+    "journal_rows": 58,
+    "formal_pass_delta": 0
   },
+  "logout": {
+    "ledger_rows": 92,
+    "last_event_kind": "REVOKE",
+    "last_session_has_one_open": true,
+    "last_session_revoked": true
+  },
+  "frontend_final_commit": "a3781df54533d7f4a797d4d4cac53fe6106a6889",
+  "final_stage": "AUTH_CONNECT",
+  "frontend_auth04_enabled": false,
+  "disable_verified_jst": "2026-11-13T08:14:04+09:00",
+  "final_journal_rows": 58,
+  "final_journal_sha256": "1c783409e5f4cc1057de2d0de76ac379b4bb73e74f665438cfb595e9a42731b2",
   "remaining_live": [
-    "stale version refusal",
-    "missing correction reason refusal",
-    "any additional tests requiring new authenticated session"
-  ]
+    "stale-version refusal",
+    "missing-correction-reason refusal"
+  ],
+  "pi_action": "Google device approval on previously shown iPad; challenge not a UAT or release approval",
+  "production_release_approved": false,
+  "protected_environments_changed": false
 }
