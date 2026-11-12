@@ -1,0 +1,86 @@
+{
+  "at_utc": "2026-11-12T14:46:14.389374+00:00",
+  "deployment_id": "AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ",
+  "version": 1,
+  "endpoint": "https://script.google.com/macros/s/AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ/exec",
+  "requests": [
+    {
+      "case": "empty_object_no_signature",
+      "http_status": 200,
+      "response": {
+        "ok": false,
+        "error": "ISOLATION_NOT_APPROVED"
+      },
+      "rejected": true
+    },
+    {
+      "case": "malformed_json",
+      "http_status": 200,
+      "response": {
+        "ok": false,
+        "error": "ISOLATION_NOT_APPROVED"
+      },
+      "rejected": true
+    },
+    {
+      "case": "unsigned_save",
+      "http_status": 200,
+      "response": {
+        "ok": false,
+        "error": "ISOLATION_NOT_APPROVED"
+      },
+      "rejected": true
+    },
+    {
+      "case": "invalid_assertion",
+      "http_status": 200,
+      "response": {
+        "ok": false,
+        "error": "ISOLATION_NOT_APPROVED"
+      },
+      "rejected": true
+    }
+  ],
+  "interpretation": "Gate-closed live rejection only: configuration is absent. Does not prove active signature verification or individual ACL authorization.",
+  "formal_uat_delta": 0,
+  "invariance": [
+    {
+      "range": "D3_Journal!A1:Z1000",
+      "unchanged": true,
+      "rows": 3
+    },
+    {
+      "range": "V3_Users!A1:G100",
+      "unchanged": true,
+      "rows": 1
+    },
+    {
+      "range": "V3_SessionEvents!A1:C10001",
+      "unchanged": true,
+      "rows": 1
+    }
+  ],
+  "source_sha256": "154b14d5513a95fded38045b8c87b3c90cf194088968a968aefc0f36406c65bd",
+  "script_id": "11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy",
+  "spreadsheet_id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+  "preconditions": {
+    "source_hash_match": true,
+    "config_absent": true,
+    "signing_keys_absent": true,
+    "principal_acl_empty": true,
+    "baseline_11_tables_empty": true,
+    "external_mail_upload_calls_absent": true
+  },
+  "approval_scope": "PI-approved initial public deployment as owner; unauthenticated and invalid request denial only. User personally completed Google broad Sheets consent.",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "rollback": "Apps Script > Deploy > Manage deployments > select this deployment ID > Archive deployment. Do not remove versions or data.",
+  "uat_mapping": {
+    "AUTH_03": "Supplemental isolated deployment rejection evidence; pre-existing PASS unchanged",
+    "AUTH_04": "Not executed; FAIL retained"
+  }
+}
