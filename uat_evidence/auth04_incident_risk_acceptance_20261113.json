@@ -1,0 +1,9 @@
+{
+ "status":"PI_ACCEPTED_CONTINUATION_OF_ISOLATED_WORK_NOT_CREDENTIAL_REMEDIATION",
+ "user_instruction":"そこは問題ありません 続けてください",
+ "scope":"Existing isolated fictional-only task; production and release remain prohibited",
+ "rotation_verified":false,
+ "residual_risk":"Disclosure of a Streamlit cookie signing secret can undermine trust in the signed login cookie. Code-level OIDC validation remaining unchanged does not prove unchanged effective authentication assurance.",
+ "limits":["No new authentication-security PASS based on this state","No production/release clearance","No retrieval or display of Secrets through another UI/API/path","Any alternative config must contain nonsecret scope/mode flags only, retain independent GAS gate and exact fixed case/role/facility pins","Conditional live activation still requires independent technical risk review"],
+ "formal_uat_delta":0
+}
