@@ -80,7 +80,7 @@ def run():
     st.set_page_config(page_title="JUOG UAT — Google認証確認", layout="centered")
     st.title("JUOG UAT：Google認証確認")
     st.info("隔離環境・認証確認のみ。CRF保存、GAS送信、メール送信は停止しています。")
-    st.caption("Build: oidc-preflight-20261111-05")
+    st.caption("Build: oidc-acl-proposal-20261113-01")
     try:
         root_config = st.secrets["auth"]
         named_google = "google" in root_config
@@ -126,6 +126,30 @@ def run():
     st.table([{"確認項目": labels[k], "結果": "確認済み" if v else "未確認・不一致"} for k, v in checks.items()])
     st.write(authentication_time_status(st.user, int(time.time())))
     st.caption("個人識別子・トークン・認証時刻の実値は表示しません。")
+    st.subheader("本人ACL登録前の照合（読取専用）")
+    st.caption("案Bは最大60分のアプリセッションです。Googleでの直近1時間以内の再認証を保証しません。")
+    from uat_identity_proposal import identity_proposal
+    try:
+        proposal = identity_proposal(st.user, config["client_id"], int(time.time()))
+    except PermissionError as error:
+        messages = {
+            "LOGIN_REQUIRED": "Googleログインが必要です。",
+            "IDENTITY_MISMATCH": "本人識別子または既存OAuthクライアントとの一致を確認できません。",
+            "RELOGIN_REQUIRED": "既存認証結果の期限が切れています。ログアウト後、Googleで再ログインしてください。",
+            "NONCE_UNAVAILABLE": "B2に必要なnonceを取得できません。接続を有効化せず実装を確認してください。",
+        }
+        st.warning(messages.get(str(error), "本人照合を完了できません。"))
+    else:
+        st.success("正規ログイン結果と既存OAuthクライアントの一致、およびB2用属性を確認しました。")
+        st.write("本人照合番号（issuer＋subjectのSHA-256）：")
+        st.code(proposal["principal_fingerprint"], language=None)
+        st.table([
+            {"登録予定項目": "対象施設", "内容": "TEST01のみ"},
+            {"登録予定項目": "ロール", "内容": "facility（全施設管理権限なし）"},
+            {"登録予定項目": "期限", "内容": "2026年11月19日23:59 JST"},
+            {"登録予定項目": "接続段階", "内容": "AUTH_CONNECTのみ・業務保存禁止"},
+        ])
+        st.info("これは登録予定の照合です。本人ACL登録・GAS送信・設定有効化は行っていません。PI承認前に権限は付与されません。")
     st.warning("施設・ロールACLは未接続です。業務操作は許可されていません。正式UATのPASS判定ではありません。")
     if not all(checks.values()):
         st.error("不足する属性・期限条件があります。認証・認可の完成とは判定しません。")
