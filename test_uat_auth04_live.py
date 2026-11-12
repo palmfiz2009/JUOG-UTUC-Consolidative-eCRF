@@ -127,4 +127,42 @@ class Tests(unittest.TestCase):
    with patch.object(h,'call',return_value=result):
     with self.assertRaises(PermissionError):h.other_owner_read_denied(ui)
 
+ def test_prepare_margin_exact_boundary_and_shorter_expiry(self):
+  ui=self.ui();body={'action':'save_draft','payload':h.draft_payload()}
+  for iat,exp,allowed in [(1000,6000,True),(999,6000,False),(1000,4599,False),(True,6000,False)]:
+   native=types.SimpleNamespace(user={'iat':iat,'exp':exp})
+   with self.subTest(iat=iat,exp=exp),patch.object(h,'native_context',return_value=native),patch.object(h.time,'time',return_value=3700),patch.object(h,'signed_request',return_value={}) as signed,patch.object(h,'send',return_value={'ok':True}) as send:
+    if allowed:self.assertTrue(h.call(ui,'prepare_request',body)['ok']);send.assert_called_once()
+    else:
+     with self.assertRaises(h.PrepareWindowClosed):h.call(ui,'prepare_request',body)
+     signed.assert_not_called();send.assert_not_called()
+ def test_prepare_margin_rechecked_after_signing(self):
+  ui=self.ui();native=types.SimpleNamespace(user={'iat':1000,'exp':6000})
+  with patch.object(h,'native_context',return_value=native),patch.object(h.time,'time',side_effect=[3700,3701]),patch.object(h,'signed_request',return_value={}),patch.object(h,'send') as send:
+   with self.assertRaises(h.PrepareWindowClosed):h.call(ui,'prepare_request',{'action':'save_draft','payload':h.draft_payload()})
+   send.assert_not_called()
+ def test_margin_does_not_block_observed_reconciliation_or_reads(self):
+  ui=self.ui();ui.session_state['auth04_operation_ids']=['observed']
+  native=types.SimpleNamespace(user={'iat':1000,'exp':6000})
+  with patch.object(h,'native_context',return_value=native),patch.object(h.time,'time',return_value=4599),patch.object(h,'signed_request',return_value={}),patch.object(h,'send',return_value={'ok':True}) as send:
+   for action in ('request_status','execute_request'):self.assertTrue(h.call(ui,action,{'operation_id':'observed'})['ok'])
+   self.assertTrue(h.call(ui,'read_crf',h.read_payload())['ok']);self.assertEqual(send.call_count,3)
+ def test_local_margin_refusal_is_not_uncertain_prepare(self):
+  ui=self.ui()
+  with patch.object(h,'context'),patch.object(h,'call',side_effect=h.PrepareWindowClosed('AUTH04_PREPARE_WINDOW_CLOSED')):
+   with self.assertRaises(h.PrepareWindowClosed):h.write_once(ui,'save_draft',h.draft_payload())
+  self.assertFalse(ui.session_state['auth04_preparation_uncertain']);self.assertNotIn('auth04_pending',ui.session_state)
+ def test_legacy_representation_drift_rejected_before_restore(self):
+  variants=[]
+  for key,value in [('d90_nested',{'CRP':0}),('d90_age',46.0),('d90_age',True)]:
+   bad=h.expected_legacy90d();bad[key]['value']=value;variants.append(bad)
+  bad=h.expected_legacy90d();bad['d90_nested']={'type':'value','value':'{"CRP":0}','extra':'unexpected'};variants.append(bad)
+  variants.append(__import__('json').dumps(h.expected_legacy90d()))
+  for bad in variants:
+   with self.subTest(draft_type=type(bad).__name__),patch.object(h,'call',return_value={'ok':True,'result':{'source_found':True,'draft_state':bad}}),patch.object(h,'restore_draft_state') as restore:
+    with self.assertRaises(PermissionError):h.legacy90d_read_restore(self.ui())
+    restore.assert_not_called()
+  expected=h.expected_legacy90d();equivalent=copy.deepcopy(expected);equivalent['d90_nested']['value']='{ "CRP" : 0 }'
+  self.assertTrue(h.legacy90d_matches(equivalent,expected))
+
 if __name__=='__main__':unittest.main()

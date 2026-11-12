@@ -15,6 +15,18 @@ FIXTURE_SHA=hashlib.sha256(FIXTURE_PATH.read_bytes()).hexdigest()
 WRITE_ACTIONS={'save_draft','save_crf'}
 READ_ACTIONS={'ui_context','get_draft','read_crf'}
 LIFECYCLE={'prepare_request','execute_request','request_status'}
+PREPARE_MIN_REMAINING_SECONDS=900
+
+class PrepareWindowClosed(PermissionError):
+    """Local refusal before transmission; does not imply an uncertain write."""
+
+def require_prepare_window(native):
+    # Called only after native_context validates the OIDC result. This additional
+    # experiment limit never changes the authentication deadline.
+    now=int(time.time());iat,exp=native.user.get('iat'),native.user.get('exp')
+    if (type(iat) is not int or type(exp) is not int or not 0<=iat<=now<exp or
+        min(iat+3600,exp)-now<PREPARE_MIN_REMAINING_SECONDS):
+        raise PrepareWindowClosed('AUTH04_PREPARE_WINDOW_CLOSED')
 PAIRS={('perioperative_30d','30d'),('day90','90d'),('followup','6m')}
 PRIVACY_FIXTURES=[{'reg_birth_date': 'SYNTHETIC-ID'}, {'regBirthDate': 'SYNTHETIC-ID'}, {'regFirstName': 'SYNTHETIC-ID'}, {'regLastName': 'SYNTHETIC-ID'}, {'regDOB': 'SYNTHETIC-ID'}, {'regＭＲＮ': 'SYNTHETIC-ID'}, {'regＢirthDate': 'SYNTHETIC-ID'}, {'note': '患者氏名は架空検証者'}, {'note': 'カルテ番号はSYNTHETIC-001'}, {'note': '生年月日は１９８０年１月２日'}, {'note': 'DOB: 1980-01-02'}, {'nested': [{'encoded': '{"regFirstName": "FICTIONAL"}'}]}, {'患者氏名': 'SYNTHETIC-ID'}, {'カルテ番号': 'SYNTHETIC-ID'}, {'生年月日': '1980-01-02'}, {'nested': [{'encoded': '{"患者氏名": "SYNTHETIC-ID"}'}]}]
 
@@ -65,7 +77,11 @@ def call(ui,action,payload):
         if action=='ui_context':outbound={'registration_id':payload['registration_id']}
         if action=='read_crf':outbound={k:payload[k] for k in ('registration_id','facility_code','record_key')}
         body={'id':'auth04_read_'+uuid.uuid4().hex,'action':action,'payload':outbound}
-    return send(signed_request(native_context(ui),action,body))
+    native=native_context(ui)
+    if action=='prepare_request':require_prepare_window(native)
+    envelope=signed_request(native,action,body)
+    if action=='prepare_request':require_prepare_window(native)
+    return send(envelope)
 
 def context(ui):
     r=call(ui,'ui_context',{'registration_id':CASE,'facility_code':FACILITY})
@@ -78,7 +94,10 @@ def write_once(ui,action,payload):
         raise PermissionError('RECONCILE_BEFORE_NEW_PREPARE')
     context(ui)
     ui.session_state['auth04_preparation_uncertain']=True
-    prepared=call(ui,'prepare_request',{'action':action,'payload':payload})
+    try:prepared=call(ui,'prepare_request',{'action':action,'payload':payload})
+    except PrepareWindowClosed:
+        ui.session_state['auth04_preparation_uncertain']=False
+        raise
     if prepared.get('state')=='UNKNOWN' or prepared.get('error') in ('PREPARATION_UNCERTAIN','REQUEST_UNCERTAIN_RECONCILE_BEFORE_RETRY'):
         raise PermissionError('PREPARATION_UNCERTAIN')
     ui.session_state['auth04_preparation_uncertain']=False
@@ -169,15 +188,26 @@ def semantic_json_strings(value):
 def expected_legacy90d():
     return {'d90_age':{'type':'value','value':46},'d90_birth_year_month':{'type':'value','value':'1980-01'},'d90_clinical_note':{'type':'value','value':'完全架空の臨床記載'},'d90_nested':{'type':'value','value':'{"CRP":0}'}}
 
+def legacy90d_matches(draft,expected):
+    # JSON-string whitespace may differ; string-to-object coercion and numeric
+    # type drift must not be concealed by semantic JSON comparison.
+    if type(draft) is not dict or set(draft)!=set(expected):return False
+    for key,want in expected.items():
+        got=draft[key]
+        if (type(got) is not dict or set(got)!=set(want) or
+            type(got.get('type')) is not str or got['type']!=want['type'] or
+            type(got.get('value')) is not type(want['value'])):return False
+    return semantic_json_strings(draft)==semantic_json_strings(expected)
+
 def legacy90d_read_restore(ui):
     r=call(ui,'get_draft',read_payload(1));result=r.get('result',{})
     if r.get('ok') is not True or result.get('source_found') is not True:raise PermissionError('LEGACY_READ_NOT_CONFIRMED')
     draft=result.get('draft_state');expected=expected_legacy90d()
     # Compare the server return before local redaction can conceal a server defect.
-    if semantic_json_strings(draft)!=semantic_json_strings(expected):raise PermissionError('SERVER_LEGACY_REDACTION_MISMATCH')
+    if not legacy90d_matches(draft,expected):raise PermissionError('SERVER_LEGACY_REDACTION_MISMATCH')
     ui.session_state['d90_patient_name']='SYNTHETIC-STALE';ui.session_state['widget_d90_patient_name']='SYNTHETIC-STALE'
     clear_session_state_prefixes(('d90_','widget_d90_'));restore_draft_state(draft)
-    if 'd90_patient_name' in ui.session_state or 'widget_d90_patient_name' in ui.session_state or semantic_json_strings(capture_draft_state('d90_'))!=semantic_json_strings(expected):raise PermissionError('LEGACY_RESTORE_MISMATCH')
+    if 'd90_patient_name' in ui.session_state or 'widget_d90_patient_name' in ui.session_state or not legacy90d_matches(capture_draft_state('d90_'),expected):raise PermissionError('LEGACY_RESTORE_MISMATCH')
     return r
 
 def other_owner_read_denied(ui):
@@ -271,6 +301,9 @@ def run():
                 if r.get('ok') is not True or r.get('state')!='SAVED':raise PermissionError('REPLAY_STATUS_NOT_CONFIRMED')
             st.session_state.setdefault('auth04_results',[]).append({'check':choice,**summarize(r)})
             st.table(st.session_state['auth04_results'])
+        except PrepareWindowClosed:
+            st.session_state['auth04_preparation_uncertain']=False
+            st.warning('期限まで15分未満のため新しい保存要求を送信しません。読取・保存状態の照合後にログアウトしてください。')
         except Exception:
             st.session_state['auth04_halted']=True
             st.error('実測を確認できないため停止しました。自動再送せず、監査と台帳を照合してください。')
