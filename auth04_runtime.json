@@ -1,5 +1,5 @@
 {
-  "enabled": true,
+  "enabled": false,
   "stage": "AUTH04_APPROVED",
   "fixture_id": "JUOG-970",
   "facility_code": "TEST01",
