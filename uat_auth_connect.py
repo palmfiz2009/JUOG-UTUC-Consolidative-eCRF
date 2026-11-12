@@ -75,6 +75,10 @@ def run():
             if valid_context(result):st.success('ACL_SINGLE_ALLOWED_TEST01_FACILITY')
             elif result.get('ok') is False and result.get('error') == 'ACL_DENIED':
                 st.warning('ACL_SINGLE_DENIED：'+result['error'])
+            elif result.get('ok') is False and result.get('error') == 'UNIFIED_TRANSACTION_INCOMPLETE':
+                st.error('ACL_SINGLE_REJECTED_UNCLASSIFIED：UNIFIED_TRANSACTION_INCOMPLETE（ACL合格には加算しません）')
+                st.session_state['auth_connect_halted']=True
+                st.stop()
             else:raise PermissionError('UNEXPECTED_RESPONSE')
         except Exception:
             st.session_state['auth_connect_halted']=True
