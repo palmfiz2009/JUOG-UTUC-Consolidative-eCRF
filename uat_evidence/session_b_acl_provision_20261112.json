@@ -1,0 +1,47 @@
+{
+  "at": "2026-11-12T13:44:15.518Z",
+  "spreadsheet_id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+  "sheet": "V3_Users",
+  "sheet_id": 20261112,
+  "headers": [
+    "issuer",
+    "subject",
+    "user_id",
+    "enabled",
+    "role",
+    "facility_ids_json",
+    "valid_until"
+  ],
+  "principal_rows": 0,
+  "journal_A1_F4_unchanged": true,
+  "scope": "Only empty ACL table provisioned; no principal grant; no business write",
+  "session_b": {
+    "status": "candidate_not_deployed",
+    "tests_new": 16,
+    "existing_regression_tests": 12,
+    "expiry": "min(first_server_seen+3600, verified_token_iat+3600, verified_token_exp)",
+    "not_google_reauthentication": true,
+    "default_legacy_auth_time_unchanged": true,
+    "release_blockers": [
+      "Durable shared session store not provisioned on actual runtime",
+      "Native verified claims including nonce/iat must be confirmed without logging identifiers",
+      "Already-issued GAS envelopes retain up to 60 seconds validity after app-session revoke; resolve or review bounded risk before execution approval",
+      "Real OIDC issuer+subject not available to this execution; no guessed ACL grant",
+      "Actual isolated GAS endpoint and execution approval not established"
+    ],
+    "review_findings_fixed": [
+      "Candidate UI logout revokes durable session first",
+      "Expired session may clear old cookie",
+      "Failed active-session revocation blocks cookie-only logout"
+    ]
+  },
+  "formal_uat": {
+    "pass": 32,
+    "fail": 1,
+    "blocked": 29,
+    "not_run": 5,
+    "delta_pass": 0
+  },
+  "live_acl": "NOT_RUN",
+  "live_AUTH04": "NOT_RUN"
+}

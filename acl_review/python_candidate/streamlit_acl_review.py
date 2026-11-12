@@ -10,6 +10,10 @@ def run():
         if st.button("Googleでログイン"):
             st.login("google")
         st.stop()
+    if st.button("ログアウト"):
+        from app_session_b import policy_logout
+        policy_logout(st)
+        st.stop()
     if not st.button("承認済み隔離先で自分のACLを確認"):
         st.stop()
     try:

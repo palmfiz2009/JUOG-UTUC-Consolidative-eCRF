@@ -17,7 +17,7 @@ def screen(response=None, logged_in=True, clicked=True):
     st.set_page_config = lambda **k: None
     st.title = lambda *a: None
     st.info = lambda *a: None
-    st.button = lambda *a, **k: clicked
+    st.button = lambda label, **k: clicked if label != 'ログアウト' else False
     st.login = lambda provider: events.append(("login", provider))
     st.error = lambda message: events.append(("error", message))
     st.success = lambda message: events.append(("success", message))

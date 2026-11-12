@@ -57,7 +57,9 @@ def role_gate(st,allowed):
     ctx=registry_call(st,'ui_context')
     if not ctx.get('ok') or ctx.get('role') not in allowed:
         st.error('この画面の個人権限を確認できません。')
-        if st.button('ログアウトして本人認証をやり直す'):st.logout()
+        if st.button('ログアウトして本人認証をやり直す'):
+            from app_session_b import policy_logout
+            policy_logout(st)
         return None
     render_recovery_controls(st)
     return ctx['role']

@@ -29,9 +29,17 @@ def signed_request(st, action, payload):
     expiry = st.user.get('exp')
     if not isinstance(expiry, int) or isinstance(expiry, bool) or expiry <= now:
         raise PermissionError('OIDC_TOKEN_EXPIRED_OR_MISSING')
-    auth_time = st.user.get('auth_time')
-    if not isinstance(auth_time, int) or isinstance(auth_time, bool) or not 0 <= now - auth_time <= int(cfg['max_auth_age_seconds']):
-        raise PermissionError('FRESH_OIDC_LOGIN_REQUIRED')
+    session_expiry = expiry
+    mode = cfg.get('session_policy', 'google_auth_time')
+    if mode == 'isolated_app_session_b':
+        from app_session_b import check
+        session_expiry = check(st.user, cfg, now)
+    elif mode == 'google_auth_time':
+        auth_time = st.user.get('auth_time')
+        if not isinstance(auth_time, int) or isinstance(auth_time, bool) or not 0 <= now - auth_time <= int(cfg['max_auth_age_seconds']):
+            raise PermissionError('FRESH_OIDC_LOGIN_REQUIRED')
+    else:
+        raise PermissionError('SESSION_POLICY_INVALID')
     key = str(cfg['signing_key']).encode('utf-8')
     if len(key) < 32:
         raise PermissionError('BRIDGE_NOT_CONFIGURED')
@@ -40,7 +48,7 @@ def signed_request(st, action, payload):
     if len(request.encode('utf-8')) > 200000:
         raise ValueError('REQUEST_TOO_LARGE')
     claims = {'v': 1, 'iss': cfg['bridge_issuer'], 'aud': cfg['audience'],
-              'oidc_issuer': issuer, 'sub': sub, 'iat': now, 'exp': now + 60,
+              'oidc_issuer': issuer, 'sub': sub, 'iat': now, 'exp': min(now + 60, session_expiry),
               'request_hash': hashlib.sha256(request.encode('utf-8')).hexdigest()}
     encoded = _b64(json.dumps(claims, ensure_ascii=False, separators=(',', ':')).encode('utf-8'))
     signature = _b64(hmac.new(key, encoded.encode('ascii'), hashlib.sha256).digest())
