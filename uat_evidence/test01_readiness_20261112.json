@@ -1,0 +1,40 @@
+{
+  "date_jst": "2026-11-12",
+  "scope": "Review-only TEST01 readiness; no deployment or live ACL provisioning",
+  "source_evidence": "uat_evidence/google_live_test01_20261112.json",
+  "principal_status": "Presence observed only; raw subject not retrieved. No invented principal.",
+  "approved_scope": {
+    "facility": "TEST01",
+    "persons": 1,
+    "expires_at": "2026-11-19T14:59:00Z"
+  },
+  "offline_validation": {
+    "python_unittest_methods": 12,
+    "python_gas_assertion_groups": 12,
+    "result": "PASS",
+    "synthetic_identity_only": true,
+    "live_requests": 0
+  },
+  "provider_reference": "https://developers.google.com/identity/siwg/security-bundle",
+  "provider_requirements": [
+    "Publishing status In production",
+    "Verification Status Verified",
+    "Session age claims enabled"
+  ],
+  "provider_settings_observed": false,
+  "auth_time_policy": "Unchanged: missing, future, or stale authentication time is rejected. Neither iat nor local time substitutes for auth_time.",
+  "remaining": [
+    "Read the three Google Auth Platform settings for project hardy-portal-514413-u8; no publishing/config change performed.",
+    "Obtain issuer+subject server-side from validated authentication; never infer from email or store raw credentials in evidence.",
+    "Provision scoped ACL only after freshness prerequisite is satisfied and isolated target/configuration verified.",
+    "Run live positive/negative ACL and AUTH-04 tests."
+  ],
+  "formal_uat": {
+    "pass": 32,
+    "fail": 1,
+    "blocked": 29,
+    "not_run": 5
+  },
+  "protected_changes": false,
+  "harness_sha256": "d0b99ada3a20444861634ae81b298ca0ed9fb2a2eeaf0e1ca6cf38d06c6bee28"
+}
