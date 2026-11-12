@@ -1,0 +1,19 @@
+{
+  "review_result": "PASS",
+  "entry_sha256": "51592f3d9b9d24d56593b2c3b5889026db5a0515e96c1061f6d035e263f28d37",
+  "pinned_harness_sha256": "640d83e69e17a8077da6114edac7c84f2ae6f48b62a66d4d10b41d03541549f1",
+  "entry_commit_reported_by_root": "ccf42cb7b870f051ddb7e3b79e3ea6c92b648135",
+  "tests": 3,
+  "test_path": "test_auth04_entry_refresh.py",
+  "test_sha256": "989858ef5babfff969b0fd738d99f3a450940d6e457d613ae01e77e902327b67",
+  "checks": [
+    "Actual entry prefix verifies fixed source hash before import/reload",
+    "Valid reload calls refreshed run while preserving observed pending session state",
+    "Hash mismatch performs no reload/run/request and stops",
+    "Reload failure displays static error and stops without old harness or auth-connect fallback",
+    "Postreload code checks callable6m recovery/revoke and recovery_index local variable"
+  ],
+  "scope": "Offline mocked module imports and actual entry prefix; no credentials or external calls",
+  "application_files_modified_by_reviewer": false,
+  "formal_uat_delta": 0
+}
