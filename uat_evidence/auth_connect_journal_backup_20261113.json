@@ -1,0 +1,29 @@
+{
+  "range": "D3_Journal!A1:Z1000",
+  "majorDimension": "ROWS",
+  "values": [
+    [
+      "batch_id",
+      "kind",
+      "part",
+      "total",
+      "sha256",
+      "data"
+    ],
+    [
+      "BASELINE-AUTH04-20261111-001",
+      "baseline",
+      0,
+      1,
+      "8c3af6961358d848ab6f51cfb1d846eb2507f5258b869dcaf039dd85e4dbc2ba",
+      "{\"Registry\":[[\"registered_at\",\"registration_id\",\"status\",\"facility_code\",\"facility_name\",\"local_subject_code\",\"reporter_email\",\"consent_date\",\"mdt_date\",\"cN\",\"best_effect\",\"site_recist\",\"screening_id\",\"central_recist\",\"recist_concordance\"]],\"Screening\":[[\"screening_id\",\"created_at\",\"updated_at\",\"status\",\"review_round\",\"facility_code\",\"facility_name\",\"local_subject_code\",\"reporter_email\",\"submission_id\",\"consent_date\",\"cT\",\"cN\",\"cM\",\"best_effect\",\"site_recist\",\"planned_surgery\",\"planned_surgery_date\",\"mdt_date\",\"central_recist\",\"recist_concordance\",\"mdt_decision\",\"mdt_reason\",\"consensus_note\",\"registration_id\",\"registered_at\",\"admin_user\"]],\"ScreeningAudit\":[[\"timestamp\",\"screening_id\",\"review_round\",\"action\",\"status_after\",\"facility_code\",\"local_subject_code\",\"submission_id\",\"mdt_date\",\"site_recist\",\"central_recist\",\"recist_concordance\",\"mdt_decision\",\"mdt_reason\",\"consensus_note\",\"registration_id\",\"admin_user\"]],\"MDTReviews\":[[\"review_id\",\"submitted_at\",\"screening_id\",\"review_round\",\"reviewer_role\",\"reviewer_name\",\"review_version\",\"is_correction\",\"correction_reason\",\"decision\",\"comment\",\"central_recist\",\"organ_invasion\",\"vessel_invasion\",\"cm1_status\",\"g3_ae_recovered\",\"ecog_0_1\",\"medical_safety\",\"technically_resectable\",\"surgery_appropriate\"]],\"ScreeningCRF\":[[\"saved_at\",\"record_version\",\"submission_id\",\"record_key\",\"submission_kind\",\"correction_reason\",\"submitted_at\",\"registration_id\",\"facility_code\",\"facility_name\",\"reporter_email\",\"crf_type\",\"visit\",\"schema_version\",\"study_code\",\"payload_json\"]],\"CRF_30d\":[[\"saved_at\",\"record_version\",\"submission_id\",\"record_key\",\"submission_kind\",\"correction_reason\",\"submitted_at\",\"registration_id\",\"facility_code\",\"facility_name\",\"reporter_email\",\"crf_type\",\"visit\",\"schema_version\",\"study_code\",\"payload_json\"]],\"CRF_90d\":[[\"saved_at\",\"record_version\",\"submission_id\",\"record_key\",\"submission_kind\",\"correction_reason\",\"submitted_at\",\"registration_id\",\"facility_code\",\"facility_name\",\"reporter_email\",\"crf_type\",\"visit\",\"schema_version\",\"study_code\",\"payload_json\"]],\"CRF_Followup\":[[\"saved_at\",\"record_version\",\"submission_id\",\"record_key\",\"submission_kind\",\"correction_reason\",\"submitted_at\",\"registration_id\",\"facility_code\",\"facility_name\",\"reporter_email\",\"crf_type\",\"visit\",\"schema_version\",\"study_code\",\"payload_json\"]],\"CRFSubmissionAudit\":[[\"saved_at\",\"sheet_name\",\"record_key\",\"record_version\",\"submission_id\",\"submission_kind\",\"registration_id\",\"facility_code\"]],\"CRF_Drafts\":[[\"draft_key\",\"updated_at\",\"registration_id\",\"crf_type\",\"visit\",\"facility_code\",\"facility_name\",\"reporter_email\",\"schema_version\",\"draft_json\",\"resume_code_hash\",\"failed_attempts\",\"locked_until\",\"code_reset_at\",\"code_reset_by\",\"email_reset_at\",\"email_reset_by\"]],\"Settings\":[[\"key\",\"value\"]]}"
+    ],
+    [
+      "BASELINE-AUTH04-20261111-001",
+      "baseline",
+      "SEALED",
+      1,
+      "8c3af6961358d848ab6f51cfb1d846eb2507f5258b869dcaf039dd85e4dbc2ba"
+    ]
+  ]
+}

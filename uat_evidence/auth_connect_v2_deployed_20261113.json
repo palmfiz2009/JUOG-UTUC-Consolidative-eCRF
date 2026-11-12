@@ -1,0 +1,43 @@
+{
+  "date_jst": "2026-11-13",
+  "deployed_version": 2,
+  "deployment_id": "AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ",
+  "source_sha256": "cc6b536b84209c01f71aaab20748c450ab669f150e014e13215320809c83e05c",
+  "editor_readback_sha_match": true,
+  "execute_as": "owner",
+  "access": "anyone (unchanged)",
+  "independent_technical_review": "PASS_SCOPED_GAS_AND_FRONTEND",
+  "human_qa": false,
+  "gas_new_checks": 15,
+  "frontend_new_checks": 6,
+  "frontend_commit": "25f7500a7ad6ab4c2edd4f451f48224635ec1058",
+  "signing_key_generated": true,
+  "key_entropy_bits": 384,
+  "key_settings_completed": false,
+  "auth_connect_enabled": false,
+  "version2_unsigned_probe": {
+    "ok": false,
+    "error": "ISOLATION_NOT_APPROVED"
+  },
+  "acl": {
+    "principals": 1,
+    "role": "facility",
+    "facilities": [
+      "TEST01"
+    ],
+    "expiry": "2026-11-19T23:59:00+09:00"
+  },
+  "journal_unchanged": true,
+  "session_journal_unchanged": true,
+  "live_signed_communication": "NOT_RUN",
+  "auth04": "NOT_AUTHORIZED",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "rollback": "Remove UNIFIED_ISOLATION_CONFIG (or set authConnectReviewApproved false) and disable frontend auth_connect.enabled; archive exact deployment for public shutdown",
+  "remaining": "PI entry/save of new signing credential into GAS and Streamlit secret stores, followed by configuration-match check and approved supervised AUTH_CONNECT tests",
+  "residual_file": "Runtime read-only download persists; operator deletion request not sent because no operator support channel is available"
+}

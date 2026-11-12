@@ -1,0 +1,22 @@
+{
+  "environment": "ISOLATED_TEST",
+  "approvalRef": "PI-AUTH_CONNECT-20261113",
+  "backupVerified": true,
+  "qaApproved": true,
+  "fictionalBaselineVerified": true,
+  "notificationsDisabled": true,
+  "spreadsheetId": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+  "approvedSpreadsheetId": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+  "allRoutesReviewed": false,
+  "schemaParityApproved": false,
+  "sessionPolicy": "isolated_gas_session_b2",
+  "sessionStoreGeneration": "d72bcf33-423d-4c4d-862d-2e2d69bc3edf",
+  "sessionStoreApproved": true,
+  "sessionExecutionStage": "AUTH_CONNECT",
+  "auth04ExecutionApprovalRef": null,
+  "oidcIssuer": "https://accounts.google.com",
+  "bridgeIssuer": "JUOG_ISOLATED_STREAMLIT_TEST01",
+  "audience": "JUOG_AUTH04_GAS_TEST01",
+  "authConnectReviewApproved": true,
+  "authConnectReviewRef": "19ced23e080b44ab0a08e2861872f1bd1071b87d/uat_evidence/auth_connect_scoped_safety_review_20261113.json"
+}
