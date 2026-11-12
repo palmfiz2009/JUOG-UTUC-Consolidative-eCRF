@@ -51,6 +51,14 @@ def run():
     if not st.user.is_logged_in:
         if st.button('Googleでログイン'):st.login('google')
         st.stop()
+    if st.session_state.get('auth_connect_halted'):
+        st.error('前回の異常で停止しています。管理者による確認・無効化が必要です。')
+        st.stop()
+    from uat_boundary_probe import panel as boundary_panel
+    boundary_panel(lambda:context(st), context_envelope, send, valid_context)
+    probe=st.session_state.get('real_boundary_probe', {})
+    if st.session_state.get('auth_connect_halted') or probe.get('phase') in ('WAITING','WAITING_EXPIRY','CHECKING_EXPIRY'):
+        st.stop()
     try:native=context(st)
     except Exception:
         st.error('承認条件・本人認証・期限・設定を確認できません。接続していません。')
@@ -61,6 +69,17 @@ def run():
     if st.session_state.get('auth_connect_halted'):
         st.error('前回の異常で接続試験を停止しています。管理者による確認・無効化が必要です。')
         st.stop()
+    if st.button('現在の本人ACLを1回だけ照合'):
+        try:
+            result=send(context_envelope(native))
+            if valid_context(result):st.success('ACL_SINGLE_ALLOWED_TEST01_FACILITY')
+            elif result.get('ok') is False and result.get('error') == 'ACL_DENIED':
+                st.warning('ACL_SINGLE_DENIED：'+result['error'])
+            else:raise PermissionError('UNEXPECTED_RESPONSE')
+        except Exception:
+            st.session_state['auth_connect_halted']=True
+            st.error('単回ACL照合を確認できません。自動再送しません。')
+            st.stop()
     if st.button('本人ACLと拒否条件を実測'):
         checks=[]
         def record(name, passed):
