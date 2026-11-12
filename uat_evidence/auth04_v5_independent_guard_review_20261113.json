@@ -1,0 +1,58 @@
+{
+  "review_result": "APPROVED_FOR_ISOLATED_FUNCTIONAL_SCOPE",
+  "reviewer": "privacy_diagnostic_review",
+  "core_sha256": "939b1132da3d0b277c8f5909b6382fd84ad09ead18c0f9f85ab52b12bc93acea",
+  "full_editor_sha256": "99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5",
+  "changes": [
+    "Remove duplicate outer guard wrapper only; each physical chunk and seal retains authoritative guard",
+    "Recheck assertion and session deadlines after remote session/ACL reads",
+    "Expose six fixed guard error codes; all unknown exception messages remain DOMAIN_INCOMPLETE"
+  ],
+  "security_controls_unchanged": [
+    "15-second signature expiry",
+    "60-minute session ceiling",
+    "current individual ACL before each write",
+    "replay refusal",
+    "revocation refusal",
+    "fixed TEST01/JUOG-970 scope",
+    "append-only sealed intent/audit/commit semantics"
+  ],
+  "independent_tests": {
+    "guard_and_recovery": 11,
+    "scope_endpoint": 17,
+    "same_tests_on_actual_full_editor": true,
+    "result": "PASS",
+    "guard_test_path": "acl_review/auth04_write_guard_candidate/test_independent_guard.cjs",
+    "guard_test_sha256": "ff80514943a51122a792012ec8f8554d2f269f903fd0bffbaeb43f3ad3275c82",
+    "checks": [
+      "All5append methods guard each physical chunk and seal",
+      "ACL read delay crossing deadline denies before append",
+      "Expiry after commit-data chunk leaves UNFINISHED and unsealed evidence",
+      "Fresh same-operation recovery preserves unsealed batch and yields exactlyone sealedcommit",
+      "Same-ID repeat no duplicate business writes",
+      "Expired original envelope rejected",
+      "Replay rejected",
+      "Disabled ACL denies append",
+      "Revocation rejects preissued envelope",
+      "Concurrent AUTH_CONNECT endpoint gives exact LOCK_TIMEOUT",
+      "Known errors classified and SECRET_SENTINEL message masked"
+    ]
+  },
+  "recovery_helper": {
+    "sha256": "1482039e42bf86e197c72e1c818dc43d301145967a66ef89f86f292001a36d54",
+    "guard_tests": 24,
+    "result": "PASS",
+    "journal_hash_substitution": true,
+    "synthetic_principal_substitution": true,
+    "live56row_hash_verified_by_this_reviewer": false,
+    "required_live_preflight": "Exact56row snapshot hash must pass helper readonly guard; root independently measured pin"
+  },
+  "limitations": [
+    "Synthetic clock and Sheets; planner stub used for transaction recovery mechanism",
+    "Live failure cause still not proven solely by offline reproduction",
+    "Generic old session harness is incompatible with fixed AUTH04 scope; not counted as passed",
+    "No guarantee that performance optimization alone avoids every15second interruption"
+  ],
+  "formal_uat_delta": 0,
+  "external_actions_by_reviewer": 0
+}

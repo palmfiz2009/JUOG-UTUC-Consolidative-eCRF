@@ -1,0 +1,16 @@
+{
+  "status": "REVIEWED_CANDIDATE",
+  "frontend_sha256": "640d83e69e17a8077da6114edac7c84f2ae6f48b62a66d4d10b41d03541549f1",
+  "tests_sha256": "c5f2169758621d5934e79c9f6795fd698e1be6f26c5759f9b81b46d750c39219",
+  "tests": 50,
+  "result": "PASS",
+  "scope": [
+    "Recovery only fixed index1/2 with observedID;6m requires90v1 verifiedhash and30v2",
+    "Exact read/history before clearing pending/halt; failures remain stopped",
+    "Revoke-and-logout only after no pending/uncertain operation",
+    "Revoke signed with fixed empty payload; logout only after ok=true and revoked=true"
+  ],
+  "no_expiry_extension": true,
+  "no_new_prepare_in_recovery": true,
+  "formal_uat_delta": 0
+}

@@ -1,0 +1,15 @@
+{
+  "version": 5,
+  "sha256": "99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5",
+  "deployment_id_unchanged": true,
+  "owner_and_public_access_unchanged": true,
+  "deployed_jst": "2026-11-13T07:58:00+09:00",
+  "readiness": {
+    "ok": true,
+    "configuration_changed": false,
+    "observed_jst": "2026-11-13T07:59:20+09:00",
+    "journal_sha256": "efbcd9ab04a4dba8a1313b867df19c4e2136f8dcc249b8ccfb33a416fe831dc6"
+  },
+  "frontend_commit": "c97a18f1d35f92028a7922726138ff07878edadb",
+  "formal_pass_delta": 0
+}
