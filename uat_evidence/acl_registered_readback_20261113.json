@@ -1,0 +1,41 @@
+{
+  "date_jst": "2026-11-13",
+  "principal_fingerprint_match": true,
+  "registered_principals": 1,
+  "duplicate_count": 0,
+  "range": "V3_Users!A2:G2",
+  "role": "facility",
+  "facilities": [
+    "TEST01"
+  ],
+  "valid_until": "2026-11-19T23:59:00+09:00",
+  "enabled": true,
+  "seven_columns_exact_readback": true,
+  "subject_stored_as_string": true,
+  "journal_unchanged": true,
+  "session_events_unchanged": true,
+  "signing_keys_set": false,
+  "auth_connect_activated": false,
+  "signed_requests_sent": 0,
+  "auth04_executed": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "delta_PASS": 0
+  },
+  "private_handoff": {
+    "temporary_export_removed": true,
+    "cleanup_commit": "bddfce0b0214550d9da67835c3428f57944e624c",
+    "working_copy_removed": true,
+    "browser_download_removal": "FAILED_READ_ONLY_FILESYSTEM",
+    "tokens_or_keys_in_handoff": false
+  },
+  "remaining_before_activation": [
+    "Review B2 Python/GAS route guards and rollback; AUTH04_APPROVED remains prohibited",
+    "Provision isolated signing key and required supporting secrets only after separate PI approval",
+    "Match endpoint, issuer/audience, session generation and 60-minute/15-second limits on Python and GAS",
+    "Obtain AUTH_CONNECT activation and signed-test approval; verify replay/revocation/ACL denial and business-write refusal"
+  ]
+}
