@@ -1,9 +1,9 @@
 {
-  "at": "2026-11-12T14:09:38.248Z",
-  "candidate_commit": "b7ca7e9494d4ebbc468bdf82d9d66b5444245169",
+  "at": "2026-11-12T14:12:53.171Z",
+  "candidate_commit": "cf174e186fab051894beac795431b90488275141",
   "script_id": "11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy",
   "source_before_sha256": "88ca8903f1c767ef9c861ce405753389899172ef55aa9d9b27c6eca7c08e250f",
-  "source_after_sha256": "13ad8c48fdac3d0bf0dc584ae871e15035126c35aac314a250994b3f060775e6",
+  "source_after_sha256": "154b14d5513a95fded38045b8c87b3c90cf194088968a968aefc0f36406c65bd",
   "editor_saved": true,
   "reloaded_source_exact_match": true,
   "deployed": false,
@@ -36,5 +36,14 @@
     "NOT_RUN": 5,
     "delta_PASS": 0
   },
-  "screenshot": "Not exported: automatic approval review rejected screenshot/deliverable action due concern about private source disclosure."
+  "screenshot": "Not exported: automatic approval review rejected screenshot/deliverable action due concern about private source disclosure.",
+  "review": {
+    "kind": "Independent agent read-only code review; not human QA or execution approval",
+    "findings": [
+      "Require B2 policy at HTTP entry",
+      "Compare session generation between Python and GAS"
+    ],
+    "fixes_applied_to_editor": true,
+    "offline_related_checks": 26
+  }
 }
