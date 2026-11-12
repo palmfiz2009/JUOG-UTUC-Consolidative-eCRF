@@ -1,0 +1,108 @@
+{
+  "scope": "Offline exact full GAS bundle and actual editor source; synthetic identity and Sheets only",
+  "deployed_bundle_sha256": "b4b8ef029e27cd208bcf6b56f86e15add998c15e43d5ffa2ca149a44645c597d",
+  "editor_sha256": "e406794dd768e20f49800df2148c88c81fabc3bb4eeee335334c68c4583de848",
+  "full_source_vm_used": true,
+  "global_privacy_predicate": {
+    "bundle": {
+      "checks": 16,
+      "rejected": 16
+    },
+    "editor": {
+      "checks": 16,
+      "rejected": 16
+    }
+  },
+  "signed_prepare_endpoint": {
+    "checks": [
+      {
+        "fixture": 1,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 2,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 3,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 4,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 5,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 6,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 7,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 8,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 9,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 10,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 11,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 12,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 13,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 14,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 15,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      },
+      {
+        "fixture": 16,
+        "ok": false,
+        "error": "DIRECT_IDENTIFIER_NOT_ALLOWED"
+      }
+    ],
+    "business_journal_unchanged": true,
+    "synthetic_principal_digest_substitution": true,
+    "real_sha256_hmac_for_other_operations": true,
+    "clock_and_sheets": "synthetic test harness"
+  },
+  "duplicate_function_analysis": "Later textual privacy definitions are nested within legacy adapter scope; full VM execution confirms global Japanese-key guard remains active. Textual order alone is not evidence of a global override.",
+  "live_cause": "NOT_ESTABLISHED",
+  "formal_uat_delta": 0,
+  "credentials_or_actual_principal_identifiers_in_proof": false
+}
