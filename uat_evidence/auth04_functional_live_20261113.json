@@ -1,7 +1,7 @@
 {
   "scope": "TEST01/JUOG-970 fully fictional data only",
-  "status": "IN_PROGRESS",
-  "frontend_commit": "610d5df97e92e36865c24cd842e413ea12da7be5",
+  "status": "IN_PROGRESS_AFTER_VERIFIED_RECOVERY",
+  "frontend_commit": "05cbf75b608e9eb03a5afd56bdfbe5b16e3d25f6",
   "gas_version": 4,
   "privacy": {
     "fixtures": 16,
@@ -80,5 +80,56 @@
     "Original same-session 60-minute boundary evidence incomplete",
     "Prior credential exposure; rotation not verified",
     "Initial uninstrumented privacy batch stop cause remains unknown"
-  ]
+  ],
+  "pending90": {
+    "rows": 44,
+    "journal_sha256": "10ce07ef859fe6d14b3f8522c2e14153ce47b26d131f64ba0d89f9186c813399",
+    "pending_intents": 1,
+    "pending_action": "save_crf",
+    "registration_id": "JUOG-970",
+    "facility_code": "TEST01",
+    "crf_type": "day90",
+    "visit": "90d",
+    "request_matches_intent": true,
+    "revision": 6,
+    "actor_consistent": true,
+    "request_fingerprint_present": true,
+    "committed_prefix_preserved": true,
+    "latest_intent_after_changed_tables": [
+      "CRF_90d",
+      "CRFSubmissionAudit",
+      "V3_CrfState"
+    ],
+    "audit_or_commit_exists": false,
+    "all_hashes_valid": true,
+    "frontend_failure_category": "LOCAL_CHECK_FAILED",
+    "gas_restricted_stage": "AUTH_CONNECT",
+    "gas_disable_readback_jst": "2026-11-13T07:36:00+09:00",
+    "confirmed_cause": null,
+    "resolved_by_same_operation": true
+  },
+  "crf90_recovery": {
+    "rows": 48,
+    "all_hashes_valid": true,
+    "unsealed": 0,
+    "kinds": {
+      "baseline": 1,
+      "intents": 6,
+      "audits": 6,
+      "commits": 6,
+      "requests": 4
+    },
+    "original44_rows_preserved": true,
+    "same_intent_exact": true,
+    "no_new_request": true,
+    "no_new_intent": true,
+    "id_matches": true,
+    "audit_hashes_match": true,
+    "ui_status_sequence": [
+      "UNFINISHED",
+      "SAVED",
+      "SAVED"
+    ],
+    "ui_exact_readback": true
+  }
 }
