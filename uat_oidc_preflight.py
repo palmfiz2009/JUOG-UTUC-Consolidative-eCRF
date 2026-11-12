@@ -126,7 +126,7 @@ def run():
     st.table([{"確認項目": labels[k], "結果": "確認済み" if v else "未確認・不一致"} for k, v in checks.items()])
     st.write(authentication_time_status(st.user, int(time.time())))
     st.caption("個人識別子・トークン・認証時刻の実値は表示しません。")
-    st.subheader("本人ACL登録前の照合（読取専用）")
+    st.subheader("本人ACL照合（読取専用）")
     st.caption("案Bは最大60分のアプリセッションです。Googleでの直近1時間以内の再認証を保証しません。")
     from uat_identity_proposal import identity_proposal
     try:
@@ -149,21 +149,7 @@ def run():
             {"登録予定項目": "期限", "内容": "2026年11月19日23:59 JST"},
             {"登録予定項目": "接続段階", "内容": "AUTH_CONNECTのみ・業務保存禁止"},
         ])
-        st.info("これは登録予定の照合です。本人ACL登録・GAS送信・設定有効化は行っていません。PI承認前に権限は付与されません。")
-        # PI approval 2026-11-13: this exact principal only. No tokens/keys exported.
-        # Temporary private handoff for connector enrollment; remove after readback.
-        if proposal["principal_fingerprint"] == "f0ea0ddb132e96bbd08cba4e37dc38609b73db5740530a05225c5acb6cab798f":
-            handoff = {
-                "spreadsheet_id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
-                "sheet": "V3_Users",
-                "fingerprint": proposal["principal_fingerprint"],
-                "verified_at": int(time.time()),
-                "row": [st.user["iss"], st.user["sub"], "UAT_TEST01_PI_01", True,
-                        "facility", '["TEST01"]', "2026-11-19T23:59:00+09:00"],
-            }
-            st.download_button("承認済み本人ACL登録用データを取得", json.dumps(handoff),
-                               file_name="juog_acl_private_handoff.json", mime="application/json")
-            st.caption("本人識別子を含む登録専用データです。チャット・GitHubへ掲載せず、隔離V3_Users登録にのみ使用します。")
+        st.info("本人ACLは2026年11月13日に隔離V3_Usersへ1名登録し、再読込で照合済みです（保存済み検証記録）。この画面からのGAS送信・設定有効化は停止しています。")
     st.warning("施設・ロールACLは未接続です。業務操作は許可されていません。正式UATのPASS判定ではありません。")
     if not all(checks.values()):
         st.error("不足する属性・期限条件があります。認証・認可の完成とは判定しません。")
