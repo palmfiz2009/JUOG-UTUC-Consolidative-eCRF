@@ -1,0 +1,350 @@
+{
+  "date_jst": "2026-11-12",
+  "source_sha256": "93678e17c7073d5889c9af826749f67827764b94a03580c4980e9e4be37f2e44",
+  "candidate_sha256": "b9e8823e123b113cc799114bb837b9f6d012e222ee58633b84313da36518c5c3",
+  "fixture_steps": 30,
+  "facility_replacements": [
+    {
+      "path": "/steps/0/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/0/operation/payload/crf_payload/record_key",
+      "before": "T1|FICTIONAL-1",
+      "after": "TEST01|FICTIONAL-1"
+    },
+    {
+      "path": "/steps/6/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/7/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/8/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/10/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/11/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/12/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/19/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/20/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/21/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/22/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/23/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/26/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    },
+    {
+      "path": "/steps/27/operation/payload/facility_code",
+      "before": "T1",
+      "after": "TEST01"
+    }
+  ],
+  "original_preserved": true,
+  "required_roles": [
+    "admin",
+    "facility",
+    "medical_oncology",
+    "radiology",
+    "second",
+    "urology"
+  ],
+  "approved_person_count": 1,
+  "role_expansion_performed": false,
+  "live_execution": false,
+  "google_console_observation": "Site Unavailable / Unable to access this site",
+  "formal_uat_counts": {
+    "PASS": 32,
+    "BLOCKED": 29,
+    "NOT RUN": 5,
+    "FAIL": 1
+  },
+  "formal_pass_added": 0,
+  "remaining": [
+    {
+      "test_id": "ENV-03",
+      "status": "BLOCKED",
+      "criterion": "テスト時に参加施設の実メール・本番提出先へ送らない。",
+      "unlock": "通知先・メール送信・Dropboxアップロードの送信先を確認。",
+      "latest_remaining": "DropboxのTEST提出先/停止運用の承認証拠が不足。Stage1通知なしは既存TEST全体の証明ではない。"
+    },
+    {
+      "test_id": "ENV-04",
+      "status": "BLOCKED",
+      "criterion": "現在のテスト対象版と本番版が識別可能。変更履歴が保存される。",
+      "unlock": "本番・TESTのGAS版、GitHub commit、ファイルSHA256を記録。",
+      "latest_remaining": "TEST HEAD/version1保全・復元証拠あり。本番稼働版とソースの対応は未確認。"
+    },
+    {
+      "test_id": "PROD-01",
+      "status": "NOT RUN",
+      "criterion": "PRODUCTIONが正常応答し、登録件数がRegistryと一致。書込みを行わない。",
+      "unlock": "本番事務局画面を開き、環境表示とRegistry総数を読むだけ。",
+      "latest_remaining": "PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。"
+    },
+    {
+      "test_id": "PROD-02",
+      "status": "NOT RUN",
+      "criterion": "サーバーエラーなく表示される。実患者情報は外部共有しない。",
+      "unlock": "既存画面の表示・ページ切替のみを実施。",
+      "latest_remaining": "PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。"
+    },
+    {
+      "test_id": "SCR-05",
+      "status": "BLOCKED",
+      "criterion": "中央画像・臨床情報による条件確認ができる。",
+      "unlock": "cM1でEVP後遠隔転移巣CRのダミー症例を登録審査する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "SCR-06",
+      "status": "BLOCKED",
+      "criterion": "3か月以上の条件確認ができる。",
+      "unlock": "cM1で局所治療後cNEDが3か月以上継続する例を審査する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "SCR-07",
+      "status": "NOT RUN",
+      "criterion": "条件不充足例が正式登録されない。",
+      "unlock": "cM1で遠隔病変残存／cNED条件未達の例を入力。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "SCR-11",
+      "status": "BLOCKED",
+      "criterion": "診断時・最終投与後の画像と症例識別コードが照合可能。",
+      "unlock": "2時点画像の提出・事務局受領・確認をシミュレーション。",
+      "latest_remaining": "画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。"
+    },
+    {
+      "test_id": "REG-06",
+      "status": "BLOCKED",
+      "criterion": "LockServiceによりJUOG番号が重複しない。",
+      "unlock": "2操作端末から異なる適格例をほぼ同時に登録。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "REG-07",
+      "status": "BLOCKED",
+      "criterion": "SURGERY_BEFORE_MDTで拒否される。",
+      "unlock": "手術予定日がMDT判定日より前の例を正式登録。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "REG-08",
+      "status": "BLOCKED",
+      "criterion": "SURGERY_BEFORE_REGISTRATIONで拒否される。",
+      "unlock": "手術予定日が正式登録日より前の例を正式登録。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "REG-09",
+      "status": "BLOCKED",
+      "criterion": "4週以上・原則8週以内、合理的理由で最大12週の規定を運用で逸脱なく判定。システム自動判定の範囲も記録。",
+      "unlock": "最終EVP投与日から3、4、8、9、12、13週のケースを比較し事務局の確認手順を照合。",
+      "latest_remaining": "8条件の画面証拠は保持。延期理由の医学的判断者、承認済み手順、判断保存記録が不足。"
+    },
+    {
+      "test_id": "CAP-03",
+      "status": "BLOCKED",
+      "criterion": "cN1-only枠は増えず、全体のみ+1。",
+      "unlock": "条件付きcT3N1M1を1症例正式登録する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-04",
+      "status": "BLOCKED",
+      "criterion": "cN1-only枠は増えない。",
+      "unlock": "cT3N2M0を1症例正式登録する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-05",
+      "status": "BLOCKED",
+      "criterion": "cN1-only枠は+1。",
+      "unlock": "cTaN1M0を正式登録する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-06",
+      "status": "BLOCKED",
+      "criterion": "20例まで計上、21例目はCN1_CAP_REACHED。",
+      "unlock": "cN1-onlyを19→20→21症例で順次登録を試みる。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-07",
+      "status": "BLOCKED",
+      "criterion": "42例は許容、43例目はTOTAL_CAP_REACHED。",
+      "unlock": "正式登録41→42→43症例の境界値を確認。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-08",
+      "status": "BLOCKED",
+      "criterion": "SD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。",
+      "unlock": "SDを11→12→13例として登録を試みる。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-09",
+      "status": "BLOCKED",
+      "criterion": "確定した分類が上限管理に反映、または監査可能な手作業管理手順を承認。現コードの自動修正有無は未確認。",
+      "unlock": "施設申告cNと中央MDTの診断時cN判断が異なる事例の扱いを確認。",
+      "latest_remaining": "中央判定変更時の分類・枠反映、又は監査可能な手作業の承認と実測が不足。"
+    },
+    {
+      "test_id": "CAP-10",
+      "status": "BLOCKED",
+      "criterion": "VOIDは正式登録総数・cN1-only・SDのアクティブ件数から除外。",
+      "unlock": "TESTで登録済み症例を承認済み手順に従ってVOID扱いにした場合を確認。",
+      "latest_remaining": "承認済みVOID手順と実件数再計算の証拠が不足。"
+    },
+    {
+      "test_id": "POST-01",
+      "status": "BLOCKED",
+      "criterion": "イベント・日付・Gradeが正確に保存され集計へ取得可能。",
+      "unlock": "術後30日以内Clavien–Dindo Grade 3以上の手術関連合併症を登録。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "POST-02",
+      "status": "NOT RUN",
+      "criterion": "術後30日以内の主要評価イベントに誤算入されない。",
+      "unlock": "術後31日以降発生の同Grade合併症を主要endpoint欄に入力。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "POST-03",
+      "status": "BLOCKED",
+      "criterion": "N/Aと実施記録が区別され、必須項目整合性を維持。",
+      "unlock": "手術未実施症例と手術実施症例で30日CRFを保存する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "POST-04",
+      "status": "BLOCKED",
+      "criterion": "数値0や病理結果が失われず、データ矛盾が検出される。",
+      "unlock": "出血量0、R0、TRG、pCR等を記録して再読込する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "POST-06",
+      "status": "BLOCKED",
+      "criterion": "SOURCE_CRF_UPDATED等で不整合が検出される。",
+      "unlock": "参照元30日CRF更新後に旧版参照の90日CRFを保存する。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "FUP-01",
+      "status": "BLOCKED",
+      "criterion": "訪問時期、検査、再発・進行、生存情報が正確に取得可能。",
+      "unlock": "6/9/12/15/18/21/24か月の各CRFを模擬保存・再読込。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "FUP-02",
+      "status": "NOT RUN",
+      "criterion": "規定の入力制御・警告が機能し、確定値を追跡可能。",
+      "unlock": "進行日・死亡日・術後補助療法の矛盾を入力。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "AUTH-04",
+      "status": "FAIL",
+      "criterion": "氏名・MRN等は承認外で収集・露出せず、コードによる仮名化を維持。",
+      "unlock": "FAIL継続。GAS編集画面の現行全ファイル保全と安全なTEST版作成、正規TEST試験、独立QAが必要。",
+      "latest_remaining": "追加識別子/ラベル検出と画面捕捉/復元を候補で是正。承認対象版の隔離実画面/実GAS/実ログ/通知停止証拠、年齢・生年月の正式申請保持、独立QA未完。無ラベルの氏名/日付を完全自動判別する保証なし。FAIL維持。"
+    },
+    {
+      "test_id": "IMG-01",
+      "status": "BLOCKED",
+      "criterion": "DICOM内部メタデータ・焼込み文字・ファイル名の識別情報がない。",
+      "unlock": "匿名化済みサンプルDICOMを承認済み経路で提出し手順を照合。",
+      "latest_remaining": "画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。"
+    },
+    {
+      "test_id": "DATA-01",
+      "status": "BLOCKED",
+      "criterion": "定めた手順で復旧可能なバックアップが取得される。",
+      "unlock": "バックアップの権限・頻度・保存先・保持期間を確認。",
+      "latest_remaining": "第9.2/14.1節の保存期間（研究終了又は最終公表から10年の遅い日）を原本で確認。実際の頻度・保存先・権限・保持/復元SOPの承認と履行証拠は未完。"
+    },
+    {
+      "test_id": "DATA-02",
+      "status": "BLOCKED",
+      "criterion": "登録・CRF・監査履歴・添付紐付けの件数と内容が一致。",
+      "unlock": "TESTの模擬データを承認済み復旧先へリストア。",
+      "latest_remaining": "実TEST登録/CRF/監査照合とStage1一件照合は取得済み。正式復元後の全件・添付紐付け照合が不足。S2-01はCRF一件の部分証拠。"
+    },
+    {
+      "test_id": "DATA-04",
+      "status": "BLOCKED",
+      "criterion": "連絡先、代替手順、復旧後照合、データ逸失防止が文書化される。",
+      "unlock": "Streamlit/GAS/Sheetが一時利用不可の状況を想定して運用手順を確認。",
+      "latest_remaining": "S2-01復旧コード候補は用意済み。実復旧、連絡体制、代替記録/照合運用の承認・実演が不足。"
+    },
+    {
+      "test_id": "REL-01",
+      "status": "BLOCKED",
+      "criterion": "cN1-only以外の既存機能の挙動を変えていない。",
+      "unlock": "cN1-only修正前後の主要フローを回帰試験（MDT、登録、CRF）。",
+      "latest_remaining": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "REL-02",
+      "status": "BLOCKED",
+      "criterion": "変更記録が追跡でき、未実施テストをPASSにしていない。",
+      "unlock": "修正理由、実施日時、コードdiff、GAS v6、合否証拠を突合。",
+      "latest_remaining": "Stage1/S2候補の版とハッシュは追跡可。原基準のGAS v6を含む変更履歴全体の対応は未完。"
+    },
+    {
+      "test_id": "REL-03",
+      "status": "BLOCKED",
+      "criterion": "必要な操作手順が関係者へ伝わり、版・教育記録が保管される。",
+      "unlock": "参加施設説明書・MDT操作手順・問い合わせ窓口の最新版を確認。",
+      "latest_remaining": "説明資料あり。正本版対応、MDT全手順、配布・教育記録が不足。"
+    }
+  ]
+}
