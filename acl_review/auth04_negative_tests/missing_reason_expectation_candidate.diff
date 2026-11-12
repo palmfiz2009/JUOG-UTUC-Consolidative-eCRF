@@ -1,0 +1,5 @@
+--- a/uat_auth04_live.py
++++ b/uat_auth04_live.py
+@@ -428,1 +428,1 @@
+-                expected_error='STALE_VERSION' if choice=='古い版指定拒否' else 'CORRECTION_REASON_REQUIRED'
++                expected_error='STALE_VERSION' if choice=='古い版指定拒否' else 'VALIDATION_FAILED'

@@ -1,0 +1,111 @@
+{
+  "scope": "TEST01/JUOG-970/day30; two PI-approved negative correction operations only",
+  "gas_deployed_version": 5,
+  "gas_deployed_sha256": "99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5",
+  "editor_only_helper_sha256": "220d2bbcfdea3d8249990af56bff910457fae4a0db9273142d8f7087f0842f4c",
+  "frontend_execution_commit": "0cf9fc6a46b9b05ae4709505a42b76bebb89fec2",
+  "frontend_disabled_commit": "69030ab9d02e86ad94cc3b3ede2cd9f435a276f9",
+  "readiness_verified_jst": "2026-11-13T08:48:13+09:00",
+  "enabled_verified_jst": "2026-11-13T08:49:27+09:00",
+  "disabled_verified_jst": "2026-11-13T08:53:32+09:00",
+  "stale_version": {
+    "live_state": "FAILED",
+    "live_error": "STALE_VERSION",
+    "expected_match": true,
+    "ledger": {
+      "rows": 62,
+      "kinds": {
+        "baseline": 1,
+        "intents": 7,
+        "audits": 7,
+        "commits": 7,
+        "requests": 6,
+        "requestEvents": 1
+      },
+      "events": [
+        {
+          "kind": "FAILED",
+          "error": "STALE_VERSION"
+        }
+      ],
+      "prefixUnchanged": true,
+      "businessUnchanged": true,
+      "sha256": "ae82a9e4ceaa8f47c455599b760e8056aac6df4e83b6ca3f9199aeac9ea8c6b9"
+    }
+  },
+  "missing_reason": {
+    "live_state": "FAILED",
+    "live_error": "VALIDATION_FAILED",
+    "original_harness_expected": "CORRECTION_REASON_REQUIRED",
+    "original_harness_match": false,
+    "diagnosis": "HARNESS_EXPECTED_ERROR_MISMATCH; validateClinicalV3 rejects REQUIRED:correction_reason before dedicated downstream check",
+    "technical_outcome": "Refused with no business write; exact code mismatch retained for QA",
+    "ledger": {
+      "rows": 66,
+      "kinds": {
+        "baseline": 1,
+        "intents": 7,
+        "audits": 7,
+        "commits": 7,
+        "requests": 7,
+        "requestEvents": 2
+      },
+      "events": [
+        {
+          "kind": "FAILED",
+          "error": "STALE_VERSION"
+        },
+        {
+          "kind": "FAILED",
+          "error": "VALIDATION_FAILED"
+        }
+      ],
+      "prefixUnchanged": true,
+      "businessUnchanged": true,
+      "sha256": "8441de491fb974555aa0e63f4e690974c6c4af4f890493e1ed8af51b96609b24"
+    },
+    "independent_offline_review": "acl_review/auth04_negative_tests/missing_reason_diagnostic_review.json"
+  },
+  "request_verification": {
+    "onlyPayloadDifferences": [
+      "expected_record_version",
+      "correction_reason"
+    ],
+    "firstExpectedVersion": 0,
+    "secondExpectedVersion": 2,
+    "secondReasonEmpty": true,
+    "latestBusinessRevision": 7,
+    "requestEventIdentityMatches": true,
+    "uniqueOperationIds": true
+  },
+  "versions_before_after": [
+    1,
+    2
+  ],
+  "new_crf_versions": 0,
+  "new_business_audits": 0,
+  "business_revision_before_after": 7,
+  "requests_added": 2,
+  "failed_request_events_added": 2,
+  "all_original_58_rows_preserved": true,
+  "unsealed_original_commit_batch_preserved": true,
+  "current_stage": "AUTH_CONNECT",
+  "auth04_ui_enabled": false,
+  "boundary": {
+    "deadline_epoch": 1794530465,
+    "deadline_utc": "2026-11-13T00:41:05.000Z",
+    "observed_state": "WAITING",
+    "same_session_reference_not_published": true,
+    "formal_pass_added": 0
+  },
+  "formal_counts": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "formal_pass_delta": 0,
+  "formal_qa_completed": false,
+  "protected_environments_changed": false,
+  "secrets_or_full_principal_in_evidence": false
+}

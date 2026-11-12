@@ -1,0 +1,21 @@
+const fs=require('fs'),vm=require('vm'),crypto=require('crypto'),assert=require('assert/strict'),path=require('path');
+const source=fs.readFileSync('/workspace/shared/juog_auth04_editor_v5.gs','utf8');
+const fixture=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../../../auth-connect/uat_auth04_fixture.json'),'utf8'));
+const ctx=vm.createContext({fixtureJSON:JSON.stringify(fixture),console,sha:s=>crypto.createHash('sha256').update(s).digest('hex')});
+vm.runInContext(source,ctx);
+const result=vm.runInContext(`(()=>{
+ const fixture=JSON.parse(fixtureJSON),make=()=>{const p=JSON.parse(JSON.stringify(fixture.crfs[0]));p.submission_id=p.submission_id.replace('-V1','-V2')+'-NEGATIVE';p.submission_kind='訂正報告';p.expected_record_version=2;p.correction_reason='';return p;};
+ const reg={...fixture.historical_synthetic_registry_values,registration_date:fixture.historical_synthetic_registry_values.registered_at};
+ const empty=()=>({intents:[],records:[],audits:[],events:[]});
+ const tests=[];const check=(name,p,expectedErrors)=>{const validation=validateClinicalV3(p,reg,'2026-11-13',empty());if(JSON.stringify(validation.errors||[])!==JSON.stringify(expectedErrors))throw Error(name+': '+JSON.stringify(validation));tests.push(name);return validation;};
+ const missing=make();check('exact live fixture missing reason only',missing,['REQUIRED:correction_reason']);
+ const good=make();good.correction_reason='完全架空UATの訂正確認';check('positive reason restores validation',good,[]);
+ const whitespace=make();whitespace.correction_reason='   ';check('whitespace reason',whitespace,['REQUIRED:correction_reason']);
+ const fullwidth=make();fullwidth.correction_reason='　';check('fullwidth whitespace reason',fullwidth,['REQUIRED:correction_reason']);
+ const malformed=make();malformed.facility_code='';check('another metadata defect distinguished internally',malformed,['REQUIRED:facility_code','REQUIRED:correction_reason']);
+ let writes=0;const store={read:empty,assertFits:()=>{},appendIntent:()=>writes++,appendRecord:()=>writes++,appendAudit:()=>writes++,appendEvent:()=>writes++};
+ const service=JuogSaveServiceV3({store,verifyIdentity:()=>({issuer:'SYNTHETIC',subject:'SYNTHETIC'}),directory:()=>({id:'SYNTHETIC',enabled:true,role:'facility',facilities:['TEST01']}),registry:()=>reg,privacy:containsDirectIdentifier_,validate:validateClinicalV3,hash:sha,today:()=> '2026-11-13',now:()=> '2026-11-13T00:00:00Z',withLock:f=>f()});
+ const actual=service.save('SYNTHETIC',missing);if(actual.ok!==false||actual.error!=='VALIDATION_FAILED'||writes!==0)throw Error('Unexpected save result '+JSON.stringify(actual));tests.push('save rejects VALIDATION_FAILED with zero business writes');
+ return {tests,missing_reason_errors:validateClinicalV3(missing,reg,'2026-11-13',empty()).errors,service_response:actual,writes,fixture_sha256:sha(fixtureJSON),source_sha256:sha(${JSON.stringify(source)})};
+})()`,ctx);
+console.log(JSON.stringify({scope:'OFFLINE_SYNTHETIC_ONLY',passed:result.tests.length,...result,formal_uat_delta:0},null,2));

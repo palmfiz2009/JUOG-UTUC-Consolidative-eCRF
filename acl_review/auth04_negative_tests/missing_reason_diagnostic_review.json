@@ -1,0 +1,39 @@
+{
+  "scope": "OFFLINE_SYNTHETIC_ONLY",
+  "passed": 6,
+  "tests": [
+    "exact live fixture missing reason only",
+    "positive reason restores validation",
+    "whitespace reason",
+    "fullwidth whitespace reason",
+    "another metadata defect distinguished internally",
+    "save rejects VALIDATION_FAILED with zero business writes"
+  ],
+  "missing_reason_errors": [
+    "REQUIRED:correction_reason"
+  ],
+  "service_response": {
+    "ok": false,
+    "error": "VALIDATION_FAILED"
+  },
+  "writes": 0,
+  "fixture_sha256": "16320cb7602c870486be77c8b63eb48757d550bf7e0d45248ea3bc8f9f942885",
+  "source_sha256": "99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5",
+  "formal_uat_delta": 0,
+  "fixture_file_sha256": "0747f9ac3f59a6e230cc6cc6debaebde3138578ec82741567e995ab1e2d0d126",
+  "reviewer": "independent negative_helper_review agent",
+  "review_type": "Independent technical diagnostic review; not formal QA",
+  "finding": "HARNESS_EXPECTED_ERROR_MISMATCH",
+  "cause": "validateClinicalV3 requires correction_reason for corrections; JuogSaveServiceV3 checks deps.validate first and returns VALIDATION_FAILED before the later CORRECTION_REASON_REQUIRED branch.",
+  "live_result_provenance": "Parent reports FAILED/VALIDATION_FAILED, requests+1/FAILED requestEvent+1, no intent/audit/commit/version/revision change; this agent did not perform live reads.",
+  "interpretation": "Exact fictional missing-reason fixture has only REQUIRED:correction_reason internally; with reason restored it validates. Generic safe public error is consistent with current deployed v5 behavior and does not imply missing-reason acceptance.",
+  "candidate_change": "For this fixed missing-reason fixture only, expect FAILED/VALIDATION_FAILED. Keep stale expected STALE_VERSION and exact ok=false/state=FAILED checks. No broad acceptance of arbitrary errors.",
+  "candidate_not_applied": true,
+  "required_before_deploy": [
+    "Update frontend source SHA pin if candidate applied",
+    "Perform relevant harness regression and review",
+    "Do not resend these two already completed live requests merely to erase the expectation mismatch",
+    "Link live evidence and this diagnosis; formal QA decides status, no automatic PASS increment"
+  ],
+  "open_contract_question": "If an approved formal API requirement demands the dedicated CORRECTION_REASON_REQUIRED code, a backend classification change is needed; this diagnostic alone does not change that requirement."
+}
