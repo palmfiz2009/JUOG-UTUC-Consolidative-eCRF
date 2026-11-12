@@ -656,7 +656,9 @@ def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), 
             continue
         if any(str(key).startswith(x) for x in exclude_prefixes):
             continue
-        value = st.session_state[key]
+        if is_direct_identifier_key(key):
+            continue
+        value = redact_draft_identifiers(st.session_state[key])
         if isinstance(value, datetime):
             out[str(key)] = {"type": "datetime", "value": value.isoformat()}
         elif isinstance(value, date):
@@ -665,6 +667,9 @@ def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), 
             out[str(key)] = {"type": "value", "value": value}
 
     for key, value in (overrides or {}).items():
+        value = redact_draft_identifiers(value)
+        if is_direct_identifier_key(key):
+            continue
         if isinstance(value, datetime):
             out[str(key)] = {"type": "datetime", "value": value.isoformat()}
         elif isinstance(value, date):
@@ -672,6 +677,7 @@ def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), 
         else:
             out[str(key)] = {"type": "value", "value": value}
     return out
+
 
 
 def clear_session_state_prefixes(prefixes: tuple[str, ...] | list[str]):
@@ -688,10 +694,12 @@ def restore_draft_state(draft_state: dict):
     import streamlit as st
 
     for key, item in (draft_state or {}).items():
+        if is_direct_identifier_key(key):
+            continue
         if not isinstance(item, dict) or "value" not in item:
             continue
         kind = str(item.get("type") or "value")
-        value = item.get("value")
+        value = redact_draft_identifiers(item.get("value"))
         try:
             if kind == "date" and value:
                 value = date.fromisoformat(str(value)[:10])
@@ -700,6 +708,7 @@ def restore_draft_state(draft_state: dict):
         except Exception:
             continue
         st.session_state[str(key)] = value
+
 
 def validate_registry_id(registration_id: str, facility_code: str):
     if not valid_registration_id(registration_id):
@@ -770,3 +779,35 @@ def render_submission_kind(prefix: str, disabled=False):
     if kind == "訂正報告":
         reason = st.text_area("訂正理由*", key=f"{prefix}_correction_reason", disabled=disabled)
     return kind, reason
+
+
+def is_direct_identifier_key(key: str) -> bool:
+    import re, unicodedata
+    s = unicodedata.normalize('NFKC', str(key))
+    if re.search(r'(?:^|[^一-龯ぁ-んァ-ヶ])(?:患者氏名|患者姓名|カルテ番号|診療録番号|生年月日)$', s):
+        return True
+    s = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s)
+    s = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s)
+    s = re.sub(r'[^a-z0-9]+', '_', s.lower()).strip('_')
+    return bool(re.search(r'(?:^|_)(?:birth_date|dob|full_dob|date_of_birth|patient_name|patient_full_name|full_patient_name|first_name|last_name|given_name|family_name|patient_surname|mrn|medical_record_number|patient_address|personal_address|patient_phone)$', s))
+
+
+def redact_draft_identifiers(value):
+    import re, json, unicodedata
+    if isinstance(value, str):
+        if value.lstrip().startswith(('{', '[')):
+            try:
+                parsed = json.loads(value)
+                if isinstance(parsed, (dict, list)):
+                    return json.dumps(redact_draft_identifiers(parsed), ensure_ascii=False)
+            except (ValueError, TypeError):
+                pass
+        s = unicodedata.normalize('NFKC', value)
+        patterns = [r'(?:生年月日|患者氏名|カルテ番号)\s*(?:は|が|[:=])\s*\S', r'(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S', r'(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]']
+        return '[REDACTED]' if any(re.search(p, s, re.I) for p in patterns) else value
+    if isinstance(value, list):
+        return [redact_draft_identifiers(v) for v in value]
+    if isinstance(value, dict):
+        return {k: redact_draft_identifiers(v) for k, v in value.items() if not is_direct_identifier_key(k)}
+    return value
+

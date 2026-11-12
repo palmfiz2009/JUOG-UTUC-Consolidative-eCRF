@@ -1,0 +1,123 @@
+{
+  "status": "REVIEW_ONLY_NOT_PROVISIONED",
+  "case_id": "JUOG-970",
+  "facility": "TEST01",
+  "fictional_only": true,
+  "actual_setup_timestamp": "MUST_BE_ACTUAL_RUNTIME_TIMESTAMP_IN_INITIALIZATION_AUDIT",
+  "historical_synthetic_registry_values": {
+    "registered_at": "2026-04-01",
+    "registration_id": "JUOG-970",
+    "status": "ACTIVE",
+    "facility_code": "TEST01",
+    "facility_name": "完全架空施設",
+    "consent_date": "2026-03-25"
+  },
+  "protected_source": "S2-02 template read only; S2-01 never modified",
+  "scope_limit": "Non-operative data can prove CRF lifecycle/privacy/ownership only; not surgical POST outcome branches. 30d source fields must use returned actual latest version/submission when corrections precede90d/followup.",
+  "crfs": [
+    {
+      "study_code": "JUOG_UTUC_Consolidative",
+      "schema_version": "review-v3-unapproved",
+      "registration_id": "JUOG-970",
+      "facility_code": "TEST01",
+      "facility_name": "完全架空施設",
+      "reporter_email": "fictional@example.invalid",
+      "crf_type": "perioperative_30d",
+      "visit": "30d",
+      "record_key": "JUOG-970|perioperative_30d|30d",
+      "submission_id": "AUTH04-20261113-30D-V1",
+      "submission_kind": "初回報告",
+      "expected_record_version": 0,
+      "data": {
+        "surgery_performed": "実施しなかった",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-05-13",
+        "last_evp_date": "2026-03-16",
+        "day30_visit_date": "2026-05-13",
+        "day30_lab_date": "2026-05-13",
+        "day30_labs": {
+          "CRP": 0
+        },
+        "postop_treatment": "無治療（経過観察）",
+        "no_operation_reason": "患者希望"
+      }
+    },
+    {
+      "study_code": "JUOG_UTUC_Consolidative",
+      "schema_version": "review-v3-unapproved",
+      "registration_id": "JUOG-970",
+      "facility_code": "TEST01",
+      "facility_name": "完全架空施設",
+      "reporter_email": "fictional@example.invalid",
+      "crf_type": "day90",
+      "visit": "90d",
+      "record_key": "JUOG-970|day90|90d",
+      "submission_id": "AUTH04-20261113-90D-V1",
+      "submission_kind": "初回報告",
+      "expected_record_version": 0,
+      "data": {
+        "source_30d_linked": true,
+        "source_30d_record_version": 1,
+        "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+        "surgery_performed": "実施しなかった",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-07-12",
+        "visit_date": "2026-07-12",
+        "lab_available": "あり",
+        "lab_date": "2026-07-12",
+        "labs": {
+          "CRP": 0
+        },
+        "urine_cytology": "Negative (クラスI・II)",
+        "imaging_status": "実施",
+        "imaging_date": "2026-07-12",
+        "recist_progression_status": "PDなし",
+        "cystoscopy_status": "実施",
+        "cystoscopy_date": "2026-07-12",
+        "cystoscopy_result": "腫瘍なし",
+        "intraluminal_recurrence": "なし",
+        "postop_treatment": "無治療（経過観察）"
+      }
+    },
+    {
+      "study_code": "JUOG_UTUC_Consolidative",
+      "schema_version": "review-v3-unapproved",
+      "registration_id": "JUOG-970",
+      "facility_code": "TEST01",
+      "facility_name": "完全架空施設",
+      "reporter_email": "fictional@example.invalid",
+      "crf_type": "followup",
+      "visit": "6m",
+      "record_key": "JUOG-970|followup|6m",
+      "submission_id": "AUTH04-20261113-FUP6M-V1",
+      "submission_kind": "初回報告",
+      "expected_record_version": 0,
+      "data": {
+        "source_30d_linked": true,
+        "source_30d_record_version": 1,
+        "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+        "surgery_performed": "実施しなかった",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-10-13",
+        "visit_month": "6ヶ月",
+        "visit_date": "2026-10-13",
+        "labs_performed": true,
+        "labs": {
+          "CRP": 0
+        },
+        "urine_cytology": "Negative (クラスI・II)",
+        "imaging_status": "実施",
+        "imaging_date": "2026-10-13",
+        "recist_progression_status": "PDなし",
+        "cystoscopy_status": "実施",
+        "cystoscopy_date": "2026-10-13",
+        "cystoscopy_result": "腫瘍なし",
+        "intraluminal_recurrence_status": "なし",
+        "current_treatment": "無治療（経過観察）"
+      }
+    }
+  ]
+}
