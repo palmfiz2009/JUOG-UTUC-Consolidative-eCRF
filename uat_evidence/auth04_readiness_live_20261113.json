@@ -1,0 +1,33 @@
+{
+  "status": "READ_ONLY_PREREQUISITES_CONFIRMED_ACTIVATION_NOT_YET_PERFORMED",
+  "observed_jst": "2026-11-13T07:03:38+09:00",
+  "readiness_result": {
+    "ok": true,
+    "configuration_changed": false,
+    "stage": "AUTH_CONNECT",
+    "scope": "TEST01/JUOG-970",
+    "journal_sha256": "927ddea90e6d0c8d589f2203fe06fb44fe6d215ca84fdbc9c407a57139c09c85"
+  },
+  "deployment_ui_confirmed": {
+    "version": 4,
+    "source_sha256": "b4b8ef029e27cd208bcf6b56f86e15add998c15e43d5ffa2ca149a44645c597d",
+    "same_deployment_id": true,
+    "execution_owner_unchanged": true,
+    "access_anyone_unchanged": true
+  },
+  "editor_readiness_sha256": "e406794dd768e20f49800df2148c88c81fabc3bb4eeee335334c68c4583de848",
+  "prerequisites": {
+    "script_sheet_generation_pins": "live readiness PASS",
+    "single_approved_principal_acl_facility_expiry": "live readiness PASS",
+    "fixture_manifest_and_postsetup_journal": "live readiness PASS, D3 fifteen rows, exact snapshot",
+    "business_notifications_disabled": "live readiness PASS; reviewed bundle has no outbound mail/upload integration",
+    "frontend_privacy_and_prepare_margin": "isolated branch f0f746a, 30 offline tests, disabled mode",
+    "independent_technical_reviews": "4ea55520a2b26a037ce26c0069e886f687f902e9",
+    "backup_recovery": "Original baseline preserved; exact postsetup private snapshot retained, append-only reconciliation/stop procedure reviewed",
+    "allowed_case_and_operations": "GAS v4 exact JUOG970,TEST01,facility,approved principal, save_draft/save_crf and bounded reads/lifecycle",
+    "boundary_gap_and_credential_incident": "Unresolved; PI explicit continuation + technical risk evaluation; synthetic FUNCTIONAL tests only, no auth-security PASS or release clearance"
+  },
+  "approval": "PI integrated conditional fictional-only execution plus explicit continuation after incident disclosure",
+  "auto_review_prior_rejection": "Activation rejected for insufficient prerequisite evidence. This read-only evidence supplements those checks; no alternate activation path used.",
+  "formal_uat_delta": 0
+}
