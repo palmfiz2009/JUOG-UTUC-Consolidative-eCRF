@@ -1,0 +1,11 @@
+--- a/acl_review/auth_bridge.gs
++++ b/acl_review/auth_bridge.gs
+@@ -36,7 +36,7 @@
+   if(matches.length!==1)return null;const r=matches[0],facilities=JSON.parse(String(r[idx.facility_ids_json]||'[]'));
+   if(!Array.isArray(facilities)||facilities.some(x=>typeof x!=='string'||!x))throw Error('ACL_INVALID');
+   const roles=['facility','admin','recovery_admin','radiology','medical_oncology','urology'];
+-  if(!roles.includes(r[idx.role]))throw Error('ACL_INVALID');
++  if(!roles.includes(r[idx.role]))throw Error('ACL_DENIED');
+   const expiry=new Date(r[idx.valid_until]);const enabled=(r[idx.enabled]===true||r[idx.enabled]==='TRUE')&&Number.isFinite(expiry.getTime())&&expiry.getTime()>Date.now();
+   const id=String(r[idx.user_id]||'').trim();
+   if(!id)throw Error('ACL_INVALID');

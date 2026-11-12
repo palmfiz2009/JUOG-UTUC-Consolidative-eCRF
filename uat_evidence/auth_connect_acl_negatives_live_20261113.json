@@ -1,0 +1,59 @@
+{
+  "cases": [
+    {
+      "case": "unregistered",
+      "response": "ACL_DENIED"
+    },
+    {
+      "case": "other_facility",
+      "response": "ACL_DENIED"
+    },
+    {
+      "case": "disabled",
+      "response": "ACL_DENIED"
+    },
+    {
+      "case": "expired",
+      "response": "ACL_DENIED"
+    },
+    {
+      "case": "invalid_role",
+      "response": "UNIFIED_TRANSACTION_INCOMPLETE",
+      "classification": "rejected_unclassified_not_pass"
+    }
+  ],
+  "restored_after_each": true,
+  "restored_positive_after_each": true,
+  "principal_count": 1,
+  "original_acl_exact": true,
+  "business_journal_unchanged": true,
+  "session_event_count": 12,
+  "session_event_kinds": [
+    "OPEN",
+    "USE",
+    "USE",
+    "REVOKE",
+    "OPEN",
+    "USE",
+    "USE",
+    "USE",
+    "USE",
+    "USE",
+    "USE",
+    "USE"
+  ],
+  "same_session": true,
+  "same_deadline": true,
+  "boundary_phase": "WAITING",
+  "deadline_utc": "2026-11-12T17:03:09.000Z",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "formal_pass_delta": 0,
+  "invalid_role_classification_patch": "REVIEW_ONLY_NOT_DEPLOYED",
+  "auth04": "NOT_AUTHORIZED",
+  "frontend_commit": "f931c4cfa9912a6468c64398fc33ae10880b4d64"
+}
