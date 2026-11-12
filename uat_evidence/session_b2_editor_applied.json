@@ -1,0 +1,40 @@
+{
+  "at": "2026-11-12T14:09:38.248Z",
+  "candidate_commit": "b7ca7e9494d4ebbc468bdf82d9d66b5444245169",
+  "script_id": "11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy",
+  "source_before_sha256": "88ca8903f1c767ef9c861ce405753389899172ef55aa9d9b27c6eca7c08e250f",
+  "source_after_sha256": "13ad8c48fdac3d0bf0dc584ae871e15035126c35aac314a250994b3f060775e6",
+  "editor_saved": true,
+  "reloaded_source_exact_match": true,
+  "deployed": false,
+  "executed": false,
+  "script_properties_before": [],
+  "script_properties_after": [
+    "JUOG_B2_HEAD_1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU"
+  ],
+  "session_store": {
+    "spreadsheet_id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+    "sheet_id": 20261113,
+    "title": "V3_SessionEvents",
+    "headers": [
+      "sequence",
+      "event_json",
+      "chain_sha256"
+    ],
+    "events": 0,
+    "generation": "d72bcf33-423d-4c4d-862d-2e2d69bc3edf",
+    "head": "0:7482c1109ca53601559fd1fa2100bc4b7e7358f59a4042541532fe4ed37828da"
+  },
+  "journal_A1_F4_unchanged": true,
+  "activation_config_set": false,
+  "signing_keys_set": false,
+  "principal_acl_granted": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "delta_PASS": 0
+  },
+  "screenshot": "Not exported: automatic approval review rejected screenshot/deliverable action due concern about private source disclosure."
+}

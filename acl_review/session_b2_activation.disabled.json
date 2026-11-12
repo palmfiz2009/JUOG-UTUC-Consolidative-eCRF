@@ -1,0 +1,20 @@
+{
+  "environment": "ISOLATED_TEST",
+  "approvalRef": null,
+  "backupVerified": false,
+  "qaApproved": false,
+  "fictionalBaselineVerified": false,
+  "notificationsDisabled": true,
+  "spreadsheetId": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+  "approvedSpreadsheetId": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+  "allRoutesReviewed": false,
+  "schemaParityApproved": false,
+  "sessionPolicy": "isolated_gas_session_b2",
+  "sessionStoreGeneration": "d72bcf33-423d-4c4d-862d-2e2d69bc3edf",
+  "sessionStoreApproved": false,
+  "sessionExecutionStage": "AUTH_CONNECT",
+  "auth04ExecutionApprovalRef": null,
+  "oidcIssuer": "https://accounts.google.com",
+  "bridgeIssuer": "JUOG_ISOLATED_STREAMLIT_TEST01",
+  "audience": "JUOG_AUTH04_GAS_TEST01"
+}
