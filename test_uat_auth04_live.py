@@ -45,6 +45,67 @@ class Tests(unittest.TestCase):
  def test_safe_summary_drops_raw_data(self):
   r=h.summarize({'ok':False,'error':'secret arbitrary text','message':'secret','result':{'patient_name':'fictional'}})
   self.assertEqual(r,{'ok':False,'state':None,'error':'UNCLASSIFIED'})
+ def test_privacy_one_request_per_click_and_completion_no_resend(self):
+  ui=self.ui();rejection={'ok':False,'error':'DIRECT_IDENTIFIER_NOT_ALLOWED'}
+  with patch.object(h,'call',return_value=rejection) as call:
+   for i in range(16):
+    self.assertEqual(h.privacy_probe_once(ui),rejection)
+    self.assertEqual(call.call_count,i+1)
+    self.assertEqual(ui.session_state['auth04_privacy_next'],i+1)
+    self.assertEqual(call.call_args.args[2]['payload']['draft_state']['privacy_probe'],h.PRIVACY_FIXTURES[i])
+   with self.assertRaises(PermissionError):h.privacy_probe_once(ui)
+   self.assertEqual(call.call_count,16)
+  self.assertEqual([r['fixture'] for r in ui.session_state['auth04_privacy_progress']],list(range(1,17)))
+  self.assertTrue(all(r['confirmed'] for r in ui.session_state['auth04_privacy_progress']))
+ def test_privacy_timeout_retains_uncertain_blocks_retry_and_hides_message(self):
+  ui=self.ui()
+  with patch.object(h,'call',side_effect=TimeoutError('DO_NOT_DISPLAY_secret_url')) as call:
+   with self.assertRaises(TimeoutError):h.privacy_probe_once(ui)
+   with self.assertRaises(PermissionError):h.privacy_probe_once(ui)
+   call.assert_called_once()
+  self.assertTrue(ui.session_state['auth04_preparation_uncertain']);self.assertTrue(ui.session_state['auth04_halted'])
+  progress=ui.session_state['auth04_privacy_progress']
+  self.assertEqual(progress,[{'fixture':1,'confirmed':False,'category':'TIMEOUT','elapsed':'LT_15S'}])
+ def test_privacy_response_allowlist_and_pending_id_remain_private(self):
+  for result in ({'ok':False,'error':'AUTH_EXPIRED'}, {'ok':False,'error':'DO_NOT_DISPLAY_secret'}, {'ok':True,'operation_id':'PRIVATE_OPERATION_ID','data':'secret'}):
+   ui=self.ui()
+   with patch.object(h,'call',return_value=result) as call:
+    with self.assertRaises(PermissionError):h.privacy_probe_once(ui)
+    with self.assertRaises(PermissionError):h.privacy_probe_once(ui)
+    call.assert_called_once()
+   text=str(ui.session_state['auth04_privacy_progress'])
+   self.assertNotIn('DO_NOT_DISPLAY',text);self.assertNotIn('PRIVATE_OPERATION_ID',text);self.assertNotIn('secret',text)
+   if result.get('operation_id'):self.assertEqual(ui.session_state['auth04_pending'],'PRIVATE_OPERATION_ID')
+   self.assertNotIn('auth04_privacy_next',ui.session_state)
+ def test_privacy_local_window_closure_is_not_sent_or_uncertain(self):
+  ui=self.ui()
+  with patch.object(h,'call',side_effect=h.PrepareWindowClosed('unused')):
+   with self.assertRaises(h.PrepareWindowClosed):h.privacy_probe_once(ui)
+  self.assertFalse(ui.session_state['auth04_preparation_uncertain'])
+  self.assertEqual(ui.session_state['auth04_privacy_progress'][0]['category'],'LOCAL_WINDOW_CLOSED')
+  self.assertNotIn('auth04_privacy_next',ui.session_state)
+ def test_safe_exception_categories_never_format_exception(self):
+  class Hostile(Exception):
+   def __str__(self):raise AssertionError('Must not format')
+  cases=[(Hostile(),'LOCAL_CHECK_FAILED'),(TimeoutError('secret'),'TIMEOUT'),(h.urllib.error.URLError(TimeoutError('secret')),'TIMEOUT'),(h.urllib.error.URLError('secret-url'),'TRANSPORT_ERROR'),(h.urllib.error.HTTPError('secret-url',500,'secret',{},None),'HTTP_ERROR'),(h.json.JSONDecodeError('secret','secret',0),'INVALID_JSON')]
+  for exc,expected in cases:self.assertEqual(h.safe_exception_category(exc),expected)
+ def test_diagnostic_latency_boundaries(self):
+  for now,expected in [(14.999,'LT_15S'),(15,'15_TO_30S'),(29.999,'15_TO_30S'),(30,'GE_30S')]:
+   with patch.object(h.time,'monotonic',return_value=now):self.assertEqual(h.elapsed_bucket(0),expected)
+ def test_persistent_progress_renders_before_halt_without_new_request(self):
+  class Stop(BaseException):pass
+  class Fake:
+   user=types.SimpleNamespace(is_logged_in=True)
+   session_state={'auth04_halted':True,'auth04_privacy_progress':[{'fixture':2,'confirmed':False,'category':'TIMEOUT'}],'auth04_results':[{'check':'接続・対象症例確認','ok':True}]}
+   shown=[]
+   def __getattr__(self,n):return lambda *a,**k:None
+   def table(self,rows):self.shown.append(rows)
+   def stop(self):raise Stop()
+  ui=Fake()
+  with patch.object(h,'st',ui),patch.object(h,'native_context'),patch.object(h,'send') as send:
+   with self.assertRaises(Stop):h.run()
+   send.assert_not_called()
+  self.assertIn(ui.session_state['auth04_privacy_progress'],ui.shown);self.assertIn(ui.session_state['auth04_results'],ui.shown)
  def test_fixture_payloads_pinned(self):
   for i in range(3):h.check_payload('save_crf',h.crf_payload(i))
   self.assertEqual(h.crf_payload(0,2)['expected_record_version'],1)

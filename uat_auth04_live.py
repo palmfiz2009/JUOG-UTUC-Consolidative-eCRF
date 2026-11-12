@@ -1,7 +1,7 @@
 """Isolated AUTH04 harness. Disabled unless exact reviewed config is supplied.
 No legacy navigation, arbitrary payload editor, raw responses or secret output.
 """
-import copy, hashlib, json, time, uuid
+import copy, hashlib, json, time, uuid, urllib.error
 from pathlib import Path
 from types import SimpleNamespace
 import streamlit as st
@@ -218,8 +218,58 @@ def other_owner_read_denied(ui):
 
 def summarize(result):
     # Never render raw result, error message/details, actor, data, or operation ID.
-    known={'DIRECT_IDENTIFIER_NOT_ALLOWED','ACL_DENIED','DRAFT_OWNER_REQUIRED','STALE_VERSION','CORRECTION_REASON_REQUIRED','INITIAL_ALREADY_EXISTS','NO_PRIOR_RECORD','VALIDATION_FAILED','REQUEST_NOT_VISIBLE','STATUS_UNVERIFIABLE','AUTH_EXPIRED','SESSION_REVOKED','AUTH_REQUIRED','UNIFIED_TRANSACTION_INCOMPLETE','UNFINISHED_REQUEST_BLOCKS_NEW_OPERATION','UNKNOWN_REQUEST_BLOCKS_NEW_OPERATION'}
-    return {'ok':result.get('ok') is True,'state':result.get('state') if result.get('state') in ('SAVED','FAILED','UNKNOWN','UNFINISHED') else None,'error':result.get('error') if result.get('error') in known else ('UNCLASSIFIED' if result.get('error') else None)}
+    known={'DIRECT_IDENTIFIER_NOT_ALLOWED','ACL_DENIED','DRAFT_OWNER_REQUIRED','STALE_VERSION','CORRECTION_REASON_REQUIRED','INITIAL_ALREADY_EXISTS','NO_PRIOR_RECORD','VALIDATION_FAILED','REQUEST_NOT_VISIBLE','STATUS_UNVERIFIABLE','AUTH_EXPIRED','SESSION_REVOKED','AUTH_REQUIRED','UNIFIED_TRANSACTION_INCOMPLETE','UNFINISHED_REQUEST_BLOCKS_NEW_OPERATION','UNKNOWN_REQUEST_BLOCKS_NEW_OPERATION','AUTH_INVALID','SESSION_INVALID','SESSION_STORE_INVALID','SESSION_STORE_UNAVAILABLE','ASSERTION_REPLAY','LOCK_TIMEOUT','PREPARATION_UNCERTAIN','AUTH04_SCOPE_DENIED','AUTH04_SCOPE_NOT_APPROVED','AUTH04_EXECUTION_NOT_APPROVED'}
+    error=result.get('error');state=result.get('state')
+    return {'ok':result.get('ok') is True,'state':state if isinstance(state,str) and state in ('SAVED','FAILED','UNKNOWN','UNFINISHED') else None,'error':error if isinstance(error,str) and error in known else ('UNCLASSIFIED' if error else None)}
+
+def safe_exception_category(exc):
+    # Classify without formatting exception messages, URLs, bodies or arguments.
+    if isinstance(exc,TimeoutError):return 'TIMEOUT'
+    if isinstance(exc,urllib.error.HTTPError):return 'HTTP_ERROR'
+    if isinstance(exc,urllib.error.URLError):
+        return 'TIMEOUT' if isinstance(exc.reason,TimeoutError) else 'TRANSPORT_ERROR'
+    if isinstance(exc,json.JSONDecodeError):return 'INVALID_JSON'
+    return 'LOCAL_CHECK_FAILED'
+
+def elapsed_bucket(start):
+    seconds=max(0,time.monotonic()-start)
+    return 'LT_15S' if seconds<15 else ('15_TO_30S' if seconds<30 else 'GE_30S')
+
+def privacy_probe_once(ui):
+    # One fixed fixture per explicit click. Unknown requests are never retried.
+    if any(ui.session_state.get(k) for k in ('auth04_halted','auth04_preparation_uncertain','auth04_pending')):
+        raise PermissionError('RECONCILE_BEFORE_NEW_PREPARE')
+    index=ui.session_state.get('auth04_privacy_next',0)
+    if type(index) is not int or not 0<=index<len(PRIVACY_FIXTURES):
+        raise PermissionError('PRIVACY_SEQUENCE_NOT_AVAILABLE')
+    row={'fixture':index+1,'confirmed':False,'category':'REQUEST_STARTED'}
+    ui.session_state.setdefault('auth04_privacy_progress',[]).append(row)
+    p=draft_payload();p['draft_state']['privacy_probe']=copy.deepcopy(PRIVACY_FIXTURES[index])
+    ui.session_state['auth04_preparation_uncertain']=True
+    started=time.monotonic()
+    try:r=call(ui,'prepare_request',{'action':'save_draft','payload':p})
+    except PrepareWindowClosed:
+        row['category']='LOCAL_WINDOW_CLOSED';ui.session_state['auth04_preparation_uncertain']=False
+        raise
+    except Exception as exc:
+        row['category']=safe_exception_category(exc);ui.session_state['auth04_halted']=True
+        raise
+    finally:row['elapsed']=elapsed_bucket(started)
+    safe=summarize(r);row.update(safe);row['category']='RESPONSE_RECEIVED'
+    if r.get('ok') is not False or r.get('error')!='DIRECT_IDENTIFIER_NOT_ALLOWED':
+        op=r.get('operation_id')
+        if isinstance(op,str) and op:
+            ui.session_state.setdefault('auth04_operation_ids',[]).append(op);ui.session_state['auth04_pending']=op
+        ui.session_state['auth04_halted']=True
+        raise PermissionError('PRIVACY_REJECTION_NOT_CONFIRMED')
+    row['confirmed']=True;ui.session_state['auth04_privacy_next']=index+1
+    ui.session_state['auth04_preparation_uncertain']=False
+    return r
+
+def render_progress(ui):
+    if ui.session_state.get('auth04_results'):ui.table(ui.session_state['auth04_results'])
+    if ui.session_state.get('auth04_privacy_progress'):ui.table(ui.session_state['auth04_privacy_progress'])
+    if ui.session_state.get('auth04_last_exception_category'):ui.caption(ui.session_state['auth04_last_exception_category'])
 
 def run():
     st.set_page_config(page_title='JUOG AUTH04 isolated',layout='centered')
@@ -235,6 +285,7 @@ def run():
         if type(iat) is int and type(exp) is int and int(time.time())>=min(iat+3600,exp):
             if st.button('期限切れのログインを終了して再認証'):st.logout()
         st.stop()
+    render_progress(st)
     if st.session_state.get('auth04_preparation_uncertain'):
         st.error('応答が不確定なため停止しています。新しいprepareを送らず、サーバー台帳を照合してください。');st.stop()
     pending=st.session_state.get('auth04_pending')
@@ -253,16 +304,10 @@ def run():
         try:
             if choice=='接続・対象症例確認':r=context(st)
             elif choice=='識別入力prepare拒否':
-                for fixture in PRIVACY_FIXTURES:
-                    p=draft_payload();p['draft_state']['privacy_probe']=copy.deepcopy(fixture)
-                    st.session_state['auth04_preparation_uncertain']=True
-                    r=call(st,'prepare_request',{'action':'save_draft','payload':p})
-                    if r.get('ok') is not False or r.get('error')!='DIRECT_IDENTIFIER_NOT_ALLOWED':
-                        if r.get('operation_id'):
-                            st.session_state.setdefault('auth04_operation_ids',[]).append(r['operation_id']);st.session_state['auth04_pending']=r['operation_id']
-                        raise PermissionError('PRIVACY_REJECTION_NOT_CONFIRMED')
-                    st.session_state['auth04_preparation_uncertain']=False
-                st.write('拒否確認件数：'+str(len(PRIVACY_FIXTURES)))
+                if st.session_state.get('auth04_privacy_next',0)==len(PRIVACY_FIXTURES):
+                    st.info('全16条件の拒否確認済みです。再送しません。');st.stop()
+                r=privacy_probe_once(st)
+                st.write('拒否確認件数：'+str(st.session_state['auth04_privacy_next'])+'/'+str(len(PRIVACY_FIXTURES)))
             elif choice=='正常下書き保存':
                 clear_session_state_prefixes(('peri_','widget_peri_'));restore_draft_state(draft_payload()['draft_state'])
                 p=draft_payload();p['draft_state']=capture_draft_state('peri_');r=write_once(st,'save_draft',p)
@@ -301,11 +346,13 @@ def run():
                 r=call(st,action,{'operation_id':saved_id})
                 if r.get('ok') is not True or r.get('state')!='SAVED':raise PermissionError('REPLAY_STATUS_NOT_CONFIRMED')
             st.session_state.setdefault('auth04_results',[]).append({'check':choice,**summarize(r)})
-            st.table(st.session_state['auth04_results'])
+            render_progress(st)
         except PrepareWindowClosed:
             st.session_state['auth04_preparation_uncertain']=False
             st.warning('期限まで15分未満のため新しい保存要求を送信しません。読取・保存状態の照合後にログアウトしてください。')
-        except Exception:
+        except Exception as exc:
             st.session_state['auth04_halted']=True
+            st.session_state['auth04_last_exception_category']=safe_exception_category(exc)
+            render_progress(st)
             st.error('実測を確認できないため停止しました。自動再送せず、監査と台帳を照合してください。')
     st.stop()
