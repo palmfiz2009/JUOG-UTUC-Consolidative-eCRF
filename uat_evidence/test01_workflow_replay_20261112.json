@@ -1,0 +1,219 @@
+{
+  "scope": "OFFLINE ONLY; exact review bundle with TEST01 fixture; synthetic roles and in-memory journal; controlled business clocks. Not real IdP, GAS, Sheets or formal UAT.",
+  "bundle_sha256": "107478619171019fabcc264a731c3b6539cc93e321d3eb9b685fef51984a529b",
+  "fixture_sha256": "b9e8823e123b113cc799114bb837b9f6d012e222ee58633b84313da36518c5c3",
+  "steps": [
+    {
+      "id": "op1",
+      "action": "submit_screening",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op2",
+      "action": "submit_mdt_review",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op3",
+      "action": "submit_mdt_review",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op4",
+      "action": "submit_mdt_review",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op5",
+      "action": "submit_mdt_review",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op6",
+      "action": "finalize_mdt",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op7",
+      "action": "save_crf",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op8",
+      "action": "save_crf",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op9",
+      "action": "read_crf",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op10",
+      "action": "get_mdt_reviews",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op11",
+      "action": "save_screening_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op12",
+      "action": "get_screening_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op13",
+      "action": "get_screening_draft",
+      "expected_ok": false,
+      "actual_ok": false,
+      "error": "DRAFT_OWNER_REQUIRED"
+    },
+    {
+      "id": "op14",
+      "action": "list_review_cases",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op15",
+      "action": "get_screening_crf",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op16",
+      "action": "get_own_review",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op17",
+      "action": "list_screenings",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op18",
+      "action": "get_screening",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op19",
+      "action": "stats",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op20",
+      "action": "delete_screening_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op21",
+      "action": "save_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op22",
+      "action": "get_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op23",
+      "action": "validate",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op24",
+      "action": "get_crf_linkage",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op25",
+      "action": "reset_draft_code",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op26",
+      "action": "update_draft_email",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op27",
+      "action": "get_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op28",
+      "action": "delete_draft",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op29",
+      "action": "void_registration",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    },
+    {
+      "id": "op30",
+      "action": "stats",
+      "expected_ok": true,
+      "actual_ok": true,
+      "error": null
+    }
+  ],
+  "baseline_unchanged": true,
+  "formal_pass_added": 0
+}
