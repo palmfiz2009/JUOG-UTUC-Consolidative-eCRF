@@ -151,6 +151,57 @@ class Tests(unittest.TestCase):
   with patch.object(h,'context'),patch.object(h,'call',side_effect=[{'ok':True,'operation_id':'secret_op'},{'ok':False,'error':'DOMAIN_INCOMPLETE','state':'UNFINISHED','raw':'secret'},TimeoutError]):
    with self.assertRaises(TimeoutError):h.write_once(ui,'save_crf',h.crf_payload(1))
   self.assertEqual(ui.session_state['auth04_execution_diagnostics'],[{'phase':'EXECUTE','ok':False,'state':'UNFINISHED','error':'DOMAIN_INCOMPLETE'}])
+ def test_sixmonth_same_operation_recovery_requires_verified_90d(self):
+  ui,p=self.recovery_ui_and_payload()
+  with patch.object(h,'call') as call:
+   with self.assertRaises(PermissionError):h.resume_observed_6m(ui)
+   call.assert_not_called()
+  ui.session_state['auth04_expected_versions'][1]=1
+  with patch.object(h,'call') as call:
+   with self.assertRaises(PermissionError):h.resume_observed_6m(ui)
+   call.assert_not_called()
+ def test_sixmonth_recovery_preserves_previous_expectations(self):
+  ui,p=self.recovery_ui_and_payload();ui.session_state['auth04_expected_versions'][1]=1;ui.session_state['auth04_v1_hashes']={1:'verified90'}
+  p=h.crf_payload(2);p['data']['source_30d_record_version']=2;p['data']['source_30d_submission_id']='synthetic30v2'
+  rec={'record_key':p['record_key'],'record_version':1,'payload':p,'accepted_at':'synthetic'}
+  responses=[{'ok':True,'action':'save_crf','state':'UNFINISHED','phase':'AUDIT_OR_COMMIT_PENDING'},{'ok':True,'state':'SAVED'},{'ok':True,'action':'save_crf','state':'SAVED'}]
+  with patch.object(h,'linked_crf_payload',return_value=p) as linked,patch.object(h,'call',side_effect=responses) as call,patch.object(h,'read_records',return_value=({'ok':True},[rec])):
+   self.assertEqual(h.resume_observed_6m(ui)['state'],'SAVED');linked.assert_called_once_with(ui,2,1)
+   self.assertEqual([c.args[1] for c in call.call_args_list],['request_status','execute_request','request_status'])
+  self.assertEqual(ui.session_state['auth04_expected_versions'],{0:2,1:1,2:1});self.assertEqual(ui.session_state['auth04_v1_hashes'][1],'verified90');self.assertFalse(ui.session_state['auth04_halted'])
+ def test_recovery_index_scope_rejects_unlisted_and_boolean(self):
+  for index in (0,3,-1,True,'2'):
+   ui=self.ui()
+   with patch.object(h,'call') as call:
+    with self.assertRaises(PermissionError):h.resume_observed_crf(ui,index)
+    call.assert_not_called()
+ def test_sixmonth_wrong_payload_does_not_clear_pending(self):
+  ui,p=self.recovery_ui_and_payload();ui.session_state['auth04_expected_versions'][1]=1;ui.session_state['auth04_v1_hashes']={1:'verified90'}
+  p=h.crf_payload(2);p['data']['source_30d_record_version']=2
+  wrong=copy.deepcopy(p);wrong['visit']='other'
+  with patch.object(h,'linked_crf_payload',return_value=p),patch.object(h,'call',return_value={'ok':True,'action':'save_crf','state':'SAVED'}),patch.object(h,'read_records',return_value=({'ok':True},[{'record_version':1,'payload':wrong}])):
+   with self.assertRaises(PermissionError):h.resume_observed_6m(ui)
+  self.assertEqual(ui.session_state['auth04_pending'],'observed90');self.assertTrue(ui.session_state['auth04_halted']);self.assertNotIn(2,ui.session_state['auth04_expected_versions'])
+ def test_revoke_then_logout_uses_only_fixed_empty_payload(self):
+  ui=self.ui();ui.logout=unittest.mock.Mock();native=object()
+  with patch.object(h,'native_context',return_value=native),patch.object(h,'signed_request',return_value={'private':'envelope'}) as signed,patch.object(h,'send',return_value={'ok':True,'revoked':True}) as send:
+   h.revoke_and_logout(ui);signed.assert_called_once_with(native,'session_revoke',{});send.assert_called_once_with({'private':'envelope'});ui.logout.assert_called_once()
+ def test_failed_revocation_never_logs_out(self):
+  for result in ({'ok':False,'revoked':True},{'ok':True,'revoked':False},{'ok':True}):
+   ui=self.ui();ui.logout=unittest.mock.Mock()
+   with patch.object(h,'native_context'),patch.object(h,'signed_request'),patch.object(h,'send',return_value=result):
+    with self.assertRaises(PermissionError):h.revoke_and_logout(ui)
+   ui.logout.assert_not_called();self.assertTrue(ui.session_state['auth04_halted'])
+  ui=self.ui();ui.logout=unittest.mock.Mock()
+  with patch.object(h,'native_context'),patch.object(h,'signed_request'),patch.object(h,'send',side_effect=TimeoutError):
+   with self.assertRaises(TimeoutError):h.revoke_and_logout(ui)
+  ui.logout.assert_not_called()
+ def test_pending_or_uncertain_blocks_revocation_and_logout(self):
+  for state in ({'auth04_pending':'observed'},{'auth04_preparation_uncertain':True}):
+   ui=self.ui();ui.session_state=state;ui.logout=unittest.mock.Mock()
+   with patch.object(h,'native_context') as native,patch.object(h,'send') as send:
+    with self.assertRaises(PermissionError):h.revoke_and_logout(ui)
+    native.assert_not_called();send.assert_not_called();ui.logout.assert_not_called()
  def test_fixture_payloads_pinned(self):
   for i in range(3):h.check_payload('save_crf',h.crf_payload(i))
   self.assertEqual(h.crf_payload(0,2)['expected_record_version'],1)
