@@ -1,0 +1,44 @@
+{
+  "status": "REVIEW_CANDIDATE_NOT_DEPLOYED",
+  "date": "2026-11-13",
+  "identity": {
+    "status": "REVIEW_ONLY_NOT_DEPLOYED",
+    "base": "/workspace/scratch/426ea3aa0205/auth-connect/juog_common.py",
+    "base_sha256": "9a4b27853c9cd1f958eb897f325bcc81f85c8d39b60224b8a8016b5946ce1704",
+    "proven": "/workspace/scratch/426ea3aa0205/uat/integrated_core/streamlit_connection_candidate/juog_common.py",
+    "proven_sha256": "a61a1af5d41559dbdb377b47d8e7a81d535891660b88df005ab779bbb7cdd235",
+    "candidate_sha256": "378a54a8d02e27ff812b97effa12caa376d8ad8460f06a3039bd8d6bf57ae265",
+    "changed_functions": [
+      "capture_draft_state",
+      "restore_draft_state",
+      "is_direct_identifier_key",
+      "redact_draft_identifiers"
+    ]
+  },
+  "validation": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 python acl_review/auth04_frontend_candidate/test_candidate.py",
+    "result": "PASS",
+    "test_methods": 9,
+    "existing_gas_parity_fixtures": 12,
+    "live_requests": 0,
+    "formal_uat_pass_delta": 0
+  },
+  "risks": [
+    "REVIEW ONLY: candidate not imported by live UI, not deployed, no AUTH04 execution approval.",
+    "Restore skips prohibited keys but does not erase values already in session_state. All four inspected current CRF call sites clear their reg_/peri_/d90_/fu_ and widget prefixes first. Real UI integration must retain that ordering.",
+    "Unlabeled names/identifiers are not reliably detected; labels in harmless prose may over-redact. The entire matched string is replaced, so clinical free text mixed with identifier labels is lost and requires user review.",
+    "Embedded JSON strings are parsed/redumped; formatting may change while JSON value meaning remains. Unsupported nested types/cycles/depth attacks and arbitrary restore key scoping are not hardened by this minimal transplant.",
+    "Candidate sanitizes capture and restore; it does not erase old persisted drafts or append-only history. Genuine legacy ownership still requires verified V3_DraftOwners.",
+    "No browser widget, live GAS persistence, audit, notification-channel or authorization test performed. Nine unit tests and twelve fixture parity checks are offline evidence only.",
+    "Full candidate file is tied to recorded base hash. Apply only patch after verifying current source identity; do not overwrite newer auth-connect changes.",
+    "No changes to formal UAT count; AUTH04 remains FAIL pending real isolated evidence and separate approvals."
+  ],
+  "artifacts": {
+    "source_identity.json": "d381036ea1780eae722c195cc6ce31474c7c85c9edd50588fa573abc36d89720",
+    "test_candidate.py": "13a4590dc2b688c158c0b3bb85252297d69ac71739d56984b737655c094b8e05",
+    "REVIEW.md": "8f371ed2f4aec5e12bfbde3c0c32f72fbd69570bb0ed04066ac58a5c884f3fc6",
+    "juog_common.py": "378a54a8d02e27ff812b97effa12caa376d8ad8460f06a3039bd8d6bf57ae265",
+    "build_candidate.py": "f70d7ffa56e5898211c25fa351229bbf922ec035e6d6d473db68543a4d4c5bad",
+    "capture_restore_redaction.patch": "467457a6771b715922b95fd0d5c684e007d104dcd3579e16349e3cd45f9f589b"
+  }
+}

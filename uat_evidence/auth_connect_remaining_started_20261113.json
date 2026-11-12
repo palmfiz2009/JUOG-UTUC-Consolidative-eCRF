@@ -1,0 +1,31 @@
+{
+  "phase": "WAITING_REAL_TIME",
+  "frontend_commit": "8ae09cf6220fee1509a97d95d3c6d6ab179fd66f",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "new_formal_pass": 0,
+  "acl_negative_tests": "AWAITING_PI_INDIVIDUAL_APPROVAL",
+  "acl_unchanged": true,
+  "business_journal_unchanged": true,
+  "session_events": [
+    "OPEN",
+    "USE",
+    "USE",
+    "REVOKE",
+    "OPEN",
+    "USE",
+    "USE"
+  ],
+  "reload_same_sid": true,
+  "reload_same_deadline": true,
+  "session_duration_seconds": 3600,
+  "deadline_utc": "2026-11-12T17:03:09.000Z",
+  "boundary_result": "NOT_COMPLETED",
+  "offline_boundary_tests_pass": 16,
+  "offline_auth04_candidate_tests_pass": 9,
+  "auth04_live_execution": "NOT_AUTHORIZED"
+}

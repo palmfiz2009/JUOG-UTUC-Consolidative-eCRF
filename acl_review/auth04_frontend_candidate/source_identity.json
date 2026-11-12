@@ -1,0 +1,14 @@
+{
+  "status": "REVIEW_ONLY_NOT_DEPLOYED",
+  "base": "/workspace/scratch/426ea3aa0205/auth-connect/juog_common.py",
+  "base_sha256": "9a4b27853c9cd1f958eb897f325bcc81f85c8d39b60224b8a8016b5946ce1704",
+  "proven": "/workspace/scratch/426ea3aa0205/uat/integrated_core/streamlit_connection_candidate/juog_common.py",
+  "proven_sha256": "a61a1af5d41559dbdb377b47d8e7a81d535891660b88df005ab779bbb7cdd235",
+  "candidate_sha256": "378a54a8d02e27ff812b97effa12caa376d8ad8460f06a3039bd8d6bf57ae265",
+  "changed_functions": [
+    "capture_draft_state",
+    "restore_draft_state",
+    "is_direct_identifier_key",
+    "redact_draft_identifiers"
+  ]
+}
