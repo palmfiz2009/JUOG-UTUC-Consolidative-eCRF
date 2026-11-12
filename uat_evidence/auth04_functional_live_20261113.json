@@ -1,0 +1,84 @@
+{
+  "scope": "TEST01/JUOG-970 fully fictional data only",
+  "status": "IN_PROGRESS",
+  "frontend_commit": "610d5df97e92e36865c24cd842e413ea12da7be5",
+  "gas_version": 4,
+  "privacy": {
+    "fixtures": 16,
+    "exact_rejections": 16,
+    "raw_values_rendered": false,
+    "business_journal_unchanged": true,
+    "formal_pass_added": 0,
+    "frontend_commit": "610d5df97e92e36865c24cd842e413ea12da7be5"
+  },
+  "legacy_and_ownership": {
+    "legacy90d_server_read_restore": true,
+    "other_owner_error": "DRAFT_OWNER_REQUIRED",
+    "source_journal_rows": 15,
+    "source_journal_exactly_unchanged": true,
+    "legacy_source_not_overwritten": true,
+    "formal_pass_added": 0
+  },
+  "draft": {
+    "changed_tables": [
+      "CRF_Drafts",
+      "V3_DraftOwners"
+    ],
+    "legacy_rows_unchanged": true,
+    "legacy_owners_unchanged": true,
+    "intent_audit_commit_ids_match": true,
+    "audit_hashes_match": true,
+    "actor_matches": true,
+    "revision": 3,
+    "ui_saved": true,
+    "ui_read_restore": true
+  },
+  "crf30_version1": {
+    "ui_saved": true,
+    "ui_history_read": true,
+    "revision": 4,
+    "all_chunk_hashes_valid": true,
+    "id_matches": true,
+    "audit_hashes_match": true,
+    "old_journal_prefix_preserved": true,
+    "unchanged_tables": [
+      "Registry",
+      "Screening",
+      "ScreeningAudit",
+      "MDTReviews",
+      "ScreeningCRF",
+      "CRF_90d",
+      "CRF_Followup",
+      "CRF_Drafts",
+      "Settings",
+      "V3_DraftOwners"
+    ],
+    "crf_30d_rows": 2
+  },
+  "crf30_version2": {
+    "revision": 5,
+    "versions": [
+      1,
+      2
+    ],
+    "version1_exactly_unchanged": true,
+    "v2_has_correction_reason": true,
+    "all_hashes_valid": true,
+    "id_matches": true,
+    "audit_hashes_match": true,
+    "unchanged_prefix": true,
+    "ui_history_read": true
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "formal_pass_delta": 0,
+  "unresolved": [
+    "Original same-session 60-minute boundary evidence incomplete",
+    "Prior credential exposure; rotation not verified",
+    "Initial uninstrumented privacy batch stop cause remains unknown"
+  ]
+}
