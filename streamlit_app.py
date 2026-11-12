@@ -7,8 +7,23 @@ except PermissionError:
     _st.error("隔離試験設定を確認できません。接続していません。")
     _st.stop()
 if _auth04_config["enabled"] is True:
-    from uat_auth04_live import run as _run_auth04
-    _run_auth04()
+    # Pin reviewed source before refreshing imports; preserve observed operation IDs.
+    import hashlib as _hashlib
+    import importlib as _importlib
+    from pathlib import Path as _Path
+    try:
+        if _hashlib.sha256(_Path(__file__).with_name("uat_auth04_live.py").read_bytes()).hexdigest() != "640d83e69e17a8077da6114edac7c84f2ae6f48b62a66d4d10b41d03541549f1":
+            raise PermissionError("HARNESS_VERSION_MISMATCH")
+        import uat_auth04_live as _auth04_module
+        _auth04_module = _importlib.reload(_auth04_module)
+        if (not callable(getattr(_auth04_module, "resume_observed_6m", None)) or
+                not callable(getattr(_auth04_module, "revoke_and_logout", None)) or
+                "recovery_index" not in _auth04_module.run.__code__.co_varnames):
+            raise PermissionError("HARNESS_REFRESH_NOT_VERIFIED")
+    except Exception:
+        _st.error("隔離試験の実行版が確認できません。送信していません。")
+        _st.stop()
+    _auth04_module.run()
 if _st.secrets.get("auth_connect", {}).get("enabled") is True:
     from uat_auth_connect import run as _run_auth_connect
     _run_auth_connect()
