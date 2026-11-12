@@ -6,17 +6,32 @@ function juogUnifiedIsolationEntryV3_(envelope,c) {
  const forbidden=['1R1a55w19qfS7XTa6Ran7EnuTNZpFkGoXIFfqesv7zoc','1XEKihUvJBHP4BZNf8WMf14__zsiiZgY8ozFnhw_NZNE','1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs'];
  if(!c||c.environment!=='ISOLATED_TEST'||!c.approvalRef||c.backupVerified!==true||c.qaApproved!==true||c.fictionalBaselineVerified!==true||c.notificationsDisabled!==true||!c.spreadsheetId||c.spreadsheetId!==c.approvedSpreadsheetId||forbidden.includes(c.spreadsheetId))return {ok:false,error:'ISOLATION_NOT_APPROVED'};
  if(c.sessionPolicy==='isolated_gas_session_b2'&&(c.spreadsheetId!=='1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU'||ScriptApp.getScriptId()!=='11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy'))return {ok:false,error:'ISOLATION_NOT_APPROVED'};
+ const authConnect=c.sessionPolicy==='isolated_gas_session_b2'&&c.sessionExecutionStage==='AUTH_CONNECT';
+ if(c.sessionPolicy==='isolated_gas_session_b2'&&!['AUTH_CONNECT','AUTH04_APPROVED'].includes(c.sessionExecutionStage))return {ok:false,error:'ISOLATION_NOT_APPROVED'};
+ if(authConnect&&(c.authConnectReviewApproved!==true||typeof c.authConnectReviewRef!=='string'||!c.authConnectReviewRef.trim()))return {ok:false,error:'AUTH_CONNECT_NOT_APPROVED'};
  const lock=LockService.getScriptLock();if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
  try {
   const auth=juogV3DecodeBridge_(envelope,c),req=auth.request;
-  if(c.allRoutesReviewed!==true||c.schemaParityApproved!==true)return {ok:false,error:'INTEGRATION_NOT_APPROVED'};
+  if(!authConnect&&(c.allRoutesReviewed!==true||c.schemaParityApproved!==true))return {ok:false,error:'INTEGRATION_NOT_APPROVED'};
   const control=['session_revoke','prepare_request','request_status','list_requests','execute_request'];
   let op=req.payload;if(!op||(!control.includes(req.action)&&op.action!==req.action))return {ok:false,error:'ACTION_MISMATCH'};
   const ss=SpreadsheetApp.openById(c.spreadsheetId),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
+  if(authConnect&&req.action!=='session_revoke'&&(!who||who.role!=='facility'))return {ok:false,error:'ACL_DENIED'};
   const gate=c.sessionPolicy==='isolated_gas_session_b2'?juogSessionGateB2_(ss,c,auth,who):null;
   if(gate&&gate.response)return gate.response;
   if(gate&&c.sessionExecutionStage!=='AUTH04_APPROVED'&&req.action!=='ui_context')return {ok:false,error:'AUTH04_EXECUTION_NOT_APPROVED'};
   if(gate&&c.sessionExecutionStage==='AUTH04_APPROVED'&&!c.auth04ExecutionApprovalRef)return {ok:false,error:'AUTH04_EXECUTION_NOT_APPROVED'};
+  // Authentication scope returns before creating any business store/service or
+  // reading business data. Business approvals and business secrets stay unset.
+  if(authConnect){
+   if(!op.payload||typeof op.payload!=='object'||Array.isArray(op.payload)||
+      Object.keys(op.payload).some(k=>k!=='registration_id')||
+      (op.payload.registration_id!==undefined&&op.payload.registration_id!==''))return {ok:false,error:'AUTH_CONNECT_CONTEXT_ONLY'};
+   gate.guard();
+   return {ok:true,backend_version:'b2-auth-connect',environment:'TEST',isolation:true,
+    role:who.role,user_id:who.id,facilities:who.facilities,facility_code:'TEST01',
+    execution_stage:'AUTH_CONNECT',business_writes_allowed:false};
+  }
   const hash=s=>Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,s,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');
   const store=juogDomainSheetsStoreV3_(ss,hash,()=>Utilities.getUuid(),gate?gate.guard:null);
   if(gate){

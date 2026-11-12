@@ -1,0 +1,38 @@
+{
+  "date_jst": "2026-11-13",
+  "version1_sha256": "154b14d5513a95fded38045b8c87b3c90cf194088968a968aefc0f36406c65bd",
+  "candidate_sha256": "cc6b536b84209c01f71aaab20748c450ab669f150e014e13215320809c83e05c",
+  "independent_review": {
+    "reviewer": "review_session independent code-review agent",
+    "result": "PASS_FOR_AUTH_CONNECT_SCOPE",
+    "human_qa": false,
+    "findings_resolved": [
+      "AUTH_CONNECT scoped approval replaces business-wide approvals",
+      "AUTH_CONNECT early return avoids business sheets/services and unnecessary business secrets"
+    ]
+  },
+  "regression_checks": 15,
+  "formal_uat_delta": 0,
+  "required_configuration": {
+    "authConnectReviewApproved": true,
+    "authConnectReviewRef": "uat_evidence/auth_connect_scoped_safety_review_20261113.json",
+    "allRoutesReviewed": false,
+    "schemaParityApproved": false,
+    "sessionExecutionStage": "AUTH_CONNECT",
+    "auth04ExecutionApprovalRef": null
+  },
+  "keys": {
+    "signing_key": "required; not yet provisioned",
+    "resume_derivation_key": "not used by AUTH_CONNECT; leave unset",
+    "draft_pepper": "not used by AUTH_CONNECT; leave unset"
+  },
+  "residual_identity_file": {
+    "path": "/opt/codex/downloads/3d29d3f8-b320-4681-8d6e-80ca23a6ec4a/7d662139-9d9d-4b3d-ae63-5bfd76bc28c8",
+    "unix_mode": "0600",
+    "unix_owner": "agent",
+    "filesystem": "read-only overlay",
+    "scope_known": "owner/root access in runtime; service/operator retention and access not independently verifiable",
+    "deletion": "not possible through current runtime; platform operator deletion required"
+  },
+  "live_activation": false
+}

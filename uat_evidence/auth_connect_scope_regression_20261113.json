@@ -1,0 +1,24 @@
+{
+  "count": 15,
+  "checks": [
+    "scoped context works without business approvals or business keys",
+    "no business sheet is opened by context",
+    "missing scoped review denied without session events",
+    "invalid signature denied",
+    "replay denied in a fresh GAS context",
+    "all business and recovery actions rejected",
+    "case-specific context rejected",
+    "other facility and admin role denied",
+    "revoked and expired ACL denied",
+    "logout invalidates an already issued signature",
+    "expired signature denied",
+    "session expiration denied",
+    "concurrent lock is fail closed",
+    "scope cannot enter AUTH04 with business approval flags false",
+    "unknown stage denied"
+  ],
+  "result": "PASS",
+  "journal_unchanged": true,
+  "scope": "Offline synthetic isolated GAS AUTH_CONNECT only",
+  "formal_uat_delta": 0
+}
