@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import streamlit as st
 from uat_auth_connect import URL, GENERATION, FINGERPRINT, send
 from uat_identity_proposal import identity_proposal
+from auth04_config import load_config
 from uat_b2_auth_bridge import signed_request
 from juog_common import capture_draft_state, restore_draft_state, clear_session_state_prefixes
 CASE='JUOG-970'; FACILITY='TEST01'
@@ -31,7 +32,7 @@ PAIRS={('perioperative_30d','30d'),('day90','90d'),('followup','6m')}
 PRIVACY_FIXTURES=[{'reg_birth_date': 'SYNTHETIC-ID'}, {'regBirthDate': 'SYNTHETIC-ID'}, {'regFirstName': 'SYNTHETIC-ID'}, {'regLastName': 'SYNTHETIC-ID'}, {'regDOB': 'SYNTHETIC-ID'}, {'regＭＲＮ': 'SYNTHETIC-ID'}, {'regＢirthDate': 'SYNTHETIC-ID'}, {'note': '患者氏名は架空検証者'}, {'note': 'カルテ番号はSYNTHETIC-001'}, {'note': '生年月日は１９８０年１月２日'}, {'note': 'DOB: 1980-01-02'}, {'nested': [{'encoded': '{"regFirstName": "FICTIONAL"}'}]}, {'患者氏名': 'SYNTHETIC-ID'}, {'カルテ番号': 'SYNTHETIC-ID'}, {'生年月日': '1980-01-02'}, {'nested': [{'encoded': '{"患者氏名": "SYNTHETIC-ID"}'}]}]
 
 def native_context(ui):
-    cfg=dict(ui.secrets['auth04']);auth=dict(ui.secrets['auth_connect'])
+    cfg=load_config();auth=dict(ui.secrets['auth_connect'])
     if (cfg.get('enabled') is not True or cfg.get('stage')!='AUTH04_APPROVED' or
         cfg.get('fixture_id')!=CASE or cfg.get('facility_code')!=FACILITY or
         cfg.get('fixture_sha256')!=FIXTURE_SHA or cfg.get('url')!=URL or

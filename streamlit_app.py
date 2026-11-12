@@ -1,6 +1,12 @@
 # Isolation authentication preflight: stops before all legacy business code.
 import streamlit as _st
-if _st.secrets.get("auth04", {}).get("enabled") is True:
+from auth04_config import load_config as _load_auth04_config
+try:
+    _auth04_config = _load_auth04_config()
+except PermissionError:
+    _st.error("隔離試験設定を確認できません。接続していません。")
+    _st.stop()
+if _auth04_config["enabled"] is True:
     from uat_auth04_live import run as _run_auth04
     _run_auth04()
 if _st.secrets.get("auth_connect", {}).get("enabled") is True:
