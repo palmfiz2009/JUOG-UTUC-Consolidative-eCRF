@@ -1,0 +1,41 @@
+{
+  "scope": "TEST01/JUOG-970 fictional functional tests only",
+  "pi_explicit_exception_approved": true,
+  "auth_security_pass_authorized": false,
+  "production_release_authorized": false,
+  "gas_enable_result": {
+    "ok": true,
+    "stage": "AUTH04_APPROVED",
+    "nonsecret_configuration_only": true,
+    "observed_jst": "2026-11-13T07:07:20+09:00"
+  },
+  "gas_webapp_version": 4,
+  "gas_webapp_sha256": "b4b8ef029e27cd208bcf6b56f86e15add998c15e43d5ffa2ca149a44645c597d",
+  "frontend_enabled_commit": "319c558e9952319235d4a98e8c53a36d1316220f",
+  "pretest_journal_rows": 15,
+  "pretest_journal_sha256": "927ddea90e6d0c8d589f2203fe06fb44fe6d215ca84fdbc9c407a57139c09c85",
+  "context_live_verified": true,
+  "unresolved": [
+    "Original same-session 60-minute boundary evidence incomplete",
+    "Prior cookie_secret/client_secret exposure; rotation not verified"
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "privacy_batch_result": "UNCONFIRMED_HALTED",
+  "privacy_batch_formal_pass": false,
+  "privacy_completed_count": "unknown; previous harness did not expose partial progress",
+  "post_halt_journal_rows": 15,
+  "post_halt_journal_exactly_unchanged": true,
+  "gas_disable_result": {
+    "ok": true,
+    "stage": "AUTH_CONNECT",
+    "observed_jst": "2026-11-13T07:15:38+09:00"
+  },
+  "business_save_execute_requests_sent": false,
+  "session_ledger_rows_after": 33,
+  "cause": "Not yet determined; do not infer transport vs rejection from generic UI error"
+}
