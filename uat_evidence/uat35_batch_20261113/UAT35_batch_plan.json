@@ -1,0 +1,517 @@
+{
+  "baseline_commit": "241d9f9094c83b701340059b1ae98cdc56fa258a",
+  "counts": {
+    "PASS": 32,
+    "BLOCKED": 29,
+    "NOT RUN": 5,
+    "FAIL": 1
+  },
+  "group_counts": {
+    "A": 15,
+    "B": 7,
+    "C": 4,
+    "D": 1,
+    "QA": 8
+  },
+  "live_evidence_resolved": 0,
+  "new_formal_pass": 0,
+  "rows": [
+    {
+      "test_id": "SCR-05",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "中央画像・臨床情報による条件確認ができる。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "架空の中央画像・臨床判定を役割別に提出し、各担当・一致/不一致・監査を確認。医師の判定そのものをAIで代替しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "cM1/遠隔CRの架空中央画像・臨床条件を正規各役割で確認し登録結果を照合。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "SCR-06",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "3か月以上の条件確認ができる。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "cNED等の原条件を満たす対照/満たさない対照を3か月境界で作成。正式日数定義は原仕様照合後に固定。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "局所治療後cNEDの3か月以上条件を中央審査から登録まで確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "SCR-07",
+      "group": "A",
+      "formal_status": "NOT RUN",
+      "criterion": "条件不充足例が正式登録されない。",
+      "existing_evidence": [
+        "JUOG_run2_SCR07_no_basis.txt、JUOG_run2_SCR07_cNED_short.txt/.jpg; Run9_SCR07_exact3months.txt / Run9_SCR07_one_day_short.txt / Run9_SCR07_future.txt / Run9_SCR07_future.png"
+      ],
+      "scenario": "cM1条件不充足→保留/拒否→適格対照。原台帳のcM1期間定義を確認し、正式登録不可とrevision不変を確認。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "遠隔病変残存/cNED不足の正式登録要求が拒否される証拠を取得。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "SCR-11",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "診断時・最終投与後の画像と症例識別コードが照合可能。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "IMG-01と同じ架空DICOMで診断時/最終投与後の症例コード照合。逆対応は拒否。外部アップロードなし。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "架空2時点DICOM・症例コード・受領記録を隔離経路で照合。外部画像送信は現承認外。 画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。"
+    },
+    {
+      "test_id": "REG-06",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "LockServiceによりJUOG番号が重複しない。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "独立した正規認証要求2本で同時finalize_mdt。返却JUOG番号の一意性とRegistry/監査の件数を照合。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "異なる架空適格例の同時登録を正規認証で競合させ、番号一意・監査一意を実測。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "REG-07",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "SURGERY_BEFORE_MDTで拒否される。",
+      "existing_evidence": [
+        "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575"
+      ],
+      "scenario": "手術日がMDT前の対照をSURGERY_BEFORE_MDTで拒否。適格日付へ戻して登録し版/監査を照合。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "MDT日より前の手術予定要求を正規登録APIへ送りSURGERY_BEFORE_MDTと無登録を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "REG-08",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "SURGERY_BEFORE_REGISTRATIONで拒否される。",
+      "existing_evidence": [
+        "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575"
+      ],
+      "scenario": "手術日が登録前の対照をSURGERY_BEFORE_REGISTRATIONで拒否。登録日と同日の境界も確認。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "正式登録日より前の手術予定要求を拒否し台帳不変を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-03",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "cN1-only枠は増えず、全体のみ+1。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "原台帳の非cN1-only分類で全体のみ+1、cN1-only不変。CAP-04/05と同一集計読取を共有。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "独立架空fixtureでcN1-only枠は増えず、全体のみ+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-04",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "cN1-only枠は増えない。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "cT4等のcN1-only非該当例を原台帳に従い対照化しcN1-only非加算を確認。登録適格性と枠算入を混同しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "独立架空fixtureでcN1-only枠は増えない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-05",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "cN1-only枠は+1。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "cT3以下/cN1/cM0の適格対照で全体+1、cN1-only+1。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "独立架空fixtureでcN1-only枠は+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-06",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "20例まで計上、21例目はCN1_CAP_REACHED。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "架空スナップショット19→20許可→21拒否CN1_CAP_REACHED。他の枠は上限未満に固定。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "独立架空fixtureで20例まで計上、21例目はCN1_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-07",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "42例は許容、43例目はTOTAL_CAP_REACHED。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "架空スナップショット41→42許可→43拒否TOTAL_CAP_REACHED。他の枠は上限未満に固定。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "独立架空fixtureで42例は許容、43例目はTOTAL_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-08",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "SD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "SD11→12許可→13保留/拒否。上限解除なし。全体/cN1枠は非拘束状態。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "独立架空fixtureでSD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "CAP-09",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "確定した分類が上限管理に反映、または監査可能な手作業管理手順を承認。現コードの自動修正有無は未確認。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "中央分類訂正前後で枠と監査を照合。自動訂正APIがない場合、承認済み手順の実測へ切替し実装を迂回しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "中央判定変更後のアクティブ集計・監査を検証。手作業代替はPIの正式承認なしに採用しない。 中央判定変更時の分類・枠反映、又は監査可能な手作業の承認と実測が不足。"
+    },
+    {
+      "test_id": "CAP-10",
+      "group": "A",
+      "formal_status": "BLOCKED",
+      "criterion": "VOIDは正式登録総数・cN1-only・SDのアクティブ件数から除外。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "void_registrationを理由・approval_ref付きで実施。ACTIVEのみの全体/cN1/SD計上から除外、旧記録保持。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "別架空症例に承認済みVOID経路を実行し総数/cN1-only/SD除外と旧版・理由監査を照合。 承認済みVOID手順と実件数再計算の証拠が不足。"
+    },
+    {
+      "test_id": "POST-01",
+      "group": "B",
+      "formal_status": "BLOCKED",
+      "criterion": "イベント・日付・Gradeが正確に保存され集計へ取得可能。",
+      "existing_evidence": [
+        "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json"
+      ],
+      "scenario": "JUOG-971手術あり候補でGrade IIIaの術後30日イベント→保存/読取/集計/監査。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "手術実施の30d/90d架空fixtureを追加しイベント・日付・Gradeの保存/読取/抽出を検証。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "POST-02",
+      "group": "B",
+      "formal_status": "NOT RUN",
+      "criterion": "術後30日以内の主要評価イベントに誤算入されない。",
+      "existing_evidence": [
+        "JUOG_run3_POST02_day31.txt/.jpg、JUOG_run3_POST02_day30.txt; uat_integration_readonly.json; 30d_noop_chronology_evidence.json"
+      ],
+      "scenario": "同症例の31日イベントを30日CRFで拒否。90日CRFの31–90日領域へ正常保存し主要評価誤算入なしを確認。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "術後30日/31日境界を保存/集計まで検証。現行非手術fixtureはこの判定に使わない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "POST-03",
+      "group": "B",
+      "formal_status": "BLOCKED",
+      "criterion": "N/Aと実施記録が区別され、必須項目整合性を維持。",
+      "existing_evidence": [
+        "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "scenario": "既済970非手術N/Aを再利用し971手術あり対照の必須項目と表示・保存の差を確認。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "手術例との対照、条件付きN/Aの全要求を実機で照合。"
+    },
+    {
+      "test_id": "POST-04",
+      "group": "B",
+      "formal_status": "BLOCKED",
+      "criterion": "数値0や病理結果が失われず、データ矛盾が検出される。",
+      "existing_evidence": [
+        "—; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "scenario": "病理評価不能理由/その他詳細の欠落拒否→復元→保存。CRP0、出血量0、病理径0の保持と不正値拒否。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "病理の条件付き必須・不正値の実機拒否等、原合格条件の全枝が不足。"
+    },
+    {
+      "test_id": "POST-06",
+      "group": "B",
+      "formal_status": "BLOCKED",
+      "criterion": "SOURCE_CRF_UPDATED等で不整合が検出される。",
+      "existing_evidence": [
+        "—; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "scenario": "971の30日v1→v2後、90日/追跡の旧参照拒否→実際に返却された最新版/提出IDへ再結合。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "旧参照版の拒否と適切な再リンクの実測が不足。"
+    },
+    {
+      "test_id": "FUP-01",
+      "group": "B",
+      "formal_status": "BLOCKED",
+      "criterion": "訪問時期、検査、再発・進行、生存情報が正確に取得可能。",
+      "existing_evidence": [
+        "—; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "scenario": "再発/PD/死亡の完全架空分岐を6月以降の正当な訪問で保存/読取/集計。検査省略理由も原条件に照合。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "再発/死亡等を含む全臨床分岐の実機証拠が不足。"
+    },
+    {
+      "test_id": "FUP-02",
+      "group": "B",
+      "formal_status": "NOT RUN",
+      "criterion": "規定の入力制御・警告が機能し、確定値を追跡可能。",
+      "existing_evidence": [
+        "JUOG_run4_FUP02_required_complete.txt/.jpg、FUP02_PD_after_assessment.txt/.jpg、FUP02_restored.txt（同接頭辞）; uat_integration_readonly.json"
+      ],
+      "scenario": "PD日が評価日後、死亡原因欠落、再発詳細欠落を拒否→同一フォーム復元→正当保存。旧版不変。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "矛盾入力→拒否→正しい入力復元→正常保存・版/監査を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "ENV-03",
+      "group": "C",
+      "formal_status": "BLOCKED",
+      "criterion": "テスト時に参加施設の実メール・本番提出先へ送らない。",
+      "existing_evidence": [
+        "JUOG_run5_ENV03_mail_disabled.txt/.jpg、reference_sources/、ENV03_routes.md；run6_manual_evidence.json（libfile_af4416f2ac78819194b32f407e949a71、version5）；run6_dropbox_metadata.json; run12_ENV03_evidence.json; run12_dropbox_requests.json; run12_ENV03_runtime_view.txt; run12_notification_source_excerpts.txt; run13_mdt_v1_saved.txt"
+      ],
+      "scenario": "現行隔離版の通知/アップロード全入口の禁止と非到達を確認。旧TESTへの適用範囲は別判定。外部送信で検証しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "現在の隔離Streamlit/GASのSMTP/外部アップロード無効化と非到達を検証。画像提出を使わない限定範囲と旧基準との差を明記。 DropboxのTEST提出先/停止運用の承認証拠が不足。Stage1通知なしは既存TEST全体の証明ではない。"
+    },
+    {
+      "test_id": "IMG-01",
+      "group": "C",
+      "formal_status": "BLOCKED",
+      "criterion": "DICOM内部メタデータ・焼込み文字・ファイル名の識別情報がない。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "ローカル生成DICOMのメタデータ/ファイル名/画素に架空マーカーを埋め込み、除去/拒否を検査。焼込み文字は目視評価を併用。実患者画像・外部Dropbox禁止。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "完全架空DICOMのメタデータ・焼込み・ファイル名を検査し正規受領/閲覧ACLを確認。外部送信は承認外。 画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。"
+    },
+    {
+      "test_id": "DATA-02",
+      "group": "C",
+      "formal_status": "BLOCKED",
+      "criterion": "登録・CRF・監査履歴・添付紐付けの件数と内容が一致。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "匿名化済み隔離スナップショットを別の新規隔離復元先へ復元しRegistry/全CRF/全版/監査/添付対応を全件比較。元台帳へ復元しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "復元後の登録/全CRF/監査/添付対応の全件照合。CRF一件だけで合格にしない。 実TEST登録/CRF/監査照合とStage1一件照合は取得済み。正式復元後の全件・添付紐付け照合が不足。S2-01はCRF一件の部分証拠。"
+    },
+    {
+      "test_id": "REL-01",
+      "group": "C",
+      "formal_status": "BLOCKED",
+      "criterion": "cN1-only以外の既存機能の挙動を変えていない。",
+      "existing_evidence": [
+        "—; uat_integration_readonly.json"
+      ],
+      "scenario": "差分影響マップで必要回帰だけを選び、原32PASSの対象版との差を追跡。A/B/C/D完了証拠を再利用。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "影響範囲の原UI/API回帰を対象SHAへ対応付け、過去PASSの無条件繰越を避ける。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。"
+    },
+    {
+      "test_id": "AUTH-04",
+      "group": "D",
+      "formal_status": "FAIL",
+      "criterion": "氏名・MRN等は承認外で収集・露出せず、コードによる仮名化を維持。",
+      "existing_evidence": [
+        "run27_AUTH04_privacy_FAIL.json; TEST CRF_Drafts!A3:P3; validation source 01_registration_crf.py:199,632-642 / juog_common.py:649-674 / GAS v1:937-963,1430-1439; AUTH04_proposed.patch; AUTH04_assessment.md; AUTH04_predeployment_gate_20261111.md; AUTH04_prechange_10tabs.json; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341",
+        "uat_evidence/auth04_two_negative_live_20261113.json"
+      ],
+      "scenario": "16条件拒否と保存/復元/訂正/監査を再利用。正常臨床値・画面/応答/ログの非露出範囲、自由記載リスクの証拠と正式QA判断を補う。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": false,
+      "remaining": "正常な年齢・生年月等の全要求への追跡、画面/応答/ログの漏洩検証範囲と証拠承認、独立正式QA。自由記載の完全自動検出は保証しない。"
+    },
+    {
+      "test_id": "ENV-04",
+      "group": "QA",
+      "formal_status": "BLOCKED",
+      "criterion": "現在のテスト対象版と本番版が識別可能。変更履歴が保存される。",
+      "existing_evidence": [
+        "JUOG_run4_ENV02_deployment.txt/.jpg、JUOG_run4_ENV02_backend.txt/.jpg; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "本番稼働版とソースの対応証明。権限者から非秘密の版証明を受領。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "新隔離のcommit/deployment/source hashを結び、既存本番版の承認記録と識別する。未承認本番操作はしない。 TEST HEAD/version1保全・復元証拠あり。本番稼働版とソースの対応は未確認。"
+    },
+    {
+      "test_id": "PROD-01",
+      "group": "QA",
+      "formal_status": "NOT RUN",
+      "criterion": "PRODUCTIONが正常応答し、登録件数がRegistryと一致。書込みを行わない。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "PIが読取実施者・時間・画面/総件数のみの範囲を指定。Registry一致は担当者側で確認し個票を取得しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "別承認された読取範囲で環境表示/登録総数照合。本番変更は不可。 PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。"
+    },
+    {
+      "test_id": "PROD-02",
+      "group": "QA",
+      "formal_status": "NOT RUN",
+      "criterion": "サーバーエラーなく表示される。実患者情報は外部共有しない。",
+      "existing_evidence": [
+        "—"
+      ],
+      "scenario": "PROD-01と同一枠で画面遷移/サーバー異常の有無のみ確認。患者情報の画面撮影/外部持出しなし。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "別承認された読取範囲で画面遷移。患者情報を証拠に含めない。 PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。"
+    },
+    {
+      "test_id": "REG-09",
+      "group": "QA",
+      "formal_status": "BLOCKED",
+      "criterion": "4週以上・原則8週以内、合理的理由で最大12週の規定を運用で逸脱なく判定。システム自動判定の範囲も記録。",
+      "existing_evidence": [
+        "JUOG_run7_REG09_*weeks*.txt/.jpg；run6_manual_evidence.json；REG09_source_excerpt.txt；JUOG_UAT_Approval_Pack_Run8.docx；monitoring_source.json"
+      ],
+      "scenario": "延期理由の医学的判断者と判断・承認保存先を指定しSOP承認。期間例外を新設しない。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "既済8画面境界を再利用し、例外理由の医学的判断・承認手順・保存証跡を正式確定。 8条件の画面証拠は保持。延期理由の医学的判断者、承認済み手順、判断保存記録が不足。"
+    },
+    {
+      "test_id": "DATA-01",
+      "group": "QA",
+      "formal_status": "BLOCKED",
+      "criterion": "定めた手順で復旧可能なバックアップが取得される。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "バックアップ頻度/責任者/保存先/アクセス権/保持期限/復元演習頻度を承認し履行記録を提出。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "実保持SOP/権限/頻度とsnapshot再取得・別隔離先復元を照合。 第9.2/14.1節の保存期間（研究終了又は最終公表から10年の遅い日）を原本で確認。実際の頻度・保存先・権限・保持/復元SOPの承認と履行証拠は未完。"
+    },
+    {
+      "test_id": "DATA-04",
+      "group": "QA",
+      "formal_status": "BLOCKED",
+      "criterion": "連絡先、代替手順、復旧後照合、データ逸失防止が文書化される。",
+      "existing_evidence": [
+        "—",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "scenario": "障害連絡先、代替記録、復旧後照合の責任分担を承認し机上演習と実演記録を提出。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "正式な障害対応・連絡・代替記録・照合SOPと復旧実演の承認が不足。"
+    },
+    {
+      "test_id": "REL-02",
+      "group": "QA",
+      "formal_status": "BLOCKED",
+      "criterion": "変更記録が追跡でき、未実施テストをPASSにしていない。",
+      "existing_evidence": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "scenario": "旧GAS v6を含む変更履歴との対応、仕様変更の承認番号、欠測/未実施の区別を正式確認。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "旧GAS v6を含む既存変更記録と新隔離版の対応/未実施区分を確認。 Stage1/S2候補の版とハッシュは追跡可。原基準のGAS v6を含む変更履歴全体の対応は未完。"
+    },
+    {
+      "test_id": "REL-03",
+      "group": "QA",
+      "formal_status": "BLOCKED",
+      "criterion": "必要な操作手順が関係者へ伝わり、版・教育記録が保管される。",
+      "existing_evidence": [
+        "reference_README_JA.md（参照SHA固定）；run6_manual_evidence.json"
+      ],
+      "scenario": "正本マニュアル版、MDT全手順、対象者/受講日/教育内容/理解確認/教育者署名の実記録を提出。",
+      "evidence_resolved_this_turn": false,
+      "formal_pass_delta": 0,
+      "approval_required": true,
+      "remaining": "正本マニュアル・MDT手順・配布/教育記録・版の正式確認。 説明資料あり。正本版対応、MDT全手順、配布・教育記録が不足。"
+    }
+  ]
+}

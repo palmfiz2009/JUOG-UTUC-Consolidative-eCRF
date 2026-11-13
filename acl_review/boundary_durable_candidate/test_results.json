@@ -1,0 +1,17 @@
+{
+  "scope": "OFFLINE_ONLY_ARTIFICIAL_CLOCK_AND_TEMPORARY_FILESYSTEM",
+  "commands_observed": [
+    "python -m unittest discover -s session-b2/acl_review/boundary_durable_candidate -p test_durable_observer.py -v",
+    "python -m unittest discover -s session-b2/acl_review/boundary_durable_candidate -p test_bound_integration.py -v"
+  ],
+  "durable_observer_tests_passed": 12,
+  "bound_algorithm_integration_tests_passed": 2,
+  "failures": 0,
+  "deployed": false,
+  "actual_durable_volume_verified": false,
+  "actual_supervised_worker_verified": false,
+  "real_time_boundary_result": "NOT_RUN",
+  "formal_pass_delta": 0,
+  "independent_technical_review": "PENDING",
+  "formal_qa": "PENDING"
+}

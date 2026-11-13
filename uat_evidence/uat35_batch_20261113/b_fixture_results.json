@@ -1,0 +1,1009 @@
+{
+  "scope": "OFFLINE_VALIDATOR_ONLY_NO_LIVE_PASS",
+  "source_sha256": "99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5",
+  "passed": 14,
+  "results": [
+    {
+      "scenario": "B01_surgical_zero",
+      "uat_ids": [
+        "POST-01",
+        "POST-03",
+        "POST-04"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "scenario": "B02_day30",
+      "uat_ids": [
+        "POST-01",
+        "POST-02"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "scenario": "B03_day31_in_30d",
+      "uat_ids": [
+        "POST-01",
+        "POST-02"
+      ],
+      "ok": false,
+      "errors": [
+        "COMPLICATION_WINDOW"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B04_path_reason_missing",
+      "uat_ids": [
+        "POST-04"
+      ],
+      "ok": false,
+      "errors": [
+        "REQUIRED:eval_failed_reason"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B05_path_reason_restored",
+      "uat_ids": [
+        "POST-04"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "scenario": "B06_other_histology_missing",
+      "uat_ids": [
+        "POST-04"
+      ],
+      "ok": false,
+      "errors": [
+        "REQUIRED:histology_other"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B07_other_histology_restored",
+      "uat_ids": [
+        "POST-04"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "scenario": "B08_stale_reference",
+      "uat_ids": [
+        "POST-06"
+      ],
+      "ok": false,
+      "errors": [
+        "SOURCE_STALE_OR_MISMATCH"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B09_correct_reference",
+      "uat_ids": [
+        "POST-06"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "scenario": "B10_death_missing_cause",
+      "uat_ids": [
+        "FUP-01",
+        "FUP-02"
+      ],
+      "ok": false,
+      "errors": [
+        "REQUIRED:death_cause"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B11_death_complete",
+      "uat_ids": [
+        "FUP-01",
+        "FUP-02"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    },
+    {
+      "scenario": "B12_recurrence_missing_details",
+      "uat_ids": [
+        "FUP-01",
+        "FUP-02"
+      ],
+      "ok": false,
+      "errors": [
+        "REQUIRED:intraluminal_recurrence_date",
+        "REQUIRED:intraluminal_sites",
+        "REQUIRED:intraluminal_treatment"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B13_pd_after_visit",
+      "uat_ids": [
+        "FUP-02"
+      ],
+      "ok": false,
+      "errors": [
+        "ORDER:progression_date:visit_date"
+      ],
+      "warnings": []
+    },
+    {
+      "scenario": "B14_recurrence_complete",
+      "uat_ids": [
+        "FUP-01"
+      ],
+      "ok": true,
+      "errors": [],
+      "warnings": []
+    }
+  ],
+  "fixtures": [
+    {
+      "scenario": "B01_surgical_zero",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "Urothelial carcinoma",
+            "ypt": "ypT1",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 0,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade 0"
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    },
+    {
+      "scenario": "B02_day30",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "Urothelial carcinoma",
+            "ypt": "ypT1",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 10,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade IIIa",
+          "cd_event_date_30": "2026-05-13",
+          "cd_detail_30": "完全架空イベント",
+          "cd_surgery_relation": "関連する"
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    },
+    {
+      "scenario": "B03_day31_in_30d",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "Urothelial carcinoma",
+            "ypt": "ypT1",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 10,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade IIIa",
+          "cd_event_date_30": "2026-05-14",
+          "cd_detail_30": "完全架空イベント",
+          "cd_surgery_relation": "関連する"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "COMPLICATION_WINDOW"
+    },
+    {
+      "scenario": "B04_path_reason_missing",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "Urothelial carcinoma",
+            "ypt": "評価不能",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 10,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade 0"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "REQUIRED:eval_failed_reason"
+    },
+    {
+      "scenario": "B05_path_reason_restored",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "Urothelial carcinoma",
+            "ypt": "評価不能",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 10,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）",
+            "eval_failed_reason": "完全架空の評価不能理由"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade 0"
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    },
+    {
+      "scenario": "B06_other_histology_missing",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "その他",
+            "ypt": "ypT1",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 10,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade 0"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "REQUIRED:histology_other"
+    },
+    {
+      "scenario": "B07_other_histology_restored",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-971",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "perioperative_30d",
+        "visit": "30d",
+        "record_key": "JUOG-971|perioperative_30d|30d",
+        "submission_id": "UATPOST-20261113-30D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "surgery_performed": "実施した",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-05-13",
+          "last_evp_date": "2026-03-16",
+          "day30_visit_date": "2026-05-13",
+          "day30_lab_date": "2026-05-13",
+          "day30_labs": {
+            "CRP": 0
+          },
+          "postop_treatment": "無治療（経過観察）",
+          "operation_date": "2026-04-13",
+          "admission_date": "2026-04-12",
+          "initial_hospital_outcome": "退院済み",
+          "discharge_date": "2026-04-20",
+          "operation_type": "根治的腎尿管全摘除術",
+          "approaches": [
+            "ロボット支援"
+          ],
+          "approach_pattern": "単一アプローチ",
+          "operation_completed": "はい",
+          "operation_time_min": 180,
+          "blood_loss_ml": 0,
+          "eauiaic": "Grade 0",
+          "ln_dissection": "実施しなかった",
+          "unrecovered_grade2plus_relevant_ae": "なし",
+          "readmission_30d": "なし",
+          "pathology": {
+            "histology": "その他",
+            "ypt": "ypT1",
+            "lvi": "なし",
+            "r0": "R0",
+            "trg": "TRG 2",
+            "subtype_presence": "なし",
+            "size_mm": 10,
+            "locations": [
+              "腎盂"
+            ],
+            "ypn": "ypNX（郭清なし）",
+            "histology_other": "完全架空の病理詳細"
+          },
+          "day0_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_vitals": {
+            "sbp": 120,
+            "dbp": 70,
+            "pulse": 70,
+            "temperature": 36.5
+          },
+          "inpatient_lab_available": "なし",
+          "cd_grade_30": "Grade 0"
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    },
+    {
+      "scenario": "B08_stale_reference",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "day90",
+        "visit": "90d",
+        "record_key": "JUOG-970|day90|90d",
+        "submission_id": "AUTH04-20261113-90D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 0,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-07-12",
+          "visit_date": "2026-07-12",
+          "lab_available": "あり",
+          "lab_date": "2026-07-12",
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-07-12",
+          "recist_progression_status": "PDなし",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-07-12",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence": "なし",
+          "postop_treatment": "無治療（経過観察）"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "SOURCE_STALE_OR_MISMATCH"
+    },
+    {
+      "scenario": "B09_correct_reference",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "day90",
+        "visit": "90d",
+        "record_key": "JUOG-970|day90|90d",
+        "submission_id": "AUTH04-20261113-90D-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 1,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-07-12",
+          "visit_date": "2026-07-12",
+          "lab_available": "あり",
+          "lab_date": "2026-07-12",
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-07-12",
+          "recist_progression_status": "PDなし",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-07-12",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence": "なし",
+          "postop_treatment": "無治療（経過観察）"
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    },
+    {
+      "scenario": "B10_death_missing_cause",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "followup",
+        "visit": "6m",
+        "record_key": "JUOG-970|followup|6m",
+        "submission_id": "AUTH04-20261113-FUP6M-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 1,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "死亡",
+          "last_alive_date": "2026-10-13",
+          "visit_month": "6ヶ月",
+          "visit_date": "2026-10-13",
+          "labs_performed": true,
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-10-13",
+          "recist_progression_status": "PDなし",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-10-13",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence_status": "なし",
+          "current_treatment": "無治療（経過観察）",
+          "death_date": "2026-10-13"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "REQUIRED:death_cause"
+    },
+    {
+      "scenario": "B11_death_complete",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "followup",
+        "visit": "6m",
+        "record_key": "JUOG-970|followup|6m",
+        "submission_id": "AUTH04-20261113-FUP6M-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 1,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "死亡",
+          "last_alive_date": "2026-10-13",
+          "visit_month": "6ヶ月",
+          "visit_date": "2026-10-13",
+          "labs_performed": true,
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-10-13",
+          "recist_progression_status": "PDなし",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-10-13",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence_status": "なし",
+          "current_treatment": "無治療（経過観察）",
+          "death_date": "2026-10-13",
+          "death_cause": "他病死"
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    },
+    {
+      "scenario": "B12_recurrence_missing_details",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "followup",
+        "visit": "6m",
+        "record_key": "JUOG-970|followup|6m",
+        "submission_id": "AUTH04-20261113-FUP6M-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 1,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-10-13",
+          "visit_month": "6ヶ月",
+          "visit_date": "2026-10-13",
+          "labs_performed": true,
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-10-13",
+          "recist_progression_status": "PDなし",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-10-13",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence_status": "今回新規あり",
+          "current_treatment": "無治療（経過観察）"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "REQUIRED:intraluminal_recurrence_date"
+    },
+    {
+      "scenario": "B13_pd_after_visit",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "followup",
+        "visit": "6m",
+        "record_key": "JUOG-970|followup|6m",
+        "submission_id": "AUTH04-20261113-FUP6M-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 1,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-10-13",
+          "visit_month": "6ヶ月",
+          "visit_date": "2026-10-13",
+          "labs_performed": true,
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-10-13",
+          "recist_progression_status": "今回PDあり",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-10-13",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence_status": "なし",
+          "current_treatment": "無治療（経過観察）",
+          "progression_date": "2026-10-14",
+          "progression_sites": [
+            "肺"
+          ],
+          "progression_detail": "完全架空"
+        }
+      },
+      "expected_ok": false,
+      "expected_internal_error": "ORDER:progression_date:visit_date"
+    },
+    {
+      "scenario": "B14_recurrence_complete",
+      "payload": {
+        "study_code": "JUOG_UTUC_Consolidative",
+        "schema_version": "review-v3-unapproved",
+        "registration_id": "JUOG-970",
+        "facility_code": "TEST01",
+        "facility_name": "完全架空施設",
+        "reporter_email": "fictional@example.invalid",
+        "crf_type": "followup",
+        "visit": "6m",
+        "record_key": "JUOG-970|followup|6m",
+        "submission_id": "AUTH04-20261113-FUP6M-V1",
+        "submission_kind": "初回報告",
+        "expected_record_version": 0,
+        "data": {
+          "source_30d_linked": true,
+          "source_30d_record_version": 1,
+          "source_30d_submission_id": "AUTH04-20261113-30D-V1",
+          "surgery_performed": "実施しなかった",
+          "reference_date": "2026-04-13",
+          "vital_status": "生存",
+          "last_alive_date": "2026-10-13",
+          "visit_month": "6ヶ月",
+          "visit_date": "2026-10-13",
+          "labs_performed": true,
+          "labs": {
+            "CRP": 0
+          },
+          "urine_cytology": "Negative (クラスI・II)",
+          "imaging_status": "実施",
+          "imaging_date": "2026-10-13",
+          "recist_progression_status": "PDなし",
+          "cystoscopy_status": "実施",
+          "cystoscopy_date": "2026-10-13",
+          "cystoscopy_result": "腫瘍なし",
+          "intraluminal_recurrence_status": "今回新規あり",
+          "current_treatment": "無治療（経過観察）",
+          "intraluminal_recurrence_date": "2026-10-01",
+          "intraluminal_sites": [
+            "膀胱"
+          ],
+          "intraluminal_treatment": [
+            "経過観察"
+          ]
+        }
+      },
+      "expected_ok": true,
+      "expected_internal_error": null
+    }
+  ],
+  "formal_pass_delta": 0,
+  "limitation": "Accepted clinical payload is not proof of API authorization, saving, restore, audit or aggregation. Operation envelopes/versions must be bound at live preparation."
+}

@@ -1,0 +1,13 @@
+{
+  "scope": "OFFLINE_PINNED_HELPERS_ONLY",
+  "source_sha256": "2c420f1ebf5ae056846b6d500df69fd44dd8101d1973b2ee4b27209eb78e8f62",
+  "checks": [
+    "zero_age_lab_and_false_roundtrip",
+    "partial_birth_month_and_clinical_dates_retained",
+    "nested_json_identifier_removed_clinical_values_retained",
+    "helpers_stdout_stderr_empty"
+  ],
+  "passed": 4,
+  "known_limitation": "Unlabelled fictional name retained; helper stdout/stderr checks do not cover browser, Streamlit hosting, transport or GAS logs.",
+  "formal_pass_delta": 0
+}

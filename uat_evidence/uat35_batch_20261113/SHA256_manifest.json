@@ -1,0 +1,20 @@
+{
+  "uat_evidence/uat35_batch_20261113/APPROVAL_BUNDLE.md": "85f36e6542c30414bf88a9c4eaf50a82009c0c8ccbddf9db4a6e3822d76f9766",
+  "uat_evidence/uat35_batch_20261113/RESULT.md": "49a9edb0d8e0ca4dda1211088ce040aa68bbb6292a70bfd1f9a1fb435757f305",
+  "uat_evidence/uat35_batch_20261113/UAT35_batch_plan.json": "e76c45ea96896be3f5fef35ec861b8bebe0e52c9a9cafc81cd1bf2d3f0c4ea4f",
+  "uat_evidence/uat35_batch_20261113/BATCH_EXECUTION_PLAN.md": "748deae6f0610084cd7c9211141313d3aedddfde68c65b48db2925e8b03421d7",
+  "uat_evidence/uat35_batch_20261113/check_privacy_supplement.py": "d550df89001d5ecf63ccf7c702abf3a28c0b13f96aae1939a03bc520215ac6cc",
+  "uat_evidence/uat35_batch_20261113/SOP_DECISION_DRAFT.md": "7b3e67d968b9891b550535390aa61c17c9e687f565f29b3088ba95e3552ccce1",
+  "uat_evidence/uat35_batch_20261113/b_fixture_results.json": "a49eef1ed24c02428aee46004d6a04ade865b55da3a4a3208ccd2c86487751bf",
+  "uat_evidence/uat35_batch_20261113/privacy_supplement_results.json": "04c3e64418b80b69ae91d811b09bef8054987fc72d31981a3e9811ec02f4640e",
+  "uat_evidence/uat35_batch_20261113/QA8_REVIEW_PACKET.md": "445aa369a5341529364a543e186e332dfbb4d96a25db30bba5143533d60aa9aa",
+  "uat_evidence/uat35_batch_20261113/build_batch.py": "cd8f84b7823158cb68228ab9d0c600f608f2b7d5b0c6219ad3c2ca257143fff3",
+  "uat_evidence/uat35_batch_20261113/check_b_fixtures.cjs": "56c28b873b1cfef945afacdfac3e1d766d40adc3a536a0b0e4979df682b0dd63",
+  "uat_evidence/uat35_batch_20261113/pinned_juog_common.py": "2c420f1ebf5ae056846b6d500df69fd44dd8101d1973b2ee4b27209eb78e8f62",
+  "acl_review/boundary_durable_candidate/durable_observer.py": "6583e0553a3bc636bdc001e37721973ad241174b6d6f38369727973add39403b",
+  "acl_review/boundary_durable_candidate/README.md": "c57088d43033d4faf9bd177b266f6071cb355fe1480a84f884effd210d92e88b",
+  "acl_review/boundary_durable_candidate/test_durable_observer.py": "30070f711db3f7600971697a75d466b978ada78d909719df8307992c2cc80310",
+  "acl_review/boundary_durable_candidate/uat_boundary_probe.py": "802bd0a961cc0e550ed583bed5b7da61c7c8f5c9679e9af2ba9660fe74626dbf",
+  "acl_review/boundary_durable_candidate/test_results.json": "dbb26d0d978488f3f479fbb986294d29578b6109b09842ff0bae7a6a76b7db68",
+  "acl_review/boundary_durable_candidate/test_bound_integration.py": "89922eee6e9d50df14ffacc76fdc2bdb6cf2cfe198023696389ee1d04aaa5fee"
+}
