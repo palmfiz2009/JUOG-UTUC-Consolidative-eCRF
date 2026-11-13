@@ -1,0 +1,23 @@
+{
+  "base_commit": "409ff69942fddaedc2b0eb84f009b0797bfb2037",
+  "gas_version": 9,
+  "gas_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+  "scope": "OFFLINE_READ_ONLY_EVIDENCE_ASSESSMENT",
+  "new_offline_checks_passed": 26,
+  "new_live_tests": 0,
+  "formal_pass_delta": 0,
+  "cloud_mutations": 0,
+  "files": {
+    "QA16_assessment.json": "b7dcf92687af0e5620046d01d75c0dceacfd624199c3de343f544d5ed1c980b4",
+    "QA_PACKET.md": "8bdc86dd1f4c5223c5ed1b82196365929f73b6978a4a466db2a69e1804918365",
+    "check_evidence_gaps.py": "9e6c34367a56df6bd42f53cc37c7aea202166a51e11988d7421e7db449b0c712",
+    "check_routes_and_caps.cjs": "edec00cd0cc9efc0f16c2774780fcc8c5d467661fed1a02d835bfc5d33cff48c",
+    "clinical_projection.json": "e8cea6082166cc1deb6e3fcc885022345e786036571ad12bc0b9f5dc88ff334d",
+    "evidence_gap_results.json": "c2dc6f74f47a3c5541459a6a1ef0a480964228fdb300037d13862c60a9a6a814",
+    "fixture.json": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d",
+    "pinned_02_perioperative_30d_crf.py": "a4c3836882001399a2bd871ee7045d3df4cd31190f383a751a4bf4c2ae7abeb0",
+    "pinned_juog_common.py": "2c420f1ebf5ae056846b6d500df69fd44dd8101d1973b2ee4b27209eb78e8f62",
+    "pinned_streamlit_app.py": "f1ebaac4a9455f2683f5ce69966a381735552397618a1c00399fbb811b6706f1",
+    "route_cap_results.json": "c5d5e239081079c2b0a070a24707714724edb108d96395c156338d8cb8725075"
+  }
+}

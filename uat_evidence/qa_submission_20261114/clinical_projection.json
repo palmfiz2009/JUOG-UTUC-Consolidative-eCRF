@@ -1,0 +1,285 @@
+{
+  "scope": "READ_ONLY_OFFLINE_EXTRACTION_OF_PREVIOUS_LIVE_JOURNAL_SNAPSHOT_NOT_APPLICATION_EXPORT",
+  "source_commit": "409ff69942fddaedc2b0eb84f009b0797bfb2037",
+  "journal_sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+  "records": [
+    {
+      "table": "CRF_30d",
+      "version": 1,
+      "data": {
+        "surgery_performed": "実施した",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-05-13",
+        "last_evp_date": "2026-03-16",
+        "day30_visit_date": "2026-05-13",
+        "day30_lab_date": "2026-05-13",
+        "day30_labs": {
+          "CRP": 0
+        },
+        "postop_treatment": "無治療（経過観察）",
+        "operation_date": "2026-04-13",
+        "admission_date": "2026-04-12",
+        "initial_hospital_outcome": "退院済み",
+        "discharge_date": "2026-04-20",
+        "operation_type": "根治的腎尿管全摘除術",
+        "approaches": [
+          "ロボット支援"
+        ],
+        "approach_pattern": "単一アプローチ",
+        "operation_completed": "はい",
+        "operation_time_min": 180,
+        "blood_loss_ml": 0,
+        "eauiaic": "Grade 0",
+        "ln_dissection": "実施しなかった",
+        "unrecovered_grade2plus_relevant_ae": "なし",
+        "readmission_30d": "なし",
+        "pathology": {
+          "histology": "Urothelial carcinoma",
+          "ypt": "ypT1",
+          "lvi": "なし",
+          "r0": "R0",
+          "trg": "TRG 2",
+          "subtype_presence": "なし",
+          "size_mm": 10,
+          "locations": [
+            "腎盂"
+          ],
+          "ypn": "ypNX（郭清なし）"
+        },
+        "day0_vitals": {
+          "sbp": 120,
+          "dbp": 70,
+          "pulse": 70,
+          "temperature": 36.5
+        },
+        "inpatient_vitals": {
+          "sbp": 120,
+          "dbp": 70,
+          "pulse": 70,
+          "temperature": 36.5
+        },
+        "inpatient_lab_available": "なし",
+        "cd_grade_30": "Grade IIIa",
+        "cd_event_date_30": "2026-05-13",
+        "cd_detail_30": "完全架空処置イベント",
+        "cd_surgery_relation": "関連する"
+      }
+    },
+    {
+      "table": "CRF_30d",
+      "version": 2,
+      "data": {
+        "surgery_performed": "実施した",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-05-13",
+        "last_evp_date": "2026-03-16",
+        "day30_visit_date": "2026-05-13",
+        "day30_lab_date": "2026-05-13",
+        "day30_labs": {
+          "CRP": 0
+        },
+        "postop_treatment": "無治療（経過観察）",
+        "operation_date": "2026-04-13",
+        "admission_date": "2026-04-12",
+        "initial_hospital_outcome": "退院済み",
+        "discharge_date": "2026-04-20",
+        "operation_type": "根治的腎尿管全摘除術",
+        "approaches": [
+          "ロボット支援"
+        ],
+        "approach_pattern": "単一アプローチ",
+        "operation_completed": "はい",
+        "operation_time_min": 180,
+        "blood_loss_ml": 0,
+        "eauiaic": "Grade 0",
+        "ln_dissection": "実施しなかった",
+        "unrecovered_grade2plus_relevant_ae": "なし",
+        "readmission_30d": "なし",
+        "pathology": {
+          "histology": "Urothelial carcinoma",
+          "ypt": "評価不能",
+          "lvi": "なし",
+          "r0": "R0",
+          "trg": "TRG 2",
+          "subtype_presence": "なし",
+          "size_mm": 0,
+          "locations": [
+            "腎盂"
+          ],
+          "ypn": "ypNX（郭清なし）",
+          "eval_failed_reason": "完全架空評価不能理由"
+        },
+        "day0_vitals": {
+          "sbp": 120,
+          "dbp": 70,
+          "pulse": 70,
+          "temperature": 36.5
+        },
+        "inpatient_vitals": {
+          "sbp": 120,
+          "dbp": 70,
+          "pulse": 70,
+          "temperature": 36.5
+        },
+        "inpatient_lab_available": "なし",
+        "cd_grade_30": "Grade IIIa",
+        "cd_event_date_30": "2026-05-13",
+        "cd_detail_30": "完全架空処置イベント",
+        "cd_surgery_relation": "関連する"
+      }
+    },
+    {
+      "table": "CRF_90d",
+      "version": 1,
+      "data": {
+        "source_30d_linked": true,
+        "source_30d_record_version": 2,
+        "source_30d_submission_id": "B971-30D-V2",
+        "surgery_performed": "実施した",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-07-12",
+        "visit_date": "2026-07-12",
+        "lab_available": "あり",
+        "lab_date": "2026-07-12",
+        "labs": {
+          "CRP": 0
+        },
+        "urine_cytology": "Negative (クラスI・II)",
+        "imaging_status": "実施",
+        "imaging_date": "2026-07-12",
+        "recist_progression_status": "PDなし",
+        "cystoscopy_status": "実施",
+        "cystoscopy_date": "2026-07-12",
+        "cystoscopy_result": "腫瘍なし",
+        "intraluminal_recurrence": "なし",
+        "postop_treatment": "無治療（経過観察）",
+        "new_surgical_complication_day31_90": "あり",
+        "cd_grade_day31_90": "Grade IIIa",
+        "cd_event_date": "2026-05-14",
+        "cd_detail": "完全架空31日イベント",
+        "cd_surgery_relation": "関連する"
+      }
+    },
+    {
+      "table": "CRF_Followup",
+      "version": 1,
+      "data": {
+        "source_30d_linked": true,
+        "source_30d_record_version": 2,
+        "source_30d_submission_id": "B971-30D-V2",
+        "surgery_performed": "実施した",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-10-13",
+        "visit_month": "6ヶ月",
+        "visit_date": "2026-10-13",
+        "labs_performed": true,
+        "labs": {
+          "CRP": 0
+        },
+        "urine_cytology": "Negative (クラスI・II)",
+        "imaging_status": "実施",
+        "imaging_date": "2026-10-13",
+        "recist_progression_status": "PDなし",
+        "cystoscopy_status": "実施",
+        "cystoscopy_date": "2026-10-13",
+        "cystoscopy_result": "腫瘍なし",
+        "intraluminal_recurrence_status": "今回新規あり",
+        "current_treatment": "無治療（経過観察）",
+        "intraluminal_recurrence_date": "2026-10-01",
+        "intraluminal_sites": [
+          "膀胱"
+        ],
+        "intraluminal_treatment": [
+          "経過観察"
+        ]
+      }
+    },
+    {
+      "table": "CRF_Followup",
+      "version": 2,
+      "data": {
+        "source_30d_linked": true,
+        "source_30d_record_version": 2,
+        "source_30d_submission_id": "B971-30D-V2",
+        "surgery_performed": "実施した",
+        "reference_date": "2026-04-13",
+        "vital_status": "生存",
+        "last_alive_date": "2026-10-13",
+        "visit_month": "6ヶ月",
+        "visit_date": "2026-10-13",
+        "labs_performed": true,
+        "labs": {
+          "CRP": 0
+        },
+        "urine_cytology": "Negative (クラスI・II)",
+        "imaging_status": "実施",
+        "imaging_date": "2026-10-13",
+        "recist_progression_status": "今回PDあり",
+        "cystoscopy_status": "実施",
+        "cystoscopy_date": "2026-10-13",
+        "cystoscopy_result": "腫瘍なし",
+        "intraluminal_recurrence_status": "今回新規あり",
+        "current_treatment": "無治療（経過観察）",
+        "intraluminal_recurrence_date": "2026-10-01",
+        "intraluminal_sites": [
+          "膀胱"
+        ],
+        "intraluminal_treatment": [
+          "経過観察"
+        ],
+        "progression_date": "2026-10-12",
+        "progression_sites": [
+          "肺"
+        ],
+        "progression_detail": "完全架空進行"
+      }
+    },
+    {
+      "table": "CRF_Followup",
+      "version": 3,
+      "data": {
+        "source_30d_linked": true,
+        "source_30d_record_version": 2,
+        "source_30d_submission_id": "B971-30D-V2",
+        "surgery_performed": "実施した",
+        "reference_date": "2026-04-13",
+        "vital_status": "死亡",
+        "last_alive_date": "2026-10-13",
+        "visit_month": "6ヶ月",
+        "visit_date": "2026-10-13",
+        "labs_performed": true,
+        "labs": {
+          "CRP": 0
+        },
+        "urine_cytology": "Negative (クラスI・II)",
+        "imaging_status": "実施",
+        "imaging_date": "2026-10-13",
+        "recist_progression_status": "今回PDあり",
+        "cystoscopy_status": "実施",
+        "cystoscopy_date": "2026-10-13",
+        "cystoscopy_result": "腫瘍なし",
+        "intraluminal_recurrence_status": "今回新規あり",
+        "current_treatment": "無治療（経過観察）",
+        "intraluminal_recurrence_date": "2026-10-01",
+        "intraluminal_sites": [
+          "膀胱"
+        ],
+        "intraluminal_treatment": [
+          "経過観察"
+        ],
+        "progression_date": "2026-10-12",
+        "progression_sites": [
+          "肺"
+        ],
+        "progression_detail": "完全架空進行",
+        "death_date": "2026-10-13",
+        "death_cause": "他病死"
+      }
+    }
+  ],
+  "formal_pass_delta": 0
+}

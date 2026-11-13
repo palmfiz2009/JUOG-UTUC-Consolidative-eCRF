@@ -1,0 +1,69 @@
+{
+  "scope": "OFFLINE_EXACT_V9_CODE_NOT_LIVE_API",
+  "source_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+  "results": [
+    {
+      "name": "POST06 current source accepted by exact v9 validator",
+      "passed": true
+    },
+    {
+      "name": "POST06 stale source produces exact internal code",
+      "passed": true
+    },
+    {
+      "name": "public validation adapter collapses errors to VALIDATION_FAILED",
+      "passed": true
+    },
+    {
+      "name": "isolated scope excludes export_csv",
+      "passed": true
+    },
+    {
+      "name": "isolated scope excludes get_stats",
+      "passed": true
+    },
+    {
+      "name": "isolated scope excludes upload_image",
+      "passed": true
+    },
+    {
+      "name": "isolated scope excludes restore_backup",
+      "passed": true
+    },
+    {
+      "name": "simultaneous total priority",
+      "passed": true
+    },
+    {
+      "name": "CN1 priority before SD",
+      "passed": true
+    },
+    {
+      "name": "SD bound independent of CN1",
+      "passed": true
+    },
+    {
+      "name": "PR unaffected by SD bound",
+      "passed": true
+    },
+    {
+      "name": "VOID frees all three bounds",
+      "passed": true
+    },
+    {
+      "name": "missing CN1 source fails closed",
+      "passed": true
+    },
+    {
+      "name": "classification change removes cT4 from CN1 only",
+      "passed": true
+    }
+  ],
+  "passed": 14,
+  "formal_pass_delta": 0,
+  "limitations": [
+    "No authenticated MDT, persistent changes, lock contention or real issuance tested.",
+    "POST06 public/internal mapping proven from implementation; approved API specification acceptance remains a QA decision.",
+    "Export/attachment routes are excluded by the current isolated scope; no enablement performed."
+  ]
+}

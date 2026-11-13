@@ -1,0 +1,60 @@
+{
+  "scope": "OFFLINE_PINNED_SOURCE_AND_PRIOR_LIVE_SNAPSHOT_NOT_NEW_LIVE_EXPORT",
+  "passed": 12,
+  "results": [
+    {
+      "name": "current helper source matches prior privacy evidence",
+      "passed": true
+    },
+    {
+      "name": "successful draft branch clears before restoration",
+      "passed": true
+    },
+    {
+      "name": "caller pair removes stale backing/widget identifiers and stale clinical values",
+      "passed": true
+    },
+    {
+      "name": "caller pair preserves zero partial birth month clinical date and unrelated state",
+      "passed": true
+    },
+    {
+      "name": "pathology requirements nested under surgery performed",
+      "passed": true
+    },
+    {
+      "name": "no surgery branch requires reason and conditional other detail",
+      "passed": true
+    },
+    {
+      "name": "saved 30d event is day30 with Grade IIIa",
+      "passed": true
+    },
+    {
+      "name": "saved 90d event is day31 distinct from day30",
+      "passed": true
+    },
+    {
+      "name": "saved 90d refers to 30d version2",
+      "passed": true
+    },
+    {
+      "name": "saved zero clinical values survive corrected record",
+      "passed": true
+    },
+    {
+      "name": "followup prior recurrence version and later progression version retained",
+      "passed": true
+    },
+    {
+      "name": "latest followup retains recurrence progression death dates",
+      "passed": true
+    }
+  ],
+  "formal_pass_delta": 0,
+  "limitations": [
+    "Clinical projection is an independent evidence extraction, not the application aggregation/export path.",
+    "Page AST and helper execution do not establish live screen accessibility or host/GAS log non-exposure.",
+    "Prior live snapshot timestamp and provenance are in commit409ff69; no current cloud state remeasurement."
+  ]
+}
