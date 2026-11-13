@@ -1,0 +1,92 @@
+{
+  "scope": "OFFLINE_REAL_DOMAIN_LIFECYCLE_PREPARE_VIEW",
+  "source_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+  "passed": 21,
+  "results": [
+    {
+      "name": "one verified view reused for completed request loop",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request audit",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request viewhash",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request history",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request duplicatecommit",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request orphancommit",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request duplicateintent",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request missingAudit",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request identity",
+      "passed": true
+    },
+    {
+      "name": "corruption prevents new request duplicateFailed",
+      "passed": true
+    },
+    {
+      "name": "same pending request reused no duplicate append",
+      "passed": true
+    },
+    {
+      "name": "different pending blocks prepare",
+      "passed": true
+    },
+    {
+      "name": "denial no write {\"deny\":true}",
+      "passed": true
+    },
+    {
+      "name": "denial no write {\"noauth\":true}",
+      "passed": true
+    },
+    {
+      "name": "denial no write {\"private\":true}",
+      "passed": true
+    },
+    {
+      "name": "expiry at write remains refusal and fixed diagnostic",
+      "passed": true
+    },
+    {
+      "name": "arbitrary exception secrets never logged",
+      "passed": true
+    },
+    {
+      "name": "readback failure remains uncertain not success",
+      "passed": true
+    },
+    {
+      "name": "next invocation revalidates fresh corrupted history",
+      "passed": true
+    },
+    {
+      "name": "prepare never mutates input operation or existing history",
+      "passed": true
+    },
+    {
+      "name": "status still uses fresh verified view",
+      "passed": true
+    }
+  ],
+  "formal_uat_delta": 0
+}

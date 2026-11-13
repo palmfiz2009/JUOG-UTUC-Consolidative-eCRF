@@ -1,0 +1,28 @@
+{
+  "scope": "OFFLINE_COUNT_ONLY_NOT_LIVE_TIMING",
+  "results": [
+    {
+      "file": "bundle_cache_reconciliation_candidate.gs",
+      "sha256": "e51bd244ed674286bfa2bd0ebb0f53744b5e6dc5192e07c23fc2f10dd417d638",
+      "verified_view_rebuilds": 14,
+      "appends": 1,
+      "result": {
+        "ok": true,
+        "operation_id": "new-op",
+        "existing": false
+      }
+    },
+    {
+      "file": "bundle_prepare_view_candidate.gs",
+      "sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+      "verified_view_rebuilds": 1,
+      "appends": 1,
+      "result": {
+        "ok": true,
+        "operation_id": "new-op",
+        "existing": false
+      }
+    }
+  ],
+  "formal_uat_delta": 0
+}
