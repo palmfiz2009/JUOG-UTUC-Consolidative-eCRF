@@ -1,0 +1,43 @@
+{
+  "review_type": "INDEPENDENT_TECHNICAL_REVIEW_NOT_FORMAL_QA",
+  "decision": "APPROVED_FOR_SCOPED_DEPLOYMENT_AND_READ_ONLY_CHECKPOINT_REVALIDATION",
+  "reviewed_at_utc": "2026-11-13T04:47:45.351433+00:00",
+  "reviewed_sha256": {
+    "uat_b971_continuation.py": "52375bbff09081fdd2a86496b2771a67474a0974273c02a85f98cf70b5e6d3a7",
+    "streamlit_app_continuation.py": "dd023d026b725f279dbe1eeaaa560b6be0721ae046aea39184cefb29a04fc9a6",
+    "resume_checkpoint_candidate.py": "07de5c71803995e110964a76365bf634c4457a36f1cd244c9306f7e3d439b98a",
+    "b971_checkpoint.json": "6617e884b5b380b01af876c8e8a04652a3bdf4185f3e95369e4a65825c04c653",
+    "uat_auth04_fixture.json": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d"
+  },
+  "offline_tests": {
+    "pure_verifier": 15,
+    "wrapper": 14,
+    "existing_auth_sign_write_recovery_functions_ast_unchanged": true
+  },
+  "resolved_findings": [
+    "Pre-expiry reauth now uses confirmed GAS session_revoke before cookie logout; failure stops.",
+    "Fixture bytes freshly hashed and parsed from same bytes.",
+    "Pinned verifier reloaded so cached prior code cannot override reviewed bytes.",
+    "All3histories required, status operation/action bound, exact contiguousversions enforced."
+  ],
+  "checkpoint_review": {
+    "cursor": 4,
+    "schema_and_pins_valid": true,
+    "operation_ids": "4 unique nonempty IDs; not identities or authentication tokens",
+    "histories": "30d versions1,2;90d and6m empty",
+    "unresolved_operations": [],
+    "live_provenance": "Parent independently reports102journalrows/revision10, exact4request payloads,2FAILED negativeevents with no businessintent/audit/commit,2positive transactions unique and verified. This reviewer has not reread live Sheets and does not claim direct observation."
+  },
+  "execution_conditions": [
+    "Deploy only exact reviewed continuation/entry/verifier/checkpoint/fixture hashes into isolated frontend.",
+    "Backend remains reviewedv6 unchanged; no TTL/session/auth/ACL extension.",
+    "Read-only checkpoint restore must succeed through regularOIDC, context,4freshstatuses and3freshCRFhistories beforecursor4 is restored.",
+    "No pending or uncertain preparation may be bypassed.",
+    "If restored histories/statuses differ, stop without newprepare or state reset.",
+    "Reauth requires successful serverrevocation before logout while originalsession stillvalid; if alreadyexpired use existing expired-session path.",
+    "Do not claim newlivePASS for restoredcompletedsteps or use newOIDC asold60minboundaryevidence.",
+    "ReturnAUTH_CONNECT and disablebusiness afterscopecompletion/incident."
+  ],
+  "formal_uat_delta": 0,
+  "external_mutations_by_reviewer": false
+}
