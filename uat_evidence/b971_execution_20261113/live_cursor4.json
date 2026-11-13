@@ -1,0 +1,38 @@
+{
+  "at_jst": "2026-11-13T13:44:12+09:00",
+  "scope": "TEST01/JUOG-971",
+  "completed_scenarios": 4,
+  "total_scenarios": 12,
+  "formal_pass_delta": 0,
+  "journal_rows": 102,
+  "sealed_hashes_valid": true,
+  "preexisting_or_interrupted_unsealed_batches": 2,
+  "revision": 10,
+  "old_970_records_unchanged": true,
+  "registry_unchanged": true,
+  "new_971_versions": [
+    {
+      "record_key": "JUOG-971|perioperative_30d|30d",
+      "version": 1,
+      "payload_sha256": "8d4382180dc108498ee08503814ec0b0fdb86c8aa0544e572cfc5631b062773d"
+    },
+    {
+      "record_key": "JUOG-971|perioperative_30d|30d",
+      "version": 2,
+      "payload_sha256": "036bef13268a456d219794a416ee0f08f5ef1a619b7db379ccdb60965284edda"
+    }
+  ],
+  "new_requests": 4,
+  "new_crf_intents": 2,
+  "new_business_audits": 2,
+  "new_commits": 2,
+  "new_request_rejection_events": 2,
+  "unresolved_operations": 0,
+  "checkpoint_sha256": "6617e884b5b380b01af876c8e8a04652a3bdf4185f3e95369e4a65825c04c653",
+  "recovery": "step4_same_operation_required_two_recovery_attempts_after_short_assertion_expiry; audit_and_commit_then_confirmed",
+  "limits": [
+    "Not formal QA",
+    "UI/HTTP/hosted-log identifier nonexposure remains incomplete",
+    "Not60minboundary evidence"
+  ]
+}
