@@ -1,0 +1,38 @@
+{
+  "at_utc": "2026-11-13T03:59:20.150Z",
+  "source_rows": 66,
+  "backup_sheet": "UAT971_BACKUP_20261113",
+  "restore_sheet": "UAT971_RESTORE_20261113",
+  "source_unchanged": true,
+  "backup_exact_match": true,
+  "restore_exact_match": true,
+  "revision": 7,
+  "table_counts": {
+    "Registry": 1,
+    "Screening": 0,
+    "ScreeningAudit": 0,
+    "MDTReviews": 0,
+    "ScreeningCRF": 0,
+    "CRF_30d": 2,
+    "CRF_90d": 1,
+    "CRF_Followup": 1,
+    "CRFSubmissionAudit": 4,
+    "CRF_Drafts": 3,
+    "Settings": 0,
+    "V3_DraftOwners": {
+      "entries": 3
+    },
+    "V3_CrfState": {
+      "intents": 4,
+      "records": 4,
+      "audits": 4,
+      "events": 4
+    }
+  },
+  "legacy_synthetic_marker_in_archived_journal": true,
+  "limitations": [
+    "Full journal cloned inside same approved workbook with unchanged sharing; not a separate disaster-recovery service.",
+    "No external attachment binaries are stored in this workbook; attachment recovery not proven.",
+    "Legacy synthetic identifier migration fixture intentionally remains in historical journal; backup of history is not proof of zero historical identifiers."
+  ]
+}

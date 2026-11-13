@@ -1,0 +1,22 @@
+{
+  "rows": 73,
+  "prefix_unchanged": true,
+  "revision": 8,
+  "fixture": "JUOG-971",
+  "existing_view_unchanged": true,
+  "stage": "AUTH_CONNECT",
+  "source_sha256": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+  "gas_version": 6,
+  "journal_unchanged_since_setup": true,
+  "gas_stage_after_enable_attempt": "UNKNOWN_BROWSER_TIMEOUT_NO_RUN_RESULT",
+  "frontend_execution_enabled": false,
+  "frontend_commit": "837e3445793cbb575f7293401da0ed9aa0056822",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "B7": "NOT_RUN_AUTHENTICATED_CRF_TRIALS",
+  "new_formal_pass": 0
+}

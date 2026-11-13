@@ -1,0 +1,72 @@
+{
+  "scope": "LOCAL_SYNTHETIC_DICOM_ONLY",
+  "pydicom_version": "3.0.2",
+  "results": [
+    {
+      "file": "clean971.dcm",
+      "sha256": "4cbc916379ccdd30280589c35eb79c07986f86d09c6104ce8636ad22a856a991",
+      "metadata_findings": [],
+      "burned_marker_detected": false,
+      "filename_marker_detected": false,
+      "declared_burned_in": "NO",
+      "decision": "CLEAN_SYNTHETIC_CONTROL",
+      "decoded_pixels_verified": true
+    },
+    {
+      "file": "metadata971.dcm",
+      "sha256": "42ad8f877755252ca9015bb7d9fba18c24e82f229ce05ebfc83dac816becc1d0",
+      "metadata_findings": [
+        "PatientName",
+        "PatientID",
+        "PatientBirthDate",
+        "(0011,0010)",
+        "(0011,1010)",
+        "PatientName"
+      ],
+      "burned_marker_detected": false,
+      "filename_marker_detected": false,
+      "declared_burned_in": "NO",
+      "decision": "REJECT",
+      "decoded_pixels_verified": true
+    },
+    {
+      "file": "burned971.dcm",
+      "sha256": "25a41a979fec3626299160553fe195f49fb72eb5abeaa64ac89f1f439dce8881",
+      "metadata_findings": [],
+      "burned_marker_detected": true,
+      "filename_marker_detected": false,
+      "declared_burned_in": "YES",
+      "decision": "REJECT",
+      "decoded_pixels_verified": true
+    },
+    {
+      "file": "mislabelled971.dcm",
+      "sha256": "3f7c62ea69f7417871040ff3eab204824e4c06aa763b79ad465cc748095001d2",
+      "metadata_findings": [],
+      "burned_marker_detected": true,
+      "filename_marker_detected": false,
+      "declared_burned_in": "NO",
+      "decision": "REJECT",
+      "decoded_pixels_verified": true
+    },
+    {
+      "file": "SYNTHETIC-MRN-971.dcm",
+      "sha256": "aed6765ebd7e3dd8cbd002e037ab4011b1bb7ec9dbae8a2a7f9c4a59c28d8360",
+      "metadata_findings": [],
+      "burned_marker_detected": false,
+      "filename_marker_detected": true,
+      "declared_burned_in": "NO",
+      "decision": "REJECT",
+      "decoded_pixels_verified": true
+    }
+  ],
+  "passed": 5,
+  "real_patient_data": false,
+  "external_upload": false,
+  "limitations": [
+    "OCR may miss arbitrary burned-in text; manual image inspection still required.",
+    "This is detection on controlled fixtures, not clinical DICOM anonymization validation.",
+    "No EDC upload/receipt/role workflow has been exercised."
+  ],
+  "formal_pass_delta": 0
+}

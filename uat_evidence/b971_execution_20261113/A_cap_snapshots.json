@@ -1,0 +1,777 @@
+{
+  "scope": "OFFLINE_SYNTHETIC_SNAPSHOTS_NOT_PROVISIONED",
+  "snapshots": [
+    {
+      "name": "CN1",
+      "rows": [
+        {
+          "local_fixture_id": "A-CN1-001",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-002",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-003",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-004",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-005",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-006",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-007",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-008",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-009",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-010",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-011",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-012",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-013",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-014",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-015",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-016",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-017",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-018",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-CN1-019",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN1",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        }
+      ],
+      "initial_counts": {
+        "total": 19,
+        "cn1_only": 19,
+        "sd": 0
+      },
+      "stages": [
+        19,
+        20,
+        21
+      ],
+      "isolation": "Independent snapshot; never merge with other cap groups",
+      "sha256": "3c834f180df2bbb41e423001ecd77db71f757926ccbbb710d6eeb51ef62e8d55"
+    },
+    {
+      "name": "TOTAL",
+      "rows": [
+        {
+          "local_fixture_id": "A-TOTAL-001",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-002",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-003",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-004",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-005",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-006",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-007",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-008",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-009",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-010",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-011",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-012",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-013",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-014",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-015",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-016",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-017",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-018",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-019",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-020",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-021",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-022",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-023",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-024",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-025",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-026",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-027",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-028",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-029",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-030",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-031",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-032",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-033",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-034",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-035",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-036",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-037",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-038",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-039",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-040",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-TOTAL-041",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT3",
+          "cN": "cN2",
+          "cM": "cM0",
+          "best_effect": "PR",
+          "fictional": true
+        }
+      ],
+      "initial_counts": {
+        "total": 41,
+        "cn1_only": 0,
+        "sd": 0
+      },
+      "stages": [
+        41,
+        42,
+        43
+      ],
+      "isolation": "Independent snapshot; never merge with other cap groups",
+      "sha256": "e7d22b0b27b15f3f2b5fc27c65f17aa95a7fed391e5cbac48cd423cd6d799433"
+    },
+    {
+      "name": "SD",
+      "rows": [
+        {
+          "local_fixture_id": "A-SD-001",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-002",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-003",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-004",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-005",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-006",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-007",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-008",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-009",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-010",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        },
+        {
+          "local_fixture_id": "A-SD-011",
+          "facility_code": "TEST01",
+          "status": "ACTIVE",
+          "cT": "cT4",
+          "cN": "cN0",
+          "cM": "cM0",
+          "best_effect": "SD",
+          "fictional": true
+        }
+      ],
+      "initial_counts": {
+        "total": 11,
+        "cn1_only": 0,
+        "sd": 11
+      },
+      "stages": [
+        11,
+        12,
+        13
+      ],
+      "isolation": "Independent snapshot; never merge with other cap groups",
+      "sha256": "f54c2f79b40296eda28d1a6143edbd1759c41b74fb1f12b1c51f9f60c59c4721"
+    }
+  ],
+  "live_roles_available": [
+    "facility"
+  ],
+  "missing_roles": [
+    "radiology",
+    "medical_oncology",
+    "urology",
+    "admin"
+  ],
+  "not_real_registration_ids": true,
+  "limitation": "Full Screening schema, protocol eligibility and assigned authentic reviewers must be bound before live initialization. No invented OIDC principals."
+}

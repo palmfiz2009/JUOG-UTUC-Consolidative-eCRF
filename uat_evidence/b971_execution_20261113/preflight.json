@@ -1,0 +1,28 @@
+{
+  "at_utc": "2026-11-13T03:53:22.965Z",
+  "rows": 66,
+  "sha256": "8441de491fb974555aa0e63f4e690974c6c4af4f890493e1ed8af51b96609b24",
+  "contains971": false,
+  "sealed_counts": {
+    "baseline": 1,
+    "intents": 7,
+    "audits": 7,
+    "commits": 7,
+    "requests": 7,
+    "requestEvents": 2
+  },
+  "unsealed_batches": 1,
+  "acl_count": 1,
+  "roles": [
+    "facility"
+  ],
+  "facilities": [
+    [
+      "TEST01"
+    ]
+  ],
+  "expiry": [
+    "2026-11-19T23:59:00+09:00"
+  ],
+  "reviewer_or_admin_count": 0
+}
