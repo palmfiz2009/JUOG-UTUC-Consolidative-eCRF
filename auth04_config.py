@@ -12,9 +12,9 @@ _FIELDS = {'enabled', 'stage', 'fixture_id', 'facility_code', 'fixture_sha256',
            'prerequisites_verified', 'notifications_disabled', 'write_actions'}
 _PINS = {
     'stage': 'AUTH04_APPROVED',
-    'fixture_id': 'JUOG-970',
+    'fixture_id': 'JUOG-971',
     'facility_code': 'TEST01',
-    'fixture_sha256': '0747f9ac3f59a6e230cc6cc6debaebde3138578ec82741567e995ab1e2d0d126',
+    'fixture_sha256': '0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d',
     'url': 'https://script.google.com/macros/s/AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ/exec',
     'session_store_generation': 'd72bcf33-423d-4c4d-862d-2e2d69bc3edf',
 }
