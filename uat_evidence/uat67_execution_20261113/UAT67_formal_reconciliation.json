@@ -10,9 +10,9 @@
   },
   "new_formal_pass": 0,
   "new_unconditionally_pass_eligible_ids": [],
-  "latest_live_evidence_commit": "65a9b426982081eaaa1cfd8a8f18d40916a24341",
-  "current_turn_browser_observation": "Normal Google authentication completed. New same-session boundary probe WAITING; deadline 2026-11-13 09:41:05 JST.",
-  "current_turn_mutations": "Isolated editor helper added; temporary AUTH04 mode used for two requests only, then AUTH_CONNECT restored. Original business journal preserved; only requests and FAILED events appended.",
+  "latest_live_evidence_commit": "4e25df7e556c96618137375d3d50c485e37b0239",
+  "current_turn_browser_observation": "Original app tab unavailable; only about:blank remains. No new login or request substituted for original session.",
+  "current_turn_mutations": "Read-only live Sheets checks; local assessment/report updates only. No live request replay, business write, ACL edit or mode change.",
   "rows": [
     {
       "test_id": "ENV-01",
@@ -34,7 +34,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_UAT_ENV01_20261109.md／既保存ENV01 Evidence ZIP"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "ENV-02",
@@ -56,7 +59,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_run4_ENV02_backend.txt/.jpg、ENV02_deployment.txt/.jpg、ENV02_registered.txt/.jpg（同接頭辞）；run4_sheet_metadata.json；run4_admin_reference.py；Run5_review_block.txt；run6_sheet_ids.json; run10_admin_confirmation.json; run11_ENV02_comparison.json; run11_version1_history.txt; run11_GAS_version1_code.gs; run11_github_tree.json"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "ENV-03",
@@ -85,7 +91,13 @@
       "unmet_formal_pass_requirements": "現在の隔離Streamlit/GASのSMTP/外部アップロード無効化と非到達を検証。画像提出を使わない限定範囲と旧基準との差を明記。 DropboxのTEST提出先/停止運用の承認証拠が不足。Stage1通知なしは既存TEST全体の証明ではない。",
       "evidence_files": [
         "JUOG_run5_ENV03_mail_disabled.txt/.jpg、reference_sources/、ENV03_routes.md；run6_manual_evidence.json（libfile_af4416f2ac78819194b32f407e949a71、version5）；run6_dropbox_metadata.json; run12_ENV03_evidence.json; run12_dropbox_requests.json; run12_ENV03_runtime_view.txt; run12_notification_source_excerpts.txt; run13_mdt_v1_saved.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "ENV-04",
@@ -115,7 +127,12 @@
       "unmet_formal_pass_requirements": "新隔離のcommit/deployment/source hashを結び、既存本番版の承認記録と識別する。未承認本番操作はしない。 TEST HEAD/version1保全・復元証拠あり。本番稼働版とソースの対応は未確認。",
       "evidence_files": [
         "JUOG_run4_ENV02_deployment.txt/.jpg、JUOG_run4_ENV02_backend.txt/.jpg; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "PROD-01",
@@ -140,7 +157,12 @@
       "unmet_formal_pass_requirements": "別承認された読取範囲で環境表示/登録総数照合。本番変更は不可。 PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "PROD-02",
@@ -165,7 +187,12 @@
       "unmet_formal_pass_requirements": "別承認された読取範囲で画面遷移。患者情報を証拠に含めない。 PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-01",
@@ -187,7 +214,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_run2_SCR01_no_consent.txt/.jpg、JUOG_run2_SCR01_consent_restored.txt"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-02",
@@ -209,7 +239,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_run2_SCR02.txt/.jpg、JUOG_run2_positive_control.txt/.jpg"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-03",
@@ -231,7 +264,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-04",
@@ -253,7 +289,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E01/E03"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-05",
@@ -280,7 +319,13 @@
       "unmet_formal_pass_requirements": "cM1/遠隔CRの架空中央画像・臨床条件を正規各役割で確認し登録結果を照合。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-06",
@@ -307,7 +352,13 @@
       "unmet_formal_pass_requirements": "局所治療後cNEDの3か月以上条件を中央審査から登録まで確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-07",
@@ -334,7 +385,13 @@
       "unmet_formal_pass_requirements": "遠隔病変残存/cNED不足の正式登録要求が拒否される証拠を取得。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "JUOG_run2_SCR07_no_basis.txt、JUOG_run2_SCR07_cNED_short.txt/.jpg; Run9_SCR07_exact3months.txt / Run9_SCR07_one_day_short.txt / Run9_SCR07_future.txt / Run9_SCR07_future.png"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-08",
@@ -356,7 +413,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_SCR08_age19_20261109.jpg（画面部分記録）／boundary_observations age20／JUOG_SCR08_age20_20261110.txt、jpg／実行時ブラウザ観測"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-09",
@@ -378,7 +438,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_run2_SCR09_PS2.txt/.jpg、JUOG_run2_SCR09_PS1_and_SCR10_63_reason.txt"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-10",
@@ -400,7 +463,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_run2_SCR10_62_reason.txt/.jpg、62_no_reason.txt、63_no_reason.txt、63_reason_restored.txt（同接頭辞）"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-11",
@@ -426,7 +492,13 @@
       "unmet_formal_pass_requirements": "架空2時点DICOM・症例コード・受領記録を隔離経路で照合。外部画像送信は現承認外。 画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "SCR-12",
@@ -448,7 +520,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run18_results.json; run18_before.json; run18_after_screening.json; run18_scr12_blank.txt; run18_scr12_abnormal.txt; run18_scr12_na_no_reason.txt; run18_scr12_saved.txt/png"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-01",
@@ -470,7 +545,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E01/E03"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-02",
@@ -492,7 +570,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-03",
@@ -514,7 +595,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E01/E03"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-01",
@@ -536,7 +620,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E02"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-02",
@@ -558,7 +645,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt; run17_results.json; run18_after_radiology.json; UAT_Run18_MDT02_PENDING_APPROVAL.gs; run19_results.json; run19_before.json; run19_after.json; run19_execution_log.txt; run19_execution_stopped.png; run19_installed_code.gs; run20_readonly_diagnosis.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_before.json; run19_after.json; run19_execution_log.txt; run21_results.json; run20_before_live.json; run21_after_live.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_after.json; Apps Script実行ログ（20:01:34–20:01:48 JST）"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-03",
@@ -580,7 +670,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-04",
@@ -602,7 +695,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED; run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575; run28_MDT04_oncology_saved.json; run30_MDT04_SD_registration.json"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-05",
@@ -624,7 +720,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-06",
@@ -646,7 +745,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E01"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "MDT-07",
@@ -668,7 +770,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-04",
@@ -690,7 +795,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E01/E02/E04"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-05",
@@ -712,7 +820,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-06",
@@ -739,7 +850,13 @@
       "unmet_formal_pass_requirements": "異なる架空適格例の同時登録を正規認証で競合させ、番号一意・監査一意を実測。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-07",
@@ -766,7 +883,13 @@
       "unmet_formal_pass_requirements": "MDT日より前の手術予定要求を正規登録APIへ送りSURGERY_BEFORE_MDTと無登録を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-08",
@@ -793,7 +916,13 @@
       "unmet_formal_pass_requirements": "正式登録日より前の手術予定要求を拒否し台帳不変を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REG-09",
@@ -819,7 +948,12 @@
       "unmet_formal_pass_requirements": "既済8画面境界を再利用し、例外理由の医学的判断・承認手順・保存証跡を正式確定。 8条件の画面証拠は保持。延期理由の医学的判断者、承認済み手順、判断保存記録が不足。",
       "evidence_files": [
         "JUOG_run7_REG09_*weeks*.txt/.jpg；run6_manual_evidence.json；REG09_source_excerpt.txt；JUOG_UAT_Approval_Pack_Run8.docx；monitoring_source.json"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-01",
@@ -841,7 +975,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-02",
@@ -863,7 +1000,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-03",
@@ -890,7 +1030,13 @@
       "unmet_formal_pass_requirements": "独立架空fixtureでcN1-only枠は増えず、全体のみ+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-04",
@@ -917,7 +1063,13 @@
       "unmet_formal_pass_requirements": "独立架空fixtureでcN1-only枠は増えない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-05",
@@ -944,7 +1096,13 @@
       "unmet_formal_pass_requirements": "独立架空fixtureでcN1-only枠は+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-06",
@@ -971,7 +1129,13 @@
       "unmet_formal_pass_requirements": "独立架空fixtureで20例まで計上、21例目はCN1_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-07",
@@ -998,7 +1162,13 @@
       "unmet_formal_pass_requirements": "独立架空fixtureで42例は許容、43例目はTOTAL_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-08",
@@ -1025,7 +1195,13 @@
       "unmet_formal_pass_requirements": "独立架空fixtureでSD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-09",
@@ -1051,7 +1227,13 @@
       "unmet_formal_pass_requirements": "中央判定変更後のアクティブ集計・監査を検証。手作業代替はPIの正式承認なしに採用しない。 中央判定変更時の分類・枠反映、又は監査可能な手作業の承認と実測が不足。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "CAP-10",
@@ -1077,7 +1259,13 @@
       "unmet_formal_pass_requirements": "別架空症例に承認済みVOID経路を実行し総数/cN1-only/SD除外と旧版・理由監査を照合。 承認済みVOID手順と実件数再計算の証拠が不足。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "POST-01",
@@ -1104,7 +1292,13 @@
       "unmet_formal_pass_requirements": "手術実施の30d/90d架空fixtureを追加しイベント・日付・Gradeの保存/読取/抽出を検証。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "POST-02",
@@ -1131,7 +1325,13 @@
       "unmet_formal_pass_requirements": "術後30日/31日境界を保存/集計まで検証。現行非手術fixtureはこの判定に使わない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "JUOG_run3_POST02_day31.txt/.jpg、JUOG_run3_POST02_day30.txt; uat_integration_readonly.json; 30d_noop_chronology_evidence.json"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "POST-03",
@@ -1160,7 +1360,13 @@
         "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "POST-04",
@@ -1189,7 +1395,13 @@
         "—; uat_integration_readonly.json",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "POST-05",
@@ -1213,7 +1425,10 @@
         "E06/E04",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "POST-06",
@@ -1244,7 +1459,13 @@
         "—; uat_integration_readonly.json",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "FUP-01",
@@ -1275,7 +1496,13 @@
         "—; uat_integration_readonly.json",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "FUP-02",
@@ -1302,7 +1529,13 @@
       "unmet_formal_pass_requirements": "矛盾入力→拒否→正しい入力復元→正常保存・版/監査を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "JUOG_run4_FUP02_required_complete.txt/.jpg、FUP02_PD_after_assessment.txt/.jpg、FUP02_restored.txt（同接頭辞）; uat_integration_readonly.json"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUD-01",
@@ -1323,13 +1556,16 @@
       "supplemental_scope": "TEST01/JUOG-970 fictional only; GAS v4 then v5; original formal criterion not automatically satisfied",
       "official_status": "PASS",
       "live_result": "30日v1/v2、90日v1、6月v1の保存・監査照合、旧版保持。 追加2件（古い版/訂正理由欠落）は拒否・業務不変。理由欠落の公開コードはVALIDATION_FAILEDで試験期待値不一致を記録。",
-      "unmet_formal_pass_requirements": "既済PASS維持。古い版・理由欠落の新規拒否試験は未実施。",
+      "unmet_formal_pass_requirements": "既済PASS維持。新隔離版の古い版・理由欠落拒否は実測済み。VALIDATION_FAILEDの期待値差は診断証拠と併せ正式QAで評価。再送不要。",
       "evidence_files": [
         "E04",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341",
         "uat_evidence/auth04_two_negative_live_20261113.json"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUD-02",
@@ -1351,7 +1587,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUD-03",
@@ -1373,7 +1612,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "E05"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUTH-01",
@@ -1395,7 +1637,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "JUOG_AUTH01_20261109.jpg／実行時ブラウザ観測"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUTH-02",
@@ -1419,7 +1664,10 @@
         "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUTH-03",
@@ -1443,7 +1691,10 @@
         "run10_auth03_before.json / run10_auth03_responses.json / run10_auth03_after.json / run10_auth03_comparison.json",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "AUTH-04",
@@ -1460,8 +1711,8 @@
       ],
       "tested_version": "既存TEST／validation-v2.2.8／GAS active v1",
       "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
-      "unfinished_reason": "追加識別子/ラベル検出と画面捕捉/復元を候補で是正。承認対象版の隔離実画面/実GAS/実ログ/通知停止証拠、年齢・生年月の正式申請保持、独立QA未完。無ラベルの氏名/日付を完全自動判別する保証なし。FAIL維持。",
-      "required_fix_or_action": "4関数privacy修正を現行SHAから最小差分統合。復元前の状態消去、正常値保持、限定実APIの識別拒否・保存復元・ログ非露出・所有権を実測。",
+      "unfinished_reason": "正常な年齢・生年月等の全要求への追跡、画面/応答/ログの漏洩検証範囲と証拠承認、独立正式QA。自由記載の完全自動検出は保証しない。",
+      "required_fix_or_action": "既存の16条件拒否・下書き・所有権・CRF・監査の証拠を正式要求へ追跡し、ログ/画面/臨床値保持の残る範囲を評価。独立正式QAの判定までFAILを維持。",
       "pass_criterion": "氏名・MRN等は承認外で収集・露出せず、コードによる仮名化を維持。",
       "existing_evidence": "run27_AUTH04_privacy_FAIL.json; TEST CRF_Drafts!A3:P3; validation source 01_registration_crf.py:199,632-642 / juog_common.py:649-674 / GAS v1:937-963,1430-1439; AUTH04_proposed.patch; AUTH04_assessment.md; AUTH04_predeployment_gate_20261111.md; AUTH04_prechange_10tabs.json; uat_integration_readonly.json",
       "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
@@ -1477,7 +1728,13 @@
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341",
         "uat_evidence/auth04_two_negative_live_20261113.json"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "元の識別情報不具合に対する修正と限定実測あり。正式FAILの解除条件未充足。全入力への完全自動検出は保証しない。"
     },
     {
       "test_id": "IMG-01",
@@ -1503,7 +1760,13 @@
       "unmet_formal_pass_requirements": "完全架空DICOMのメタデータ・焼込み・ファイル名を検査し正規受領/閲覧ACLを確認。外部送信は承認外。 画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。",
       "evidence_files": [
         "—"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "DATA-01",
@@ -1530,7 +1793,12 @@
       "unmet_formal_pass_requirements": "実保持SOP/権限/頻度とsnapshot再取得・別隔離先復元を照合。 第9.2/14.1節の保存期間（研究終了又は最終公表から10年の遅い日）を原本で確認。実際の頻度・保存先・権限・保持/復元SOPの承認と履行証拠は未完。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "DATA-02",
@@ -1557,7 +1825,13 @@
       "unmet_formal_pass_requirements": "復元後の登録/全CRF/監査/添付対応の全件照合。CRF一件だけで合格にしない。 実TEST登録/CRF/監査照合とStage1一件照合は取得済み。正式復元後の全件・添付紐付け照合が不足。S2-01はCRF一件の部分証拠。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "DATA-03",
@@ -1579,7 +1853,10 @@
       "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
       "evidence_files": [
         "run6_export.xlsx、run6_live_values.json、run6_DATA03_result.json、run6_compare.py；本報告の抽出範囲表"
-      ]
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "DATA-04",
@@ -1594,7 +1871,7 @@
       ],
       "tested_version": "未実行／実行時に固定",
       "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
-      "unfinished_reason": "S2-01復旧コード候補は用意済み。実復旧、連絡体制、代替記録/照合運用の承認・実演が不足。",
+      "unfinished_reason": "隔離90日/6月CRFの同一operation復旧と重複なしは実測済み。正式な連絡・代替記録・全体復旧照合SOPおよび承認は未充足。",
       "required_fix_or_action": "障害後status照合・同operation再開・重複防止に加え連絡/代替手順の実演記録。",
       "pass_criterion": "連絡先、代替手順、復旧後照合、データ逸失防止が文書化される。",
       "existing_evidence": "—",
@@ -1610,7 +1887,12 @@
         "—",
         "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
       ],
-      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5."
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REL-01",
@@ -1640,7 +1922,13 @@
       "unmet_formal_pass_requirements": "影響範囲の原UI/API回帰を対象SHAへ対応付け、過去PASSの無条件繰越を避ける。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
       "evidence_files": [
         "—; uat_integration_readonly.json"
-      ]
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REL-02",
@@ -1670,7 +1958,12 @@
       "unmet_formal_pass_requirements": "旧GAS v6を含む既存変更記録と新隔離版の対応/未実施区分を確認。 Stage1/S2候補の版とハッシュは追跡可。原基準のGAS v6を含む変更履歴全体の対応は未完。",
       "evidence_files": [
         "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     },
     {
       "test_id": "REL-03",
@@ -1700,102 +1993,30 @@
       "unmet_formal_pass_requirements": "正本マニュアル・MDT手順・配布/教育記録・版の正式確認。 説明資料あり。正本版対応、MDT全手順、配布・教育記録が不足。",
       "evidence_files": [
         "reference_README_JA.md（参照SHA固定）；run6_manual_evidence.json"
-      ]
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。"
     }
   ],
   "boundary": {
-    "reviewer": "independent fixture_diagnostic_review agent",
-    "review_type": "Recorded independent technical risk assessment; not formal independent QA or production release approval",
-    "decision": "BOUNDARY_EVIDENCE_GAP_DOES_NOT_BLOCK_SUPERVISED_FICTIONAL_AUTH04_IF_ALL_OTHER_PREREQUISITES_PASS",
-    "authorization_basis": "PI integrated execution instruction permits remaining authentication items to be formally evaluated with reasons and risks before isolated fictional AUTH04 testing",
-    "uncompleted_item": "Original same-OIDC-session real-time 60-minute near-boundary observation",
-    "evidence_limit": {
-      "original_deadline_jst": "2026-11-13T02:03:09+09:00",
-      "near_boundary_ui_result": "Not recovered after browser/session interruption",
-      "old_cookie_later_reopened": "Parent observed zero remaining seconds and refused connection",
-      "durable_session_events": "Parent observed same deadline and no new OPEN for the old session; events contain no trusted observation timestamps",
-      "not_proven": [
-        "Actual near-deadline permission",
-        "Immediate deadline rejection timing",
-        "Old pending signed-envelope GAS response at the deadline"
-      ],
-      "forbidden_substitution": "A later fresh login must never be attributed to the original boundary experiment"
-    },
-    "risk_assessment": {
-      "issue_type": "Unresolved live validation evidence, not an observed authorization bypass",
-      "residual_risk": "Timing/race defects exactly at expiry remain insufficiently evidenced on the deployed live path",
-      "existing_controls": [
-        "Server-side deadline and envelope-expiry checks remain unchanged",
-        "GAS guard runs before each business append",
-        "Durable generation, revocation and replay protections remain unchanged",
-        "Individual ACL is rechecked for each operation",
-        "Fixed verified principal, facility TEST01, facility role, case JUOG-970 and narrow action/record allowlists"
-      ],
-      "supporting_tests": "Existing offline boundary tests and live replay/revocation/logout evidence support limited experimentation but cannot establish missing live boundary PASS",
-      "potential_impact_under_limited_test": "Only explicitly approved fictional case data in the isolated workbook; production and real patient data remain inaccessible by scope",
-      "security_relaxation_required": false
-    },
-    "mandatory_execution_limits": [
-      "Keep all existing auth/ACL/replay/deadline controls and fixed-case API scope unchanged",
-      "Use a fresh independently identified OIDC session for AUTH04 after recording the old-session evidence gap",
-      "Supervise every operation and do not initiate ordinary business tests near the session deadline; use a conservative 15-minute margin",
-      "When the margin is reached, reconcile any in-flight operation, stop new writes and logout; never extend or modify token/session timestamps",
-      "Re-login for a later distinct AUTH04 session is allowed only after prior operation state is certain; it is not continuation evidence for the old boundary experiment",
-      "Confirm all other prerequisites independently: deployed hashes, frontend privacy validation, migration fixture, exact ACL, safe backup, notification/upload stop and key configuration",
-      "Capture before/after journal snapshots, request/intent/audit/commit and old-version comparisons for every business test group",
-      "On unexpected permission, uncertain write, privacy leak or audit mismatch, stop requests and disable isolated AUTH04 routes using reviewed stop procedure",
-      "Do not claim the 60-minute live test complete, waive it for release, or increment formal UAT from this assessment"
+    "result": "NOT ESTABLISHED — missing post-deadline live observation",
+    "deadline_jst": "2026-11-13T09:41:05+09:00",
+    "same_session_ledger_open_count": 1,
+    "ledger_deadline_unchanged": true,
+    "evidence": "uat_evidence/boundary_readback_20261113.json",
+    "missing": [
+      "timestamped post-expiry new-signature refusal",
+      "post-expiry access refusal for the same session",
+      "reload/Cookie non-extension live outcome",
+      "probe DONE/FAILED record"
     ],
-    "remaining_release_requirement": "Recover trustworthy original near-boundary evidence or run a new separately identified complete real-time experiment; independent formal QA and release approval remain outstanding",
-    "fixture_initialization_note": "Parent reports 06:25:22 JST diagnostic run succeeded with revision1 and exact3-to9-row append. Prior zero-append cause remains unknown and must not be described as a diagnosed/fixed root cause.",
-    "formal_uat_delta": 0,
-    "formal_uat_unchanged": {
-      "PASS": 32,
-      "FAIL": 1,
-      "BLOCKED": 29,
-      "NOT_RUN": 5
-    }
+    "cause": "Original browser tabs and in-memory probe state unavailable after runtime inactivity/reset. No durable probe result recovered. Ledger has no per-USE observation timestamps.",
+    "formal_pass_delta": 0
   },
-  "remaining_negative_tests": {
-    "status": "EXECUTED_REFUSED_BUSINESS_UNCHANGED",
-    "reason": "Both refused; missing-reason public code VALIDATION_FAILED differs from original harness expectation; diagnosis reviewed, formal QA pending.",
-    "case": "TEST01/JUOG-970/day30",
-    "existing_versions": [
-      1,
-      2
-    ],
-    "operations": [
-      {
-        "name": "stale_version",
-        "expected_record_version": 0,
-        "expected_error": "STALE_VERSION"
-      },
-      {
-        "name": "missing_reason",
-        "expected_record_version": 2,
-        "correction_reason": "",
-        "expected_error": "CORRECTION_REASON_REQUIRED"
-      }
-    ],
-    "approved_proposal_only": true,
-    "expected_delta_per_test": {
-      "requests": 1,
-      "requestEvents_FAILED": 1,
-      "intents": 0,
-      "business_audits": 0,
-      "commits": 0,
-      "business_revision": 0,
-      "crf_versions": 0
-    },
-    "preconditions": [
-      "fresh verified OIDC; sufficient remaining time",
-      "fresh before-state hash and target/source pin",
-      "independent review of narrow execution scope",
-      "separate PI authorization; AUTH_CONNECT maintained until then"
-    ],
-    "stop_condition": "Unexpected permission/write/unknown state: stop and reconcile; no automatic retry.",
-    "restore": "Disable limited execution and verify AUTH_CONNECT after both tests or any anomaly."
-  },
+  "remaining_negative_tests": [],
   "release_gaps": [
     "Same-session real-time 60-minute boundary evidence",
     "Credential rotation not verified; previous exposure unresolved",
@@ -1806,5 +2027,44 @@
     "Training, version/change-control records",
     "Formal release authorization; production unchanged"
   ],
-  "supplemental_two_negative_tests": "uat_evidence/auth04_two_negative_live_20261113.json"
+  "supplemental_two_negative_tests": "uat_evidence/auth04_two_negative_live_20261113.json",
+  "latest_readback": {
+    "observed_at_utc": "2026-11-13T02:48:42.952Z",
+    "journal_rows": 66,
+    "journal_sha256": "8441de491fb974555aa0e63f4e690974c6c4af4f890493e1ed8af51b96609b24",
+    "session_rows": 103,
+    "matching_deadline_open_count": 1,
+    "same_session_event_counts": {
+      "OPEN": 1,
+      "USE": 10
+    },
+    "same_session_open_deadlines": [
+      1794530465
+    ],
+    "event_fields": [
+      "kind",
+      "sid",
+      "owner",
+      "deadline",
+      "jti"
+    ],
+    "limitation": "Ledger events alone do not establish observed expiry refusal or request time; original probe runtime unavailable."
+  },
+  "negative_test_assessment": {
+    "stale_version": "Confirmed STALE_VERSION refusal; no business changes.",
+    "missing_reason": "Functional refusal confirmed. Current deployed v5 validation rejects only REQUIRED:correction_reason as VALIDATION_FAILED. Reviewed UAT criteria require reason/traceability, not the dedicated CORRECTION_REASON_REQUIRED public code. Treat observed discrepancy as harness expectation mismatch against v5; formal API-contract/QA acceptance remains outstanding.",
+    "requirements_review_scope": [
+      "UAT67_current.json AUD-01 / AUTH-04 criteria",
+      "review-branch Markdown/JSON dedicated-code references",
+      "v5 diagnostic six-case independent technical review"
+    ],
+    "limitation": "This bounded review is not proof that no other approved API contract exists. No production API requirement changed.",
+    "live_rerun": false,
+    "formal_pass_delta": 0
+  },
+  "unfinished_primary_gap_counts": {
+    "実機証拠不足": 27,
+    "独立QA・承認不足": 8
+  },
+  "classification_note": "主阻害要因の分類。技術的不具合0は本照合で新規確定した未解決実装不具合が0という意味であり、正式FAIL0や重大問題不存在の保証ではない。複数条件を要する項目はgap_categoriesで併記。"
 }

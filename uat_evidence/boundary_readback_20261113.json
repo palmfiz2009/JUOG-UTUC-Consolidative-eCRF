@@ -1,0 +1,22 @@
+{
+  "observed_at_utc": "2026-11-13T02:48:42.952Z",
+  "journal_rows": 66,
+  "journal_sha256": "8441de491fb974555aa0e63f4e690974c6c4af4f890493e1ed8af51b96609b24",
+  "session_rows": 103,
+  "matching_deadline_open_count": 1,
+  "same_session_event_counts": {
+    "OPEN": 1,
+    "USE": 10
+  },
+  "same_session_open_deadlines": [
+    1794530465
+  ],
+  "event_fields": [
+    "kind",
+    "sid",
+    "owner",
+    "deadline",
+    "jti"
+  ],
+  "limitation": "Ledger events alone do not establish observed expiry refusal or request time; original probe runtime unavailable."
+}
