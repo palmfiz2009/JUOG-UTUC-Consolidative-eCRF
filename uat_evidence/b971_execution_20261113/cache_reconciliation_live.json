@@ -1,0 +1,35 @@
+{
+  "scope": "TEST01/JUOG-971",
+  "gas_version": 8,
+  "gas_source_sha256": "e51bd244ed674286bfa2bd0ebb0f53744b5e6dc5192e07c23fc2f10dd417d638",
+  "frontend_commit": "75618540f80b9395f3a9f2734b3cda8fc000ff68",
+  "technical_review_commit": "618bd028fdd503b3c2885e0ea375766f0cc70c26",
+  "preflight": {
+    "journal_rows": 118,
+    "full_journal_unchanged": true,
+    "sha256": "920d9bb567490c6895f642df1b758910ed4fea68c4ff7e1d1a6c14723e24680e",
+    "backup_exact_match": true,
+    "revision": 11,
+    "sealed_counts": {
+      "intents": 11,
+      "audits": 11,
+      "commits": 11,
+      "requests": 13,
+      "requestEvents": 5
+    },
+    "unsealed_batches_preserved": 3
+  },
+  "live_checkpoint_verification": {
+    "six_terminal_operations_match": true,
+    "three_histories_match": true,
+    "no_new_business_request_issued": true
+  },
+  "formal_uat_delta": 0,
+  "classification": "Checkpoint reconciliation evidence; not B7 complete or formal QA",
+  "logout": {
+    "ledger_event": "REVOKE",
+    "ledger_row_count": 193,
+    "login_screen_observed": true
+  },
+  "authentication": "Google device approval required; no successful new authentication yet"
+}
