@@ -1,0 +1,32 @@
+{
+  "reviewer": "/root/b971_independent_review",
+  "review_ref": "B971_BATCH_RECOVERY_REVIEW_20261113",
+  "classification": "Independent AI technical review; not formal third-party QA",
+  "verdict": "APPROVED_WITH_LIVE_PRECONDITIONS",
+  "source_sha256": {
+    "bundle_batch_recovery_candidate.gs": "211159ea4c29a0047ed3b7e97d0558c4afd30eca897b455445e4658c39b74b85",
+    "uat_b971_prepare_recovery.py": "f021782ad80bc7382876e872647ec3ec80148537d83ea9634085b44590468d05",
+    "streamlit_app_prepare_recovery.py": "c35323c0285efa1f16bfe6bdbc08cbe23d462cbb42a012d0813a98dda39ce7e2"
+  },
+  "offline_checks": {
+    "batch_adapter": 13,
+    "recovery_admin": 13,
+    "continuation_and_recovery_ui": 18
+  },
+  "preconditions": [
+    "Deploy exact reviewed pins only to existing isolated GAS and Streamlit.",
+    "Keep AUTH_CONNECT during editor-only recovery; require exact pinned 107-row baseline, original orphan request and no same-ID business events.",
+    "Recover original request object and operation ID only; retain orphan row. Independently read back 109 rows, exactly one sealed matching request and unchanged revision10/business arrays before resume.",
+    "No automatic retry after ambiguous write; same-ID authoritative readback. ACK loss may mean committed.",
+    "Resume requires durable exact request and existing ACL/backup/config gates; experiment TTL does not extend OIDC/signature/session expiry.",
+    "Frontend must fresh signed query original ID as UNFINISHED/PREPARED with revision10 and empty day90 history before adopting pending ID. Explicit same-ID execute only.",
+    "Verify 970 and earlier business histories unchanged, then continue existing approved fixture sequence. Restore AUTH_CONNECT after live testing."
+  ],
+  "limitations": [
+    "Synthetic tests use explicit digest doubles for live baseline pins; live baseline authenticity is parent-reported and must be verified externally.",
+    "Single setValues reduces physical calls; does not guarantee network atomicity or cancellation of in-flight write after expiry.",
+    "Unknown or partial write requires reconciliation; do not infer failure from transport exception.",
+    "No new formal UAT PASS and no live outcome certified by this review."
+  ],
+  "formal_uat_delta": 0
+}
