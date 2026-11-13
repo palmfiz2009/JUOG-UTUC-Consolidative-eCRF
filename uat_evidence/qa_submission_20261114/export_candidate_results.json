@@ -1,0 +1,20 @@
+{
+  "scope": "OFFLINE_REVIEW_EXPORT_ONLY",
+  "tests_passed": 8,
+  "formal_pass_delta": 0,
+  "source_records": 6,
+  "latest_records": 3,
+  "cloud_changes": false,
+  "limitations": [
+    "Not a deployed export route; no new authenticated live evidence.",
+    "Window counts do not adjudicate clinical endpoint eligibility or renal exceptions.",
+    "Input provenance refers to prior journal evidence; this tool does not cryptographically authenticate remote journal contents."
+  ],
+  "sha256": {
+    "clinical_readonly_export.py": "735496e6cb828ba4d76b6ed4cefc52fcff251bdb06bbe27a71df108d177dce9e",
+    "test_clinical_readonly_export.py": "fd58a92c0d575903a19b7731e9b51c9527809e4338883508fc9952053df40cb0",
+    "clinical_history_review.csv": "3d854ad66fad8f16f5ec48549fa600278eaf044dcf6ef92906807e6ae6da407d",
+    "clinical_latest_review.csv": "82c67f0782e757dd3586e8e1d08dea087dbdc6b8eaf9297b522180b549882c85",
+    "clinical_review_summary.json": "8ac6ab4c74f5e6cdb4d07365a40d3f2b008e1b88f79ae5e7e68d0eddb0f75293"
+  }
+}

@@ -1,0 +1,7 @@
+table,version,latest,reference_date,visit_date,event_date,event_day,grade,window,recurrence_date,progression_date,death_date,blood_loss_ml,pathology_size_mm,crp
+CRF_30d,1,False,2026-04-13,2026-05-13,2026-05-13,30,Grade IIIa,day0_30,,,,0,10,0
+CRF_30d,2,True,2026-04-13,2026-05-13,2026-05-13,30,Grade IIIa,day0_30,,,,0,0,0
+CRF_90d,1,True,2026-04-13,2026-07-12,2026-05-14,31,Grade IIIa,day31_90,,,,,,0
+CRF_Followup,1,False,2026-04-13,2026-10-13,,,,no_event_date,2026-10-01,,,,,0
+CRF_Followup,2,False,2026-04-13,2026-10-13,,,,no_event_date,2026-10-01,2026-10-12,,,,0
+CRF_Followup,3,True,2026-04-13,2026-10-13,,,,no_event_date,2026-10-01,2026-10-12,2026-10-13,,,0

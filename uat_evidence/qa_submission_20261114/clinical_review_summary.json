@@ -1,0 +1,13 @@
+{
+  "record_count_history": 6,
+  "record_count_latest": 3,
+  "latest_events_day0_30": 1,
+  "latest_events_day31_90": 1,
+  "latest_followup_with_recurrence": 1,
+  "latest_followup_with_progression": 1,
+  "latest_followup_with_death": 1,
+  "scope": "OFFLINE_REVIEW_EXPORT_NOT_DEPLOYED_APPLICATION",
+  "clinical_endpoint_adjudication": false,
+  "formal_pass_delta": 0,
+  "projection_sha256": "e8cea6082166cc1deb6e3fcc885022345e786036571ad12bc0b9f5dc88ff334d"
+}
