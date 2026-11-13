@@ -1,0 +1,271 @@
+{
+  "kind": "READ_ONLY_VERSION9_STOP_AND_B971_RECONCILIATION",
+  "date_jst": "2026-11-14",
+  "formal_uat_delta": 0,
+  "gas": {
+    "script_id": "11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy",
+    "deployment_id": "AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ",
+    "version": 9,
+    "source_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+    "review_commit": "e0f4de48bf3051cc426916bbf82ea28786e418c4",
+    "current_editor_sha_matches_deployment_description": true
+  },
+  "stop": {
+    "verdict": "PASS_READ_ONLY_CONFIG_AND_SOURCE_VERIFICATION",
+    "executed_jst": "2026-11-14T07:43:08+09:00",
+    "completed_log_jst": "2026-11-14T07:43:09+09:00",
+    "log": {
+      "ok": true,
+      "stage": "AUTH_CONNECT",
+      "scope": "TEST01/JUOG-971",
+      "business_enabled": false
+    },
+    "current_config": {
+      "environment": "ISOLATED_TEST",
+      "sessionExecutionStage": "AUTH_CONNECT",
+      "auth04ScopeReviewed": false,
+      "auth04ExecutionApprovalRef": null,
+      "b971ExecutionUntil": 0,
+      "allRoutesReviewed": false,
+      "schemaParityApproved": false,
+      "notificationsDisabled": true,
+      "isolated_sheet_match": true
+    },
+    "static_allowlist_note": "Code allowlist remains for reviewed future use, but all business activation gates are false. Scope review reference and fixture metadata remain inert; no new live business request sent."
+  },
+  "acl": {
+    "count": 1,
+    "enabled": true,
+    "role": "facility",
+    "facilities": [
+      "TEST01"
+    ],
+    "valid_until": "2026-11-19T23:59:00+09:00"
+  },
+  "journal": {
+    "rows": 165,
+    "sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+    "matches_previous_turn_final": true,
+    "prefix118_sha256": "920d9bb567490c6895f642df1b758910ed4fea68c4ff7e1d1a6c14723e24680e",
+    "prefix118_unchanged": true,
+    "verified": 70,
+    "unsealed": 3,
+    "counts": {
+      "baseline": 1,
+      "intents": 14,
+      "audits": 14,
+      "commits": 14,
+      "requests": 19,
+      "requestEvents": 8
+    },
+    "unchanged": {
+      "Registry": true,
+      "Screening": true,
+      "ScreeningAudit": true,
+      "MDTReviews": true,
+      "ScreeningCRF": true,
+      "CRF_30d": true,
+      "CRF_90d": true,
+      "CRF_Drafts": true,
+      "Settings": true,
+      "V3_DraftOwners": true,
+      "other_followup": true
+    },
+    "all_intent_hashes_and_audits_match": true,
+    "latest_revision": 14
+  },
+  "scenarios": [
+    {
+      "scenario": 1,
+      "name": "30日CRFの31日イベント拒否",
+      "execution_version": "historical v6/v7; v8/v9 readback",
+      "request_count": 1,
+      "intent_count": 0,
+      "audit_count": 0,
+      "commit_count": 0,
+      "event_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "expected_error": "VALIDATION_FAILED",
+      "exact_payload_readback": null,
+      "matched": true,
+      "operation_id": "706b8de3-a2ec-482d-ae85-02ab25cd730f"
+    },
+    {
+      "scenario": 2,
+      "name": "30日イベント初回保存",
+      "execution_version": "historical v6/v7; v8/v9 readback",
+      "request_count": 1,
+      "intent_count": 1,
+      "audit_count": 1,
+      "commit_count": 1,
+      "event_errors": [],
+      "expected_error": null,
+      "exact_payload_readback": true,
+      "matched": true,
+      "operation_id": "e57611a2-857c-43ed-94ef-14fa8be31c90",
+      "revision": 9
+    },
+    {
+      "scenario": 3,
+      "name": "病理理由欠落拒否",
+      "execution_version": "historical v6/v7; v8/v9 readback",
+      "request_count": 1,
+      "intent_count": 0,
+      "audit_count": 0,
+      "commit_count": 0,
+      "event_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "expected_error": "VALIDATION_FAILED",
+      "exact_payload_readback": null,
+      "matched": true,
+      "operation_id": "963e78c2-22d6-4706-a954-9006fdb7d747"
+    },
+    {
+      "scenario": 4,
+      "name": "病理理由復元と数値0保持",
+      "execution_version": "historical v6/v7; v8/v9 readback",
+      "request_count": 1,
+      "intent_count": 1,
+      "audit_count": 1,
+      "commit_count": 1,
+      "event_errors": [],
+      "expected_error": null,
+      "exact_payload_readback": true,
+      "matched": true,
+      "operation_id": "c80315a9-1d03-4931-91ae-73182ff6036b",
+      "revision": 10
+    },
+    {
+      "scenario": 5,
+      "name": "旧30日参照版拒否",
+      "execution_version": "historical v6/v7; v8/v9 readback",
+      "request_count": 1,
+      "intent_count": 0,
+      "audit_count": 0,
+      "commit_count": 0,
+      "event_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "expected_error": "VALIDATION_FAILED",
+      "exact_payload_readback": null,
+      "matched": true,
+      "operation_id": "a30241dc-34b5-487b-bec3-393f3088c4d3"
+    },
+    {
+      "scenario": 6,
+      "name": "正しい参照版と31日イベント保存",
+      "execution_version": "historical v6/v7; v8/v9 readback",
+      "request_count": 1,
+      "intent_count": 1,
+      "audit_count": 1,
+      "commit_count": 1,
+      "event_errors": [],
+      "expected_error": null,
+      "exact_payload_readback": true,
+      "matched": true,
+      "operation_id": "2b1ceeb6-5f20-479f-ba74-f15182246813",
+      "revision": 11
+    },
+    {
+      "scenario": 7,
+      "name": "再発詳細欠落拒否",
+      "execution_version": "v9",
+      "request_count": 1,
+      "intent_count": 0,
+      "audit_count": 0,
+      "commit_count": 0,
+      "event_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "expected_error": "VALIDATION_FAILED",
+      "exact_payload_readback": null,
+      "matched": true,
+      "operation_id": "ca5faa3a-65f4-4e32-9f8d-123249cda271"
+    },
+    {
+      "scenario": 8,
+      "name": "再発情報復元と保存",
+      "execution_version": "v9",
+      "request_count": 1,
+      "intent_count": 1,
+      "audit_count": 1,
+      "commit_count": 1,
+      "event_errors": [],
+      "expected_error": null,
+      "exact_payload_readback": true,
+      "matched": true,
+      "operation_id": "36261cec-95e0-475a-9371-87e19e7322ab",
+      "revision": 12
+    },
+    {
+      "scenario": 9,
+      "name": "評価日後のPD拒否",
+      "execution_version": "v9",
+      "request_count": 1,
+      "intent_count": 0,
+      "audit_count": 0,
+      "commit_count": 0,
+      "event_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "expected_error": "VALIDATION_FAILED",
+      "exact_payload_readback": null,
+      "matched": true,
+      "operation_id": "92c199da-d7f5-4047-9543-18ad5ca697c8"
+    },
+    {
+      "scenario": 10,
+      "name": "PD日復元と保存",
+      "execution_version": "v9",
+      "request_count": 1,
+      "intent_count": 1,
+      "audit_count": 1,
+      "commit_count": 1,
+      "event_errors": [],
+      "expected_error": null,
+      "exact_payload_readback": true,
+      "matched": true,
+      "operation_id": "71e674fe-4369-4480-9a54-47d2fd4e80fc",
+      "revision": 13
+    },
+    {
+      "scenario": 11,
+      "name": "死亡原因欠落拒否",
+      "execution_version": "v9",
+      "request_count": 1,
+      "intent_count": 0,
+      "audit_count": 0,
+      "commit_count": 0,
+      "event_errors": [
+        "VALIDATION_FAILED"
+      ],
+      "expected_error": "VALIDATION_FAILED",
+      "exact_payload_readback": null,
+      "matched": true,
+      "operation_id": "421efe90-35f9-4f51-8ae8-9a4b848f3869"
+    },
+    {
+      "scenario": 12,
+      "name": "死亡情報復元と保存",
+      "execution_version": "v9",
+      "request_count": 1,
+      "intent_count": 1,
+      "audit_count": 1,
+      "commit_count": 1,
+      "event_errors": [],
+      "expected_error": null,
+      "exact_payload_readback": true,
+      "matched": true,
+      "operation_id": "7e1e1b03-8adb-48fe-99ef-719a87f01647",
+      "revision": 14
+    }
+  ],
+  "limitations": [
+    "Scenarios1-6 executed historically under v6/v7; v9 readback does not relabel their original execution version.",
+    "No new business rejection request sent in this read-only turn.",
+    "Formal QA approval not provided.",
+    "Historical unsealed batches preserved; none newly created."
+  ]
+}
