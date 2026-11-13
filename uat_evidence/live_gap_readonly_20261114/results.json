@@ -1,0 +1,86 @@
+{
+  "observed_date_jst": "2026-11-14",
+  "scope": "LIVE_READ_ONLY_NO_BUSINESS_TRANSMISSION",
+  "base_review_commit": "2b6c99c9fa818cd04983f80d6258cd0a5c199934",
+  "screen": {
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/",
+    "heading": "B群 TEST01/JUOG-971 限定実機試験",
+    "message": "checkpointの正規認証・状態・3履歴を確認できません。新規送信なし。",
+    "clinical_form_visible": false,
+    "export_control_visible": false,
+    "authenticated_business_read_performed": false,
+    "post03_closed": false
+  },
+  "host_log": {
+    "access": "READ_SUCCESS_VIA_MANAGE_APP",
+    "observed_dom_characters": 25923,
+    "branch": "uat-fixture-isolated-20261109",
+    "entry": "streamlit_app.py",
+    "marker_search_count": 7,
+    "marker_matches": 0,
+    "scope_limit": "Only rendered retained log; no completeness assertion or per-request correlation. Four known synthetic privacy markers plus three B971 clinical markers. Raw logs not persisted.",
+    "historical_tracebacks_present": true,
+    "traceback_types": [
+      "ImportError",
+      "KeyError"
+    ],
+    "token_or_identity_search_performed": false
+  },
+  "gas_log": {
+    "project": "isolated",
+    "version9_execution_observed": "2026/11/14 7:42:08 JST",
+    "status": "完了",
+    "cloud_log_menu": "DISABLED",
+    "cloud_error_menu": "DISABLED",
+    "cause": "UI capability disabled; underlying IAM/config cause not established",
+    "stop_log": {
+      "time_jst": "2026-11-14 07:43:09",
+      "stage": "AUTH_CONNECT",
+      "business_enabled": false
+    },
+    "all_execution_log_nonexposure_proven": false
+  },
+  "drive_access": {
+    "id": "1Hd6EHDPZe8zGcDbILkaBLubgF5atfAzRfpPSN5LemiU",
+    "title": "",
+    "mime_type": "application/vnd.google-apps.spreadsheet",
+    "size": null,
+    "url": null,
+    "file_or_folder": "file",
+    "created_time": null,
+    "modified_time": null,
+    "parent_ids": null,
+    "drive_id": null,
+    "current_user_can_share": true,
+    "has_augmented_permissions": null,
+    "shared": false,
+    "permissions": [
+      {
+        "type": "user",
+        "role": "owner",
+        "emailAddress": null,
+        "domain": null,
+        "displayName": null,
+        "allowFileDiscovery": null
+      }
+    ],
+    "source_visibility_status": "permission_metadata_available"
+  },
+  "backup_tabs_confirmed": [
+    "UAT971_RESTORE_20261113",
+    "UAT971_BACKUP_20261113"
+  ],
+  "http_response_capture": "NOT_OBTAINED_NO_NEW_REQUEST",
+  "audit_and_backup_content": "Existing evidence reused; no raw contents extracted this turn and no deletion.",
+  "new_formal_pass": 0,
+  "complete_uat_gaps_closed": 0,
+  "partial_evidence_added": [
+    "Live host log access and bounded marker scan",
+    "Live direct workbook access: not shared, one owner; backup tabs in same workbook"
+  ],
+  "cloud_mutations": [],
+  "business_writes": 0,
+  "new_oidc_logins": 0,
+  "acl_changes": 0,
+  "deployments": 0
+}
