@@ -1,0 +1,66 @@
+{
+  "scope": "TEST01/JUOG-971",
+  "recorded_source_sha256": "f021782ad80bc7382876e872647ec3ec80148537d83ea9634085b44590468d05",
+  "gas_sha256": "211159ea4c29a0047ed3b7e97d0558c4afd30eca897b455445e4658c39b74b85",
+  "fixture_sha256": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d",
+  "cursor": 6,
+  "completed": [
+    {
+      "index": 0,
+      "operation_id": "706b8de3-a2ec-482d-ae85-02ab25cd730f",
+      "expected_state": "FAILED",
+      "expected_error": "VALIDATION_FAILED"
+    },
+    {
+      "index": 1,
+      "operation_id": "e57611a2-857c-43ed-94ef-14fa8be31c90",
+      "expected_state": "SAVED",
+      "expected_error": null
+    },
+    {
+      "index": 2,
+      "operation_id": "963e78c2-22d6-4706-a954-9006fdb7d747",
+      "expected_state": "FAILED",
+      "expected_error": "VALIDATION_FAILED"
+    },
+    {
+      "index": 3,
+      "operation_id": "c80315a9-1d03-4931-91ae-73182ff6036b",
+      "expected_state": "SAVED",
+      "expected_error": null
+    },
+    {
+      "index": 4,
+      "operation_id": "a30241dc-34b5-487b-bec3-393f3088c4d3",
+      "expected_state": "FAILED",
+      "expected_error": "VALIDATION_FAILED"
+    },
+    {
+      "index": 5,
+      "operation_id": "2b1ceeb6-5f20-479f-ba74-f15182246813",
+      "expected_state": "SAVED",
+      "expected_error": null
+    }
+  ],
+  "histories": {
+    "JUOG-971|perioperative_30d|30d": {
+      "sha256": "be43770305ef3e42ac92408284bc8d395b4533a67353f67b09db1aa031a9602a",
+      "versions": [
+        1,
+        2
+      ]
+    },
+    "JUOG-971|day90|90d": {
+      "sha256": "984fb60edc5bd43d9398385a578b56c728aa7de774039a2f5716dc23d1e8bbe5",
+      "versions": [
+        1
+      ]
+    },
+    "JUOG-971|followup|6m": {
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+      "versions": []
+    }
+  },
+  "evidence_ref": "B971_LIVE_20261113_CURSOR6_JOURNAL118_REV11_STEP7_NO_DURABLE_PREPARE",
+  "unresolved_operations": []
+}

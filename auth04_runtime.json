@@ -7,7 +7,7 @@
   "url": "https://script.google.com/macros/s/AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ/exec",
   "session_store_generation": "d72bcf33-423d-4c4d-862d-2e2d69bc3edf",
   "approval_ref": "PI_B971_CONDITIONAL_EXECUTION_20261113",
-  "review_ref": "B971_BATCH_RECOVERY_REVIEW_20261113;2482602982a8c815ff69595fd82d6b9f6e15e451",
+  "review_ref": "B971_CACHE_RECONCILIATION_REVIEW_20261113;618bd028fdd503b3c2885e0ea375766f0cc70c26",
   "prerequisites_verified": true,
   "notifications_disabled": true,
   "write_actions": [
