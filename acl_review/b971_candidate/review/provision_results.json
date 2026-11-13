@@ -1,0 +1,48 @@
+{
+  "scope": "OFFLINE_INDEPENDENT_PROVISIONING_TEST",
+  "source_sha256": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+  "passed": 10,
+  "results": [
+    {
+      "name": "populated revision7 append preserves complete old view/history",
+      "passed": true
+    },
+    {
+      "name": "same fixed operation id retry is idempotent",
+      "passed": true
+    },
+    {
+      "name": "partial appendAudit same operation recovery",
+      "passed": true
+    },
+    {
+      "name": "partial appendCommit same operation recovery",
+      "passed": true
+    },
+    {
+      "name": "971 collision in requests refuses before write",
+      "passed": true
+    },
+    {
+      "name": "971 collision in requestEvents refuses before write",
+      "passed": true
+    },
+    {
+      "name": "971 collision in existing Registry refuses",
+      "passed": true
+    },
+    {
+      "name": "wrong base revision refuses",
+      "passed": true
+    },
+    {
+      "name": "guard refusal produces no writes",
+      "passed": true
+    },
+    {
+      "name": "prior unrelated pending intent blocks new initialization",
+      "passed": true
+    }
+  ],
+  "formal_uat_delta": 0
+}

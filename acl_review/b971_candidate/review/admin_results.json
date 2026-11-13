@@ -1,0 +1,64 @@
+{
+  "scope": "OFFLINE_INDEPENDENT_ADMIN_FAULT_TEST_SYNTHETIC_DOUBLES",
+  "source_sha256": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+  "passed": 14,
+  "results": [
+    {
+      "name": "enable only changes nonsecret config and sets60min TTL",
+      "passed": true
+    },
+    {
+      "name": "check mode no property writes",
+      "passed": true
+    },
+    {
+      "name": "disable closes gate",
+      "passed": true
+    },
+    {
+      "name": "lock refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "wrong script refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "wrong sheet refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "notifications active refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "backup not verified refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "ACL mismatch refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "prefix mismatch refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "revision mismatch refusal has no config write",
+      "passed": true
+    },
+    {
+      "name": "write/readback failure restores AUTH_CONNECT {\"readbackFail\":true}",
+      "passed": true
+    },
+    {
+      "name": "write/readback failure restores AUTH_CONNECT {\"writeThrow\":true}",
+      "passed": true
+    },
+    {
+      "name": "TTL expiration refuses scope",
+      "passed": true
+    }
+  ],
+  "formal_uat_delta": 0
+}

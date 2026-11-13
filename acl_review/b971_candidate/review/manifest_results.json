@@ -1,0 +1,160 @@
+{
+  "scope": "OFFLINE_MANIFEST_VALIDATOR_AND_VERSION_SEQUENCE_ONLY",
+  "passed": 12,
+  "source_sha256": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+  "fixture_sha256": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d",
+  "results": [
+    {
+      "name": "30日CRFの31日イベント拒否",
+      "uat_ids": [
+        "POST-02"
+      ],
+      "ok": false,
+      "internal_errors": [
+        "COMPLICATION_WINDOW"
+      ],
+      "warnings": [],
+      "before_version": 0,
+      "after_version": 0
+    },
+    {
+      "name": "30日イベント初回保存",
+      "uat_ids": [
+        "POST-01",
+        "POST-03"
+      ],
+      "ok": true,
+      "internal_errors": [],
+      "warnings": [],
+      "before_version": 0,
+      "after_version": 1
+    },
+    {
+      "name": "病理理由欠落拒否",
+      "uat_ids": [
+        "POST-04"
+      ],
+      "ok": false,
+      "internal_errors": [
+        "REQUIRED:eval_failed_reason"
+      ],
+      "warnings": [],
+      "before_version": 1,
+      "after_version": 1
+    },
+    {
+      "name": "病理理由復元と数値0保持",
+      "uat_ids": [
+        "POST-04"
+      ],
+      "ok": true,
+      "internal_errors": [],
+      "warnings": [],
+      "before_version": 1,
+      "after_version": 2
+    },
+    {
+      "name": "旧30日参照版拒否",
+      "uat_ids": [
+        "POST-06"
+      ],
+      "ok": false,
+      "internal_errors": [
+        "SOURCE_STALE_OR_MISMATCH"
+      ],
+      "warnings": [],
+      "before_version": 0,
+      "after_version": 0
+    },
+    {
+      "name": "正しい参照版と31日イベント保存",
+      "uat_ids": [
+        "POST-02",
+        "POST-06"
+      ],
+      "ok": true,
+      "internal_errors": [],
+      "warnings": [],
+      "before_version": 0,
+      "after_version": 1
+    },
+    {
+      "name": "再発詳細欠落拒否",
+      "uat_ids": [
+        "FUP-02"
+      ],
+      "ok": false,
+      "internal_errors": [
+        "REQUIRED:intraluminal_recurrence_date",
+        "REQUIRED:intraluminal_sites",
+        "REQUIRED:intraluminal_treatment"
+      ],
+      "warnings": [],
+      "before_version": 0,
+      "after_version": 0
+    },
+    {
+      "name": "再発情報復元と保存",
+      "uat_ids": [
+        "FUP-01",
+        "FUP-02"
+      ],
+      "ok": true,
+      "internal_errors": [],
+      "warnings": [],
+      "before_version": 0,
+      "after_version": 1
+    },
+    {
+      "name": "評価日後のPD拒否",
+      "uat_ids": [
+        "FUP-02"
+      ],
+      "ok": false,
+      "internal_errors": [
+        "ORDER:progression_date:visit_date"
+      ],
+      "warnings": [],
+      "before_version": 1,
+      "after_version": 1
+    },
+    {
+      "name": "PD日復元と保存",
+      "uat_ids": [
+        "FUP-01",
+        "FUP-02"
+      ],
+      "ok": true,
+      "internal_errors": [],
+      "warnings": [],
+      "before_version": 1,
+      "after_version": 2
+    },
+    {
+      "name": "死亡原因欠落拒否",
+      "uat_ids": [
+        "FUP-02"
+      ],
+      "ok": false,
+      "internal_errors": [
+        "REQUIRED:death_cause"
+      ],
+      "warnings": [],
+      "before_version": 2,
+      "after_version": 2
+    },
+    {
+      "name": "死亡情報復元と保存",
+      "uat_ids": [
+        "FUP-01",
+        "FUP-02"
+      ],
+      "ok": true,
+      "internal_errors": [],
+      "warnings": [],
+      "before_version": 2,
+      "after_version": 3
+    }
+  ],
+  "formal_uat_delta": 0
+}

@@ -1,0 +1,8 @@
+{
+  "scope": "OFFLINE_EXACT_FUNCTION_AST_AND_UI_DOUBLES",
+  "passed": 13,
+  "failed": 0,
+  "source_sha256": "669719d5a63f8c0dda4dc5bb3b5a64297442e07c35db509283d2e3a5bfa8898f",
+  "entry_sha256": "5e5bc2f646769ed7b4fa227a24981a1b82755de286b7bcc7db76b132b3c07080",
+  "formal_uat_delta": 0
+}

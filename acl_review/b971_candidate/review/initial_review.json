@@ -1,0 +1,29 @@
+{
+  "review_type": "INDEPENDENT_TECHNICAL_SAFETY_REVIEW_NOT_FORMAL_QA",
+  "scope": "Existing v5 guard, editor helper, frontend; proposed TEST01/JUOG-971 extension",
+  "status": "CANDIDATE_REQUIRED_BEFORE_APPROVAL",
+  "findings": [
+    "v5 scope, runtime config, frontend CASE and fixture hashes exclusively pin JUOG-970. A generic two-case allowlist would permit new 970 writes, contradicting the latest PI restriction.",
+    "Old negative helper pins the pre-negative 58-row journal. Current baseline must be freshly read and pinned, not replaced merely to bypass a mismatch.",
+    "Fixture970 initialization assumes an empty baseline and revision0. A global text substitution is unsafe for971 in the populated journal.",
+    "New971 initialization must use the existing append-only domain service, fixed setup operation ID, actual setup timestamp, fixed synthetic business dates, exclusive ScriptLock, and before/after verification of every pre-existing table/record.",
+    "Mode enable must require confirmed backup, reviewed exact source/deployment, actual review evidence reference, unchanged verified one-person facility ACL, and current journal baseline. Readiness must have no side effects.",
+    "Request preparation, execution, status and read paths must all apply the same971-only scope and reauthorize saved operations. No legacy direct-write path or actor spoofing.",
+    "Existing session signing, replay checks, per-physical-write expiry and ACL rechecks must remain byte-identical outside the minimal approved scope change.",
+    "Failure or ambiguous acknowledgement must halt; retain operation_id and query status. Do not generate a new operation to hide an uncertain save. Return to AUTH_CONNECT and verify readback after the batch."
+  ],
+  "required_tests": [
+    "970 write denied;971 allowed only in TEST01 with exact fixed record keys;972 and other facility denied",
+    "unapproved role/principal/expired ACL refused; schema malformed refused",
+    "scope/config/fixture hash/deployment/journal mismatch refuses activation without mutation",
+    "971 collision in Registry, drafts, CRF records, pending or committed intents/requests prevents initialization",
+    "971 setup appends exactly one fixed transaction and preserves all970 content; replay idempotent; interrupted setup does not start second operation",
+    "unexpected action/visit/record_key/reporter email/caller actor fields refused",
+    "prepared old970 request cannot execute while971 scope is active",
+    "prepare expiry window/session revocation/signature replay regression retained",
+    "enable readback failure restores restrictive state; disable failure never restores enabled config",
+    "clinical refusal keeps CRF versions/business revision/audit unchanged while expected request events may append"
+  ],
+  "live_mutations_performed": false,
+  "formal_uat_delta": 0
+}

@@ -1,0 +1,7 @@
+{
+  "base_gas_sha256": "99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5",
+  "candidate_gas_sha256": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+  "fixture_sha256": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d",
+  "state": "CANDIDATE_NOT_DEPLOYED_REVIEW_PENDING",
+  "operations": 12
+}

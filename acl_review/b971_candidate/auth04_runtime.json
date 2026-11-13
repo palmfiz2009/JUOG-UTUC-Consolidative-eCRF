@@ -1,0 +1,17 @@
+{
+  "enabled": false,
+  "stage": "AUTH04_APPROVED",
+  "fixture_id": "JUOG-971",
+  "facility_code": "TEST01",
+  "fixture_sha256": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d",
+  "url": "https://script.google.com/macros/s/AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ/exec",
+  "session_store_generation": "d72bcf33-423d-4c4d-862d-2e2d69bc3edf",
+  "approval_ref": "PI_B971_CONDITIONAL_EXECUTION_20261113",
+  "review_ref": "",
+  "prerequisites_verified": false,
+  "notifications_disabled": true,
+  "write_actions": [
+    "save_draft",
+    "save_crf"
+  ]
+}

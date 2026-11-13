@@ -1,0 +1,100 @@
+{
+  "scope": "OFFLINE_INDEPENDENT_SCOPE_TEST_ONLY",
+  "source_sha256": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+  "passed": 23,
+  "results": [
+    {
+      "name": "971 perioperative_30d save",
+      "allowed": true
+    },
+    {
+      "name": "971 day90 save",
+      "allowed": true
+    },
+    {
+      "name": "971 followup save",
+      "allowed": true
+    },
+    {
+      "name": "JUOG-970 save denied",
+      "allowed": false
+    },
+    {
+      "name": "JUOG-972 save denied",
+      "allowed": false
+    },
+    {
+      "name": "JUOG-001 save denied",
+      "allowed": false
+    },
+    {
+      "name": " save denied",
+      "allowed": false
+    },
+    {
+      "name": "foreign facility denied",
+      "allowed": false
+    },
+    {
+      "name": "wrong visit denied",
+      "allowed": false
+    },
+    {
+      "name": "mismatched key denied",
+      "allowed": false
+    },
+    {
+      "name": "real-looking reporter denied",
+      "allowed": false
+    },
+    {
+      "name": "void_registration denied",
+      "allowed": false
+    },
+    {
+      "name": "finalize_mdt denied",
+      "allowed": false
+    },
+    {
+      "name": "submit_screening denied",
+      "allowed": false
+    },
+    {
+      "name": "delete_draft denied",
+      "allowed": false
+    },
+    {
+      "name": "reset_draft_code denied",
+      "allowed": false
+    },
+    {
+      "name": "prepare971",
+      "allowed": true
+    },
+    {
+      "name": "prepare970 denied",
+      "allowed": false
+    },
+    {
+      "name": "context971",
+      "allowed": true
+    },
+    {
+      "name": "context970 denied",
+      "allowed": false
+    },
+    {
+      "name": "direct save denied",
+      "allowed": false
+    },
+    {
+      "name": "execute extra fields denied",
+      "allowed": false
+    },
+    {
+      "name": "status empty id denied",
+      "allowed": false
+    }
+  ],
+  "formal_uat_delta": 0
+}

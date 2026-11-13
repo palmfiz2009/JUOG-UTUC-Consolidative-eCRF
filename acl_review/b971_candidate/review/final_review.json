@@ -1,0 +1,62 @@
+{
+  "review_ref": "B971_INDEPENDENT_REVIEW_20261113",
+  "reviewer": "independent b971_independent_review AI agent",
+  "review_type": "INDEPENDENT_TECHNICAL_SAFETY_REVIEW_NOT_FORMAL_THIRD_PARTY_QA",
+  "decision": "APPROVED_WITH_LIVE_PRECONDITIONS",
+  "reviewed_at_utc": "2026-11-13T04:02:14.567475+00:00",
+  "reviewed_source_sha256": {
+    "bundle_candidate.gs": "1ccce6dc1ce67a6147f5f571c1603ef191a8afafd0d77d20d2c85d7595a3ebea",
+    "uat_b971_live.py": "669719d5a63f8c0dda4dc5bb3b5a64297442e07c35db509283d2e3a5bfa8898f",
+    "streamlit_app.py": "5e5bc2f646769ed7b4fa227a24981a1b82755de286b7bcc7db76b132b3c07080",
+    "auth04_config.py": "83319243b4238524ce0ca4691421e4789e61e25b45d076c9e9b346c08f5dd4fc",
+    "auth04_runtime.json": "edec3c0b55f19e821e34d848de98463e3d1706d73e5a720521328f20e4c7a691",
+    "uat_auth04_fixture.json": "0bd57252f46b6ac98c1e11d7e7bf983e91ef240ff3c0426c06b9b7bdf0f2e72d",
+    "provision971.gs": "6dd00e1b0dd51d09da5edb1f3e0f608971661c4bb4b01465751b29e9620a4522"
+  },
+  "offline_checks": {
+    "scope": 23,
+    "populated_provisioning_and_recovery": 10,
+    "manifest_validator_and_version_sequence": 12,
+    "admin_config_faults_and_ttl": 14,
+    "frontend": 13,
+    "total": 72
+  },
+  "resolved_findings": [
+    {
+      "finding": "Cached UNFINISHED status survived recovery exception and could permit another execute without fresh status inquiry",
+      "resolution": "Root clears cached status and operation binding before query and execute; independent tests confirm no replay after timeout until fresh status."
+    },
+    {
+      "finding": "Expected-negative FAILED status after ambiguous execute could remain unreconciled",
+      "resolution": "Root handles exact expected FAILED status through history-invariance checks and clears pending only after successful reconciliation."
+    }
+  ],
+  "code_review": [
+    "New web scope is971-only;970,otherfacility,otherCRF/visit,admin/deletion/directwrite routes rejected.",
+    "Principal fingerprint, one facility role TEST01, OIDC bridge, replay and session expiry checks preserved. Added finite experimentTTLchecked both before and after remote per-write checks.",
+    "Populated revision7 setup appends fixed revision8 only; complete prior business view/history invariant, setup actor explicitly administrative not OIDC.",
+    "Preparation/execute/status and source-version manifest remain fixed. Clinical validator unchanged from v5.",
+    "No secret values in configs/fixture/review files; runtime disabled by default; frontend entry source SHA pinned.",
+    "Configuration write/readback faults restore AUTH_CONNECT where possible and otherwise report state unknown/stop."
+  ],
+  "live_preconditions": [
+    "Verify editor and deployed version correspond exactly to reviewed GAS SHA; proof is not supplied by admin helper itself.",
+    "Before provisioning confirm source66row baseline SHA8441de491fb974555aa0e63f4e690974c6c4af4f890493e1ed8af51b96609b24, backup/restore match,971unused and reviewed ACL1facilityTEST01. Parent reports live confirmation; this reviewer performed no live reads.",
+    "Store review record at fixed review_ref before setting auth04ScopeReviewed or frontend prerequisites_verified. qaApproved remains legacy technical execution gate, not formal QA.",
+    "Only runtime.enabled/prerequisites_verified/review_ref may be switched after preconditions; all fixed pins unchanged; review_ref identifies this completed record.",
+    "Verify fixture initialization readback revision8 and970/fullprior-view invariance before enabling B971.",
+    "Use actual regular Google OIDC login; no synthetic identity, credential recreation or ACL expansion.",
+    "Perform supervised sequential scenarios with independent journal/CRF/audit comparisons. On uncertain status query sameoperation only; no newprepare.",
+    "Return GAS and frontend to AUTH_CONNECT/disabled after batch or unexpected permission/write. TTL expiration denies business but does not itself write AUTH_CONNECT property.",
+    "Do not classify old970 synthetic privacy marker retained in backup as newly leaked971 marker; preserve970 unchanged and report historic legacy fixture separately."
+  ],
+  "limitations": [
+    "Offline clocks and mock Sheets are not live UAT proof. Admin fault tests intentionally use synthetic ACL/hash doubles, not real principal values.",
+    "This review is not formal independent QA, PI signature, release approval or clinical validation.",
+    "60-minute real-time session boundary is not proven by experimentTTL or these tests.",
+    "Auth04 free-text unlabelled identifier limits and all hosted logs remain separate evidence gaps.",
+    "No guaranteed throughput under15second assertion; interrupted writes must retain existing operation and fail closed."
+  ],
+  "external_mutations_by_reviewer": false,
+  "formal_uat_delta": 0
+}

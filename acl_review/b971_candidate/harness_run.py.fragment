@@ -1,0 +1,84 @@
+def b971_history(ui,p):
+    request={k:p[k] for k in ('registration_id','facility_code','crf_type','visit','record_key')}
+    r=call(ui,'read_crf',request)
+    records=r.get('result',{}).get('records')
+    if r.get('ok') is not True or type(records) is not list:raise PermissionError('READ_NOT_CONFIRMED')
+    if any(x.get('record_key')!=p['record_key'] or x.get('payload',{}).get('registration_id')!=CASE for x in records):raise PermissionError('WRONG_RECORDS')
+    return sorted(records,key=lambda x:x['record_version'])
+
+def b971_finish(ui,step,result,before):
+    p=step['payload'];records=b971_history(ui,p)
+    if step['expected_error']:
+        if result.get('ok') is not False or result.get('error')!=step['expected_error'] or result.get('state')!='FAILED':raise PermissionError('REJECTION_NOT_CONFIRMED')
+        if records!=before:raise PermissionError('REJECTED_WRITE_CHANGED_RECORDS')
+    else:
+        if result.get('ok') is not True or result.get('state')!='SAVED':raise PermissionError('SAVE_NOT_CONFIRMED')
+        prior=[r for r in records if r['record_version']<=p['expected_record_version']]
+        if prior!=before:raise PermissionError('OLD_VERSION_CHANGED')
+        latest=[r for r in records if r['record_version']==p['expected_record_version']+1]
+        if len(records)!=len(before)+1 or len(latest)!=1 or latest[0]['payload']!=p:raise PermissionError('PAYLOAD_MISMATCH')
+    ui.session_state.setdefault('b971_results',[]).append({'check':step['name'],'matched':True,**summarize(result)})
+    ui.session_state['b971_step']=ui.session_state.get('b971_step',0)+1
+    ui.session_state.pop('b971_before',None);ui.session_state.pop('b971_active_step',None)
+
+def run():
+    st.set_page_config(page_title='JUOG B971 isolated',layout='centered')
+    st.title('B群 TEST01/JUOG-971 限定実機試験')
+    st.caption('完全架空症例。970への書込みなし。生の応答・本人識別子・署名・入力マーカーは表示しません。')
+    if not st.user.is_logged_in:
+        if st.button('Googleでログイン'):st.login('google')
+        st.stop()
+    try:native_context(st)
+    except Exception:
+        st.error('対象版・承認・正規認証を確認できません。送信していません。')
+        iat,exp=st.user.get('iat'),st.user.get('exp')
+        if type(iat) is int and type(exp) is int and int(time.time())>=min(iat+3600,exp):
+            if st.button('期限切れのログインを終了して再認証'):st.logout()
+        st.stop()
+    if st.session_state.get('b971_results'):st.table(st.session_state['b971_results'])
+    if st.session_state.get('auth04_execution_diagnostics'):st.table(st.session_state['auth04_execution_diagnostics'])
+    if st.session_state.get('auth04_preparation_uncertain'):
+        st.error('prepare結果不確定。台帳照合まで停止。再prepareしません。');st.stop()
+    op=st.session_state.get('auth04_pending')
+    if op:
+        st.warning('未確定の同じoperationを照会してから復旧します。新規操作は禁止。')
+        if st.button('同じoperationの状態照会'):
+            try:
+                st.session_state.pop('b971_pending_status',None);st.session_state.pop('b971_pending_status_op',None)
+                status=call(st,'request_status',{'operation_id':op});record_execution_diagnostic(st,'RECOVERY_STATUS',status)
+                st.session_state['b971_pending_status']=status;st.session_state['b971_pending_status_op']=op
+                if status.get('ok') is True and status.get('state')=='SAVED':
+                    b971_finish(st,st.session_state['b971_active_step'],status,st.session_state['b971_before']);st.session_state['auth04_pending']=None;st.session_state['b971_halted']=False
+                if status.get('ok') is True and status.get('state')=='FAILED' and st.session_state['b971_active_step']['expected_error']:
+                    b971_finish(st,st.session_state['b971_active_step'],dict(status,ok=False),st.session_state['b971_before']);st.session_state['auth04_pending']=None;st.session_state['b971_halted']=False
+                st.json(summarize(status))
+            except Exception:st.error('照会未確認。新規送信なし。')
+        status=st.session_state.get('b971_pending_status',{})
+        if st.session_state.get('b971_pending_status_op')==op and status.get('ok') is True and status.get('state')=='UNFINISHED' and status.get('phase')=='AUDIT_OR_COMMIT_PENDING':
+            if st.button('確認済み同一operationを一度だけ復旧'):
+                try:
+                    st.session_state.pop('b971_pending_status',None);st.session_state.pop('b971_pending_status_op',None)
+                    result=call(st,'execute_request',{'operation_id':op});record_execution_diagnostic(st,'RECOVERY_EXECUTE',result)
+                    status=call(st,'request_status',{'operation_id':op});record_execution_diagnostic(st,'RECOVERY_STATUS',status)
+                    st.session_state.pop('b971_pending_status',None)
+                    if status.get('ok') is not True or status.get('state')!='SAVED':raise PermissionError('RECOVERY_NOT_CONFIRMED')
+                    b971_finish(st,st.session_state['b971_active_step'],status,st.session_state['b971_before']);st.session_state['auth04_pending']=None;st.session_state['b971_halted']=False
+                    st.success('同一operation復旧と読取照合済み')
+                except Exception:st.error('復旧未確認。新規送信なし。')
+        st.stop()
+    if st.session_state.get('b971_halted'):
+        st.error('不一致で停止。台帳を照合してください。');st.stop()
+    steps=json.loads(FIXTURE_PATH.read_text())['steps'];index=st.session_state.get('b971_step',0)
+    st.write('検証進捗：'+str(index)+' / '+str(len(steps)))
+    if index<len(steps):
+        step=steps[index]
+        if st.button('次の1件：'+step['name']):
+            try:
+                before=b971_history(st,step['payload']);st.session_state['b971_before']=before;st.session_state['b971_active_step']=step
+                result=write_once(st,'save_crf',copy.deepcopy(step['payload']))
+                b971_finish(st,step,result,before);st.success('保存/拒否と旧版/読取の照合が一致しました。')
+            except Exception:
+                st.session_state['b971_halted']=True;st.error('通信または期待結果が不確定。新規送信を停止しました。')
+    else:
+        st.success('B群の12保存/拒否シナリオ照合済み。業務監査の別照合と正式QAは未完です。')
+    st.stop()
