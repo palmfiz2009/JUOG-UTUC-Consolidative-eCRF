@@ -14,10 +14,23 @@ def gate(cfg,now):
         raise PermissionError('READ_PROBE_NOT_APPROVED')
 
 def probe(native_provider,transport,cfg,clock=time.time):
+    bound_identity=None
     def call(action,payload):
+        nonlocal bound_identity
         gate(cfg,int(clock()))
         if action not in ('list_requests','read_crf','request_status'):raise PermissionError('READ_SCOPE')
-        result=transport(signed_request(native_provider(),action,payload))
+        native=native_provider()
+        envelope=signed_request(native,action,payload)
+        # The signer validates each native context; also prohibit mixing actors
+        # across this multi-request read. Keep identity in memory, never output it.
+        try:
+            identity=(native.user['iss'],native.user['sub'],native.secrets['juog_identity_bridge']['session_environment'])
+        except (AttributeError,KeyError,TypeError):
+            raise PermissionError('PROBE_IDENTITY_INVALID') from None
+        if any(not isinstance(value,str) or not value for value in identity):raise PermissionError('PROBE_IDENTITY_INVALID')
+        if bound_identity is None:bound_identity=identity
+        elif identity!=bound_identity:raise PermissionError('PROBE_PRINCIPAL_CHANGED')
+        result=transport(envelope)
         gate(cfg,int(clock()))
         if not isinstance(result,dict) or result.get('ok') is not True:raise PermissionError('READ_NOT_CONFIRMED')
         return result

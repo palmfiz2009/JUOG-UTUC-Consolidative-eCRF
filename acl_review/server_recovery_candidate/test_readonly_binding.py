@@ -4,6 +4,7 @@ from unittest.mock import patch
 P=Path(__file__).parent
 sys.path[:0]=[str(P),str(P.parent/'canonical_v9_integration')]
 import readonly_probe as m
+from test_bridge import native
 
 class Binding(unittest.TestCase):
  def run_probe(self,requests,records):
@@ -17,7 +18,7 @@ class Binding(unittest.TestCase):
     return dict(ok=True,action='save_crf',operation_id=q['operation_id'],state=q['state'],phase=q['phase'])
    return dict(ok=True,read_only=True,result=dict(ok=True,records=records))
   with patch.object(m,'signed_request',lambda n,a,p:(a,p)):
-   return m.probe(lambda:None,transport,cfg,lambda:1001),calls
+   return m.probe(lambda:native,transport,cfg,lambda:1001),calls
  def data(self):
   q=dict(operation_id='fake-op',submission_id='fake-sub',state='SAVED',phase='COMMITTED',expected_record_version=0,content_sha256='a'*64)
   r=dict(record_key=m.SCOPE['record_key'],record_version=1,submission_id='fake-sub',payload=dict(registration_id='JUOG-971',facility_code='TEST01',crf_type='perioperative_30d',visit='30d',clinical='FICTIONAL_PRIVATE_MARKER'))

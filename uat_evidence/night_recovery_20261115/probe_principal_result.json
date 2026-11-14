@@ -1,0 +1,37 @@
+{
+  "base_commit": "8d51bca66548ad7739d481946f3df49379cd14ee",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Readonly probe re-evaluated native context for each signed call without binding principal across the list/status/read sequence. A changed subject could issue the next signed request and combine results.",
+  "fix": "Bind issuer, subject and environment in memory after native signer validation; reject any changed identity before transport. No identity emitted. Existing approval, expiry, scope and signature controls retained.",
+  "reproduction": {
+    "new_tests": 2,
+    "before_fix_failures": 1,
+    "after_fix_failures": 0,
+    "fixture": "Synthetic native contexts and ephemeral local test signing key; no real identity, no live transport."
+  },
+  "regression": {
+    "server_recovery_tests": 35,
+    "canonical_save_tests": 17,
+    "all_passed": true,
+    "warning": "Existing canonical subprocess harness ResourceWarning remains."
+  },
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/readonly_probe.py": "3435507ebd053e000196b854f81c908568aad62a4fa6b217948b6334b08bd504",
+    "acl_review/server_recovery_candidate/test_probe_principal.py": "68ddbf55d7efefc2aba75572e74bf4433b5d12ee97c009e5b8e62921f017d6fb",
+    "acl_review/server_recovery_candidate/test_readonly_probe.py": "cee1e7bc0620abf435de8160ebac582f147c910ef4f4b66b4c402552a921e3bc",
+    "acl_review/server_recovery_candidate/test_readonly_binding.py": "2011a4a0c601c59e9d4ca84cb7247da890da3f1c9ce0dfdae00f3d7a648b3dda"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Candidate only; not deployed or independently reviewed.",
+    "No live configuration, key, authentication, ACL or business operations; live 165 rows not accessed.",
+    "Old-key signature rejection, live recovery, durable sixty-minute observation and formal QA remain incomplete."
+  ],
+  "next": "Include probe principal binding in independent review of recovery candidates before any approved live read. Do not clear AUTH_CONNECT_NOT_APPROVED."
+}
