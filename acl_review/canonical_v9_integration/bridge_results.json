@@ -1,0 +1,8 @@
+{
+  "mode": "OFFLINE_SYNTHETIC_CLAIMS_NOT_REAL_OIDC_LOGIN",
+  "tests": 12,
+  "passed": true,
+  "secrets_or_envelopes_saved": false,
+  "business_network_calls": 0,
+  "formal_pass_delta": 0
+}

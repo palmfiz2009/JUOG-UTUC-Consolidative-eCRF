@@ -1,0 +1,22 @@
+{
+  "mode": "OFFLINE_ACTUAL_V9_DOMAIN_AND_LIFECYCLE_CANONICAL_PAYLOAD_IN_MEMORY_STORE",
+  "checks": [
+    "canonical first save and audit",
+    "same operation id reexecution does not duplicate",
+    "correction v2 keeps v1 and matching audit",
+    "read latest through actual domain route",
+    "stale version has no business write",
+    "missing correction reason has no business write",
+    "foreign facility denied before prepare",
+    "identifier rejected before durable request",
+    "actual draft save and ownership",
+    "actual draft read retains zero",
+    "different same-facility owner denied"
+  ],
+  "passed": true,
+  "count": 11,
+  "network_calls": 0,
+  "real_oidc": false,
+  "live_draft_restore_tested": false,
+  "formal_pass_delta": 0
+}

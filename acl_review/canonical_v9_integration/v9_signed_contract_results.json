@@ -1,0 +1,18 @@
+{
+  "mode": "OFFLINE_ACTUAL_PINNED_V9_WITH_SYNTHETIC_SHEETS_CLOCK_AND_IDENTITY",
+  "checks": [
+    "canonical Python envelope accepted by pinned V9 decoder but business denied",
+    "same canonical signature replay denied",
+    "context approved for exact facility",
+    "unregistered principal rejected",
+    "wrong role rejected",
+    "other facility rejected",
+    "revocation rejects already signed context",
+    "expired envelope rejected",
+    "business journal unchanged"
+  ],
+  "passed": true,
+  "count": 9,
+  "business_network_calls": 0,
+  "formal_pass_delta": 0
+}

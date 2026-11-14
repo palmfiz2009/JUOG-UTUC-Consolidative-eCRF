@@ -1,0 +1,69 @@
+{
+  "base_canonical_commit": "703ffd614a9ccdfa692bb28131856a3c4cbe79c6",
+  "isolated_frontend_commit": "50d607ad8f4a235d5915039ff1068ddc88b62bed",
+  "frontend_branch": "uat-fixture-isolated-20261109",
+  "gas_version": 9,
+  "gas_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+  "file_sha256": {
+    "02_perioperative_30d_crf.py": "ed3f9518f3f0e2db1d23dd4a9479030b496966427b8b8e4934d943471850b421",
+    "juog_common.py": "f5a7d8f89b38a94ad93b5699fd4c62fd6be6d012e9d756b59e5557a296b0acac",
+    "canonical_v9_bridge.py": "f86abce824e40f86e3fa32e11c61d7f04625b3866ed683fca88751cd41a22d2d",
+    "streamlit_app.py": "c8e7dfd42bca326d949b524d5e94406fce086f692741c5ac3e3f3ac2088aacdb"
+  },
+  "independent_technical_review": {
+    "reviewer": "review_session",
+    "scope": "display and signed preview only",
+    "major_blockers": 0,
+    "reexecuted_bridge_tests": 12,
+    "reexecuted_pinned_v9_signature_conditions": 9,
+    "reexecuted_form_v9_validator": true,
+    "formal_qa": false
+  },
+  "entry_regression": {
+    "tests": 8,
+    "passed": true
+  },
+  "runtime_business_http_implemented": false,
+  "gas_config_modified": false,
+  "acl_modified": false,
+  "business_writes": 0,
+  "live_state": {
+    "prior_session_expired": true,
+    "expired_session_logged_out": true,
+    "awaiting_regular_google_account_choice": true,
+    "canonical_form_live_display_confirmed": false,
+    "preview_live_confirmed": false,
+    "live_journal_fresh_readback_this_turn": false
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "delta": 0
+  },
+  "remaining_live_conditions": [
+    "Regular OIDC login and fresh TEST01 ui_context",
+    "Rendered canonical form and non-sending preview evidence",
+    "Fresh journal/backup readback for preservation evidence",
+    "Separate limited permission before any business HTTP",
+    "Transport response adapter must bind authenticated read_crf record_version and unwrap result for draft restore before enabling save"
+  ],
+  "pcr_protocol": {
+    "source": "2026-09-16 protocol section 3.3(5)",
+    "definition": "ypT0N0 or ypT0Nx; node assessment requires ypN0",
+    "unresolved": "ypNX unevaluable versus no dissection requires PI medical interpretation; no definition changed"
+  },
+  "privacy_limits": [
+    "Unlabelled free text can remain undetected",
+    "Native Sheets/XLSX and historical backups are not sanitized export routes",
+    "No new full live HTTP/host/GAS log coverage",
+    "Old append-only history preserved"
+  ],
+  "uat_mapping": {
+    "POST-03": "Canonical form with surgery unselected distinct from none; offline rendering regression; live canonical authentication pending",
+    "POST-04": "Canonical build_submission used by preview and existing save branch; pCR branches tested offline; pCR live fixture remains absent",
+    "POST-06": "Actual pinned V9 lifecycle rejected stale version and missing correction reason; latter VALIDATION_FAILED remains formal contract/QA interpretation",
+    "AUTH-04": "Actual canonical privacy rejection and legacy read projection offline; live log/export/history access gaps remain"
+  }
+}

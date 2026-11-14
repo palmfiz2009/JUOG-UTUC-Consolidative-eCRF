@@ -1,0 +1,10 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert/strict'),crypto=require('crypto');
+const source=fs.readFileSync(__dirname+'/../b971_candidate/bundle_prepare_view_candidate.gs','utf8');
+assert.equal(crypto.createHash('sha256').update(source).digest('hex'),'6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6');
+const x=vm.createContext({console:{log:()=>{}},Date,JSON,Object,Array,String,Number,Error,Math,Set});vm.runInContext(source,x);
+const op=JSON.parse(fs.readFileSync(0,'utf8'));
+x.juogAuth04Operation_(op);
+const result=x.validateClinicalV3(op.payload,'2026-11-14');
+const out={mode:'ACTUAL_PINNED_V9_VALIDATOR_CANONICAL_FORM_PAYLOAD_NO_NETWORK',result};
+fs.writeFileSync(__dirname+'/v9_validator_results.json',JSON.stringify(out,null,2)+'\n');console.log(JSON.stringify(out));
+assert.equal(result.ok,true);

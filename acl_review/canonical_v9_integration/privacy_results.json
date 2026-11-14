@@ -1,0 +1,13 @@
+{
+  "mode": "OFFLINE_PINNED_COMMON_ON_EXISTING_PRIVATE_SNAPSHOT",
+  "legacy_drafts_with_marker": 1,
+  "sanitized_projection_without_marker": 1,
+  "original_snapshot_unchanged": true,
+  "raw_values_exported": false,
+  "capture_and_restore_preserve_age_birth_month_clinical_date_zero": true,
+  "structured_nested_and_labelled_identifier_removed": true,
+  "unlabelled_name_detection_limit_remains": true,
+  "native_sheets_xlsx_is_not_sanitized": true,
+  "live_read_export_route_verified": false,
+  "formal_pass_delta": 0
+}

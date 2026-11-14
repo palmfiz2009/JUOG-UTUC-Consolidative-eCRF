@@ -1,0 +1,57 @@
+{
+  "mode": "OFFLINE_REAL_STREAMLIT_CANONICAL_SOURCE_AND_SAVE_DATA_CONSTRUCTOR",
+  "conditions": [
+    {
+      "condition": "unselected surgery not N/A and required",
+      "pass": true
+    },
+    {
+      "condition": "unselected dissection cannot yield pCR",
+      "pass": true
+    },
+    {
+      "condition": "zero retained in actual save-data constructor",
+      "pass": true
+    },
+    {
+      "condition": "explicit no dissection preserves ypT0Nx pCR",
+      "pass": true
+    },
+    {
+      "condition": "ypT0N0 pCR payload retained",
+      "pass": true
+    },
+    {
+      "condition": "ypT0N1 not pCR",
+      "pass": true
+    },
+    {
+      "condition": "unevaluable reason conditionally required",
+      "pass": true
+    },
+    {
+      "condition": "reason preserved in actual save-data constructor",
+      "pass": true
+    },
+    {
+      "condition": "day31 rejected in canonical validation",
+      "pass": true
+    },
+    {
+      "condition": "day30 clears boundary error",
+      "pass": true
+    },
+    {
+      "condition": "explicit no surgery serializes empty pathology",
+      "pass": true
+    },
+    {
+      "condition": "no actual business network",
+      "pass": true
+    }
+  ],
+  "live_save_performed": false,
+  "pCR_live_fixture_test": false,
+  "source_sha256": "ed3f9518f3f0e2db1d23dd4a9479030b496966427b8b8e4934d943471850b421",
+  "formal_pass_delta": 0
+}

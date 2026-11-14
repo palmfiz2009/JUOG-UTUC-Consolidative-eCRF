@@ -1,0 +1,9 @@
+{
+  "mode": "OFFLINE_REAL_STREAMLIT_WIDGETS_SYNTHETIC_IDENTITY",
+  "canonical_payload_validated_by_actual_v9": true,
+  "preview_button_signs_without_http": true,
+  "business_buttons_disabled": 3,
+  "missing": 0,
+  "errors": 0,
+  "formal_pass_delta": 0
+}
