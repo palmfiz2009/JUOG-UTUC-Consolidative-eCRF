@@ -12,7 +12,8 @@ function juogRecoverExpiredSessionHead(execute, approvalRef) {
   lock=LockService.getScriptLock();locked=lock.tryLock(1000);
   if(!locked)throw Error('BUSY');
   const p=PropertiesService.getScriptProperties();
-  const c=JSON.parse(p.getProperty('UNIFIED_ISOLATION_CONFIG'));
+  const configRaw=p.getProperty('UNIFIED_ISOLATION_CONFIG');
+  const c=JSON.parse(configRaw);
   if(!c||c.environment!=='ISOLATED_TEST'||c.spreadsheetId!==sheet||c.approvedSpreadsheetId!==sheet)throw Error('TARGET_MISMATCH');
   if(c.sessionExecutionStage!=='AUTH_CONNECT'||c.authConnectReviewApproved!==false)throw Error('STOP_NOT_CONFIRMED');
   if(c.sessionStoreGeneration!==generation||c.sessionPolicy!=='isolated_gas_session_b2'||c.sessionStoreApproved!==true)throw Error('SESSION_CONFIG_MISMATCH');
@@ -46,6 +47,10 @@ function juogRecoverExpiredSessionHead(execute, approvalRef) {
   if(Math.floor(Date.now()/1000)<maxDeadline)throw Error('UNEXPIRED_SESSIONS');
   const journal=SpreadsheetApp.openById(sheet).getSheetByName('D3_Journal').getDataRange().getValues();
   if(journal.length!==165||journal.some(r=>r.length!==6)||hash(JSON.stringify(journal))!=='1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797')throw Error('BUSINESS_BASELINE_CHANGED');
+  function verifyUnchanged(){
+   if(p.getProperty('UNIFIED_ISOLATION_CONFIG')!==configRaw||JSON.stringify(sh.getDataRange().getValues())!==JSON.stringify(rows)||JSON.stringify(SpreadsheetApp.openById(sheet).getSheetByName('D3_Journal').getDataRange().getValues())!==JSON.stringify(journal))throw Error('CONCURRENT_CHANGE');
+  }
+  verifyUnchanged();
   if(p.getProperty('JUOG_B2_HEAD_'+sheet)!==raw)throw Error('CONCURRENT_CHANGE');
   if(execute!==true){out.ok=true;out.result='DRY_RUN_READY';}else{
   if(approvalRef!=='PI_SESSION_HEAD_REPAIR_360_362')throw Error('REPAIR_APPROVAL_REQUIRED');
@@ -53,6 +58,7 @@ function juogRecoverExpiredSessionHead(execute, approvalRef) {
   writeAttempted=true;
   p.setProperty('JUOG_B2_HEAD_'+sheet,'362:'+chain);
   if(p.getProperty('JUOG_B2_HEAD_'+sheet)!=='362:'+chain)throw Error('WRITE_UNCERTAIN_KEEP_STOPPED');
+  verifyUnchanged();
   out.ok=true;out.result='HEAD_REPAIRED_AUTH_REMAINS_DISABLED';}
  }catch(e){
   const safe=['UNEXPECTED_STATE','SNAPSHOT_CHANGED','UNEXPIRED_SESSIONS','BUSINESS_BASELINE_CHANGED','CONCURRENT_CHANGE','REPAIR_APPROVAL_REQUIRED','WRITE_UNCERTAIN_KEEP_STOPPED','TARGET_MISMATCH','BUSY','STOP_NOT_CONFIRMED','SESSION_CONFIG_MISMATCH','SHEET_MISSING','STRUCTURE_INVALID','CHAIN_INVALID','EVENT_INVALID','DUPLICATE_OPEN','HEAD_FORMAT_INVALID'];
