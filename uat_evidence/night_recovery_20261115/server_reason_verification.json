@@ -1,0 +1,23 @@
+{
+  "base_commit": "15407fbfed099f63e06bd313d322d46a36e6c03c",
+  "mode": "OFFLINE_ACTUAL_GAS_LIFECYCLE_MEMORY_STORE",
+  "finding": "Existing validateClinicalV3 rejects non-string correction_reason before the coercive domain check. The prior suggestion that strict server typing required a patch was not confirmed. No server patch is needed for these tested inputs.",
+  "test_cases": 2,
+  "invalid_reason_values": 10,
+  "results": [
+    "All invalid values rejected through prepare/execute lifecycle without client preflight",
+    "CRF records, business revision and business audits unchanged on rejection",
+    "Valid correction preserves exact reason and old version; adds one audit"
+  ],
+  "source_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+  "live_calls": 0,
+  "deployed": false,
+  "formal_pass_delta": 0,
+  "remaining": [
+    "Old-key signature rejection and new-key live regression",
+    "Scoped recovery deployment and live read/write approval",
+    "Durable sixty-minute observation",
+    "Formal QA and remaining UAT evidence"
+  ],
+  "note": "Request journal/events may record rejected attempts and are distinct from business audits. No live 165-row remeasurement."
+}
