@@ -1,0 +1,155 @@
+Browser tab: 10, Title: "JUOG AUTH_CONNECT · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+0 AXWebArea JUOG AUTH_CONNECT · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
+	1 container
+		2 container streamlitApp
+			3 AXWebArea JUOG AUTH_CONNECT, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
+				4 container
+					5 container
+						6 link Description: Skip to main content, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#stMain
+						7 container
+							8 button Share
+							9 button favorite
+							10 button edit
+							11 button source
+							12 pop up button (collapsed) Description: Main menu, Secondary Actions: Expand
+						13 container stMain
+							14 heading JUOG 隔離認証接続, Value: 1, ID: juog
+								15 text JUOG 隔離認証接続
+								16 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog
+							17 text AUTH_CONNECT：業務保存は禁止されています。
+							18 container
+								19 checkbox (settable, integer) Description: 30日CRFの画面確認（保存・取得・送信は無効）, Value: 1
+								20 text 30日CRFの画面確認（保存・取得・送信は無効）
+							27 text TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。
+							28 text 完全架空入力による画面確認専用です。台帳照合・保存・下書き取得・通知は実行できません。
+							29 heading JUOG UTUC_Consolidative 周術期・術後30日CRF, Value: 1, ID: juog-utuc-consolidative-30-crf
+								30 text JUOG UTUC_Consolidative 周術期・術後30日CRF
+								31 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog-utuc-consolidative-30-crf
+							32 text 主要評価項目の手術関連合併症は『手術終了時〜術後30日目』で判定します。30日訪問自体は30日±14日を許容します。
+							33 button (disabled) 💾 仮保存
+								34 text 💾 仮保存
+							35 pop up button (collapsed) ↩ 再開, Secondary Actions: Expand
+								36 text ↩ 再開
+							37 text 1. 基本情報
+							38 container
+								39 text field (disabled) Description: 施設名*, Value: 架空施設（隔離UAT専用） / TEST01, ID: :r6:
+							40 container
+								41 text field (settable) Description: JUOG登録番号*, Value: JUOG-971, ID: :rc:
+							42 container
+								43 text field (settable) Description: 担当者メールアドレス*, Value: fictional@example.invalid, ID: :ri:
+							44 container
+								45 Description: 報告種別*, ID: react-aria3022413348-:ro:
+									46 container
+										47 radio button (settable, integer) Description: 初回報告, Value: 1
+										48 text 初回報告
+									49 container
+										50 radio button (settable, integer) Description: 訂正報告, Value: 0
+										51 text 訂正報告
+							52 container
+								53 Description: Consolidative surgeryの実施*, ID: react-aria3022413348-:r10:
+									54 container
+										55 radio button (settable, integer) Description: 実施した, Value: 0
+										56 text 実施した
+									57 container
+										58 radio button (settable, integer) Description: 実施しなかった, Value: 0
+										59 text 実施しなかった
+							60 text 2. 手術・入院経過
+							61 text Consolidative surgeryの実施有無を選択すると、必要な項目が表示されます。
+							62 text 3. 術後病理
+							63 text 手術実施有無が未選択のため、病理の適用可否は未確定です。
+							64 text 4. 術後30日評価
+							65 container
+								66 container Description: 30日評価日*, ID: react-aria3022413348-:r1a:
+									67 stepper Description: year, 30日評価日*, Value: 0, ID: react-aria3022413348-:r1f:
+									68 stepper Description: month, 30日評価日*, Value: 0, ID: react-aria3022413348-:r1j:
+									69 stepper Description: day, 30日評価日*, Value: 0, ID: react-aria3022413348-:r1n:
+								70 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
+							71 text 30日評価 血液検査（必須）
+							72 text 30日±14日の期間内で、術後30日目に最も近い採血結果を入力してください。
+							73 container
+								74 container Description: 30日評価に用いた採血日*, ID: react-aria3022413348-:r1r:
+									75 stepper Description: year, 30日評価に用いた採血日*, Value: 0, ID: react-aria3022413348-:r20:
+									76 stepper Description: month, 30日評価に用いた採血日*, Value: 0, ID: react-aria3022413348-:r24:
+									77 stepper Description: day, 30日評価に用いた採血日*, Value: 0, ID: react-aria3022413348-:r28:
+								78 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
+							79 text 数値を入力してください。未測定・欠測の項目は空欄で構いません。0 は実測値として保存されます。
+							80 container
+								81 text field (settable) Description: WBC (/μL), ID: :r2a:
+							82 container
+								83 text field (settable) Description: Neutro (%), ID: :r2g:
+							84 container
+								85 text field (settable) Description: Eosino (%), ID: :r2m:
+							86 container
+								87 text field (settable) Description: T-Bil (mg/dL), ID: :r40:
+							88 container
+								89 text field (settable) Description: ALT (U/L), ID: :r46:
+							90 container
+								91 text field (settable) Description: Cre (mg/dL), ID: :r4c:
+							92 container
+								93 text field (settable) Description: Na (mEq/L), ID: :r4i:
+							94 container
+								95 text field (settable) Description: CRP (mg/dL), ID: :r62:
+							96 container
+								97 text field (settable) Description: Hb (g/dL), ID: :r2s:
+							98 container
+								99 text field (settable) Description: Lympho (%), ID: :r32:
+							100 container
+								101 text field (settable) Description: Baso (%), ID: :r38:
+							102 container
+								103 text field (settable) Description: Alb (g/dL), ID: :r4o:
+							104 container
+								105 text field (settable) Description: TP (g/dL), ID: :r4u:
+							106 container
+								107 text field (settable) Description: eGFR (mL/min/1.73m²), ID: :r54:
+							108 container
+								109 text field (settable) Description: K (mEq/L), ID: :r5a:
+							110 container
+								111 text field (settable) Description: PLT (×10^4/μL), ID: :r3e:
+							112 container
+								113 text field (settable) Description: Mono (%), ID: :r3k:
+							114 container
+								115 text field (settable) Description: ALP (U/L), ID: :r3q:
+							116 container
+								117 text field (settable) Description: AST (U/L), ID: :r5g:
+							118 container
+								119 text field (settable) Description: LDH (U/L), ID: :r5m:
+							120 container
+								121 text field (settable) Description: BUN (mg/dL), ID: :r5s:
+							122 container
+								123 text field (settable) Description: Cl (mEq/L), ID: :r68:
+							124 container
+								125 checkbox (settable, integer) Description: 術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある, Value: 0
+								126 text 術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある
+							127 heading 術後治療, Value: 3, ID: 672d4873
+								128 text 術後治療
+								129 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#672d4873
+							130 container
+								131 combo box (collapsed, settable) Description: 術後治療・今後の予定*, Value: 選択してください, ID: react-aria3022413348-:r70:, Secondary Actions: Expand
+								132 pop up button (collapsed) Description: Open, ID: react-aria3022413348-:r6s:, Secondary Actions: Expand
+							133 heading 生存状況, Value: 3, ID: c0d5ab69
+								134 text 生存状況
+								135 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#c0d5ab69
+							136 container
+								137 Description: 生存状況*, ID: react-aria3022413348-:r6i:
+									138 container
+										139 radio button (settable, integer) Description: 生存, Value: 0
+										140 text 生存
+									141 container
+										142 radio button (settable, integer) Description: 死亡, Value: 0
+										143 text 死亡
+							144 text 5. 送信
+							145 text 入力状況：未入力 6項目
+							146 button (collapsed) 入力状況の詳細を確認, Secondary Actions: Expand
+								147 text 入力状況の詳細を確認
+							148 text 仮保存は正式送信ではありません。
+							149 button (disabled) 事務局へ確定送信
+								150 text 事務局へ確定送信
+							151 button 保存要求の形式を確認（送信しません）
+								152 text 保存要求の形式を確認（送信しません）
+							153 text Version 9用の署名付き要求を生成しました。送信・保存・台帳照合は未実施です。
+							154 text 未入力 6件 / 入力エラー 0件。臨床入力の合格や保存成功を意味しません。
+		24 button Manage app
+			25 image
+			26 text Manage app
+
+The focused UI element is 151 button 保存要求の形式を確認（送信しません）

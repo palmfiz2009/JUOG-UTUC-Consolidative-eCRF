@@ -1,0 +1,42 @@
+{
+  "frontend_commit": "50d607ad8f4a235d5915039ff1068ddc88b62bed",
+  "gas_version": 9,
+  "scope": "LIVE_AUTHENTICATED_CANONICAL_FORM_NON_SENDING_PREVIEW",
+  "oidc_return_confirmed": true,
+  "ui_context_test01_facility_auth_connect_confirmed": true,
+  "canonical_form_displayed": true,
+  "signed_preview_generated": true,
+  "preview_explicitly_reports_no_send_save_registry_match": true,
+  "clinical_inputs_incomplete": 6,
+  "clinical_validation_pass_claimed": false,
+  "business_saves": 0,
+  "draft_sends": 0,
+  "surgery_unselected_not_none": true,
+  "dissection_unselected_prompt": true,
+  "surgery_no_pathology_na": true,
+  "unevaluable_reason_field_displayed": true,
+  "zero_preserved": {
+    "pathology_size": "0.00",
+    "crp": "0"
+  },
+  "journal": {
+    "read_range": "D3_Journal!A1:F1000",
+    "rows": 165,
+    "sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+    "expected_sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+    "raw_cells_output": false,
+    "matches_prior": true
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "formal_pass_delta": 0,
+  "remaining": [
+    "Authenticated record_version/response adapter before enabling real corrections",
+    "Durable client reconciliation and reviewed limited business-send approval",
+    "Full privacy log/export coverage and formal QA remain"
+  ]
+}
