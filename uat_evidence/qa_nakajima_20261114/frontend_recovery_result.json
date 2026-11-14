@@ -1,0 +1,24 @@
+{
+  "date_jst": "2026-11-14",
+  "frontend_commit": "dc2632fa934254e9553b7df0533c4bbb7109081c",
+  "entry_sha256": "53b5528c356a5516d7fd1fa851a2eac06e03e171704e42e68bf2838287816ba0",
+  "changed_files": [
+    "streamlit_app.py",
+    "auth04_runtime.json"
+  ],
+  "independent_technical_review": "review_session: no blocking issues after expired-cookie recovery and halt-state preservation",
+  "regression_pass": 10,
+  "auth_only_screen_restored": true,
+  "expired_native_login_refused": true,
+  "expired_cookie_logout_then_unauthenticated_screen": true,
+  "new_entry_live_acl_check": "PASS: regular Google login returned to app; one signed ui_context confirmed TEST01/facility/AUTH_CONNECT/business_writes_allowed=false",
+  "out_of_scope_live_retest": false,
+  "business_or_boundary_autostart": false,
+  "normal_crf_screen_reached": false,
+  "gas_acl_secrets_changed": false,
+  "business_rows": 165,
+  "business_sha256_before_and_after": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+  "business_journal_and_embedded_audits_unchanged": true,
+  "formal_pass_delta": 0,
+  "verified_at_utc": "2026-11-14T00:25Z"
+}

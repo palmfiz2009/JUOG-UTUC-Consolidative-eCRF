@@ -3,8 +3,11 @@
   "actual_privacy_fixture_marker_strings_checked": 5,
   "matches_in_loaded_host_log_and_current_dom": 0,
   "host_log_loaded": true,
-  "checkpoint_still_shown": true,
   "HTTP_response_capture": false,
   "GAS_full_log_access": false,
-  "scope_limit": "Only rendered retained logs, not proof of complete request-specific history; no new business request."
+  "scope_limit": "Only rendered retained logs, not proof of complete request-specific history; no new business request.",
+  "previous_checkpoint_observation": true,
+  "current_auth_only_screen_recovered": true,
+  "current_screen_contains_identity_or_token": false,
+  "current_screen_scope": "Login/ACL confirmation only; not CRF identifier rejection screen; HTTP raw response not captured."
 }

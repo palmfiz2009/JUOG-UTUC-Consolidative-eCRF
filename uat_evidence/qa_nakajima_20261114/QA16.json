@@ -7,6 +7,7 @@
     "NOT_RUN": 5
   },
   "technical_candidates": [
+    "POST-01",
     "POST-04",
     "FUP-02"
   ],
@@ -17,7 +18,7 @@
       "test_id": "POST-01",
       "formal_status": "BLOCKED",
       "criterion": "イベント・日付・Gradeが正確に保存され集計へ取得可能。",
-      "classification": "実機証拠の不足",
+      "classification": "独立QAの未承認",
       "new_assessment": "実XLSXとAPI165行一致。day30 Grade IIIa・日付・因果関係を含む6版全payload一致。取得可能性の不足を補完。",
       "evidence": [
         "clinical_projection.json",
@@ -43,13 +44,14 @@
         "evidence_gap_results.json",
         "../live_gap_readonly_20261114/native_export_result.json"
       ],
-      "unmet": "主要評価算入規則に対するQA/医学担当者の評価。",
+      "unmet": "既存31日拒否・90日保存・XLSX分離証拠と原定義の正式QA/医学評価。新たなアプリ集計機能は要件化しない。",
       "qa_status": "未評価・未署名",
       "qa_reviewer": null,
       "qa_decision": null,
       "qa_signature": null,
       "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
-      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）",
+      "protocol_definition_review": "2026-09-16第1版3.3(1): 手術終了から30/90日目まで、Grade3以上、手術関連又は否定できない。31日事象は30日主要評価窓外。腎機能低下・予定透析の除外規定は医学判断を要する。"
     },
     {
       "test_id": "POST-03",
@@ -122,7 +124,25 @@
       "qa_decision": null,
       "qa_signature": null,
       "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
-      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）",
+      "required_remaining_live_visits": {
+        "months": [
+          9,
+          12,
+          15,
+          18,
+          21,
+          24
+        ],
+        "conditions": [
+          "同一承認済み架空症例・TEST01",
+          "訪問時期と検査・再発・進行・生存情報の整合",
+          "各訪問の正規保存・読取・出力一致",
+          "監査・参照版・旧版保持",
+          "新規業務保存の限定承認が必要。現在実行禁止"
+        ],
+        "six_month_evidence_reused": true
+      }
     },
     {
       "test_id": "FUP-02",
@@ -312,5 +332,12 @@
     "signature": null,
     "contacted": false,
     "shared": false
-  }
+  },
+  "priority_order": [
+    "POST-01",
+    "POST-04",
+    "FUP-02",
+    "POST-06",
+    "AUTH-04"
+  ]
 }

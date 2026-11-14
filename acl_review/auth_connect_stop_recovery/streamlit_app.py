@@ -1,6 +1,7 @@
-"""Review candidate: AUTH_CONNECT recovery only. No business or boundary harness.
-Not deployed. Reuses existing native OIDC, signed request, GAS ACL/session checks.
+"""Isolated entry: AUTH_CONNECT recovery only. No business or boundary harness.
+Reuses existing native OIDC, signed request, GAS ACL/session checks.
 """
+import time
 import streamlit as st
 from uat_auth_connect import context, context_envelope, send, valid_context
 
@@ -12,10 +13,17 @@ def run():
         if st.button('Googleでログイン'):
             st.login('google')
         st.stop()
+    if st.session_state.get('auth_connect_halted'):
+        st.error('前回の異常で停止しています。管理者の確認が必要です。')
+        st.stop()
     try:
         native=context(st)
     except Exception:
         st.error('本人認証・期限・設定を確認できません。送信していません。')
+        iat, exp = st.user.get('iat'), st.user.get('exp')
+        if type(iat) is int and type(exp) is int and int(time.time()) >= min(iat + 3600, exp):
+            if st.button('期限切れのログインを終了して再認証'):
+                st.logout()
         st.stop()
     if st.button('現在の本人ACLを読取確認'):
         try:
@@ -24,6 +32,7 @@ def run():
                 raise PermissionError('ACL_NOT_CONFIRMED')
             st.success('TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。')
         except Exception:
+            st.session_state['auth_connect_halted'] = True
             st.error('ACLまたは接続を確認できません。再送していません。')
     st.caption('CRF入力画面はこの回復版には含みません。認証・ACLを迂回して開きません。')
     st.stop()

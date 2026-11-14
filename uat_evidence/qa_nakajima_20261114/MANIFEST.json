@@ -8,11 +8,15 @@
     "NOT_RUN": 5
   },
   "files": {
-    "privacy_live_read.json": "e504e21fd25136225eb6f947bf3a27782f02ac672f1128d1e2d2334a0d091461",
-    "UAT67.json": "07d8d93844fac87756254050d46a541324b26acaaee57014602f8a5b4c2308ad",
-    "QA16.json": "2e874c8d7f574bc1549f2d58b31c69ea26a2f880aca9cda5c7371a78f3e49ccd",
-    "REVIEW_PACKAGE.md": "544b279ab5973e8b8a68f607aa15907271dfe9b376ce1d8547ccda52aa122466"
+    "QA16.json": "0d1bc766fa7ac38a3fc09eb747692ae2607263eb5848f08a9d5f88b548745780",
+    "REVIEW_PACKAGE.md": "2b3957901f7e2ea6fb9855ed3dbc777040fe6f77c08a865a446989aecf2aa8c9",
+    "UAT67.json": "1feb225f46b22a470b42c3b4ed5cd78798b680647571a27c056fdfc257c997d6",
+    "auth_connect_recovered.jpg": "33782a806e1f0e07266642f27ebc34119147689797e02b386374f9f999d0d7e5",
+    "auth_connect_verified.jpg": "1156cd14bb1b8c392ccfb1783dc1cae4bb183ca9e064e9285179690a140c51fb",
+    "frontend_recovery_result.json": "76356377ab5a62d2f19bfee6a7b326dcb3dd4794cfc1c6d7e0fcd9e99e348da7",
+    "privacy_live_read.json": "dedbedf5afbee6df7bc7406bec842913957f18803b1f0fdd1fb298a7a88fb56a"
   },
-  "recovery_candidate_sha256": "cc58961c826960a9bff85b0b72ae7d4565ffc4822da10bbd910cd61f1f645586",
-  "deployment_performed": false
+  "recovery_candidate_sha256": "53b5528c356a5516d7fd1fa851a2eac06e03e171704e42e68bf2838287816ba0",
+  "deployment_performed": true,
+  "frontend_commit": "dc2632fa934254e9553b7df0533c4bbb7109081c"
 }
