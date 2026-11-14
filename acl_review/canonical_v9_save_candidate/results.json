@@ -1,0 +1,8 @@
+{
+  "tests": 11,
+  "passed": true,
+  "mode": "OFFLINE_PYTHON_CLIENT_ACTUAL_V9_DOMAIN_LOCAL_SQLITE",
+  "live_storage_approved": false,
+  "network_calls": 0,
+  "formal_pass_delta": 0
+}

@@ -1,0 +1,64 @@
+{
+  "snapshot_sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+  "snapshot_rows": 165,
+  "registry_971_count": 1,
+  "registry_971_facilities": [
+    "TEST01"
+  ],
+  "crfs": [
+    {
+      "type": "perioperative_30d",
+      "visit": "30d",
+      "version": 1,
+      "submission_id_sha256": "2491c365b7126305f77f9d3524d1753d49cc1d8aef629276e6367fde841d464a"
+    },
+    {
+      "type": "perioperative_30d",
+      "visit": "30d",
+      "version": 2,
+      "submission_id_sha256": "e9f75d3858305bcc30dcf33acdc46218fec1a7f361059b68bf28447d1fe23fb8"
+    },
+    {
+      "type": "day90",
+      "visit": "90d",
+      "version": 1,
+      "submission_id_sha256": "b29ee3a8b93e5d478857664e7123ef73489396d1eb9a2f1b052d2c890c05e401"
+    },
+    {
+      "type": "followup",
+      "visit": "6m",
+      "version": 1,
+      "submission_id_sha256": "67c815c1caa36286ef4b918dd2eace5e0ac137c545ffada8f015239f6947775a"
+    },
+    {
+      "type": "followup",
+      "visit": "6m",
+      "version": 2,
+      "submission_id_sha256": "7fe3eb394109aac8e03d6b6aa532912ebc45b0fa2b208ae0ad864e8fa258299b"
+    },
+    {
+      "type": "followup",
+      "visit": "6m",
+      "version": 3,
+      "submission_id_sha256": "975adb67909e8495c2ec8d65833150392726112e7b7604ad7648d6e7dd2c3a0a"
+    }
+  ],
+  "existing_request_count": 13,
+  "existing_operation_hashes": [
+    "d8e28fed6df77f5fe04d9847dfef386abb09266eba2ff32494442c753a4360cc",
+    "a65468ecd7324ef5034107c721241e35b652b25810ef0ff9174fc4c44e986ed6",
+    "1d7d2104b505987360b312cf72ad0e3d3700907b0092af69eacb91ea86683baf",
+    "388b5fa333dc82d43d38807980fa58ebb752b177df1fac8c47582eecd2411148",
+    "8c6ca7e437d6600bc8ab5ac3e123590b7e15288f9926a5c3016d1a795965005f",
+    "3edba8e780b2403ef1d42cb45ea2392308a93c7188f6ff07c552cef591c741b1",
+    "3edba8e780b2403ef1d42cb45ea2392308a93c7188f6ff07c552cef591c741b1",
+    "fb92172d39fc1d19352e4131425a058d5a93a218221adcac06ee0750621a25f6",
+    "38d87e341f7a3369213d8abd25f0094688a16bc87dfe41a2dbf48681d592ded7",
+    "edbf37e3738b698a9774cc2561fd3306cc135c4ab6c370d5b854a0ee0fb581cc",
+    "dd8f8bac644b63a3fb049eb5c44ae430f98c02481c9f5e3d24131aefe08340f5",
+    "23091d8a7418b0d2045ea60f683ae34acf8fa19c25e6612a3f5107f6aff5bc5c",
+    "39141c81d3ccb8fd3b8a0ea707709e3ec45ff16bc5f06e361eb6915187e69f65"
+  ],
+  "new_initial_30d_on_971_allowed": false,
+  "mode": "EXISTING_PRIVATE_SNAPSHOT_MATCHED_PREVIOUS_LIVE_READ_NOT_NEW_API_READ"
+}
