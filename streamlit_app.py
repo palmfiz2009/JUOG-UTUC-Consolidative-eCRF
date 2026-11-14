@@ -2,6 +2,8 @@
 Reuses existing native OIDC, signed request, GAS ACL/session checks.
 """
 import time
+import runpy
+from pathlib import Path
 import streamlit as st
 from uat_auth_connect import context, context_envelope, send, valid_context
 
@@ -25,7 +27,8 @@ def run():
             if st.button('期限切れのログインを終了して再認証'):
                 st.logout()
         st.stop()
-    if st.button('現在の本人ACLを読取確認'):
+    inspect_crf = st.checkbox('30日CRFの画面確認（保存・取得・送信は無効）')
+    if inspect_crf or st.button('現在の本人ACLを読取確認'):
         try:
             response=send(context_envelope(native))
             if not valid_context(response):
@@ -34,7 +37,12 @@ def run():
         except Exception:
             st.session_state['auth_connect_halted'] = True
             st.error('ACLまたは接続を確認できません。再送していません。')
-    st.caption('CRF入力画面はこの回復版には含みません。認証・ACLを迂回して開きません。')
+            st.stop()
+    if inspect_crf:
+        st.warning('完全架空入力による画面確認専用です。台帳照合・保存・下書き取得・通知は実行できません。')
+        runpy.run_path(str(Path(__file__).with_name('uat_readonly_30d.py')), run_name='__main__')
+    else:
+        st.caption('30日CRFを表示する場合も、操作のたびに正規認証とGASの本人ACLを確認します。')
     st.stop()
 
 run()
