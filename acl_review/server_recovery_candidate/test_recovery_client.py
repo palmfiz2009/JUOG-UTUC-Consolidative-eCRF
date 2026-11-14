@@ -8,13 +8,13 @@ class T(unittest.TestCase):
   def call(a,p):
    self.calls.append(a)
    if a=='list_requests':return {'ok':True,'read_only':True,'record_key':KEY,'requests':rows}
-   return {'ok':True,'operation_id':p['operation_id'],'action':'save_crf','state':'UNFINISHED'}
+   return {'ok':True,'operation_id':p['operation_id'],'action':'save_crf','state':'UNFINISHED','phase':'PREPARED'}
   return call
  def test_empty_never_permits_prepare(self):
   self.assertFalse(discover(self.call_for([]))['may_prepare']);self.assertEqual(self.calls,['list_requests'])
  def test_one_discovers_same_id_only(self):
-  r=discover(self.call_for([{'operation_id':'offline-id','state':'UNFINISHED'}]));self.assertEqual(r['operation_id'],'offline-id');self.assertFalse(r['may_execute']);self.assertEqual(self.calls,['list_requests','request_status'])
+  r=discover(self.call_for([{'operation_id':'offline-id','state':'UNFINISHED','phase':'PREPARED'}]));self.assertEqual(r['operation_id'],'offline-id');self.assertFalse(r['may_execute']);self.assertEqual(self.calls,['list_requests','request_status'])
  def test_multiple_stops(self):
-  with self.assertRaises(BridgeError):discover(self.call_for([{'operation_id':'a','state':'UNFINISHED'},{'operation_id':'b','state':'UNFINISHED'}]))
+  with self.assertRaises(BridgeError):discover(self.call_for([{'operation_id':'a','state':'UNFINISHED','phase':'PREPARED'},{'operation_id':'b','state':'UNFINISHED','phase':'PREPARED'}]))
   self.assertEqual(self.calls,['list_requests'])
 if __name__=='__main__':unittest.main()

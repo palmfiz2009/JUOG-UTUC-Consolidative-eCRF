@@ -1,0 +1,35 @@
+{
+  "base_commit": "99e1a6223deb0a29dd7430ebd9a073d2805ff64e",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Local-state-loss discovery ignored unknown states and accepted contradictory state/phase responses; unapproved payload fields in list responses were returned to caller. No automatic write was permitted, but recovery reporting and metadata privacy were insufficient.",
+  "fix": "Validate list row shape, unique bounded operation IDs, state/phase combinations and allowed metadata fields; reject unexpected payload or malformed optional metadata. Validate status phase before returning state; explicitly deny execute for empty discovery too.",
+  "reproduction": {
+    "new_cases": 4,
+    "before_fix_failures": 4,
+    "after_fix_failures": 0
+  },
+  "regression": {
+    "server_recovery_tests": 39,
+    "canonical_save_tests": 19,
+    "all_passed": true,
+    "warning": "Existing canonical harness subprocess ResourceWarning remains."
+  },
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/recovery_client.py": "94af3b7d889ef32da6fbc2140ab35f09a6e2bb48d425b77523d9d771728ebd4e",
+    "acl_review/server_recovery_candidate/test_recovery_client.py": "311a633aaecabf229c74947737b947ef1355daf072f876de49d19b389ed2a8b2",
+    "acl_review/server_recovery_candidate/test_discovery_response_validation.py": "c26bc38a38c04ece057a23ef4f5aa1e41e4cb06c95aa32c2335b8446f1f2bdda"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Not deployed or independently reviewed. Discovery remains read-only and manual content reconciliation is required after local state loss.",
+    "No live access to settings, authentication, secrets, ACL, 165 business rows or audit.",
+    "Old-key rejection, live recovery, durable sixty-minute observation and formal QA remain incomplete."
+  ],
+  "next": "Review discovery response contract with signed read-only probe before approved live integration; do not enable recovery APIs or clear communication stop."
+}
