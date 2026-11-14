@@ -1,0 +1,18 @@
+{
+  "mode": "LIVE_GOOGLE_SHEETS_NATIVE_XLSX_VS_LIVE_SHEETS_API",
+  "journal_rows": 165,
+  "journal_sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+  "api_digest_equal": true,
+  "previous_165_rows_unchanged": true,
+  "sealed_batches_verified": 70,
+  "legacy_unsealed_batches_preserved": 3,
+  "business_revision": 14,
+  "all_six_971_clinical_payloads_equal": true,
+  "numeric_conversion": "XLSX shared strings 0.0/1.0 etc in chunk part/total normalized to exact integer metadata; all other cells unchanged. Raw cell types differ, semantic content agrees.",
+  "POST01": "day30 Grade IIIa/date/relation and complete payload available in actual native export; candidate for QA",
+  "POST02": "day31 stored in 90d, excluded from 30d window; primary endpoint interpretation remains QA/medical review",
+  "FUP01": "6m history confirmed; 9/12/15/18/21/24m live records not supplied by existing fixture",
+  "formal_pass_delta": 0,
+  "xlsx_sha256": "f753295437c9b0d637f375665a33caa4bffd55941b20261776c042fa3d9c5eb2",
+  "raw_export_published": false
+}

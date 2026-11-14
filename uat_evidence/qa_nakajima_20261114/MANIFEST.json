@@ -1,0 +1,18 @@
+{
+  "qa_planned_reviewer": "中嶋 將仁",
+  "signatures": null,
+  "formal_counts": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "files": {
+    "privacy_live_read.json": "e504e21fd25136225eb6f947bf3a27782f02ac672f1128d1e2d2334a0d091461",
+    "UAT67.json": "07d8d93844fac87756254050d46a541324b26acaaee57014602f8a5b4c2308ad",
+    "QA16.json": "2e874c8d7f574bc1549f2d58b31c69ea26a2f880aca9cda5c7371a78f3e49ccd",
+    "REVIEW_PACKAGE.md": "544b279ab5973e8b8a68f607aa15907271dfe9b376ce1d8547ccda52aa122466"
+  },
+  "recovery_candidate_sha256": "cc58961c826960a9bff85b0b72ae7d4565ffc4822da10bbd910cd61f1f645586",
+  "deployment_performed": false
+}

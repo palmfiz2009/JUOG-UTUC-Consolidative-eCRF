@@ -1,0 +1,10 @@
+{
+  "date_jst": "2026-11-14",
+  "actual_privacy_fixture_marker_strings_checked": 5,
+  "matches_in_loaded_host_log_and_current_dom": 0,
+  "host_log_loaded": true,
+  "checkpoint_still_shown": true,
+  "HTTP_response_capture": false,
+  "GAS_full_log_access": false,
+  "scope_limit": "Only rendered retained logs, not proof of complete request-specific history; no new business request."
+}

@@ -1,0 +1,2145 @@
+{
+  "kind": "UAT67_READ_ONLY_ASSESSMENT_20261114",
+  "official_register_sha256": "663ed0ada91b7f570364615131dfbacfb1863de3c5f6dd1cef70a3b9d031dee1",
+  "counts": {
+    "PASS": 32,
+    "BLOCKED": 29,
+    "NOT RUN": 5,
+    "FAIL": 1
+  },
+  "new_formal_pass": 0,
+  "rows": [
+    {
+      "test_id": "ENV-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "新規専用GAS・589b374e参照／2026-11-09追補",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "SPREADSHEET_IDがPRODUCTIONと異なるTEST専用シートを指す。",
+      "existing_evidence": "JUOG_UAT_ENV01_20261109.md／既保存ENV01 Evidence ZIP",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_UAT_ENV01_20261109.md／既保存ENV01 Evidence ZIP"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "ENV-02",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST Streamlit validation-v2.2.8 / GAS固定version1 / Git commit 589b374e2d4be45efec6ef258157a7bac5c0fd83",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "TESTがPRODUCTIONデプロイID・本番台帳を参照しない。",
+      "existing_evidence": "JUOG_run4_ENV02_backend.txt/.jpg、ENV02_deployment.txt/.jpg、ENV02_registered.txt/.jpg（同接頭辞）；run4_sheet_metadata.json；run4_admin_reference.py；Run5_review_block.txt；run6_sheet_ids.json; run10_admin_confirmation.json; run11_ENV02_comparison.json; run11_version1_history.txt; run11_GAS_version1_code.gs; run11_github_tree.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_run4_ENV02_backend.txt/.jpg、ENV02_deployment.txt/.jpg、ENV02_registered.txt/.jpg（同接頭辞）；run4_sheet_metadata.json；run4_admin_reference.py；Run5_review_block.txt；run6_sheet_ids.json; run10_admin_confirmation.json; run11_ENV02_comparison.json; run11_version1_history.txt; run11_GAS_version1_code.gs; run11_github_tree.json"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "ENV-03",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G0",
+      "dependencies": [
+        "AUTH_CONNECT残試験",
+        "対象版SHA固定",
+        "privacy統合",
+        "狭いAPI allowlist",
+        "架空fixture初期化",
+        "backup確認"
+      ],
+      "tested_version": "既存TEST実画面2026-11-10 JST、参照SHA589b374e2d4be45efec6ef258157a7bac5c0fd83",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "DropboxのTEST提出先/停止運用の承認証拠が不足。Stage1通知なしは既存TEST全体の証明ではない。",
+      "required_fix_or_action": "現在の隔離Streamlit/GASのSMTP/外部アップロード無効化と非到達を検証。画像提出を使わない限定範囲と旧基準との差を明記。",
+      "pass_criterion": "テスト時に参加施設の実メール・本番提出先へ送らない。",
+      "existing_evidence": "JUOG_run5_ENV03_mail_disabled.txt/.jpg、reference_sources/、ENV03_routes.md；run6_manual_evidence.json（libfile_af4416f2ac78819194b32f407e949a71、version5）；run6_dropbox_metadata.json; run12_ENV03_evidence.json; run12_dropbox_requests.json; run12_ENV03_runtime_view.txt; run12_notification_source_excerpts.txt; run13_mdt_v1_saved.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "現在の隔離Streamlit/GASのSMTP/外部アップロード無効化と非到達を検証。画像提出を使わない限定範囲と旧基準との差を明記。 DropboxのTEST提出先/停止運用の承認証拠が不足。Stage1通知なしは既存TEST全体の証明ではない。",
+      "evidence_files": [
+        "JUOG_run5_ENV03_mail_disabled.txt/.jpg、reference_sources/、ENV03_routes.md；run6_manual_evidence.json（libfile_af4416f2ac78819194b32f407e949a71、version5）；run6_dropbox_metadata.json; run12_ENV03_evidence.json; run12_dropbox_requests.json; run12_ENV03_runtime_view.txt; run12_notification_source_excerpts.txt; run13_mdt_v1_saved.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "ENV-04",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G5",
+      "dependencies": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "本番既存記録の非秘密版証明",
+        "正式QA/教育記録"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "TEST HEAD/version1保全・復元証拠あり。本番稼働版とソースの対応は未確認。",
+      "required_fix_or_action": "新隔離のcommit/deployment/source hashを結び、既存本番版の承認記録と識別する。未承認本番操作はしない。",
+      "pass_criterion": "現在のテスト対象版と本番版が識別可能。変更履歴が保存される。",
+      "existing_evidence": "JUOG_run4_ENV02_deployment.txt/.jpg、JUOG_run4_ENV02_backend.txt/.jpg; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "新隔離のcommit/deployment/source hashを結び、既存本番版の承認記録と識別する。未承認本番操作はしない。 TEST HEAD/version1保全・復元証拠あり。本番稼働版とソースの対応は未確認。",
+      "evidence_files": [
+        "JUOG_run4_ENV02_deployment.txt/.jpg、JUOG_run4_ENV02_backend.txt/.jpg; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "PROD-01",
+      "status": "NOT RUN",
+      "risk": "High",
+      "group": "G6",
+      "dependencies": [
+        "実患者データを使わない範囲/担当者の明示承認",
+        "本番読取の証拠取扱い"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "本番読取の別承認工程（変更禁止）",
+      "unfinished_reason": "PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。",
+      "required_fix_or_action": "別承認された読取範囲で環境表示/登録総数照合。本番変更は不可。",
+      "pass_criterion": "PRODUCTIONが正常応答し、登録件数がRegistryと一致。書込みを行わない。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "NOT RUN",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "別承認された読取範囲で環境表示/登録総数照合。本番変更は不可。 PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "PROD-02",
+      "status": "NOT RUN",
+      "risk": "Medium",
+      "group": "G6",
+      "dependencies": [
+        "実患者データを使わない範囲/担当者の明示承認",
+        "本番読取の証拠取扱い"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "本番読取の別承認工程（変更禁止）",
+      "unfinished_reason": "PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。",
+      "required_fix_or_action": "別承認された読取範囲で画面遷移。患者情報を証拠に含めない。",
+      "pass_criterion": "サーバーエラーなく表示される。実患者情報は外部共有しない。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "NOT RUN",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "別承認された読取範囲で画面遷移。患者情報を証拠に含めない。 PRODの承認済み読取範囲と実施者が未確定。未承認読取なし。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "同意要件を満たさない申請は正式受付されない。",
+      "existing_evidence": "JUOG_run2_SCR01_no_consent.txt/.jpg、JUOG_run2_SCR01_consent_restored.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_run2_SCR01_no_consent.txt/.jpg、JUOG_run2_SCR01_consent_restored.txt"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-02",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "診断時Stage IVを満たさないため適格候補にならない。",
+      "existing_evidence": "JUOG_run2_SCR02.txt/.jpg、JUOG_run2_positive_control.txt/.jpg",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_run2_SCR02.txt/.jpg、JUOG_run2_positive_control.txt/.jpg"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-03",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST Streamlit validation-v2.2.8／GAS active version1（ENV-02証拠継承）、2026-11-10実測",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "Stage IV経路として受け付け可能（最終MDTは別判定）。",
+      "existing_evidence": "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-04",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "Stage IV経路として受け付け可能。",
+      "existing_evidence": "E01/E03",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E01/E03"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-05",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "cM1/遠隔CRの架空中央画像・臨床条件を正規各役割で確認し登録結果を照合。",
+      "pass_criterion": "中央画像・臨床情報による条件確認ができる。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "cM1/遠隔CRの架空中央画像・臨床条件を正規各役割で確認し登録結果を照合。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-06",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "局所治療後cNEDの3か月以上条件を中央審査から登録まで確認。",
+      "pass_criterion": "3か月以上の条件確認ができる。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "局所治療後cNEDの3か月以上条件を中央審査から登録まで確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-07",
+      "status": "NOT RUN",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "遠隔病変残存/cNED不足の正式登録要求が拒否される証拠を取得。",
+      "pass_criterion": "条件不充足例が正式登録されない。",
+      "existing_evidence": "JUOG_run2_SCR07_no_basis.txt、JUOG_run2_SCR07_cNED_short.txt/.jpg; Run9_SCR07_exact3months.txt / Run9_SCR07_one_day_short.txt / Run9_SCR07_future.txt / Run9_SCR07_future.png",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "NOT RUN",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "遠隔病変残存/cNED不足の正式登録要求が拒否される証拠を取得。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "JUOG_run2_SCR07_no_basis.txt、JUOG_run2_SCR07_cNED_short.txt/.jpg; Run9_SCR07_exact3months.txt / Run9_SCR07_one_day_short.txt / Run9_SCR07_future.txt / Run9_SCR07_future.png"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-08",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST実画面・validation-v2.2.8参照SHA 589b374e2d4be45efec6ef258157a7bac5c0fd83／稼働SHA独立照合はENV-04に残る",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "19歳は除外、20歳は年齢条件を通過。",
+      "existing_evidence": "JUOG_SCR08_age19_20261109.jpg（画面部分記録）／boundary_observations age20／JUOG_SCR08_age20_20261110.txt、jpg／実行時ブラウザ観測",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_SCR08_age19_20261109.jpg（画面部分記録）／boundary_observations age20／JUOG_SCR08_age20_20261110.txt、jpg／実行時ブラウザ観測"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-09",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "ECOG 2は適格候補にならない。",
+      "existing_evidence": "JUOG_run2_SCR09_PS2.txt/.jpg、JUOG_run2_SCR09_PS1_and_SCR10_63_reason.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_run2_SCR09_PS2.txt/.jpg、JUOG_run2_SCR09_PS1_and_SCR10_63_reason.txt"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-10",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "プロトコルに定める例外条件を満たす場合のみ進める。",
+      "existing_evidence": "JUOG_run2_SCR10_62_reason.txt/.jpg、62_no_reason.txt、63_no_reason.txt、63_reason_restored.txt（同接頭辞）",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_run2_SCR10_62_reason.txt/.jpg、62_no_reason.txt、63_no_reason.txt、63_reason_restored.txt（同接頭辞）"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-11",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "dependencies": [
+        "画像提出停止条件/別途承認",
+        "医学的判断者",
+        "VOID等の承認済みSOP"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。",
+      "required_fix_or_action": "架空2時点DICOM・症例コード・受領記録を隔離経路で照合。外部画像送信は現承認外。",
+      "pass_criterion": "診断時・最終投与後の画像と症例識別コードが照合可能。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "架空2時点DICOM・症例コード・受領記録を隔離経路で照合。外部画像送信は現承認外。 画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "SCR-12",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST validation-v2.2.8 / GAS固定version1 / 589b374e",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "欠損・異常は仕様どおり警告／拒否、0は0として保存される。",
+      "existing_evidence": "run18_results.json; run18_before.json; run18_after_screening.json; run18_scr12_blank.txt; run18_scr12_abnormal.txt; run18_scr12_na_no_reason.txt; run18_scr12_saved.txt/png",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run18_results.json; run18_before.json; run18_after_screening.json; run18_scr12_blank.txt; run18_scr12_abnormal.txt; run18_scr12_na_no_reason.txt; run18_scr12_saved.txt/png"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "JUOG-SCR-xxxのみ発行。正式JUOG-xxxは未発番。",
+      "existing_evidence": "E01/E03",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E01/E03"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-02",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST GAS固定デプロイversion1／v2.2.8-candidate、2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "二重受付や重複行が作られない。",
+      "existing_evidence": "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-03",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "同一Screening IDのreview_roundが更新され履歴が残る。",
+      "existing_evidence": "E01/E03",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E01/E03"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "判定者ロールと日時、結果が区別され保存される。",
+      "existing_evidence": "E02",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E02"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-02",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8 / 未デプロイRun20限定コード",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "3名未完了でJUOG番号は発番されない。",
+      "existing_evidence": "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt; run17_results.json; run18_after_radiology.json; UAT_Run18_MDT02_PENDING_APPROVAL.gs; run19_results.json; run19_before.json; run19_after.json; run19_execution_log.txt; run19_execution_stopped.png; run19_installed_code.gs; run20_readonly_diagnosis.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_before.json; run19_after.json; run19_execution_log.txt; run21_results.json; run20_before_live.json; run21_after_live.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_after.json; Apps Script実行ログ（20:01:34–20:01:48 JST）",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt; run17_results.json; run18_after_radiology.json; UAT_Run18_MDT02_PENDING_APPROVAL.gs; run19_results.json; run19_before.json; run19_after.json; run19_execution_log.txt; run19_execution_stopped.png; run19_installed_code.gs; run20_readonly_diagnosis.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_before.json; run19_after.json; run19_execution_log.txt; run21_results.json; run20_before_live.json; run21_after_live.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_after.json; Apps Script実行ログ（20:01:34–20:01:48 JST）"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-03",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "中央RECIST PD/NEでは正式登録できない。",
+      "existing_evidence": "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-04",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "中央RECISTが正式登録判定へ正しく使用される。",
+      "existing_evidence": "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED; run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575; run28_MDT04_oncology_saved.json; run30_MDT04_SD_registration.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED; run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575; run28_MDT04_oncology_saved.json; run30_MDT04_SD_registration.json"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-05",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS固定version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "不一致の場合は合意形成記録が必要。",
+      "existing_evidence": "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-06",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "理由と状態が記録され、正式番号未発行。",
+      "existing_evidence": "E01",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E01"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "MDT-07",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS固定version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "正式番号未発行、正式登録件数は増加しない。",
+      "existing_evidence": "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-04",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "JUOG-xxxが一つ発行されRegistryとScreening双方で追跡可。",
+      "existing_evidence": "E01/E02/E04",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E01/E02/E04"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-05",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS固定version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "既存登録番号を保持し、新しいJUOG番号が発行されない。",
+      "existing_evidence": "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-06",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "異なる架空適格例の同時登録を正規認証で競合させ、番号一意・監査一意を実測。",
+      "pass_criterion": "LockServiceによりJUOG番号が重複しない。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "異なる架空適格例の同時登録を正規認証で競合させ、番号一意・監査一意を実測。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-07",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "MDT日より前の手術予定要求を正規登録APIへ送りSURGERY_BEFORE_MDTと無登録を確認。",
+      "pass_criterion": "SURGERY_BEFORE_MDTで拒否される。",
+      "existing_evidence": "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "MDT日より前の手術予定要求を正規登録APIへ送りSURGERY_BEFORE_MDTと無登録を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-08",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "正式登録日より前の手術予定要求を拒否し台帳不変を確認。",
+      "pass_criterion": "SURGERY_BEFORE_REGISTRATIONで拒否される。",
+      "existing_evidence": "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "正式登録日より前の手術予定要求を拒否し台帳不変を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REG-09",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "dependencies": [
+        "画像提出停止条件/別途承認",
+        "医学的判断者",
+        "VOID等の承認済みSOP"
+      ],
+      "tested_version": "既存TEST実画面2026-11-10／参照SHA589b374e2d4be45efec6ef258157a7bac5c0fd83、稼働SHA独立照合未了",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "8条件の画面証拠は保持。延期理由の医学的判断者、承認済み手順、判断保存記録が不足。",
+      "required_fix_or_action": "既済8画面境界を再利用し、例外理由の医学的判断・承認手順・保存証跡を正式確定。",
+      "pass_criterion": "4週以上・原則8週以内、合理的理由で最大12週の規定を運用で逸脱なく判定。システム自動判定の範囲も記録。",
+      "existing_evidence": "JUOG_run7_REG09_*weeks*.txt/.jpg；run6_manual_evidence.json；REG09_source_excerpt.txt；JUOG_UAT_Approval_Pack_Run8.docx；monitoring_source.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既済8画面境界を再利用し、例外理由の医学的判断・承認手順・保存証跡を正式確定。 8条件の画面証拠は保持。延期理由の医学的判断者、承認済み手順、判断保存記録が不足。",
+      "evidence_files": [
+        "JUOG_run7_REG09_*weeks*.txt/.jpg；run6_manual_evidence.json；REG09_source_excerpt.txt；JUOG_UAT_Approval_Pack_Run8.docx；monitoring_source.json"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "cN1-only枠のみ+1（全体+1）。",
+      "existing_evidence": "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-02",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "cN1-only枠は増えず、全体のみ+1。",
+      "existing_evidence": "run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-03",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "独立架空fixtureでcN1-only枠は増えず、全体のみ+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "pass_criterion": "cN1-only枠は増えず、全体のみ+1。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "独立架空fixtureでcN1-only枠は増えず、全体のみ+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-04",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "独立架空fixtureでcN1-only枠は増えない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "pass_criterion": "cN1-only枠は増えない。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "独立架空fixtureでcN1-only枠は増えない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-05",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "独立架空fixtureでcN1-only枠は+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "pass_criterion": "cN1-only枠は+1。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "独立架空fixtureでcN1-only枠は+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-06",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "独立架空fixtureで20例まで計上、21例目はCN1_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "pass_criterion": "20例まで計上、21例目はCN1_CAP_REACHED。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "独立架空fixtureで20例まで計上、21例目はCN1_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-07",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "独立架空fixtureで42例は許容、43例目はTOTAL_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "pass_criterion": "42例は許容、43例目はTOTAL_CAP_REACHED。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "独立架空fixtureで42例は許容、43例目はTOTAL_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-08",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "dependencies": [
+        "G0",
+        "承認済み役割分担",
+        "独立架空fixture",
+        "正規reviewer/admin認証"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "独立架空fixtureでSD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "pass_criterion": "SD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "独立架空fixtureでSD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-09",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "dependencies": [
+        "画像提出停止条件/別途承認",
+        "医学的判断者",
+        "VOID等の承認済みSOP"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "中央判定変更時の分類・枠反映、又は監査可能な手作業の承認と実測が不足。",
+      "required_fix_or_action": "中央判定変更後のアクティブ集計・監査を検証。手作業代替はPIの正式承認なしに採用しない。",
+      "pass_criterion": "確定した分類が上限管理に反映、または監査可能な手作業管理手順を承認。現コードの自動修正有無は未確認。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "中央判定変更後のアクティブ集計・監査を検証。手作業代替はPIの正式承認なしに採用しない。 中央判定変更時の分類・枠反映、又は監査可能な手作業の承認と実測が不足。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "CAP-10",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "dependencies": [
+        "画像提出停止条件/別途承認",
+        "医学的判断者",
+        "VOID等の承認済みSOP"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "承認済みVOID手順と実件数再計算の証拠が不足。",
+      "required_fix_or_action": "別架空症例に承認済みVOID経路を実行し総数/cN1-only/SD除外と旧版・理由監査を照合。",
+      "pass_criterion": "VOIDは正式登録総数・cN1-only・SDのアクティブ件数から除外。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "別架空症例に承認済みVOID経路を実行し総数/cN1-only/SD除外と旧版・理由監査を照合。 承認済みVOID手順と実件数再計算の証拠が不足。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "POST-01",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "手術実施の30d/90d架空fixtureを追加しイベント・日付・Gradeの保存/読取/抽出を検証。",
+      "pass_criterion": "イベント・日付・Gradeが正確に保存され集計へ取得可能。",
+      "existing_evidence": "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "手術実施の30d/90d架空fixtureを追加しイベント・日付・Gradeの保存/読取/抽出を検証。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "30dイベント日・Grade、90dの31日イベントを保存・再読込。",
+      "scenarios": [
+        1,
+        2,
+        6
+      ],
+      "remaining_20261114": "既存保存・監査証拠と今回出力証拠に対する正式QA評価。アプリ内集計機能の新設は要求しない。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）",
+      "assessment_20261114": "実XLSXとAPI165行一致。day30 Grade IIIa・日付・因果関係を含む6版全payload一致。取得可能性の不足を補完。"
+    },
+    {
+      "test_id": "POST-02",
+      "status": "NOT RUN",
+      "risk": "Critical",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "既存TEST実画面 2026-11-10 JST／参照SHA 589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHA独立照合はENV-04未了",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "術後30日/31日境界を保存/集計まで検証。現行非手術fixtureはこの判定に使わない。",
+      "pass_criterion": "術後30日以内の主要評価イベントに誤算入されない。",
+      "existing_evidence": "JUOG_run3_POST02_day31.txt/.jpg、JUOG_run3_POST02_day30.txt; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "NOT RUN",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "術後30日/31日境界を保存/集計まで検証。現行非手術fixtureはこの判定に使わない。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "JUOG_run3_POST02_day31.txt/.jpg、JUOG_run3_POST02_day30.txt; uat_integration_readonly.json; 30d_noop_chronology_evidence.json"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "術後31日イベントを30dで拒否、30日を保存、31日を90dで保存。",
+      "scenarios": [
+        1,
+        2,
+        6
+      ],
+      "remaining_20261114": "主要評価算入規則に対するQA/医学担当者の評価。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）",
+      "assessment_20261114": "31日入力拒否・30日正常保存・90日への31日保存と今回XLSXの分離を照合。"
+    },
+    {
+      "test_id": "POST-03",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "手術なしN/A対照と手術あり対照の保存・必須条件・読取を確認。",
+      "pass_criterion": "N/Aと実施記録が区別され、必須項目整合性を維持。",
+      "existing_evidence": "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "非手術架空症例のCRF保存済み。",
+      "unmet_formal_pass_requirements": "手術例との対照、条件付きN/Aの全要求を実機で照合。",
+      "evidence_files": [
+        "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "971手術あり対照と既存970手術なし/N/A対照を読取確認。970不変。",
+      "scenarios": [
+        2,
+        4,
+        6
+      ],
+      "remaining_20261114": "既存N/A証拠と対象UI必須制御の版適合を正式QAが評価。今回の読取だけで全画面分岐を新規実測したとは扱わない。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "POST-04",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "血液検査0・病理条件付き必須等を保存/読取し、不正値でCRF無保存を確認。",
+      "pass_criterion": "数値0や病理結果が失われず、データ矛盾が検出される。",
+      "existing_evidence": "—; uat_integration_readonly.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "正常CRF保存の部分証拠あり。",
+      "unmet_formal_pass_requirements": "病理の条件付き必須・不正値の実機拒否等、原合格条件の全枝が不足。",
+      "evidence_files": [
+        "—; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "病理理由欠落拒否、復元保存、CRP・出血量・病理径の数値0を含むpayload完全一致。",
+      "scenarios": [
+        3,
+        4
+      ],
+      "remaining_20261114": "正式QAによる原合格条件・画面制御・適用版の証拠受入。技術的PASS候補。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "POST-05",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・validation-v2.2.8／589b374e（稼働SHA独立照合待ち）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "同一JUOG番号・施設と連携し、出典CRFを追跡できる。",
+      "existing_evidence": "E06/E04",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "90日・6月の保存/読戻しを確認。",
+      "unmet_formal_pass_requirements": "既済PASS維持。全臨床分岐の回帰を意味しない。",
+      "evidence_files": [
+        "E06/E04",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "POST-06",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "30d sourceの訂正後に90d/追跡の古いsource指定を拒否、実版への再結合を検証。",
+      "pass_criterion": "SOURCE_CRF_UPDATED等で不整合が検出される。",
+      "existing_evidence": "—; uat_integration_readonly.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "supplemental_live_evidence": "uat_evidence/auth04_functional_live_20261113.json @ review/acl-connection-20261112",
+      "supplemental_scope": "TEST01/JUOG-970 fictional only; GAS v4 then v5; original formal criterion not automatically satisfied",
+      "official_status": "BLOCKED",
+      "live_result": "90日/6月が最新30日v2を参照することを確認。",
+      "unmet_formal_pass_requirements": "旧参照版の拒否と適切な再リンクの実測が不足。",
+      "evidence_files": [
+        "—; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "旧30d参照版を拒否し最新版参照で90d保存。",
+      "scenarios": [
+        5,
+        6
+      ],
+      "remaining_20261114": "上位応答VALIDATION_FAILEDと原期待SOURCE_CRF_UPDATED等の分類対応をQAが確認。内部SOURCE_STALE_OR_MISMATCH検査は存在するが、内部コードを今回外部応答で観測したとは扱わない。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "FUP-01",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "6m以降の架空fixtureで検査・再発/進行・生存を保存/読取・集計。",
+      "pass_criterion": "訪問時期、検査、再発・進行、生存情報が正確に取得可能。",
+      "existing_evidence": "—; uat_integration_readonly.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "supplemental_live_evidence": "uat_evidence/auth04_functional_live_20261113.json @ review/acl-connection-20261112",
+      "supplemental_scope": "TEST01/JUOG-970 fictional only; GAS v4 then v5; original formal criterion not automatically satisfied",
+      "official_status": "BLOCKED",
+      "live_result": "6月CRFの正常保存・読戻し。",
+      "unmet_formal_pass_requirements": "再発/死亡等を含む全臨床分岐の実機証拠が不足。",
+      "evidence_files": [
+        "—; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "再発/PD/死亡分岐、FUPv1/v2/v3保存・読取・旧版保持・監査一致。",
+      "scenarios": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "remaining_20261114": "原操作が要求する9/12/15/18/21/24か月の保存・読取実測不足。追加保存は現承認外。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）",
+      "assessment_20261114": "6m v1-v3の実XLSX取得・API一致。"
+    },
+    {
+      "test_id": "FUP-02",
+      "status": "NOT RUN",
+      "risk": "High",
+      "group": "G1",
+      "dependencies": [
+        "G0",
+        "ACTIVE架空Registry",
+        "30d source version",
+        "正規facility本人"
+      ],
+      "tested_version": "既存TEST実画面2026-11-10 JST／参照SHA589b374e2d4be45efec6ef258157a7bac5c0fd83・稼働SHA未確証",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "矛盾入力→拒否→正しい入力復元→正常保存・版/監査を確認。",
+      "pass_criterion": "規定の入力制御・警告が機能し、確定値を追跡可能。",
+      "existing_evidence": "JUOG_run4_FUP02_required_complete.txt/.jpg、FUP02_PD_after_assessment.txt/.jpg、FUP02_restored.txt（同接頭辞）; uat_integration_readonly.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "NOT RUN",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "矛盾入力→拒否→正しい入力復元→正常保存・版/監査を確認。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "JUOG_run4_FUP02_required_complete.txt/.jpg、FUP02_PD_after_assessment.txt/.jpg、FUP02_restored.txt（同接頭辞）; uat_integration_readonly.json"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "live_result_20261114": "3種類の矛盾・欠落を拒否し、各復元後の正常保存と追跡版を確認。",
+      "scenarios": [
+        7,
+        8,
+        9,
+        10,
+        11,
+        12
+      ],
+      "remaining_20261114": "正式QAによる原入力制御・警告画面条件と版の証拠受入。技術的PASS候補。",
+      "evidence_addendum": "b971_execution_20261114/version9_stop_readonly.json",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUD-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "append-only記録・record_version・提出者/時刻・理由で差分が追える。",
+      "existing_evidence": "E04",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "supplemental_live_evidence": "uat_evidence/auth04_functional_live_20261113.json @ review/acl-connection-20261112",
+      "supplemental_scope": "TEST01/JUOG-970 fictional only; GAS v4 then v5; original formal criterion not automatically satisfied",
+      "official_status": "PASS",
+      "live_result": "30日v1/v2、90日v1、6月v1の保存・監査照合、旧版保持。 追加2件（古い版/訂正理由欠落）は拒否・業務不変。理由欠落の公開コードはVALIDATION_FAILEDで試験期待値不一致を記録。",
+      "unmet_formal_pass_requirements": "既済PASS維持。新隔離版の古い版・理由欠落拒否は実測済み。VALIDATION_FAILEDの期待値差は診断証拠と併せ正式QAで評価。再送不要。",
+      "evidence_files": [
+        "E04",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341",
+        "uat_evidence/auth04_two_negative_live_20261113.json"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUD-02",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST Streamlit validation-v2.2.8／GAS active version1（ENV-02証拠継承）、2026-11-10実測",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "旧判定・新判定・理由・版が残り上書き消去されない。",
+      "existing_evidence": "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUD-03",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存実TEST・validation-v2.2.8／589b374e（稼働SHA独立照合待ち）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "メール不一致ではアクセスを拒否する。",
+      "existing_evidence": "E05",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "E05"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUTH-01",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST実画面・validation-v2.2.8参照SHA 589b374e2d4be45efec6ef258157a7bac5c0fd83／稼働SHA独立照合はENV-04に残る",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "管理画面・データ・登録操作へのアクセス拒否。",
+      "existing_evidence": "JUOG_AUTH01_20261109.jpg／実行時ブラウザ観測",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "JUOG_AUTH01_20261109.jpg／実行時ブラウザ観測"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUTH-02",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST GAS固定デプロイversion1／v2.2.8-candidate、2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "ロール外の操作を許可しない。",
+      "existing_evidence": "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "本人ACL・署名・失効等の既存実測を保持。",
+      "unmet_formal_pass_requirements": "既済PASS維持。新たな60分境界と認証情報更新後の回帰は別途未完。",
+      "evidence_files": [
+        "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUTH-03",
+      "status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存TEST 実GAS deployment version1（管理者確認）。稼働ソース対応はENV-02で未完了。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "UNAUTHORIZEDを返し書込みは生じない。",
+      "existing_evidence": "run10_auth03_before.json / run10_auth03_responses.json / run10_auth03_after.json / run10_auth03_comparison.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "本人ACLとログアウト後の失効記録を保持。",
+      "unmet_formal_pass_requirements": "既済PASS維持。60分境界を合格扱いしない。",
+      "evidence_files": [
+        "run10_auth03_before.json / run10_auth03_responses.json / run10_auth03_after.json / run10_auth03_comparison.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "AUTH-04",
+      "status": "FAIL",
+      "risk": "Critical",
+      "group": "G0",
+      "dependencies": [
+        "AUTH_CONNECT残試験",
+        "対象版SHA固定",
+        "privacy統合",
+        "狭いAPI allowlist",
+        "架空fixture初期化",
+        "backup確認"
+      ],
+      "tested_version": "既存TEST／validation-v2.2.8／GAS active v1",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "正常な年齢・生年月等の全要求への追跡、画面/応答/ログの漏洩検証範囲と証拠承認、独立正式QA。自由記載の完全自動検出は保証しない。",
+      "required_fix_or_action": "既存の16条件拒否・下書き・所有権・CRF・監査の証拠を正式要求へ追跡し、ログ/画面/臨床値保持の残る範囲を評価。独立正式QAの判定までFAILを維持。",
+      "pass_criterion": "氏名・MRN等は承認外で収集・露出せず、コードによる仮名化を維持。",
+      "existing_evidence": "run27_AUTH04_privacy_FAIL.json; TEST CRF_Drafts!A3:P3; validation source 01_registration_crf.py:199,632-642 / juog_common.py:649-674 / GAS v1:937-963,1430-1439; AUTH04_proposed.patch; AUTH04_assessment.md; AUTH04_predeployment_gate_20261111.md; AUTH04_prechange_10tabs.json; uat_integration_readonly.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "supplemental_live_evidence": "uat_evidence/auth04_functional_live_20261113.json @ review/acl-connection-20261112",
+      "supplemental_scope": "TEST01/JUOG-970 fictional only; GAS v4 then v5; original formal criterion not automatically satisfied",
+      "official_status": "FAIL",
+      "live_result": "識別入力16/16拒否・無書込み、正常下書き保存/復元、旧下書き除去、他所有者拒否を既存実測で確認。 追加2件（古い版/訂正理由欠落）は拒否・業務不変。理由欠落の公開コードはVALIDATION_FAILEDで試験期待値不一致を記録。",
+      "unmet_formal_pass_requirements": "正常な年齢・生年月等の全要求への追跡、画面/応答/ログの漏洩検証範囲と証拠承認、独立正式QA。自由記載の完全自動検出は保証しない。",
+      "evidence_files": [
+        "run27_AUTH04_privacy_FAIL.json; TEST CRF_Drafts!A3:P3; validation source 01_registration_crf.py:199,632-642 / juog_common.py:649-674 / GAS v1:937-963,1430-1439; AUTH04_proposed.patch; AUTH04_assessment.md; AUTH04_predeployment_gate_20261111.md; AUTH04_prechange_10tabs.json; uat_integration_readonly.json",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341",
+        "uat_evidence/auth04_two_negative_live_20261113.json"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "元の識別情報不具合に対する修正と限定実測あり。正式FAILの解除条件未充足。全入力への完全自動検出は保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "IMG-01",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "dependencies": [
+        "画像提出停止条件/別途承認",
+        "医学的判断者",
+        "VOID等の承認済みSOP"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。",
+      "required_fix_or_action": "完全架空DICOMのメタデータ・焼込み・ファイル名を検査し正規受領/閲覧ACLを確認。外部送信は承認外。",
+      "pass_criterion": "DICOM内部メタデータ・焼込み文字・ファイル名の識別情報がない。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "完全架空DICOMのメタデータ・焼込み・ファイル名を検査し正規受領/閲覧ACLを確認。外部送信は承認外。 画像対応/匿名化の原条件は未完。実患者画像を使わず架空DICOMと承認済み隔離提出先が必要。",
+      "evidence_files": [
+        "—"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "DATA-01",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G4",
+      "dependencies": [
+        "G1",
+        "バックアップ頻度/保持/権限SOP",
+        "別復元先",
+        "復元・復旧の実測"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "第9.2/14.1節の保存期間（研究終了又は最終公表から10年の遅い日）を原本で確認。実際の頻度・保存先・権限・保持/復元SOPの承認と履行証拠は未完。",
+      "required_fix_or_action": "実保持SOP/権限/頻度とsnapshot再取得・別隔離先復元を照合。",
+      "pass_criterion": "定めた手順で復旧可能なバックアップが取得される。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "実保持SOP/権限/頻度とsnapshot再取得・別隔離先復元を照合。 第9.2/14.1節の保存期間（研究終了又は最終公表から10年の遅い日）を原本で確認。実際の頻度・保存先・権限・保持/復元SOPの承認と履行証拠は未完。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "DATA-02",
+      "status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G4",
+      "dependencies": [
+        "G1",
+        "バックアップ頻度/保持/権限SOP",
+        "別復元先",
+        "復元・復旧の実測"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "実TEST登録/CRF/監査照合とStage1一件照合は取得済み。正式復元後の全件・添付紐付け照合が不足。S2-01はCRF一件の部分証拠。",
+      "required_fix_or_action": "復元後の登録/全CRF/監査/添付対応の全件照合。CRF一件だけで合格にしない。",
+      "pass_criterion": "登録・CRF・監査履歴・添付紐付けの件数と内容が一致。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "復元後の登録/全CRF/監査/添付対応の全件照合。CRF一件だけで合格にしない。 実TEST登録/CRF/監査照合とStage1一件照合は取得済み。正式復元後の全件・添付紐付け照合が不足。S2-01はCRF一件の部分証拠。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "DATA-03",
+      "status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "dependencies": [],
+      "tested_version": "既存UAT STAGING ID 1R1a55w19qfS7XTa6Ran7EnuTNZpFkGoXIFfqesv7zoc、2026-11-10 JST実Google Sheets XLSXエクスポート（hash別添）。アプリ/GAS変更なし",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "unfinished_reason": "既済PASS。新候補版で全回帰済みを意味しない。",
+      "required_fix_or_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "pass_criterion": "主要解析用データが欠損・重複・改変なく抽出される。",
+      "existing_evidence": "run6_export.xlsx、run6_live_values.json、run6_DATA03_result.json、run6_compare.py；本報告の抽出範囲表",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "過去PASS証拠を保持。本候補版への全回帰を意味しない。",
+      "official_status": "PASS",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。 既済PASS。新候補版で全回帰済みを意味しない。",
+      "evidence_files": [
+        "run6_export.xlsx、run6_live_values.json、run6_DATA03_result.json、run6_compare.py；本報告の抽出範囲表"
+      ],
+      "gap_categories": [],
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "DATA-04",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G4",
+      "dependencies": [
+        "G1",
+        "バックアップ頻度/保持/権限SOP",
+        "別復元先",
+        "復元・復旧の実測"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "隔離90日/6月CRFの同一operation復旧と重複なしは実測済み。正式な連絡・代替記録・全体復旧照合SOPおよび承認は未充足。",
+      "required_fix_or_action": "障害後status照合・同operation再開・重複防止に加え連絡/代替手順の実演記録。",
+      "pass_criterion": "連絡先、代替手順、復旧後照合、データ逸失防止が文書化される。",
+      "existing_evidence": "—",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "supplemental_live_evidence": "uat_evidence/auth04_functional_live_20261113.json @ review/acl-connection-20261112",
+      "supplemental_scope": "TEST01/JUOG-970 fictional only; GAS v4 then v5; original formal criterion not automatically satisfied",
+      "official_status": "BLOCKED",
+      "live_result": "中断した90日/6月を同じoperationで復旧。再実行で重複保存なし。",
+      "unmet_formal_pass_requirements": "正式な障害対応・連絡・代替記録・照合SOPと復旧実演の承認が不足。",
+      "evidence_files": [
+        "—",
+        "uat_evidence/auth04_functional_live_20261113.json @ 65a9b426982081eaaa1cfd8a8f18d40916a24341"
+      ],
+      "supplemental_version": "GAS v4/v5 mixed historical evidence; v5 SHA 99b602bb7cbfd8672f0478c1eb0a21daa68891ae746428e2ae7d082b4d7504a5; frontend stage-specific commits in evidence. Do not attribute all earlier tests to v5.",
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REL-01",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G5",
+      "dependencies": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "本番既存記録の非秘密版証明",
+        "正式QA/教育記録"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "required_fix_or_action": "影響範囲の原UI/API回帰を対象SHAへ対応付け、過去PASSの無条件繰越を避ける。",
+      "pass_criterion": "cN1-only以外の既存機能の挙動を変えていない。",
+      "existing_evidence": "—; uat_integration_readonly.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "影響範囲の原UI/API回帰を対象SHAへ対応付け、過去PASSの無条件繰越を避ける。 原操作の実画面・保存・監査の全条件を満たす証拠が未取得。Stage1技術試験で代替しない。",
+      "evidence_files": [
+        "—; uat_integration_readonly.json"
+      ],
+      "gap_categories": [
+        "実機証拠不足",
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "実機証拠不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REL-02",
+      "status": "BLOCKED",
+      "risk": "High",
+      "group": "G5",
+      "dependencies": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "本番既存記録の非秘密版証明",
+        "正式QA/教育記録"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "Stage1/S2候補の版とハッシュは追跡可。原基準のGAS v6を含む変更履歴全体の対応は未完。",
+      "required_fix_or_action": "旧GAS v6を含む既存変更記録と新隔離版の対応/未実施区分を確認。",
+      "pass_criterion": "変更記録が追跡でき、未実施テストをPASSにしていない。",
+      "existing_evidence": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "旧GAS v6を含む既存変更記録と新隔離版の対応/未実施区分を確認。 Stage1/S2候補の版とハッシュは追跡可。原基準のGAS v6を含む変更履歴全体の対応は未完。",
+      "evidence_files": [
+        "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    },
+    {
+      "test_id": "REL-03",
+      "status": "BLOCKED",
+      "risk": "Medium",
+      "group": "G5",
+      "dependencies": [
+        "G0",
+        "G1",
+        "G2",
+        "G3",
+        "G4",
+        "本番既存記録の非秘密版証明",
+        "正式QA/教育記録"
+      ],
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "unfinished_reason": "説明資料あり。正本版対応、MDT全手順、配布・教育記録が不足。",
+      "required_fix_or_action": "正本マニュアル・MDT手順・配布/教育記録・版の正式確認。",
+      "pass_criterion": "必要な操作手順が関係者へ伝わり、版・教育記録が保管される。",
+      "existing_evidence": "reference_README_JA.md（参照SHA固定）；run6_manual_evidence.json",
+      "existing_evidence_presence": "文字列参照を保持。全添付の現物存在/同一性は本棚卸しだけでは保証しない。",
+      "formal_status_changed": false,
+      "qa_note": "未完了。中本先生への連絡/指名はPI指示まで保留。",
+      "official_status": "BLOCKED",
+      "live_result": "既存証拠参照を継承。今回新規実測なし。",
+      "unmet_formal_pass_requirements": "正本マニュアル・MDT手順・配布/教育記録・版の正式確認。 説明資料あり。正本版対応、MDT全手順、配布・教育記録が不足。",
+      "evidence_files": [
+        "reference_README_JA.md（参照SHA固定）；run6_manual_evidence.json"
+      ],
+      "gap_categories": [
+        "独立QA・承認不足"
+      ],
+      "primary_gap": "独立QA・承認不足",
+      "technical_defect_assessment": "本照合で未解決実装不具合は新規確定せず。未測定条件の正常性を保証しない。",
+      "qa_planned_reviewer": "中嶋 將仁（受諾・独立性未確認）"
+    }
+  ],
+  "planned_reviewer": {
+    "name": "中嶋 將仁",
+    "organization": "ITF合同会社",
+    "profession": "プログラマー・エンジニア",
+    "role": "EDCシステムの技術的品質保証（QA）担当予定者",
+    "appointed_by": "PI",
+    "acceptance": null,
+    "actual_scope_confirmed": null,
+    "development_involvement": null,
+    "independence_assessment": null,
+    "nda_confirmed": null,
+    "access_approved": null,
+    "signature": null,
+    "contacted": false,
+    "shared": false
+  }
+}

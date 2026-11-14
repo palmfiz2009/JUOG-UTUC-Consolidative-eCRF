@@ -1,0 +1,316 @@
+{
+  "base_commit": "409ff69942fddaedc2b0eb84f009b0797bfb2037",
+  "formal_counts": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "technical_candidates": [
+    "POST-04",
+    "FUP-02"
+  ],
+  "assessment_sheets": 16,
+  "all_required_evidence_complete": false,
+  "rows": [
+    {
+      "test_id": "POST-01",
+      "formal_status": "BLOCKED",
+      "criterion": "イベント・日付・Gradeが正確に保存され集計へ取得可能。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "実XLSXとAPI165行一致。day30 Grade IIIa・日付・因果関係を含む6版全payload一致。取得可能性の不足を補完。",
+      "evidence": [
+        "clinical_projection.json",
+        "evidence_gap_results.json",
+        "../live_gap_readonly_20261114/native_export_result.json"
+      ],
+      "unmet": "既存保存・監査証拠と今回出力証拠に対する正式QA評価。アプリ内集計機能の新設は要求しない。",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "POST-02",
+      "formal_status": "NOT RUN",
+      "criterion": "術後30日以内の主要評価イベントに誤算入されない。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "31日入力拒否・30日正常保存・90日への31日保存と今回XLSXの分離を照合。",
+      "evidence": [
+        "clinical_projection.json",
+        "evidence_gap_results.json",
+        "../live_gap_readonly_20261114/native_export_result.json"
+      ],
+      "unmet": "主要評価算入規則に対するQA/医学担当者の評価。",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "POST-03",
+      "formal_status": "BLOCKED",
+      "criterion": "N/Aと実施記録が区別され、必須項目整合性を維持。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "現行取得フロントのASTで手術あり病理必須/手術なし理由分岐を確認。画面証拠と実際に提供された版の結合が未確定。",
+      "evidence": [
+        "pinned_02_perioperative_30d_crf.py",
+        "evidence_gap_results.json"
+      ],
+      "unmet": "対象版の画面到達・条件付き必須の証拠対応",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "POST-04",
+      "formal_status": "BLOCKED",
+      "criterion": "数値0や病理結果が失われず、データ矛盾が検出される。",
+      "classification": "技術的合格候補",
+      "new_assessment": "既存正常/拒否/訂正/読戻しに加え、保存済み病理径0・出血量0・CRP0と旧版保持を照合。",
+      "evidence": [
+        "../b971_execution_20261114/version9_stop_readonly.json",
+        "clinical_projection.json"
+      ],
+      "unmet": "独立QAによる合格条件充足・版適用範囲の評価",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "POST-06",
+      "formal_status": "BLOCKED",
+      "criterion": "SOURCE_CRF_UPDATED等で不整合が検出される。",
+      "classification": "仕様・期待結果の不一致",
+      "new_assessment": "正しい参照は受理、旧参照は内部SOURCE_STALE_OR_MISMATCH、外部VALIDATION_FAILEDとなる実装をV9で再現。原基準はSOURCE_CRF_UPDATED等。",
+      "evidence": [
+        "route_cap_results.json",
+        "check_routes_and_caps.cjs"
+      ],
+      "unmet": "承認済みAPI契約による外部期待コードの正式判断。読み替え未実施",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "FUP-01",
+      "formal_status": "BLOCKED",
+      "criterion": "訪問時期、検査、再発・進行、生存情報が正確に取得可能。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "6m v1-v3の実XLSX取得・API一致。",
+      "evidence": [
+        "clinical_projection.json",
+        "evidence_gap_results.json",
+        "../live_gap_readonly_20261114/native_export_result.json"
+      ],
+      "unmet": "原操作が要求する9/12/15/18/21/24か月の保存・読取実測不足。追加保存は現承認外。",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "FUP-02",
+      "formal_status": "NOT RUN",
+      "criterion": "規定の入力制御・警告が機能し、確定値を追跡可能。",
+      "classification": "技術的合格候補",
+      "new_assessment": "V9既存実測の再発詳細/PD日付/死因欠落拒否と正常復元、v1-v3追跡を対応付け。",
+      "evidence": [
+        "../b971_execution_20261114/version9_stop_readonly.json",
+        "clinical_projection.json"
+      ],
+      "unmet": "独立QAの正式評価",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "AUTH-04",
+      "formal_status": "FAIL",
+      "criterion": "氏名・MRN等は承認外で収集・露出せず、コードによる仮名化を維持。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "現行helper SHAと既存保持試験を結合。実コードのclear→restoreで古い識別/臨床状態を除去し0・生年月・臨床日付保持を追加検証。",
+      "evidence": [
+        "evidence_gap_results.json",
+        "../uat35_batch_20261113/privacy_supplement_results.json"
+      ],
+      "unmet": "画面/HTTP/ホスト/GASログの非露出、監査・バックアップ直接アクセス管理の実測、自由記載SOP、独立QA。正式FAIL維持",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "ENV-04",
+      "formal_status": "BLOCKED",
+      "criterion": "現在のテスト対象版と本番版が識別可能。変更履歴が保存される。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "V9とレビューソース対応証拠あり。本番版対応の証明は未取得。",
+      "evidence": [
+        "../b971_execution_20261114/version9_stop_readonly.json"
+      ],
+      "unmet": "権限者による本番の非秘密版証明とQA",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "PROD-01",
+      "formal_status": "NOT RUN",
+      "criterion": "PRODUCTIONが正常応答し、登録件数がRegistryと一致。書込みを行わない。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "本番読取未承認・未実施。",
+      "evidence": [
+        "../uat35_batch_20261113/QA8_REVIEW_PACKET.md"
+      ],
+      "unmet": "PIによる読取実施者/対象/時間/個票非取得の承認",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "PROD-02",
+      "formal_status": "NOT RUN",
+      "criterion": "サーバーエラーなく表示される。実患者情報は外部共有しない。",
+      "classification": "実機証拠の不足",
+      "new_assessment": "本番読取未承認・未実施。",
+      "evidence": [
+        "../uat35_batch_20261113/QA8_REVIEW_PACKET.md"
+      ],
+      "unmet": "PROD-01と同枠の限定読取承認と正式QA",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "REG-09",
+      "formal_status": "BLOCKED",
+      "criterion": "4週以上・原則8週以内、合理的理由で最大12週の規定を運用で逸脱なく判定。システム自動判定の範囲も記録。",
+      "classification": "運用SOPの未承認",
+      "new_assessment": "延期理由の既存画面証拠参照を保持。医学的判断者・承認記録なし。",
+      "evidence": [
+        "../uat35_batch_20261113/QA8_REVIEW_PACKET.md"
+      ],
+      "unmet": "医学的判断者、承認保存先、延期理由SOP承認",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "DATA-01",
+      "formal_status": "BLOCKED",
+      "criterion": "定めた手順で復旧可能なバックアップが取得される。",
+      "classification": "運用SOPの未承認",
+      "new_assessment": "既存隔離66行コピー復元証拠あり。全体復旧と責任分担を代替しない。",
+      "evidence": [
+        "../b971_execution_20261113/restore_live_result.json"
+      ],
+      "unmet": "バックアップ責任者/頻度/保管/アクセス権/保存期間と履行記録",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "DATA-04",
+      "formal_status": "BLOCKED",
+      "criterion": "連絡先、代替手順、復旧後照合、データ逸失防止が文書化される。",
+      "classification": "運用SOPの未承認",
+      "new_assessment": "同一operation照会による復旧/重複なし既存実測。",
+      "evidence": [
+        "../b971_execution_20261114/version9_stop_readonly.json"
+      ],
+      "unmet": "障害連絡・代替記録・復旧照合SOPと演習記録",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "REL-02",
+      "formal_status": "BLOCKED",
+      "criterion": "変更記録が追跡でき、未実施テストをPASSにしていない。",
+      "classification": "独立QAの未承認",
+      "new_assessment": "レビュー履歴・V9・停止状態と証拠の対応を継承。",
+      "evidence": [
+        "../b971_execution_20261114/ASSESSMENT.md"
+      ],
+      "unmet": "変更管理の正式評価、仕様変更承認、未実施の扱い",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    },
+    {
+      "test_id": "REL-03",
+      "formal_status": "BLOCKED",
+      "criterion": "必要な操作手順が関係者へ伝わり、版・教育記録が保管される。",
+      "classification": "運用SOPの未承認",
+      "new_assessment": "説明資料参照あり。受講者・教育・理解確認・署名実記録不足。",
+      "evidence": [
+        "../uat35_batch_20261113/QA8_REVIEW_PACKET.md"
+      ],
+      "unmet": "正本手順版・担当者・教育記録・署名",
+      "qa_status": "未評価・未署名",
+      "qa_reviewer": null,
+      "qa_decision": null,
+      "qa_signature": null,
+      "source_version_limit": "V9現行ソースを静的/オフライン照合。既存Bシナリオ1–6の実行はV6/V7、7–12はV9。V9読戻しは再実行を意味しない。",
+      "qa_planned_reviewer": "中嶋 將仁（ITF合同会社）"
+    }
+  ],
+  "planned_reviewer": {
+    "name": "中嶋 將仁",
+    "organization": "ITF合同会社",
+    "profession": "プログラマー・エンジニア",
+    "role": "EDCシステムの技術的品質保証（QA）担当予定者",
+    "appointed_by": "PI",
+    "acceptance": null,
+    "actual_scope_confirmed": null,
+    "development_involvement": null,
+    "independence_assessment": null,
+    "nda_confirmed": null,
+    "access_approved": null,
+    "signature": null,
+    "contacted": false,
+    "shared": false
+  }
+}
