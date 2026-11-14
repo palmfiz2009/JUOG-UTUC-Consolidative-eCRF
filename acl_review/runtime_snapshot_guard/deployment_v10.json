@@ -1,0 +1,51 @@
+{
+  "date_jst": "2026-11-14",
+  "approved_change_commit": "ff92a9118838d53b381fccdfcf8d8e1aea9a45db",
+  "scope": "security snapshot check only; auth remains disabled",
+  "script_id": "11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy",
+  "deployment_id": "AKfycbzLj9Dr-vUM6sTZHFOsxo0dUrscxNCp6LA196n2IBtYF3vYJ3ttnWLW3dY2eWJ7Gpf3GQ",
+  "previous_version": 9,
+  "new_version": 10,
+  "deployment_time_jst": "22:19",
+  "source_file": "コード.gs",
+  "base_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+  "saved_source_sha256": "b9916f8baefa6b087517a84283417af429efcf11865f6fa1006db02b121543c4",
+  "source_copy_readback_match": true,
+  "deployment_id_changed": false,
+  "execution_identity_changed": false,
+  "public_access_changed": false,
+  "recovery_candidate_deployed": false,
+  "pre_check_jst": "22:18:30",
+  "post_check_jst": "22:20:28",
+  "pre_and_post": {
+    "authEnabled": false,
+    "businessEnabled": false,
+    "stopConfirmed": true,
+    "sessionEvents": 364,
+    "businessBaselineUnchanged": true,
+    "postStopEvidenceVerified": true
+  },
+  "business_baseline": {
+    "rows_including_header": 165,
+    "columns": 6,
+    "sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797"
+  },
+  "postcheck_method": "Existing editor-only stop helper; no signed HTTP request or business operation",
+  "old_key_rejection": "NOT_MEASURED",
+  "live_race_test": "NOT_RUN_AUTH_DISABLED",
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "protected_environments_changed": false,
+  "keys_or_acl_changed": false,
+  "project_auxiliary_files": [
+    "SessionHeadReadonlyDiagnostic.gs",
+    "SessionHeadRecoveryApproved.gs",
+    "AuthProbeGateApproved.gs"
+  ],
+  "scope_of_source_hash": "main code file only, not a combined project hash",
+  "screenshot_sha256": "149a195328cded5ee3ef5a9ca815fbeb8d4830c3c4958c57982b7af49d50ee61"
+}
