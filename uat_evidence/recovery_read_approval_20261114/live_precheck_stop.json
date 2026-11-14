@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-14",
+  "approval": "PI approved proposal 24c3338",
+  "status": "STOPPED_BEFORE_DEPLOYMENT",
+  "checks": {
+    "editor_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+    "deployment_version": 9,
+    "deployment_id_matches": true,
+    "isolated_sheet_matches": true,
+    "stage": "AUTH_CONNECT",
+    "auth04ScopeReviewed": false,
+    "auth04ExecutionApprovalRef": null,
+    "b971ExecutionUntil": 0,
+    "business_rows": 165,
+    "business_sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797"
+  },
+  "incident": {
+    "description": "An overly broad browser accessibility observation included isolated script-property secret values in tool output. No secret values are included in this evidence. Limited activation was stopped.",
+    "affected_property_names": [
+      "ADMIN_BRIDGE_SIGNING_KEY",
+      "ADMIN_DRAFT_PEPPER",
+      "ADMIN_RESUME_DERIVATION_KEY"
+    ],
+    "required": "Owner-controlled coordinated credential replacement and compatibility review before live activation. Preserve existing drafts, journals and version history. Do not blindly rotate derivation secrets without checking old-data readability.",
+    "scope_uncertain": "No claim of public disclosure or third-party use; tool-output retention/access has not been established."
+  },
+  "mutations": {
+    "gas_source": false,
+    "deployment": false,
+    "config": false,
+    "frontend": false,
+    "business_write": false,
+    "acl": false
+  },
+  "read_trial": "NOT_RUN",
+  "uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  }
+}
