@@ -1,18 +1,40 @@
+"""Isolated entry: AUTH_CONNECT recovery only. No business or boundary harness.
+Reuses existing native OIDC, signed request, GAS ACL/session checks.
+"""
+import time
 import streamlit as st
-from auth04_config import load_config
-from pathlib import Path
-import hashlib, importlib
-try:
-    cfg=load_config()
-except PermissionError:
-    st.error("隔離試験設定を確認できません。送信していません。")
-    st.stop()
-if cfg['enabled']:
-    if hashlib.sha256(Path(__file__).with_name('uat_b971_cache_reconciliation.py').read_bytes()).hexdigest() != '325c8a6ee1bdd50e1e53a6dfe69e5a0b83cd555e22a414276e8e428a5ab59b87':
-        st.error("B971実行ソースが一致しません。送信していません。")
+from uat_auth_connect import context, context_envelope, send, valid_context
+
+def run():
+    st.set_page_config(page_title='JUOG AUTH_CONNECT',layout='centered')
+    st.title('JUOG 隔離認証接続')
+    st.info('AUTH_CONNECT：業務保存は禁止されています。')
+    if not st.user.is_logged_in:
+        if st.button('Googleでログイン'):
+            st.login('google')
         st.stop()
-    import uat_b971_cache_reconciliation
-    importlib.reload(uat_b971_cache_reconciliation).run()
-from uat_auth_connect import run
+    if st.session_state.get('auth_connect_halted'):
+        st.error('前回の異常で停止しています。管理者の確認が必要です。')
+        st.stop()
+    try:
+        native=context(st)
+    except Exception:
+        st.error('本人認証・期限・設定を確認できません。送信していません。')
+        iat, exp = st.user.get('iat'), st.user.get('exp')
+        if type(iat) is int and type(exp) is int and int(time.time()) >= min(iat + 3600, exp):
+            if st.button('期限切れのログインを終了して再認証'):
+                st.logout()
+        st.stop()
+    if st.button('現在の本人ACLを読取確認'):
+        try:
+            response=send(context_envelope(native))
+            if not valid_context(response):
+                raise PermissionError('ACL_NOT_CONFIRMED')
+            st.success('TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。')
+        except Exception:
+            st.session_state['auth_connect_halted'] = True
+            st.error('ACLまたは接続を確認できません。再送していません。')
+    st.caption('CRF入力画面はこの回復版には含みません。認証・ACLを迂回して開きません。')
+    st.stop()
+
 run()
-st.stop()
