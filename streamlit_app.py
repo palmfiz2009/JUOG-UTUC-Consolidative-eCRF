@@ -6,7 +6,13 @@ import runpy
 from pathlib import Path
 import streamlit as st
 from uat_auth_connect import context, context_envelope, send, valid_context
-from auth_diagnostics import checked_context, ContextFailure, expired_native_login
+from auth_diagnostics import checked_context, ContextFailure
+
+def expired_native_login(user,now):
+    """Only offer logout for demonstrably expired native claims; never clear halt."""
+    iat,exp=user.get('iat'),user.get('exp')
+    return type(iat) is int and type(exp) is int and type(now) is int and iat<=now and exp>iat and now>=min(iat+3600,exp)
+
 
 def run():
     st.set_page_config(page_title='JUOG AUTH_CONNECT',layout='centered')
