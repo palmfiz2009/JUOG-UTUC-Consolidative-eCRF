@@ -22,7 +22,7 @@ function env(action='ui_context',payload={id:'context',action:'ui_context',paylo
 const call=e=>x.juogUnifiedIsolationEntryV3_(e,c),checks=[];
 function test(name,f){f();checks.push(name);}
 
-assert.equal(hash(source),'8f26e2985af43299a9d9c6a18a981bfe3d2bc1b5a8739463f7faccb39b04cc84');
+assert.equal(hash(source),'5038e127dc2e61aeddbbcc3be9a8f46cfb9f05c7fdcf0558888b5fdb1a80bcf2');
 const originalJournal=JSON.stringify(journal);
 const py=`import sys,json
 from types import SimpleNamespace

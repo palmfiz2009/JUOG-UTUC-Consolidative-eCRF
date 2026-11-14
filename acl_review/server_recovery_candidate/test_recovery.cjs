@@ -1,10 +1,11 @@
+const crypto=require('crypto'),hash=s=>crypto.createHash('sha256').update(s).digest('hex');
 const fs=require('fs'),assert=require('assert/strict');
 const s=fs.readFileSync(__dirname+'/bundle_recovery_candidate.gs','utf8');
 const x=new Function(s+';return {juogCanonicalRecoveryList_,juogCanonicalRecoveryScope_,juogAuth04Request_};')();
 const p={registration_id:'JUOG-971',facility_code:'TEST01',record_key:'JUOG-971|perioperative_30d|30d'},who={id:'offline',enabled:true,role:'facility',facilities:['TEST01']},cfg={sessionExecutionStage:'AUTH04_APPROVED',canonicalRecoveryReadApproved:true,canonicalRecoveryReviewRef:'OFFLINE'};
 const row=(id,actor='offline',caseId='JUOG-971')=>({id,actor,operation:{action:'save_crf',payload:{...p,registration_id:caseId,crf_type:'perioperative_30d',visit:'30d',submission_id:'submission',expected_record_version:2,data:{private:'NEVER_RETURN'}}}});
 let requests=[row('observed-id'),row('other-user','other'),row('other-case','offline','JUOG-970')],statuses={};const store={read:()=>({requests})},service={readView:()=>({tables:{}}),authorize:()=>({ok:true})},life={status:id=>statuses[id]||{ok:true,operation_id:id,action:'save_crf',state:'UNFINISHED',phase:'PREPARED'}};
-const run=(c=cfg,u=who,q=p)=>x.juogCanonicalRecoveryList_(store,service,life,u,q,c),checks=[];function test(n,f){f();checks.push(n)}
+const run=(c=cfg,u=who,q=p)=>x.juogCanonicalRecoveryList_(store,service,life,u,q,c,hash),checks=[];function test(n,f){f();checks.push(n)}
 test('recover same server operation after client memory loss',()=>{const a=run(),b=run();assert.equal(a.requests.length,1);assert.equal(a.requests[0].operation_id,b.requests[0].operation_id);assert.equal(a.read_only,true);assert(!JSON.stringify(a).includes('NEVER_RETURN'));assert(!JSON.stringify(a).includes('offline'))});
 test('AUTH_CONNECT rejects route',()=>assert.equal(run({...cfg,sessionExecutionStage:'AUTH_CONNECT'}).error,'RECOVERY_READ_NOT_APPROVED'));
 test('unapproved route rejected',()=>assert.equal(run({...cfg,canonicalRecoveryReadApproved:false}).ok,false));

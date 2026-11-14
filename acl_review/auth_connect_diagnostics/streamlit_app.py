@@ -8,6 +8,12 @@ import streamlit as st
 from uat_auth_connect import context, context_envelope, send, valid_context
 from auth_diagnostics import checked_context, ContextFailure
 
+def expired_native_login(user,now):
+    """Only offer logout for demonstrably expired native claims; never clear halt."""
+    iat,exp=user.get('iat'),user.get('exp')
+    return type(iat) is int and type(exp) is int and type(now) is int and iat<=now and exp>iat and now>=min(iat+3600,exp)
+
+
 def run():
     st.set_page_config(page_title='JUOG AUTH_CONNECT',layout='centered')
     st.title('JUOG 隔離認証接続')
@@ -19,6 +25,9 @@ def run():
     if st.session_state.get('auth_connect_halted'):
         st.error('前回の異常で停止しています。管理者の確認が必要です。')
         st.caption('診断コード：'+st.session_state.get('_auth_failure_code','PREVIOUS_FAILURE_UNCLASSIFIED'))
+        if expired_native_login(st.user,int(time.time())):
+            if st.button('期限切れのログインを終了して再認証'):
+                st.logout()
         st.stop()
     try:
         native=context(st)

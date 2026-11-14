@@ -7,7 +7,7 @@ s=source
 old="if(!['ui_context','session_revoke','prepare_request','execute_request','request_status','get_draft','read_crf'].includes(req.action))"
 s=s.replace(old,old.replace("'get_draft'","'list_requests','get_draft'"),1)
 s=s.replace(" }else if(req.action==='prepare_request'){", " }else if(req.action==='list_requests'){\n  juogCanonicalRecoveryScope_(req.payload);\n }else if(req.action==='prepare_request'){",1)
-s=s.replace("if(req.action==='list_requests')return lifecycle.list();", "if(req.action==='list_requests')return auth04Scoped?juogCanonicalRecoveryList_(store,service,lifecycle,who,req.payload,c):lifecycle.list();",1)
+s=s.replace("if(req.action==='list_requests')return lifecycle.list();", "if(req.action==='list_requests')return auth04Scoped?juogCanonicalRecoveryList_(store,service,lifecycle,who,req.payload,c,hash):lifecycle.list();",1)
 s+='\n'+(P/'recovery_scope.gs').read_text()
 (P/'bundle_recovery_candidate.gs').write_text(s)
 (P/'recovery.patch').write_text(''.join(difflib.unified_diff(source.splitlines(True),s.splitlines(True),fromfile='Version9',tofile='unapproved-recovery-candidate')))

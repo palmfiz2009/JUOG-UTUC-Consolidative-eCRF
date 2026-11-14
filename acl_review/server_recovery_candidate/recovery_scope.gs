@@ -4,7 +4,7 @@
 function juogCanonicalRecoveryScope_(p){
  if(!p||typeof p!=='object'||Array.isArray(p)||Object.keys(p).sort().join(',')!=='facility_code,record_key,registration_id'||p.registration_id!=='JUOG-971'||p.facility_code!=='TEST01'||p.record_key!=='JUOG-971|perioperative_30d|30d')throw Error('RECOVERY_SCOPE_DENIED');
 }
-function juogCanonicalRecoveryList_(store,service,lifecycle,who,p,c){
+function juogCanonicalRecoveryList_(store,service,lifecycle,who,p,c,hash){
  if(!c||c.sessionExecutionStage!=='AUTH04_APPROVED'||c.canonicalRecoveryReadApproved!==true||typeof c.canonicalRecoveryReviewRef!=='string'||!c.canonicalRecoveryReviewRef.trim())return {ok:false,error:'RECOVERY_READ_NOT_APPROVED'};
  try{
   juogCanonicalRecoveryScope_(p);
@@ -23,8 +23,25 @@ function juogCanonicalRecoveryList_(store,service,lifecycle,who,p,c){
    const phases={SAVED:['COMMITTED'],FAILED:['REJECTED_BEFORE_INTENT'],UNFINISHED:['PREPARED','AUDIT_OR_COMMIT_PENDING']};
    if(!phases[status.state].includes(status.phase))throw Error('RECOVERY_STATE_UNVERIFIABLE');
    // No actor/principal, clinical payload, credentials, raw errors or broad list.
-   out.push({operation_id:r.id,state:status.state,phase:status.phase,submission_id:r.operation.payload.submission_id,expected_record_version:r.operation.payload.expected_record_version});
+   out.push({operation_id:r.id,state:status.state,phase:status.phase,submission_id:r.operation.payload.submission_id,expected_record_version:r.operation.payload.expected_record_version,content_sha256:hash(juogCanonicalRecoveryContent_(r.operation))});
   }
   return {ok:true,read_only:true,record_key:p.record_key,requests:out};
  }catch(_){return {ok:false,error:'RECOVERY_STATE_UNVERIFIABLE'};}
+}
+
+function juogCanonicalRecoveryContent_(operation){
+ const p=JSON.parse(JSON.stringify(operation.payload));delete p.submission_id;delete p.submitted_at;
+ function typed(v){
+  if(v===null)return ['null'];
+  if(typeof v==='boolean')return ['boolean',v];
+  if(typeof v==='string')return ['string',v];
+  if(typeof v==='number'){
+   if(!Number.isFinite(v))throw Error('RECOVERY_NUMBER_INVALID');
+   const b=new ArrayBuffer(8),d=new DataView(b);d.setFloat64(0,v===0?0:v,false);
+   return ['number',Array.from(new Uint8Array(b)).map(n=>n.toString(16).padStart(2,'0')).join('')];
+  }
+  if(Array.isArray(v))return ['array',v.map(typed)];
+  return ['object',Object.keys(v).sort().map(k=>[k,typed(v[k])])];
+ }
+ return JSON.stringify(typed({action:operation.action,payload:p}));
 }

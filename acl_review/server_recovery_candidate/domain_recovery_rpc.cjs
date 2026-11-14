@@ -18,6 +18,6 @@ if(q.action==='read_crf')r=service.execute('',q.payload);
 else if(q.action==='prepare_request')r=life.prepare(q.payload);
 else if(q.action==='execute_request')r=life.execute(q.payload.operation_id);
 else if(q.action==='request_status')r=life.status(q.payload.operation_id);
-else if(q.action==='list_requests')r=recovery(store,service,life,user,q.payload,config);
+else if(q.action==='list_requests')r=recovery(store,service,life,user,q.payload,config,hash);
 else if(q.action==='inspect')r={revision:service.readView().revision,audits:data.audits.length,requests:data.requests.length,events:data.requestEvents.length,records:service.readView().tables.V3_CrfState?.records||[]};
 else throw Error('BAD_ACTION');console.log(JSON.stringify(r));}catch(_){console.log(JSON.stringify({ok:false,error:'OFFLINE_RPC_ERROR'}));}});
