@@ -6,6 +6,7 @@ import runpy
 from pathlib import Path
 import streamlit as st
 from uat_auth_connect import context, context_envelope, send, valid_context
+from auth_diagnostics import checked_context, ContextFailure
 
 def run():
     st.set_page_config(page_title='JUOG AUTH_CONNECT',layout='centered')
@@ -17,6 +18,7 @@ def run():
         st.stop()
     if st.session_state.get('auth_connect_halted'):
         st.error('前回の異常で停止しています。管理者の確認が必要です。')
+        st.caption('診断コード：'+st.session_state.get('_auth_failure_code','PREVIOUS_FAILURE_UNCLASSIFIED'))
         st.stop()
     try:
         native=context(st)
@@ -30,14 +32,15 @@ def run():
     inspect_crf = st.checkbox('30日CRFの画面確認（保存・取得・送信は無効）')
     if inspect_crf or st.button('現在の本人ACLを読取確認'):
         try:
-            response=send(context_envelope(native))
-            if not valid_context(response):
-                raise PermissionError('ACL_NOT_CONFIRMED')
+            response=checked_context(send,context_envelope(native),valid_context)
             st.session_state['_canonical_acl_context'] = response
             st.success('TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。')
-        except Exception:
+        except Exception as error:
+            st.session_state['_auth_failure_code'] = error.code if isinstance(error,ContextFailure) else 'LOCAL_CONTEXT_ERROR'
+            st.session_state['_auth_failure_elapsed_ms'] = error.elapsed_ms if isinstance(error,ContextFailure) else None
             st.session_state['auth_connect_halted'] = True
             st.error('ACLまたは接続を確認できません。再送していません。')
+            st.caption('診断コード：'+st.session_state['_auth_failure_code'])
             st.stop()
     if inspect_crf:
         st.warning('完全架空入力による画面確認専用です。台帳照合・保存・下書き取得・通知は実行できません。')
