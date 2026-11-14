@@ -1,0 +1,71 @@
+{
+  "date_jst": "2026-11-14",
+  "scope": "One PI-approved normal OIDC login and TEST01 facility ui_context probe; immediately disable authentication afterward",
+  "environment": "ISOLATED_TEST",
+  "app_url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/",
+  "gas_deployed_version": 9,
+  "deployment_changed": false,
+  "editor_only_helper": "AuthProbeGateApproved.gs",
+  "helper_sha256": "dc7e5af31199274443bdf71d59456b6086456179e91ddbfb2428b9eeeee49159",
+  "technical_review": "acl_review/auth_probe_gate/technical_review.md",
+  "oidc": {
+    "user_completed_google_device_confirmation": true,
+    "returned_to_canonical_app": true,
+    "credentials_tokens_or_cookies_manipulated": false,
+    "raw_identity_or_tokens_collected_in_evidence": false
+  },
+  "enable_observation": {
+    "time_jst": "20:31:33",
+    "ok": true,
+    "sessionEvents": 362,
+    "authEnabled": true,
+    "businessEnabled": false
+  },
+  "probe_observation": {
+    "ui_action_count": 1,
+    "button": "現在の本人ACLを読取確認",
+    "response_observed_before_stop": true,
+    "visible_result": "TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。",
+    "configured_signer_communication": "SUCCESS",
+    "business_requests_sent": 0,
+    "recovery_api_requests_sent": 0
+  },
+  "stop_observation": {
+    "time_jst": "20:32:24",
+    "ok": true,
+    "authEnabled": false,
+    "businessEnabled": false,
+    "stopConfirmed": true,
+    "postStopEvidenceVerified": true,
+    "sessionEvents": 364,
+    "businessBaselineUnchanged": true
+  },
+  "business_evidence": {
+    "scope": "D3_Journal, all 165 rows including header and all six columns",
+    "sha256_compact_json": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+    "unchanged": true,
+    "whole_workbook_parity_claimed": false
+  },
+  "session_evidence": {
+    "validated_chain_and_head_after_stop": true,
+    "added_sequences": [363, 364],
+    "added_kinds": ["OPEN", "USE"],
+    "same_session": true,
+    "same_owner": true,
+    "same_fixed_deadline": true,
+    "raw_events_in_evidence": false,
+    "sixty_minute_boundary_pass_claimed": false
+  },
+  "limitations": [
+    "Key exchange is administrator-reported. Successful current signer communication is not independent proof of key provenance or rejection of the exposed old key.",
+    "Old-key signature rejection remains NOT MEASURED. Do not retrieve old secrets to fill this gap.",
+    "This was an operationally supervised single probe, not server-enforced one-shot authorization.",
+    "Version 9 can use a config snapshot obtained before disable; immediate revocation of other in-flight requests was not proven.",
+    "Authentication gate is now false. Do not resume limited recovery reads or business writes on this result alone.",
+    "Existing session was not revoked by disabling the authentication gate; no session generation reset was performed."
+  ],
+  "formal_uat": {"PASS": 32, "FAIL": 1, "BLOCKED": 29, "NOT_RUN": 5, "new_pass": 0},
+  "protected_environments_modified": false,
+  "acl_modified": false,
+  "keys_read_or_modified_by_agent": false
+}
