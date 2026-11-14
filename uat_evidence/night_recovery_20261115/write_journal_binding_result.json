@@ -1,0 +1,33 @@
+{
+  "base_commit": "2021d50d28030818fd76c5e724a9cd72163b2c02",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Pre-write discovery accepted a known submission_id even when operation_id, expected version or request state was inconsistent. Three independent regressions reproduced acceptance of a new correction.",
+  "fix": "Reuse strict discovery response validation and bind known submission IDs to locally retained operation IDs, expected versions and terminal states before allowing prepare.",
+  "new_tests": 4,
+  "pre_fix_failures": 3,
+  "post_fix": {
+    "recovery_tests": 45,
+    "canonical_save_tests": 21,
+    "all_passed": true,
+    "new_prepare_on_invalid_journal": 0,
+    "invalid_journal_business_state_unchanged": true,
+    "valid_correction_version": 2
+  },
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/recoverable_client.py": "dedd14b74c21d5a9d29aa764389f0bcf49c945118d684d04a60868238831d2e9",
+    "acl_review/server_recovery_candidate/recovery_client.py": "763fe12f3a8df59eb27d90b85f5a862cf3ffb060f1e1cf5355a92b4a10849b50",
+    "acl_review/server_recovery_candidate/test_write_journal_binding.py": "65a02564074458eabc2aae192cb8a6f08d5a8fabef04e99b3fdf0260001bf6a1"
+  },
+  "limitations": [
+    "Candidate only, not deployed or independently reviewed",
+    "No live communication, authentication, settings or ACL changes; live 165 rows not remeasured",
+    "Old-key rejection, scoped live recovery, durable sixty-minute observation and formal QA remain incomplete"
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  }
+}

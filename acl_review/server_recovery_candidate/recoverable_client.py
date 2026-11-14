@@ -4,6 +4,7 @@ Total loss of the local store still requires manual reconciliation; not a live s
 """
 import copy,hashlib,re,struct,math,json
 from client import Client,KEY,semantic_json
+from recovery_client import validated_rows
 from canonical_v9_bridge import BridgeError,operation,CASE,FACILITY
 def recovery_fingerprint(value):
  def typed(v):
@@ -21,10 +22,16 @@ class RecoverableClient(Client):
  def write(self,payload):
   # A new/empty local store is not proof that no earlier request exists.
   r=self.call('list_requests',{'registration_id':CASE,'facility_code':FACILITY,'record_key':KEY})
-  if r.get('ok') is not True or r.get('read_only') is not True or r.get('record_key')!=KEY or not isinstance(r.get('requests'),list):raise BridgeError('RECOVERY_READ_NOT_CONFIRMED')
-  known={row[0] for row in self.db.execute('SELECT submission_id FROM attempts WHERE actor=?',(self.actor,))}
-  for request in r['requests']:
-   if not isinstance(request,dict) or request.get('submission_id') not in known:raise BridgeError('LOCAL_STATE_LOST_MANUAL_RECONCILIATION')
+  rows=validated_rows(r)
+  known={row[0]:row for row in self.db.execute('SELECT submission_id,operation_id,base,state FROM attempts WHERE actor=?',(self.actor,))}
+  seen=set()
+  for request in rows:
+   sid=request.get('submission_id')
+   if sid not in known:raise BridgeError('LOCAL_STATE_LOST_MANUAL_RECONCILIATION')
+   local=known[sid]
+   if sid in seen or (local[1] is not None and request['operation_id']!=local[1]) or type(request.get('expected_record_version')) is not int or request['expected_record_version']!=local[2]:raise BridgeError('RECOVERY_JOURNAL_BINDING_MISMATCH')
+   if local[3] in ('SAVED','FAILED') and request['state']!=local[3]:raise BridgeError('RECOVERY_JOURNAL_BINDING_MISMATCH')
+   seen.add(sid)
   return super().write(payload)
  def recover_prepare(self,digest,payload):
   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')

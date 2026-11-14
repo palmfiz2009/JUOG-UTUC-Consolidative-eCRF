@@ -6,8 +6,7 @@ PHASES={'UNFINISHED':{'PREPARED','AUDIT_OR_COMMIT_PENDING'},'SAVED':{'COMMITTED'
 FIELDS={'operation_id','submission_id','state','phase','expected_record_version','content_sha256'}
 def valid_id(value):return isinstance(value,str) and re.fullmatch(r'[A-Za-z0-9_-]{1,128}',value) is not None
 
-def discover(call):
- r=call('list_requests',{'registration_id':CASE,'facility_code':FACILITY,'record_key':KEY})
+def validated_rows(r):
  if not isinstance(r,dict) or r.get('ok') is not True or r.get('read_only') is not True or r.get('record_key')!=KEY or not isinstance(r.get('requests'),list):raise BridgeError('RECOVERY_READ_NOT_CONFIRMED')
  rows=r['requests'];seen=set()
  for row in rows:
@@ -17,6 +16,10 @@ def discover(call):
   if 'expected_record_version' in row and (type(row['expected_record_version']) is not int or row['expected_record_version']<0):raise BridgeError('RECOVERY_ROW_INVALID')
   if 'content_sha256' in row and (not isinstance(row['content_sha256'],str) or not re.fullmatch('[a-f0-9]{64}',row['content_sha256'])):raise BridgeError('RECOVERY_ROW_INVALID')
   seen.add(row['operation_id'])
+ return rows
+
+def discover(call):
+ rows=validated_rows(call('list_requests',{'registration_id':CASE,'facility_code':FACILITY,'record_key':KEY}))
  pending=[v for v in rows if v['state']=='UNFINISHED']
  if len(pending)>1:raise BridgeError('AMBIGUOUS_RECOVERY')
  if not pending:return {'state':'NO_PENDING_OBSERVED','may_prepare':False,'may_execute':False,'requests':rows}
