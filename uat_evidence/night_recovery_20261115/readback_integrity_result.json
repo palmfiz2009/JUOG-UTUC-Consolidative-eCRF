@@ -1,0 +1,45 @@
+{
+  "base_commit": "ae9388dff8e5009207b7d39763a5383f12e58dc7",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Reconciliation hashed the redacted readback. Extra direct identifier fields in the returned saved payload could disappear before hashing and be incorrectly accepted as matching/SAVED.",
+  "fix": "Separate internal original-record retrieval from public redacted read. Reconcile submission metadata and semantic payload hash on original readback; never return raw payload via public read or success/error results. Seed observed version only after public redaction succeeds.",
+  "reproduction": {
+    "cases": 2,
+    "before_fix_failures": 2,
+    "after_fix_failures": 0,
+    "scope": "Injected synthetic identifier fields into local GAS fixture read responses, not live data or persisted production records.",
+    "cases_described": [
+      "extra patient_name",
+      "nested fullwidth MRN"
+    ]
+  },
+  "regression": {
+    "canonical_save_tests": 19,
+    "server_recovery_tests": 35,
+    "all_passed": true,
+    "verified": [
+      "Unexpected identifier additions reject confirmation with constant SAVE_CONTENT_MISMATCH error",
+      "Public read continues to remove synthetic marker",
+      "After removing response corruption, status-only reconciliation succeeds without another execute; audit count remains one"
+    ],
+    "warning": "Existing canonical subprocess harness ResourceWarning remains."
+  },
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/client.py": "64c265fefbddb68adafb3989a561181a29a32aeb5ee86c3f58145eda85f651af",
+    "acl_review/canonical_v9_save_candidate/test_readback_before_redaction.py": "6366628388a41dbf1c6f9a6a228e230500109cdf5b30d63d7329361a2a3c5fc9"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Candidate not deployed or independently reviewed.",
+    "No live settings, keys, authentication, ACL or business data accessed; 165 live rows not remeasured.",
+    "No claim of complete free-text identifier detection or AUTH-04 formal pass.",
+    "Old-key rejection, live recovery, durable sixty-minute observation and formal QA remain incomplete."
+  ],
+  "next": "Independently review all night recovery changes together. Verify raw payload never reaches UI/logs in approved live integration before formal AUTH-04 evaluation."
+}

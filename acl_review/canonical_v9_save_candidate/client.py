@@ -27,7 +27,8 @@ class Client:
   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')
   return self.transport(action,payload)
  def close(self):self.db.close()
- def read(self):
+ def _read_records(self):
+  """Internal integrity check input; never return unredacted content to UI."""
   self.observed=None
   r=self.call('read_crf',{'id':'read_'+uuid.uuid4().hex,'action':'read_crf','payload':{'registration_id':CASE,'facility_code':FACILITY,'record_key':KEY}})
   if r.get('ok') is not True or r.get('read_only') is not True or r.get('result',{}).get('ok') is not True:raise BridgeError('READ_NOT_CONFIRMED')
@@ -37,8 +38,12 @@ class Client:
   for n,rec in enumerate(records,1):
    p=rec.get('payload',{})
    if type(rec.get('record_version')) is not int or rec['record_version']!=n or rec.get('record_key')!=KEY or p.get('registration_id')!=CASE or p.get('facility_code')!=FACILITY or (p.get('crf_type'),p.get('visit'))!=PAIR:raise BridgeError('READ_SCOPE_OR_VERSION_INVALID')
+  return records
+ def read(self):
+  records=self._read_records()
+  redacted=self.redact(records)
   self.observed=len(records)
-  return {'ok':True,'record_version':self.observed,'records':self.redact(records)}
+  return {'ok':True,'record_version':self.observed,'records':redacted}
  def _row(self,digest):return self.db.execute('SELECT digest,actor,state,operation_id,submission_id,base FROM attempts WHERE digest=?',(digest,)).fetchone()
  def _set(self,digest,state,opid=None):
   self.db.execute('UPDATE attempts SET state=?,operation_id=COALESCE(?,operation_id) WHERE digest=?',(state,opid,digest));self.db.commit()
@@ -85,7 +90,8 @@ class Client:
   r=self.call('request_status',{'operation_id':row[3]})
   if r.get('ok') is not True or r.get('operation_id')!=row[3] or r.get('action')!='save_crf':raise BridgeError('STATUS_NOT_CONFIRMED')
   if r.get('state')=='SAVED' and r.get('phase')=='COMMITTED':
-   saved=self.read();matches=[x for x in saved['records'] if x.get('submission_id')==row[4]]
+   # Masking is a display safeguard, not proof of persisted content integrity.
+   records=self._read_records();matches=[x for x in records if x.get('submission_id')==row[4]]
    if len(matches)!=1 or matches[0]['record_version']!=row[5]+1:raise BridgeError('SAVE_READBACK_MISMATCH')
    # Semantic hashing omits submission metadata; bind it explicitly first.
    if matches[0].get('transaction_id')!=row[4] or matches[0]['payload'].get('submission_id')!=row[4]:raise BridgeError('SAVE_SUBMISSION_MISMATCH')
