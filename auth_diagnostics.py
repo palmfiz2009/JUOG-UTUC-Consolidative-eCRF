@@ -19,3 +19,8 @@ def checked_context(send,envelope,valid):
   error=r.get('error')
   raise failure(error if isinstance(error,str) and error in CODES else 'CONTEXT_REJECTED')
  return r
+
+def expired_native_login(user,now):
+    """Only offer logout for demonstrably expired native claims; never clear halt."""
+    iat,exp=user.get('iat'),user.get('exp')
+    return type(iat) is int and type(exp) is int and type(now) is int and iat<=now and exp>iat and now>=min(iat+3600,exp)
