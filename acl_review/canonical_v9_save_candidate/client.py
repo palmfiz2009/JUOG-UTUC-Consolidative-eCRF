@@ -87,6 +87,8 @@ class Client:
   if r.get('state')=='SAVED' and r.get('phase')=='COMMITTED':
    saved=self.read();matches=[x for x in saved['records'] if x.get('submission_id')==row[4]]
    if len(matches)!=1 or matches[0]['record_version']!=row[5]+1:raise BridgeError('SAVE_READBACK_MISMATCH')
+   # Semantic hashing omits submission metadata; bind it explicitly first.
+   if matches[0].get('transaction_id')!=row[4] or matches[0]['payload'].get('submission_id')!=row[4]:raise BridgeError('SAVE_SUBMISSION_MISMATCH')
    confirmed=copy.deepcopy(matches[0]['payload']);confirmed.pop('submission_id',None);confirmed.pop('submitted_at',None)
    if hashlib.sha256((self.actor+'|'+semantic_json({'action':'save_crf','payload':confirmed})).encode()).hexdigest()!=digest:raise BridgeError('SAVE_CONTENT_MISMATCH')
    self._set(digest,'SAVED');self.observed=None

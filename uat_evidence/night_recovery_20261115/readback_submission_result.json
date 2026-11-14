@@ -1,0 +1,41 @@
+{
+  "base_commit": "a1b3d8c05f6242376d421e567e8f5baabf40bb5a",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Saved readback ignored payload submission_id and transaction_id while stripping submission_id before semantic hashing; malformed metadata could be accepted as SAVED.",
+  "fix": "Require persisted payload submission_id and transaction_id to equal the retained local submission_id before marking SAVED. Existing record scope/version/content checks remain.",
+  "reproduction": {
+    "cases": 3,
+    "before_fix_failures": 3,
+    "after_fix_failures": 0,
+    "cases_described": [
+      "missing payload submission_id",
+      "different payload submission_id",
+      "different transaction_id"
+    ]
+  },
+  "regression": {
+    "canonical_save_tests": 17,
+    "server_recovery_tests": 33,
+    "all_passed": true,
+    "recovery_verified": "After correcting only the injected read response, same-operation status reconciliation succeeds without a second execute; one audit remains.",
+    "warning": "Existing canonical harness emits subprocess pipe ResourceWarning."
+  },
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/client.py": "12232cc8b13262c9f33c41a1572ddaff993a66c0ab5c5ffd22e248071b693e2c",
+    "acl_review/canonical_v9_save_candidate/test_readback_submission.py": "1956af5b042848ef0849a8f923cc6e4e01d54035d5e4426ac30836833f17f653"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "No live calls, settings, deployment, authentication or ACL changes; 165 live rows and audit not accessed.",
+    "Candidate not independently reviewed or deployed.",
+    "Local SQLite regression does not prove persistent Streamlit storage.",
+    "Old-key signature rejection, 60-minute live boundary, live recovery and formal QA remain incomplete."
+  ],
+  "next": "Independently review original/recovery prepare binding, PREPARED-only execution and readback submission binding together before any approved deployment/live test."
+}
