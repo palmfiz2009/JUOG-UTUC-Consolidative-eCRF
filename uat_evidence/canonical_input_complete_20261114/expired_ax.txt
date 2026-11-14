@@ -1,0 +1,29 @@
+Browser tab: 15, Title: "JUOG AUTH_CONNECT · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+0 AXWebArea JUOG AUTH_CONNECT · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
+	1 container
+		2 container streamlitApp
+			3 AXWebArea JUOG AUTH_CONNECT, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
+				4 container
+					27 container
+						28 link Description: Skip to main content, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#stMain
+						29 container
+							30 button Share
+							31 button favorite
+							32 button edit
+							33 button source
+							34 pop up button (collapsed) Description: Main menu, Secondary Actions: Expand
+						35 container stMain
+							36 heading JUOG 隔離認証接続, Value: 1, ID: juog
+								37 text JUOG 隔離認証接続
+								38 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog
+							39 text AUTH_CONNECT：業務保存は禁止されています。
+							40 container
+								41 checkbox (settable, integer) Description: 30日CRFの画面確認（保存・取得・送信は無効）, Value: 1
+								42 text 30日CRFの画面確認（保存・取得・送信は無効）
+							43 text ACLまたは接続を確認できません。再送していません。
+							44 text 診断コード：AUTH_EXPIRED
+		24 button Manage app
+			25 image
+			26 text Manage app
+
+The focused UI element is 3 AXWebArea JUOG AUTH_CONNECT, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
