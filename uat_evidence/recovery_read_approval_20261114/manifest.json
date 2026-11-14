@@ -1,0 +1,9 @@
+{
+  "acl_review/server_recovery_candidate/readonly_probe.py": "9139b8890b2b6d597583a18daa685baad440903fbac4f7b8fc43b92bba29dc61",
+  "acl_review/server_recovery_candidate/readonly_streamlit_entry.py": "4b305743db8024f2ac33b706b0b4d50a30ac8b7fafdb4ef647a0185b66f538da",
+  "acl_review/server_recovery_candidate/test_readonly_probe.py": "255f6d5281ccd902bc26d43bac12753284c9c26c85205df2e696448b299fa355",
+  "acl_review/server_recovery_candidate/test_readonly_activation.cjs": "0cae04aea5bedeb1c56ea413f1acddc5ccf633f26048ee5d164377e992a9e4f7",
+  "acl_review/server_recovery_candidate/readonly_results.json": "fe1ec4e24996ee5ed91ff04c2055a255da54c1e8be2d0376ddb649bf59441405",
+  "acl_review/server_recovery_candidate/source_identity.json": "f58e106de6ee9d5ec61a297e4bb20673e147e3b16f32a62d69b40774a0217224",
+  "acl_review/server_recovery_candidate/recovery.patch": "2ed93729f03df09a85f5e87a4e78e3ed1d41d24ad80dc7a3f73b0f2295206175"
+}

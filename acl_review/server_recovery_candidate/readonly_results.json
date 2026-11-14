@@ -1,0 +1,28 @@
+{
+  "mode": "OFFLINE_SIGNED_READ_ONLY_CONFIGURATION",
+  "candidate_sha256": "ea70e3970a10a405cebdcf6f049ce2f426a91337dadc8846b5a9886b0a382383",
+  "fixture_source_sha256": "0ff94ba36f1bd123bc1552eb675b823504659f14309bc3c1f93a5a824c03d343",
+  "synthetic_identity_pins": 2,
+  "business_journal_unchanged": true,
+  "live": false,
+  "checks": [
+    "read-only list/status/read reconcile committed record",
+    "valid prepared payload cannot prepare with writes false",
+    "existing real operation cannot execute with writes false",
+    "deny save_crf",
+    "deny save_draft",
+    "deny get_draft",
+    "deny submit_screening",
+    "deny submit_mdt_review",
+    "deny finalize_mdt",
+    "deny void_registration",
+    "deny export_csv",
+    "deny get_stats",
+    "request cannot inject approval flags",
+    "removing read flag cannot restore broad routes",
+    "other case visit and facility read denied",
+    "activation deadline enforced and restore AUTH_CONNECT blocks read"
+  ],
+  "count": 16,
+  "passed": true
+}
