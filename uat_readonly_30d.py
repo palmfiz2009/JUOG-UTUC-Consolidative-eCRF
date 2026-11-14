@@ -436,9 +436,12 @@ if surgery_performed == "実施した":
                 key="inspect_peri_path_ypn",
                 disabled=L,
             )
-        else:
+        elif ln_dissection == "実施しなかった":
             path["ypn"] = "ypNX（郭清なし）"
             st.info("リンパ節郭清なしのためypNは ypNX として記録します。")
+        else:
+            path["ypn"] = ""
+            st.info("リンパ節郭清の実施有無を選択してください。")
         # 術後病理で確認された検索リンパ節数。郭清なしの場合はN/A。
         if ln_dissection == "実施した":
             path["ln_count_examined"] = st.number_input(
@@ -482,8 +485,10 @@ if surgery_performed == "実施した":
         and path.get("ypn") in {"ypN0", "ypNX（郭清なし）", "ypNX（評価不能）"}
     )
     path["pcr_ypt0n0"] = bool(path.get("ypt") == "ypT0" and path.get("ypn") == "ypN0")
-else:
+elif surgery_performed == "実施しなかった":
     st.info("手術未施行のため病理項目はN/Aです。")
+else:
+    st.info("手術実施有無が未選択のため、病理の適用可否は未確定です。")
 
 # ---------------- 30d ----------------
 st.markdown('<div class="juog-header">4. 術後30日評価</div>', unsafe_allow_html=True)
