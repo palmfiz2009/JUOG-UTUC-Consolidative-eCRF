@@ -1,0 +1,23 @@
+{
+  "observed_at": "2026-11-14T08:09:20.202Z",
+  "journal_rows": 165,
+  "journal_sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+  "business_revision": 14,
+  "drafts": 3,
+  "code_hashes": 0,
+  "owned_drafts": 3,
+  "session_event_rows": 360,
+  "session_chain_intact": true,
+  "script_head_match": "NOT_RECHECKED_NO_PROPERTIES_ACCESS",
+  "business_write": false,
+  "secrets_accessed": false,
+  "request_inventory": {
+    "committed": 11,
+    "failed_before_intent": 8,
+    "prepared_without_terminal": 0,
+    "intent_without_commit": 0,
+    "inconsistent": 0
+  },
+  "request_inventory_note": "Structural journal classification, not a signed request_status trial",
+  "unsealed_history_preserved": true
+}
