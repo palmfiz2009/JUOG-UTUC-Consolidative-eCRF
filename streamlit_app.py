@@ -14,6 +14,19 @@ def expired_native_login(user,now):
     return type(iat) is int and type(exp) is int and type(now) is int and iat<=now and exp>iat and now>=min(iat+3600,exp)
 
 
+def safe_logout(st):
+    """No business retry or halt reset. Revoke live B2 authority before logout."""
+    if expired_native_login(st.user, int(time.time())):
+        st.logout()
+        return
+    from uat_b2_auth_bridge import signed_request
+    native = context(st)
+    result = send(signed_request(native, 'session_revoke', {}))
+    if not isinstance(result, dict) or result.get('ok') is not True or result.get('revoked') is not True:
+        raise PermissionError('SESSION_REVOCATION_NOT_CONFIRMED')
+    st.logout()
+
+
 def run():
     st.set_page_config(page_title='JUOG AUTH_CONNECT',layout='centered')
     st.title('JUOG 隔離認証接続')
@@ -25,9 +38,11 @@ def run():
     if st.session_state.get('auth_connect_halted'):
         st.error('前回の異常で停止しています。管理者の確認が必要です。')
         st.caption('診断コード：'+st.session_state.get('_auth_failure_code','PREVIOUS_FAILURE_UNCLASSIFIED'))
-        if expired_native_login(st.user,int(time.time())):
-            if st.button('期限切れのログインを終了して再認証'):
-                st.logout()
+        if st.button('停止中のセッションを終了して再認証'):
+            try:
+                safe_logout(st)
+            except Exception:
+                st.error('セッション失効を確認できません。停止を維持し、自動再送しません。')
         st.stop()
     try:
         native=context(st)
