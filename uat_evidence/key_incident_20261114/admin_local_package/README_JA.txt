@@ -38,7 +38,7 @@ GASの次の3欄に対応するボタンから、新しい値だけを貼り付�
 旧値はコピーしません。他のプロパティは変更しません。
 provisionIsolatedAuth04KeysReviewは実行しないでください。
 
-6. 隔離StreamlitのSettings→Secretsで、[juog_identity_bridge]内のsigning_keyの値だけを、対応ボタンから貼り付けます。
+6. 隔離StreamlitのSettings→Secretsで、[auth_connect]内のsigning_keyの値だけを、対応ボタンから貼り付けます。
 TOMLの引用符は保持し、値の文字列だけを置き換えます。他のOAuth設定・Cookie設定・世代等は変更しません。
 Save後、対象の隔離アプリだけをRebootします。
 GASとStreamlitには同じ署名鍵が入るよう、必ず同じ暗号化ファイルを使ってください。
@@ -60,3 +60,7 @@ GASのauthConnectReviewApproved=falseを維持し、まだtrueに戻さないで
 実Windows GUI、clipboard、管理画面への貼付は未検証です。異常時は続行しません。
 clipboard履歴や外部ソフトによる取得を後から消す保証はできません。事前無効化が必要です。
 Pythonのメモリ内文字列の完全消去は保証しません。作業終了後は補助ツールを閉じてください。
+
+2026-11-14訂正：現行隔離フロントの設定先は[auth_connect].signing_keyです。
+暗号化bundle内部の旧フィールド名は互換性のため保持します。既存bundleを使えます。
+本訂正だけを理由に鍵を再生成・再交換しないでください。

@@ -30,6 +30,12 @@ def unlock(path, password):
     return m
 
 
+def transfer_fields(m):
+    # Legacy encrypted bundle format is retained; deployed UI reads auth_connect.
+    return [(f'GAS / {k}', v) for k, v in m['gas'].items()] + [
+        ('Streamlit / auth_connect.signing_key', m['streamlit']['juog_identity_bridge.signing_key'])]
+
+
 def main():
     import tkinter as tk
     from tkinter import filedialog, simpledialog, messagebox
@@ -70,8 +76,7 @@ def main():
         held[0] = value
         status.set(label + ': copied locally for 45 seconds; paste only to the named isolated setting.')
         timer[0] = app.after(45000, clear)
-    fields = [(f'GAS / {k}', v) for k, v in m['gas'].items()]
-    fields += [('Streamlit / juog_identity_bridge.signing_key', m['streamlit']['juog_identity_bridge.signing_key'])]
+    fields = transfer_fields(m)
     for label, value in fields:
         tk.Button(app, text=label, command=lambda l=label, v=value: copy_value(l, v)).pack(fill='x', padx=12, pady=2)
     def close():

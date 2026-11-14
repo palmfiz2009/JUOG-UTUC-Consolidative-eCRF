@@ -1,3 +1,5 @@
+> 2026-11-14訂正：現行隔離フロントは `[auth_connect].signing_key` を読みます。本文の `juog_identity_bridge.signing_key` は内部bridge/bundle名であり、Secretsの設定先ではありません。既存暗号化bundleは再生成不要。実交換完了はこの文書だけでは証明しません。
+
 # 隔離鍵露出対応・管理者実行手順（未実行）
 
 対象：隔離 Script 11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy、隔離Streamlitのみ。Version9維持。main・本番・既存TEST変更なし。

@@ -1,0 +1,10 @@
+{
+ "date":"2026-11-14",
+ "head_repair":"completed with independent MATCH readback; see session_head_repair_executed.json",
+ "live_app":{"expired_state_observed":true,"normal_logout_clicked":true,"google_login_button_observed_after_logout":true,"new_login_attempted":false,"gas_authentication_enabled":false},
+ "destination_correction":{"deployed_frontend_setting":"auth_connect.signing_key","legacy_encrypted_bundle_field_preserved":"juog_identity_bridge.signing_key","keys_regenerated":false,"existing_bundle_reusable":true,"destination_regression":"PASS synthetic fixture; not live key verification"},
+ "corrected_package_sha256":"765ebcc303b6402a6dcfe021576286d6983b6f906ca472cb224d0e8e5da5b478",
+ "old_key_refusal":{"status":"NOT_MEASURED","reason":"ordinary endpoint stops before HMAC validation while authConnectReviewApproved=false; safe old signer not established","invalid_signature_or_expiry_substitution_allowed":false,"old_key_retrieval_allowed":false},
+ "proposed_next_scope":{"requires_PI_decision":true,"purpose":"current configured signer communication after regular OIDC login; do not claim new key provenance from success alone","environment":"existing isolated deployment only","principal":"existing TEST01 facility ACL only","operations":["ui_context"],"business_save":false,"recovery_api":false,"key_or_acl_changes":false,"restore_stop_after_probe":true,"unexpected_result":"stop; no automatic retry"},
+ "formal_uat":{"PASS":32,"FAIL":1,"BLOCKED":29,"NOT_RUN":5}
+}

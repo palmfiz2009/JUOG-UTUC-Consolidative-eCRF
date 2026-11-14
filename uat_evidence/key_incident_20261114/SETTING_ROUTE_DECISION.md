@@ -1,3 +1,5 @@
+> 2026-11-14訂正：現行隔離フロントは `[auth_connect].signing_key` を読みます。本文の `juog_identity_bridge.signing_key` は内部bridge/bundle名であり、Secretsの設定先ではありません。既存暗号化bundleは再生成不要。実交換完了はこの文書だけでは証明しません。
+
 # 設定経路の判定（2026-11-14）
 
 ## 結論
