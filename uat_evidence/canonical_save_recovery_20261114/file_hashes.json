@@ -1,0 +1,21 @@
+{
+  "acl_review/auth_connect_diagnostics/auth_diagnostics.py": "c64c247cccf39d5e63a284e2659e4f369826048bde3fdf9148020a8c0dba34b1",
+  "acl_review/auth_connect_diagnostics/streamlit_app.py": "9a598e64108d27cde99bfe6481cd1bb7ce8a0904f33ac236c763d9569ecb29bc",
+  "acl_review/auth_connect_diagnostics/test_diagnostics.py": "fe505cb6aa7958a0b23936cc3077e2e0ec68a0671a7d6c9e270fe9ed700be976",
+  "acl_review/server_recovery_candidate/build_patch.py": "9cef4c47bc9568e9853cca655d2e8549ee69d4cd788d2a1cf3b581bca77f01c9",
+  "acl_review/server_recovery_candidate/domain_recovery_results.json": "ab368f8085141bc86438538eccec8c7541730cbc5738ac8006f03f141aa4a674",
+  "acl_review/server_recovery_candidate/domain_recovery_rpc.cjs": "5e80f546069dc7049dd151fde617f197f0ec4e54a265c261236450f3a82f2af9",
+  "acl_review/server_recovery_candidate/recovery.patch": "d9b32a67030b119e1ce2bfcb0f8779d550dffb6475e5a6b0896b8e4bd1ad9e77",
+  "acl_review/server_recovery_candidate/recovery_client.py": "e386a97c0afb2ca37bece9d2cea79af53235693d9023ece6bfe11088ad45ea12",
+  "acl_review/server_recovery_candidate/recovery_scope.gs": "81d02da79f141d77a9a5d96a0c312564666dc4558ef8faa0c64a71f96e475caf",
+  "acl_review/server_recovery_candidate/results.json": "9011b58b543b1e2025eb3011247321e45277db7ec8c49c41a9bd79370af88097",
+  "acl_review/server_recovery_candidate/signed_scope_regression.json": "6fd2070006295004b1a9938784ce535f6ea2cde8f214277a6b18f1567e6754d4",
+  "acl_review/server_recovery_candidate/source_identity.json": "42187ece4a7286c295a32bf5f657993934659a4710d69af1b8eef5c306a8c2a7",
+  "acl_review/server_recovery_candidate/test_domain_recovery.py": "3db4d99c2124a2e05fc6628df6bf619a052329ed9e38b8b4e09b0d3eca6c0ae2",
+  "acl_review/server_recovery_candidate/test_recovery.cjs": "e380813de930a0dbe12a20c45b8f1953d810a1bf3717c2002a9c760d574da669",
+  "acl_review/server_recovery_candidate/test_recovery_client.py": "a072d556b9d8549404f8de7d11342816b3a5660d1071881c76b76aa8d0b25a1e",
+  "acl_review/server_recovery_candidate/test_signed_scope.cjs": "778dcafa2afd248a1331438f0aebeb09f74fe6744208a1fc23a1b2e019cb2407",
+  "uat_evidence/canonical_save_recovery_20261114/RESULTS.md": "8d9e1cc3782219d410e517ca35e4bc85146a36e192f033ba612a85ffafeff9d5",
+  "uat_evidence/canonical_save_recovery_20261114/halt.jpg": "7ce9afd5b3ca4e6534c18423ba9de35bfc5492c4098a7778c262cc1da1a37d80",
+  "uat_evidence/canonical_save_recovery_20261114/halt_ax.txt": "fb52ad6da465ae4cd3a09b8a53480f0fe7453dc8b908de69ad433df4e26827d7"
+}

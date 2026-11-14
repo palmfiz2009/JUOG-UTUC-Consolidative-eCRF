@@ -1,0 +1,7 @@
+{
+  "tests": 2,
+  "passed": true,
+  "mode": "OFFLINE_ACTUAL_V9_DOMAIN_LIFECYCLE_WITH_CANDIDATE_RECOVERY_MEMORY_STORE",
+  "live_network_calls": 0,
+  "formal_pass_delta": 0
+}

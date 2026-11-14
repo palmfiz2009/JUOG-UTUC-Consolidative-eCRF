@@ -1,0 +1,17 @@
+{
+  "mode": "OFFLINE_CANDIDATE_READONLY_RECOVERY_NOT_DEPLOYED",
+  "checks": [
+    "recover same server operation after client memory loss",
+    "AUTH_CONNECT rejects route",
+    "unapproved route rejected",
+    "wrong role facility or disabled denied",
+    "scope extras and other record rejected",
+    "unknown status fails closed",
+    "business journal never mutated",
+    "request gate accepts only exact scoped recovery",
+    "malformed metadata cannot leak through summaries"
+  ],
+  "passed": true,
+  "count": 9,
+  "live_business_calls": 0
+}
