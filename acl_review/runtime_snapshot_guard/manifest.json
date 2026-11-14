@@ -1,0 +1,14 @@
+[
+  {
+    "base": "version9",
+    "base_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
+    "candidate_sha256": "b9916f8baefa6b087517a84283417af429efcf11865f6fa1006db02b121543c4",
+    "deployed": false
+  },
+  {
+    "base": "recovery",
+    "base_sha256": "ea70e3970a10a405cebdcf6f049ce2f426a91337dadc8846b5a9886b0a382383",
+    "candidate_sha256": "5b7c086bee4afe98efc8c140204110765f9f8b534422e4ebe273bd85c2a89fbe",
+    "deployed": false
+  }
+]

@@ -1,0 +1,31 @@
+{
+  "mode": "OFFLINE_FULL_SIGNED_ENTRY_WITH_TWO_SYNTHETIC_IDENTITY_PIN_SUBSTITUTIONS",
+  "source_sha256": "5b7c086bee4afe98efc8c140204110765f9f8b534422e4ebe273bd85c2a89fbe",
+  "fixture_source_sha256": "75e8196d783aaf2137442bdca391742296e57a76dac27efa8e81dfe143973cb1",
+  "identity_pin_substitutions": 2,
+  "real_google_authentication": false,
+  "live_calls": 0,
+  "checks": [
+    "recovery read approval alone cannot prepare or execute",
+    "recovery read scope excludes other visits",
+    "signed prepare reaches actual request journal",
+    "second pending prepare denied under server lock",
+    "signed recovery reads same actor operation and content digest",
+    "additional approval false denied",
+    "other facility request denied",
+    "other case request denied",
+    "unregistered principal denied",
+    "registered other principal denied",
+    "wrong ACL role denied",
+    "signature tamper denied",
+    "replay denied",
+    "expired signature denied",
+    "out of scope API denied",
+    "AUTH_CONNECT denies route",
+    "read recovery did not mutate business journal",
+    "signed execution commits once and recovery confirms saved audit"
+  ],
+  "passed": true,
+  "count": 18,
+  "formal_pass_delta": 0
+}

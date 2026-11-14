@@ -1,0 +1,19 @@
+{
+  "live": false,
+  "deployed": false,
+  "new_defect_fixed": "stale pre-lock configuration and key snapshot accepted after stop/rotation",
+  "independent_cases": 36,
+  "independent_limit_demonstrations": 2,
+  "signed_readonly_cases": 16,
+  "signed_save_recovery_cases": 18,
+  "result": "PASS_WITH_DOCUMENTED_LOCK_DISCIPLINE_LIMITATIONS",
+  "business_mode_changed": false,
+  "real_credentials_accessed": false,
+  "formal_uat_delta": 0,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  }
+}

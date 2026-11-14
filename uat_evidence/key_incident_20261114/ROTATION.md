@@ -1,3 +1,5 @@
+> 最新実測（2026-11-14 20:32 JST）：管理者の交換申告後、現在設定された署名鍵で本人ACL照合に成功し、直後に認証停止へ復帰。旧鍵拒否は未実測。証拠は `post_repair_auth_probe_live.json`（daecaa5）。以下は作成当時の手順・停止記録を保全したもので、末尾の未実行表示は当時の状態。
+
 > 2026-11-14訂正：現行隔離フロントは `[auth_connect].signing_key` を読みます。本文の `juog_identity_bridge.signing_key` は内部bridge/bundle名であり、Secretsの設定先ではありません。既存暗号化bundleは再生成不要。実交換完了はこの文書だけでは証明しません。
 
 # 隔離鍵露出対応・管理者実行手順（未実行）

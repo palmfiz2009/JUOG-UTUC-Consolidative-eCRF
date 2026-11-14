@@ -1,0 +1,43 @@
+--- bundle_prepare_view_candidate.gs
++++ version9_candidate.gs
+@@ -3482,6 +3482,7 @@
+  if(auth04Scoped&&!juogAuth04ScopeConfigured_(c))return {ok:false,error:'AUTH04_SCOPE_NOT_APPROVED'};
+  const lock=LockService.getScriptLock();if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
+  try {
++  juogRequireCurrentRuntimeSnapshot_(c);
+   const auth=juogV3DecodeBridge_(envelope,c),req=auth.request;
+   if(!authConnect&&!auth04Scoped&&(c.allRoutesReviewed!==true||c.schemaParityApproved!==true))return {ok:false,error:'INTEGRATION_NOT_APPROVED'};
+   if(auth04Scoped)juogAuth04Request_(req);
+@@ -3554,7 +3555,7 @@
+    else response.code_delivery='SUPERSEDED';
+   }
+   return response;
+- }catch(e){const safe=['AUTH04_SCOPE_DENIED','AUTH_REQUIRED','AUTH_INVALID','AUTH_EXPIRED','REQUEST_SIGNATURE_MISMATCH','SESSION_REQUIRED','SESSION_INVALID','SESSION_REVOKED','ASSERTION_REPLAY','SESSION_STORE_UNAVAILABLE','SESSION_STORE_INVALID','SESSION_STORE_FULL','ACL_DENIED','ACL_CHANGED'];return {ok:false,error:safe.includes(e.message)?e.message:'UNIFIED_TRANSACTION_INCOMPLETE'};}finally{lock.releaseLock();}
++ }catch(e){const safe=['CONFIGURATION_CHANGED','AUTH04_SCOPE_DENIED','AUTH_REQUIRED','AUTH_INVALID','AUTH_EXPIRED','REQUEST_SIGNATURE_MISMATCH','SESSION_REQUIRED','SESSION_INVALID','SESSION_REVOKED','ASSERTION_REPLAY','SESSION_STORE_UNAVAILABLE','SESSION_STORE_INVALID','SESSION_STORE_FULL','ACL_DENIED','ACL_CHANGED'];return {ok:false,error:safe.includes(e.message)?e.message:'UNIFIED_TRANSACTION_INCOMPLETE'};}finally{lock.releaseLock();}
+ }
+ 
+ // SOURCE: isolation_unified_webapp.gs
+@@ -4054,3 +4055,23 @@
+ function juogB971ResumeRecovered(){return juogB971Admin_('resume_recovered');}
+ 
+ function juogB971ResumeAfterAbsentPrepare(){return juogB971Admin_('resume_absent_prepare');}
++
++// Recheck inside the same ScriptLock used for session and business operations.
++// Never log configuration or credentials. A change requires a fresh request.
++function juogRequireCurrentRuntimeSnapshot_(snapshot) {
++ try {
++  const props=PropertiesService.getScriptProperties();
++  const raw=props.getProperty('UNIFIED_ISOLATION_CONFIG');
++  if(!raw)throw Error('CONFIGURATION_CHANGED');
++  const current=JSON.parse(raw);
++  current.signingKey=props.getProperty('ADMIN_BRIDGE_SIGNING_KEY');
++  current.resumeDerivationKey=props.getProperty('ADMIN_RESUME_DERIVATION_KEY');
++  current.draftPepper=props.getProperty('ADMIN_DRAFT_PEPPER');
++  function stable(v){
++   if(Array.isArray(v))return '['+v.map(stable).join(',')+']';
++   if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stable(v[k])).join(',')+'}';
++   return JSON.stringify(v);
++  }
++  if(stable(current)!==stable(snapshot))throw Error('CONFIGURATION_CHANGED');
++ }catch(_){throw Error('CONFIGURATION_CHANGED');}
++}
