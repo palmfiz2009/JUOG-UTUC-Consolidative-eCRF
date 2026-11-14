@@ -482,55 +482,18 @@ def _juog_actor_auth(action: str, payload: dict, st):
     return actor, None
 
 def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
-    """Call the central registration service.
-
-    Expected Streamlit secrets:
-    [registry]
-    url = "https://script.google.com/macros/s/.../exec"
-    token = "..."
-    """
+    """Isolated integration preview: no business transport or shared-token fallback."""
     import streamlit as st
+    from canonical_v9_bridge import preview
+    from uat_auth_connect import context
+    if action not in ('save_crf', 'save_draft', 'get_draft', 'read_crf'):
+        return {"ok": False, "error": "AUTH_CONNECT_BUSINESS_DISABLED"}
     try:
-        url = st.secrets["registry"]["url"]
-        token = st.secrets["registry"]["token"]
+        result = preview(context(st), st.session_state.get('_canonical_acl_context', {}),
+                         action, payload or {}, redact_draft_identifiers, {}, st.session_state)
+        return result
     except Exception:
-        return {"ok": False, "error": "REGISTRY_NOT_CONFIGURED"}
-    actor, err = _juog_actor_auth(action, payload or {}, st)
-    if err:
-        return {"ok": False, "error": err}
-    body = {"action": action, "token": token, "payload": payload or {}}
-    if actor is not None:
-        body["actor_auth"] = actor
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(body, ensure_ascii=False, default=str).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    # Google Apps Script ContentService may transiently fail while resolving its
-    # one-time redirect URL. Retry a small number of times from the canonical
-    # /exec endpoint; persistent configuration errors still surface unchanged.
-    import time
-    retryable_http = {404, 408, 429, 500, 502, 503, 504}
-    last_error = None
-    for attempt in range(3):
-        try:
-            ctx = ssl.create_default_context()
-            with urllib.request.urlopen(req, timeout=timeout, context=ctx) as res:
-                text_body = res.read().decode("utf-8")
-            data = json.loads(text_body)
-            return data if isinstance(data, dict) else {"ok": False, "error": "INVALID_RESPONSE"}
-        except urllib.error.HTTPError as exc:
-            last_error = {"ok": False, "error": f"HTTP_{exc.code}"}
-            if exc.code not in retryable_http or attempt == 2:
-                return last_error
-            time.sleep(0.6 * (attempt + 1))
-        except Exception as exc:
-            last_error = {"ok": False, "error": f"REGISTRY_ERROR:{exc}"}
-            if attempt == 2:
-                return last_error
-            time.sleep(0.6 * (attempt + 1))
-    return last_error or {"ok": False, "error": "REGISTRY_ERROR:UNKNOWN"}
+        return {"ok": False, "error": "REQUEST_PREVIEW_REJECTED"}
 
 
 
@@ -724,16 +687,8 @@ def validate_registry_id(registration_id: str, facility_code: str):
 
 def render_facility(label="施設名*", key="facility_name", disabled=False):
     import streamlit as st
-    options = ["選択してください"] + FACILITY_NAMES
-    current = st.session_state.get(key, "選択してください")
-    try:
-        idx = options.index(current)
-    except ValueError:
-        idx = 0
-    name = st.selectbox(label, options, index=idx, key=f"widget_{key}", disabled=disabled)
-    st.session_state[key] = name
-    code = FACILITY_NAME_TO_CODE.get(name, "")
-    return code, name
+    st.text_input(label, value="架空施設（隔離UAT専用） / TEST01", disabled=True)
+    return "TEST01", "架空施設（隔離UAT専用）"
 
 
 def render_lab_panel(prefix: str, required: bool, disabled=False, columns=2):

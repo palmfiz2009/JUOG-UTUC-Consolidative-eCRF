@@ -74,46 +74,9 @@ def validate_optional_lab_panel(raw_values: dict):
 st.title("JUOG UTUC_Consolidative 周術期・術後30日CRF")
 st.caption("主要評価項目の手術関連合併症は『手術終了時〜術後30日目』で判定します。30日訪問自体は30日±14日を許容します。")
 
-if "peri_sent" not in st.session_state:
-    st.session_state.peri_sent = False
-
-if st.session_state.peri_sent:
-    sent_id = st.session_state.get("peri_sent_registration_id", "")
-    sent_version = st.session_state.get("peri_sent_version", "")
-    st.success("送信が完了しました。")
-    if sent_id:
-        st.write(f"**JUOG登録番号：{sent_id}**")
-    if sent_version:
-        st.caption(f"周術期・術後30日CRFを保存しました（version {sent_version}）。")
-    else:
-        st.caption("周術期・術後30日CRFを保存しました。")
-    if st.session_state.get("peri_sent_had_warnings"):
-        st.info("確認事項も中央データに保存されています。")
-    if st.session_state.get("peri_sent_email_failed"):
-        st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
-    if st.session_state.get("peri_sent_draft_delete_failed"):
-        st.info("確定送信は完了していますが、仮保存データの削除確認ができませんでした。確定データには影響ありません。")
-    st.caption("訂正する場合はページを再読み込みし、「訂正報告」を選択して送信してください。")
-    st.stop()
-
-if st.session_state.get("draft30_loaded_at"):
-    st.success(f"仮保存データを読み込みました（最終保存：{st.session_state['draft30_loaded_at']}）。")
-    st.session_state.pop("draft30_loaded_at", None)
-
-# Show the previous draft-save result after rerun.
-_draft_flash = st.session_state.pop("draft30_flash", None)
-if isinstance(_draft_flash, dict):
-    _kind = _draft_flash.get("kind")
-    _message = str(_draft_flash.get("message") or "")
-    if _message:
-        if _kind == "success":
-            st.success(_message)
-        else:
-            st.error(_message)
-
 draft_tool_col1, draft_tool_col2, _draft_tool_spacer = st.columns([0.9, 0.9, 6.2])
 with draft_tool_col1:
-    draft_clicked = st.button("💾 仮保存", key="draft30_save_button", disabled=False)
+    draft_clicked = st.button("💾 仮保存", key="draft30_save_button", disabled=True)
 with draft_tool_col2:
     with st.popover("↩ 再開"):
         st.caption("JUOG登録番号と、仮保存時に入力した担当者メールアドレスを入力してください。")
@@ -126,7 +89,7 @@ with draft_tool_col2:
             "担当者メールアドレス",
             key="draft30_lookup_email",
         ).strip()
-        if st.button("読み込む", key="draft30_load_button", use_container_width=True):
+        if st.button("読み込む", key="draft30_load_button", use_container_width=True, disabled=True):
             if not valid_registration_id(draft_lookup_id):
                 st.error("JUOG登録番号を正しく入力してください（例：JUOG-001）。")
             elif not valid_email(draft_lookup_email):
@@ -473,9 +436,12 @@ if surgery_performed == "実施した":
                 key="peri_path_ypn",
                 disabled=L,
             )
-        else:
+        elif ln_dissection == "実施しなかった":
             path["ypn"] = "ypNX（郭清なし）"
             st.info("リンパ節郭清なしのためypNは ypNX として記録します。")
+        else:
+            path["ypn"] = ""
+            st.info("リンパ節郭清の実施有無を選択してください。")
         # 術後病理で確認された検索リンパ節数。郭清なしの場合はN/A。
         if ln_dissection == "実施した":
             path["ln_count_examined"] = st.number_input(
@@ -519,8 +485,10 @@ if surgery_performed == "実施した":
         and path.get("ypn") in {"ypN0", "ypNX（郭清なし）", "ypNX（評価不能）"}
     )
     path["pcr_ypt0n0"] = bool(path.get("ypt") == "ypT0" and path.get("ypn") == "ypN0")
-else:
+elif surgery_performed == "実施しなかった":
     st.info("手術未施行のため病理項目はN/Aです。")
+else:
+    st.info("手術実施有無が未選択のため、病理の適用可否は未確定です。")
 
 # ---------------- 30d ----------------
 st.markdown('<div class="juog-header">4. 術後30日評価</div>', unsafe_allow_html=True)
@@ -828,7 +796,7 @@ else:
     st.success("必須項目の入力と基本的な整合性チェックが完了しています。")
 
 st.caption("仮保存は正式送信ではありません。")
-submit_clicked = st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=L, key="draft30_submit_button")
+submit_clicked = st.button("事務局へ確定送信", type="primary", use_container_width=True, disabled=True, key="draft30_submit_button")
 
 if draft_clicked:
     if not valid_registration_id(registration_id):
@@ -879,6 +847,93 @@ if draft_clicked:
             st.session_state["draft30_flash"] = {"kind": "error", "message": message}
             st.rerun()
 
+def build_submission():
+    major30 = bool(
+        surgery_performed == "実施した"
+        and cd_grade in CD_MAJOR
+        and cd_relation in ["関連する", "否定できない"]
+        and not renal_exception
+    )
+    meta = make_submission_metadata(
+        "perioperative_30d", "30d", registration_id, facility_code, facility_name, reporter_email,
+        submission_kind, correction_reason,
+    )
+    data = {
+        "surgery_performed": surgery_performed,
+        "reference_date": date_str(planned_or_reference_date),
+        "last_evp_date": date_str(last_evp_date),
+        "admission_date": date_str(op_admission_date),
+        "operation_date": date_str(op_date),
+        "initial_hospital_outcome": initial_hospital_outcome,
+        "discharge_date": date_str(op_discharge_date),
+        "readmission_30d": readmission_30d,
+        "readmission_date": date_str(readmission_date),
+        "readmission_reason": text(readmission_reason),
+        "readmission_day30_status": readmission_day30_status,
+        "readmission_discharge_date": date_str(readmission_discharge_date),
+        "operation_type": op_type,
+        "operation_type_other": text(st.session_state.get("peri_op_other", "")),
+        "approach": "＋".join(approaches),
+        "approaches": approaches,
+        "approach_pattern": approach_pattern,
+        "conversion_reason": text(conversion_reason),
+        "operation_completed": op_completed,
+        "incomplete_reason": text(op_incomplete_detail),
+        "operation_time_min": op_time,
+        "blood_loss_ml": bleeding,
+        "eauiaic": eau_grade,
+        "eauiaic_detail": text(eau_detail),
+        "ln_dissection": ln_dissection,
+        "ln_range": ln_range,
+        "unrecovered_grade2plus_relevant_ae": unrecovered_g2_relevant,
+        "unrecovered_ae_detail": text(st.session_state.get("peri_g2_detail", "")),
+        "surgery_timing_reason_or_deviation": text(protocol_deviation_reason),
+        "no_operation_reason": no_op_reason if surgery_performed == "実施しなかった" else "",
+        "no_operation_other": text(st.session_state.get("peri_noop_other", "")),
+        "day0_vitals": {"timepoint": "postoperative_care_area_arrival", "sbp": day0_sbp, "dbp": day0_dbp, "pulse": day0_pulse, "temperature": day0_temp},
+        "inpatient_vitals": {"timepoint": "discharge", "sbp": discharge_sbp, "dbp": discharge_dbp, "pulse": discharge_pulse, "temperature": discharge_temp},
+        "discharge_vitals": {"available": initial_hospital_outcome == "退院済み", "sbp": discharge_sbp, "dbp": discharge_dbp, "pulse": discharge_pulse, "temperature": discharge_temp},
+        "inpatient_lab_available": discharge_lab_available,
+        "inpatient_lab_date": date_str(discharge_lab_date),
+        "inpatient_labs": discharge_labs_parsed,
+        "inpatient_required_test_omission_reason": "",
+        "pathology": path if surgery_performed == "実施した" else {},
+        "day30_visit_date": date_str(visit_date_30),
+        "day30_window_deviation_reason": text(window_deviation_reason),
+        "day30_lab_available": day30_lab_available,
+        "day30_lab_date": date_str(day30_lab_date),
+        "day30_labs": day30_parsed,
+        "day30_required_test_omission_reason": "",
+        "cd_grade_30": cd_grade,
+        "cd_event_date_30": date_str(cd_date),
+        "cd_detail_30": text(cd_detail),
+        "cd_surgery_relation": cd_relation,
+        "renal_exception": renal_exception,
+        "renal_exception_detail": text(renal_exception_detail),
+        "major_surgery_related_complication_30d": major30,
+        "ctcae_event": has_ctcae,
+        "ctcae_detail": text(ctcae_detail),
+        "postop_treatment": adj_plan,
+        "postop_treatment_detail": text(adj_detail),
+        "postop_treatment_start": date_str(adj_start),
+        "postop_treatment_end": date_str(adj_end),
+        "postop_treatment_ongoing": adj_ongoing,
+        "vital_status": status_alive,
+        "last_alive_date": date_str(final_visit_date),
+        "death_date": date_str(death_date),
+        "death_cause": death_cause,
+    }
+    payload = {**meta, "data": data}
+    return payload
+
+if st.button("保存要求の形式を確認（送信しません）", key="canonical_v9_preview"):
+    result = save_crf_payload(build_submission())
+    if result.get('preview_valid') is True:
+        st.info("Version 9用の署名付き要求を生成しました。送信・保存・台帳照合は未実施です。")
+        st.caption(f"未入力 {len(missing)}件 / 入力エラー {len(errors)}件。臨床入力の合格や保存成功を意味しません。")
+    else:
+        st.error("要求を生成できません。TEST01/JUOG-971、架空連絡先、本人認証、訂正参照版、識別情報を確認してください。")
+
 if submit_clicked:
     if missing or errors:
         st.error("未入力または入力エラーを修正してください。")
@@ -889,82 +944,8 @@ if submit_clicked:
         else:
             if reg_ok is None:
                 st.warning(reg_message)
-            major30 = bool(
-                surgery_performed == "実施した"
-                and cd_grade in CD_MAJOR
-                and cd_relation in ["関連する", "否定できない"]
-                and not renal_exception
-            )
-            meta = make_submission_metadata(
-                "perioperative_30d", "30d", registration_id, facility_code, facility_name, reporter_email,
-                submission_kind, correction_reason,
-            )
-            data = {
-                "surgery_performed": surgery_performed,
-                "reference_date": date_str(planned_or_reference_date),
-                "last_evp_date": date_str(last_evp_date),
-                "admission_date": date_str(op_admission_date),
-                "operation_date": date_str(op_date),
-                "initial_hospital_outcome": initial_hospital_outcome,
-                "discharge_date": date_str(op_discharge_date),
-                "readmission_30d": readmission_30d,
-                "readmission_date": date_str(readmission_date),
-                "readmission_reason": text(readmission_reason),
-                "readmission_day30_status": readmission_day30_status,
-                "readmission_discharge_date": date_str(readmission_discharge_date),
-                "operation_type": op_type,
-                "operation_type_other": text(st.session_state.get("peri_op_other", "")),
-                "approach": "＋".join(approaches),
-                "approaches": approaches,
-                "approach_pattern": approach_pattern,
-                "conversion_reason": text(conversion_reason),
-                "operation_completed": op_completed,
-                "incomplete_reason": text(op_incomplete_detail),
-                "operation_time_min": op_time,
-                "blood_loss_ml": bleeding,
-                "eauiaic": eau_grade,
-                "eauiaic_detail": text(eau_detail),
-                "ln_dissection": ln_dissection,
-                "ln_range": ln_range,
-                "unrecovered_grade2plus_relevant_ae": unrecovered_g2_relevant,
-                "unrecovered_ae_detail": text(st.session_state.get("peri_g2_detail", "")),
-                "surgery_timing_reason_or_deviation": text(protocol_deviation_reason),
-                "no_operation_reason": no_op_reason if surgery_performed == "実施しなかった" else "",
-                "no_operation_other": text(st.session_state.get("peri_noop_other", "")),
-                "day0_vitals": {"timepoint": "postoperative_care_area_arrival", "sbp": day0_sbp, "dbp": day0_dbp, "pulse": day0_pulse, "temperature": day0_temp},
-                "inpatient_vitals": {"timepoint": "discharge", "sbp": discharge_sbp, "dbp": discharge_dbp, "pulse": discharge_pulse, "temperature": discharge_temp},
-                "discharge_vitals": {"available": initial_hospital_outcome == "退院済み", "sbp": discharge_sbp, "dbp": discharge_dbp, "pulse": discharge_pulse, "temperature": discharge_temp},
-                "inpatient_lab_available": discharge_lab_available,
-                "inpatient_lab_date": date_str(discharge_lab_date),
-                "inpatient_labs": discharge_labs_parsed,
-                "inpatient_required_test_omission_reason": "",
-                "pathology": path if surgery_performed == "実施した" else {},
-                "day30_visit_date": date_str(visit_date_30),
-                "day30_window_deviation_reason": text(window_deviation_reason),
-                "day30_lab_available": day30_lab_available,
-                "day30_lab_date": date_str(day30_lab_date),
-                "day30_labs": day30_parsed,
-                "day30_required_test_omission_reason": "",
-                "cd_grade_30": cd_grade,
-                "cd_event_date_30": date_str(cd_date),
-                "cd_detail_30": text(cd_detail),
-                "cd_surgery_relation": cd_relation,
-                "renal_exception": renal_exception,
-                "renal_exception_detail": text(renal_exception_detail),
-                "major_surgery_related_complication_30d": major30,
-                "ctcae_event": has_ctcae,
-                "ctcae_detail": text(ctcae_detail),
-                "postop_treatment": adj_plan,
-                "postop_treatment_detail": text(adj_detail),
-                "postop_treatment_start": date_str(adj_start),
-                "postop_treatment_end": date_str(adj_end),
-                "postop_treatment_ongoing": adj_ongoing,
-                "vital_status": status_alive,
-                "last_alive_date": date_str(final_visit_date),
-                "death_date": date_str(death_date),
-                "death_cause": death_cause,
-            }
-            payload = {**meta, "data": data}
+            payload = build_submission()
+            major30 = payload["data"]["major_surgery_related_complication_30d"]
             report = f"""【JUOG 周術期・30日報告】
 JUOG登録番号: {registration_id}
 施設: {facility_name}

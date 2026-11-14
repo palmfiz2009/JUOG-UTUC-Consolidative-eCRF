@@ -33,6 +33,7 @@ def run():
             response=send(context_envelope(native))
             if not valid_context(response):
                 raise PermissionError('ACL_NOT_CONFIRMED')
+            st.session_state['_canonical_acl_context'] = response
             st.success('TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。')
         except Exception:
             st.session_state['auth_connect_halted'] = True
@@ -40,7 +41,12 @@ def run():
             st.stop()
     if inspect_crf:
         st.warning('完全架空入力による画面確認専用です。台帳照合・保存・下書き取得・通知は実行できません。')
-        runpy.run_path(str(Path(__file__).with_name('uat_readonly_30d.py')), run_name='__main__')
+        if not st.session_state.get('_canonical_form_initialized'):
+            for key in list(st.session_state):
+                if str(key).startswith(('peri_', 'widget_peri_', 'draft30_')):
+                    del st.session_state[key]
+            st.session_state['_canonical_form_initialized'] = True
+        runpy.run_path(str(Path(__file__).with_name('02_perioperative_30d_crf.py')), run_name='__main__')
     else:
         st.caption('30日CRFを表示する場合も、操作のたびに正規認証とGASの本人ACLを確認します。')
     st.stop()
