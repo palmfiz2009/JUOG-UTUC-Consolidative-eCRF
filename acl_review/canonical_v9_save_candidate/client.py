@@ -70,7 +70,13 @@ class Client:
    raise BridgeError('PREPARE_NOT_CONFIRMED')
   opid=prepared.get('operation_id')
   if not isinstance(opid,str) or not opid or len(opid)>128:raise BridgeError('OPERATION_ID_INVALID')
-  self._set(digest,'PREPARED',opid)
+  # Recovery in another client may already have bound/executed this attempt
+  # while the original prepare response was in flight. Never rewind it.
+  with self.db:
+   bound=self.db.execute("UPDATE attempts SET state='PREPARED',operation_id=? WHERE digest=? AND actor=? AND state='PREPARING' AND operation_id IS NULL",(opid,digest,self.actor)).rowcount
+  if bound!=1:
+   current=self._row(digest)
+   if not current or current[1]!=self.actor or current[3]!=opid:raise BridgeError('PREPARE_BIND_CONFLICT')
   return self.resume(digest)
  def reconcile(self,digest):
   row=self._row(digest)

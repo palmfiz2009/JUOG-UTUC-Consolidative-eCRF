@@ -1,0 +1,36 @@
+{
+  "base_commit": "c8c9157294ecce7b2c784199b807a7d13fb9a110",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Delayed original prepare response unconditionally reset a concurrently recovered EXECUTING attempt to PREPARED, allowing another execute request; conflicting bound operation IDs could also be replaced.",
+  "fix": "Bind original prepare response with actor/digest/state/null-operation compare-and-set. Preserve already-bound matching operation and advanced state; reject conflicting operation.",
+  "reproduction": {
+    "new_cases": 2,
+    "before_fix_failures": 2,
+    "after_fix_failures": 0,
+    "concurrent_clients": "Two RecoverableClient instances share local SQLite, deterministically interleaved at original prepare response; second execute delivery is made uncertain before delivery."
+  },
+  "regression": {
+    "server_recovery_tests": 33,
+    "canonical_save_tests": 14,
+    "all_passed": true,
+    "warnings": "Existing canonical test harness subprocess pipes emit ResourceWarning."
+  },
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/client.py": "964d4c350b6c74fd3393ea9703f77890399a2e13ad053b063f90971fbb9dd220",
+    "acl_review/server_recovery_candidate/test_prepare_binding_race.py": "feca610123ec1625dd29c55af146856aa04290435ba4f9180ea2deac243743ea"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "No live network/business requests or configuration changes. Existing 165 rows not accessed.",
+    "Not deployed; independent technical review and formally approved live validation remain required.",
+    "Local SQLite fixture does not establish durable multiprocess Streamlit storage.",
+    "Old-key rejection, full sixty-minute boundary, live recovery and formal QA remain incomplete."
+  ],
+  "next": "Review both night fixes together; preserve authoritative PREPARED-only execution gate and conditional binding on original and recovered prepare paths."
+}
