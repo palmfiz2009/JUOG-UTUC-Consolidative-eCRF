@@ -38,7 +38,8 @@ def operation(action,payload,redact,versions):
             kind=p.get('submission_kind')
             if kind=='初回報告':p['expected_record_version']=0
             elif kind=='訂正報告':
-                if not str(p.get('correction_reason','')).strip():raise BridgeError('CORRECTION_REASON_REQUIRED')
+                reason=p.get('correction_reason')
+                if not isinstance(reason,str) or not reason.strip():raise BridgeError('CORRECTION_REASON_REQUIRED')
                 version=versions.get(key)
                 if type(version) is not int or version<1:raise BridgeError('VERIFIED_RECORD_VERSION_REQUIRED')
                 p['expected_record_version']=version

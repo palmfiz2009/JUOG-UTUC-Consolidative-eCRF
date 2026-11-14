@@ -1,0 +1,39 @@
+{
+  "base_commit": "0351171dcbbf73c80de3261514624da0165b7b69",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Correction preflight stringified non-text correction_reason, accepting null, numbers, booleans and containers and issuing prepare requests. Separate bridge copies serve preview and save candidate.",
+  "fix": "Both bridge copies now require a nonempty string without changing valid reason text.",
+  "reproduction": {
+    "invalid_values": 7,
+    "before_fix": "All seven passed local preflight; prepare count rose from 1 to 8.",
+    "after_fix": "All seven rejected before prepare; original local records/audits unchanged.",
+    "new_tests": 2,
+    "additional_checks": "Empty/whitespace reasons rejected; valid Japanese text preserved."
+  },
+  "regression": {
+    "canonical_save_tests": 21,
+    "server_recovery_tests": 39,
+    "bridge_tests": 12,
+    "all_passed": true,
+    "warning": "Existing canonical harness ResourceWarning observed; suppressed on final rerun, not fixed."
+  },
+  "source_sha256": {
+    "acl_review/canonical_v9_integration/canonical_v9_bridge.py": "a9dd883faedffc91fac3c0f144568384367d2351bdfcc2904d63c60cda81819e",
+    "acl_review/canonical_v9_save_candidate/canonical_v9_bridge.py": "a9dd883faedffc91fac3c0f144568384367d2351bdfcc2904d63c60cda81819e",
+    "acl_review/canonical_v9_save_candidate/test_correction_reason_type.py": "6a9ff44872cb3e2410f661f49f5d474c94c4dd992c4af0f88d84ecb33ee52b51"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Candidate-only client preflight fix, not deployed or independently reviewed.",
+    "GAS reason type coercion remains unchanged; server-side strict typing requires separate candidate review before any deployment.",
+    "No live settings, keys, authentication, ACL or business access; 165 live rows not remeasured.",
+    "Old-key rejection, live recovery, durable sixty-minute observation and formal QA remain incomplete."
+  ],
+  "next": "Review both bridge copies and server reason contract together. Preserve communication stop and do not treat offline results as formal UAT."
+}
