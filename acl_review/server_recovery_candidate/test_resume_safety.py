@@ -27,4 +27,27 @@ class T(unittest.TestCase):
   self.c.transport=bad
   with self.assertRaisesRegex(BridgeError,'STATUS_PHASE_UNSAFE'):self.c.resume(d)
   self.assertNotIn('execute_request',self.calls)
+ def test_audit_pending_never_executes_even_with_local_prepared(self):
+  d=self.lost();self.c.recover_prepare(d,BASE);original=self.c.transport
+  def pending(a,p):
+   r=original(a,p)
+   if a=='request_status':r.update(state='UNFINISHED',phase='AUDIT_OR_COMMIT_PENDING')
+   return r
+  self.c.transport=pending
+  for _ in range(2):
+   with self.assertRaisesRegex(BridgeError,'EXECUTION_UNCERTAIN_STATUS_ONLY'):self.c.resume(d)
+  self.assertNotIn('execute_request',self.calls)
+  self.assertEqual(self.c._row(d)[2],'PREPARED')
+  self.assertEqual(self.call('inspect',{})['audits'],0)
+ def test_recovered_audit_pending_remains_status_only(self):
+  d=self.lost();original=self.c.transport
+  def pending(a,p):
+   r=original(a,p)
+   if a=='request_status':r.update(state='UNFINISHED',phase='AUDIT_OR_COMMIT_PENDING')
+   return r
+  self.c.transport=pending
+  result=self.c.recover_prepare(d,BASE)
+  self.assertEqual(result['phase'],'AUDIT_OR_COMMIT_PENDING')
+  with self.assertRaisesRegex(BridgeError,'EXECUTION_UNCERTAIN_STATUS_ONLY'):self.c.resume(d)
+  self.assertNotIn('execute_request',self.calls)
 if __name__=='__main__':unittest.main()

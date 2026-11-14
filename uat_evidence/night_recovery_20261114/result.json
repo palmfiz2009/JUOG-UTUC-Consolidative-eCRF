@@ -1,0 +1,39 @@
+{
+  "base_commit": "e55a9e716618c806b1f2679963321c8c5ab1950b",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Local PREPARED state allowed execute while authoritative status was UNFINISHED/AUDIT_OR_COMMIT_PENDING.",
+  "fix": "resume requires authoritative PREPARED phase before claiming the single execution attempt. Other unfinished phase remains status-only.",
+  "reproduction": {
+    "new_cases": 2,
+    "before_fix_failures": 2,
+    "after_fix_failures": 0
+  },
+  "regression": {
+    "server_recovery_tests": 31,
+    "canonical_save_tests": 14,
+    "all_passed": true,
+    "warnings": "Existing canonical test subprocess pipes emit ResourceWarning; no test failure."
+  },
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/client.py": "f0b6aa2d100a704c8e900e7d991a32d891e62149a2bc680811b291f8a05153bc",
+    "acl_review/server_recovery_candidate/test_resume_safety.py": "64e53f902b8caad8df04e57819983d613a88fe07841bc0be77d246c2089290af"
+  },
+  "limitations": [
+    "Transport status phase is injected in new tests; real V9 domain runs only in local Node memory. No live pending operation was created.",
+    "No independent reviewer or formal QA approval in this run.",
+    "Candidate not deployed. Auth gate, ACL, keys and live 165-row journal not accessed or changed.",
+    "No claim that old-key rejection, sixty-minute boundary or recovery live tests are complete."
+  ],
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "next_required": [
+    "Independent technical review of phase gate before deployment",
+    "Approved live recovery read after key incident closure",
+    "Retain separate approval for business writes; existing JUOG-971 is not an initial-save case"
+  ]
+}

@@ -93,6 +93,9 @@ class Client:
   if not row or row[1]!=self.actor or not row[3]:raise BridgeError('ATTEMPT_NOT_OWNED')
   status=self.reconcile(digest)
   if status['state']!='UNFINISHED':return status
+  # A recovered local PREPARED row is not proof that execution never began.
+  # An existing intent/audit may still be committing on the server.
+  if status['phase']!='PREPARED':raise BridgeError('EXECUTION_UNCERTAIN_STATUS_ONLY')
   # Atomically claim the sole client execution attempt. A prior uncertain
   # execute is status-only; do not send execute again automatically.
   with self.db:
