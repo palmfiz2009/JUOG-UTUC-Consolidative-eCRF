@@ -1,0 +1,22 @@
+{
+  "observed_date": "2026-11-14",
+  "displayed_execution_time": "19:28:08–19:28:09",
+  "execution": "administrator editor; completed once; not deployed",
+  "file_added": "SessionHeadReadonlyDiagnostic.gs",
+  "source_sha256": "c9e8cb33cdcc6c366ce4a8b85d265839f4a383aa4e5c3a2a1b818e9ec066f1ba",
+  "diagnostic": "SESSION_HEAD_READONLY_V1",
+  "ok": true,
+  "events": 362,
+  "headSequence": 360,
+  "headMatchesHistoricalRow": true,
+  "headMatchesCurrent": false,
+  "result": "HEAD_BEHIND_VALID_CHAIN",
+  "verified_guards": ["fixed isolated script", "fixed isolated sheet", "fixed session generation", "AUTH_CONNECT", "authConnectReviewApproved=false"],
+  "conclusion": "Live stored head matches row 360 exactly; live session ledger has 362 valid chained events. This discrepancy is a sufficient cause of SESSION_STORE_INVALID.",
+  "not_proven": ["origin/authenticity of tail requests", "cause or time of property rollback", "old-key signature rejection", "new key identity"],
+  "business_writes": false,
+  "property_changes": false,
+  "head_repair": false,
+  "deployment_changed": false,
+  "formal_uat": {"PASS":32,"FAIL":1,"BLOCKED":29,"NOT_RUN":5}
+}
