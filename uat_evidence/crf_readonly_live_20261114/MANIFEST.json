@@ -1,0 +1,12 @@
+{
+  "crf30_dissection_unselected_fixed.txt": "e1b493e780e6a449ab43ad9347dc6f21cf06c33c27e1646d921b549507f67562",
+  "crf30_final_no_surgery.txt": "b48645f0c2983eff71ad283f689dfbdd2cb5d516b50837e6d8f219dece6e64d9",
+  "crf30_final_zero_reason.txt": "591d48caaa1182a37c8809960da3e5bb9ff3b7ef791b62dcc69a57a6d4683877",
+  "crf30_readonly_live.jpg": "c72d3a2bc1490dbe19a3f22c8e3383bb238bd5fd5663c8f00ce1de5e2abb03c2",
+  "crf30_required_conditions.txt": "951d98e36c1257566fbafed88a3c08db6c9bf77b1466a66085451bb8c5671d6c",
+  "crf30_surgery_no.txt": "80b6aebf5dbf3c25817206438e6aa0e60cd4bc665df65ed303722f94373a7727",
+  "crf30_surgery_yes.txt": "bb987fdc6b445ff32722bef8ff31ec26656dbf4d44f9a846b3e90348ff91b1c2",
+  "crf30_unselected_fixed.txt": "9715a17da7700e55a254b174f524d219c6d885f73a748ab788f615185cec0e73",
+  "privacy_bounded_read.json": "3a8f398a4b3c25e63b271de449f9706be391e042757e457425cf29636b479d4e",
+  "result.json": "39e8d278ff2ed2af4dcc7912470648b7c2702d2915a1ac6f940f64a29469fa87"
+}

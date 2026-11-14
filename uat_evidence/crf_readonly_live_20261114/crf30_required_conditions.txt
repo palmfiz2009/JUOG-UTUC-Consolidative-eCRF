@@ -1,0 +1,9 @@
+Browser tab: 7, Title: "JUOG AUTH_CONNECT · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 329-330
++							336 container
++								337 button (expanded) 入力状況の詳細を確認, Secondary Actions: Collapse
++									338 text 入力状況の詳細を確認
++								339 text 未入力
++								340 text JUOG登録番号 / 担当者メールアドレス / 手術実施日 / EVP最終投与日 / 入院日 / 初回手術入院の転帰 / 術式 / アプローチ / 手術完遂 / 手術時間 / 出血量 / EAUiaiC / リンパ節郭清 / 手術時未回復Grade 2以上AE / ypT / LVI / R0 / TRG / 亜型/分化 / 病理部位 / ypN / 病理評価不能理由 / 術後管理場所到着時 収縮期血圧 / 術後管理場所到着時 拡張期血圧 / 術後管理場所到着時 脈拍 / 術後管理場所到着時 体温 / 30日評価日 / 30日評価に用いた採血日 / 30日評価採血結果 / 30日CD Grade / 術後治療 / 生存状況
+The focused UI element is 337 button (expanded) 入力状況の詳細を確認, Secondary Actions: Collapse

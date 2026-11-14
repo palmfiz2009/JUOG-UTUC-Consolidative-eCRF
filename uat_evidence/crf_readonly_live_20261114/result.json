@@ -1,0 +1,65 @@
+{
+  "date_jst": "2026-11-14",
+  "frontend_commit": "56bcb1b660a63ce1905307fd3b4109e129f88d12",
+  "gas_version": 9,
+  "stage": "AUTH_CONNECT",
+  "independent_technical_review": "review_session; 8 regressions independently passed; final unselected-state diff approved",
+  "business_saved": false,
+  "new_apis_enabled": false,
+  "acl_changed": false,
+  "external_qa_contact_or_request": false,
+  "source_sha256": {
+    "test_readonly.py": "55be0c81253882c41254543d59f980748e3fbe320a6c258b33b47a5d489a68a5",
+    "uat_readonly_30d.py": "98717a301f69709d13fa29801dd47c355e0d43e54c4187c318eea2d2bafef363",
+    "test_widgets.py": "bb8f2259ec1ea50f16e28cdb54b7517626d80bc8d758d1ebc612ed8985a4b668",
+    "streamlit_app.py": "69081433964602b9cf8853ad1595ea2cb7a0e3e0bb797c0d68dc4a943161f861",
+    "juog_readonly_common.py": "95f874e157d87e2944c6f5fa5f7b7c0236cb6b48d4238a942a3165d1a109daf4"
+  },
+  "live_completed": [
+    "Regular Google native session + signed GAS ui_context + TEST01 facility gate",
+    "30d real Streamlit CRF rendered",
+    "Surgery performed: conditional operation/pathology fields",
+    "Surgery not performed: reference date/reason/pathology N/A",
+    "Pathology maximum diameter 0 retained after rerun",
+    "Unevaluable histology reason field",
+    "Unselected surgery distinct from N/A",
+    "Unselected dissection distinct from not-performed ypNX"
+  ],
+  "technical_defects_fixed": [
+    "stale successful-save banners and form state inherited from other flows",
+    "unselected surgery shown as not-performed N/A",
+    "unselected dissection shown as no dissection ypNX"
+  ],
+  "formal_counts": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "formal_pass_delta": 0,
+  "coverage_limits": [
+    "Display-only copy; no CRF save/read/restore/owner success claimed",
+    "30d original form clinical logic reused; only stated inspection/tri-state changes",
+    "Cannot use this result as 90d/FUP full-path validation",
+    "No actual 60min boundary observation started"
+  ],
+  "business_journal_after": {
+    "rows": 165,
+    "sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+    "unchanged": true
+  },
+  "formal_external_qa_policy": "Deferred until feasible technical development and verification exhausted; do not contact, request acceptance, share, grant access or request formal review.",
+  "remaining_technical_limits": {
+    "POST-03": "Display conditionality now live verified; no business save proof from this copy. Verify canonical deployed business frontend separately before release.",
+    "POST-04": "Pathology diameter zero and required-reason display live; persisted pCR-specific fixture remains not supplied.",
+    "POST-01": "Prior actual XLSX and clinical payload correspondence reused.",
+    "POST-02": "Protocol30/90-day definition and prior31-day rejection/90d storage evidence reused; medical exclusions remain PI judgment.",
+    "POST-06": "Specific external error-code contract still not established; no expectation rewrite.",
+    "FUP-01": "9/12/15/18/21/24m live save/read require currently prohibited business sends. Existing FUP page requires authoritative 30d linkage; not fabricated.",
+    "FUP-02": "Prior contradictions/restoration reused; untested death/adjuvant branches need approved live scenario.",
+    "A": "Central MDT real authenticated role holders not provided; no role impersonation or ACL extension.",
+    "C": "Synthetic DICOM/local restore evidence reused. Full image intake/attachment restoration not covered by present permitted routes.",
+    "boundary60m": "No confirmed independent supervised durable worker; observation not started or marked PASS.",
+    "AUTH-04": "Historical synthetic identifier draft persists in journal snapshots/backups. No deletion; bounded host log absence is not complete HTTP/GAS-log evidence."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "three_business_buttons_disabled": true,
+  "unselected_surgery_not_NA": true,
+  "legacy_state_not_rendered": true,
+  "surgery_yes_pathology_visible": true,
+  "unselected_dissection_not_NX": true,
+  "pathology_zero_retained": true,
+  "unevaluable_pathology_reason_visible": true,
+  "no_surgery_pathology_NA": true,
+  "business_http_calls": 0,
+  "mode": "OFFLINE_REAL_STREAMLIT_WIDGET_TEST_NOT_LIVE_UAT"
+}

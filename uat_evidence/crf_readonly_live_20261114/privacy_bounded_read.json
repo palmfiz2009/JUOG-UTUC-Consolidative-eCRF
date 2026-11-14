@@ -1,0 +1,207 @@
+{
+  "checked_at": "2026-11-14T00:47:14.970Z",
+  "scope": "Isolated workbook bounded reads only; exact five pre-existing synthetic markers; no real patient search",
+  "sheets": [
+    {
+      "sheet": "D3_Journal",
+      "rows": 165,
+      "marker_present": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "scope": "bounded A1:F167; exact five synthetic markers only",
+      "sha256": "1414934e5e059e3cc7882486fa7cf5ee14afe99b4ab5dce9736a3c665d0b0797",
+      "unchanged": true
+    },
+    {
+      "sheet": "UAT971_BACKUP_20261113",
+      "rows": 66,
+      "marker_present": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "scope": "bounded A1:F167; exact five synthetic markers only"
+    },
+    {
+      "sheet": "UAT971_RESTORE_20261113",
+      "rows": 66,
+      "marker_present": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "scope": "bounded A1:F167; exact five synthetic markers only"
+    },
+    {
+      "sheet": "UAT971_CACHE_FIX_20261113",
+      "rows": 118,
+      "marker_present": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "scope": "bounded A1:F167; exact five synthetic markers only"
+    },
+    {
+      "sheet": "UAT971_PREPARE_RECOVERY_20261113",
+      "rows": 107,
+      "marker_present": [
+        true,
+        false,
+        false,
+        false,
+        false
+      ],
+      "scope": "bounded A1:F167; exact five synthetic markers only"
+    }
+  ],
+  "legacy_marker_locations": [
+    {
+      "record_kind": "intents",
+      "revision": 2,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 3,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 4,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 5,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 6,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 7,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 8,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 9,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 10,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 11,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 12,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 13,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    },
+    {
+      "record_kind": "intents",
+      "revision": 14,
+      "paths": [
+        "root.after.CRF_Drafts[1][9]",
+        "root.after.CRF_Drafts[1][9].decoded.d90_patient_name.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value",
+        "root.after.CRF_Drafts[1][9].decoded.d90_nested.value.decoded.patient_name"
+      ]
+    }
+  ],
+  "raw_values_exported": false,
+  "historical_data_deleted_or_overwritten": false,
+  "loaded_host_log_marker_matches": 0,
+  "host_log_scope": "Only retained rendered log; not complete request-specific history",
+  "http_response_privacy_complete": false,
+  "full_gas_log_privacy_complete": false,
+  "formal_AUTH04": "FAIL maintained"
+}

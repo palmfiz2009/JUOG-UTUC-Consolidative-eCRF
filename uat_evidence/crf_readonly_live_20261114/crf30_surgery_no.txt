@@ -1,0 +1,168 @@
+Browser tab: 7, Title: "JUOG AUTH_CONNECT · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+0 AXWebArea JUOG AUTH_CONNECT · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
+	1 container
+		2 container streamlitApp
+			3 AXWebArea JUOG AUTH_CONNECT, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
+				4 container
+					28 container
+						29 link Description: Skip to main content, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#stMain
+						30 container
+							31 button Share
+							32 button favorite
+							33 button edit
+							34 button source
+							35 pop up button (collapsed) Description: Main menu, Secondary Actions: Expand
+						36 container stMain
+							37 heading JUOG 隔離認証接続, Value: 1, ID: juog
+								38 text JUOG 隔離認証接続
+								39 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog
+							40 text AUTH_CONNECT：業務保存は禁止されています。
+							41 container
+								42 checkbox (settable, integer) Description: 30日CRFの画面確認（保存・取得・送信は無効）, Value: 1
+								43 text 30日CRFの画面確認（保存・取得・送信は無効）
+							44 text TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。
+							45 text 完全架空入力による画面確認専用です。台帳照合・保存・下書き取得・通知は実行できません。
+							46 heading JUOG UTUC_Consolidative 周術期・術後30日CRF, Value: 1, ID: juog-utuc-consolidative-30-crf
+								47 text JUOG UTUC_Consolidative 周術期・術後30日CRF
+								48 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog-utuc-consolidative-30-crf
+							49 text 主要評価項目の手術関連合併症は『手術終了時〜術後30日目』で判定します。30日訪問自体は30日±14日を許容します。
+							50 button (disabled) 💾 仮保存
+								51 text 💾 仮保存
+							52 pop up button (collapsed) ↩ 再開, Secondary Actions: Expand
+								53 text ↩ 再開
+							54 text 1. 基本情報
+							55 container
+								56 text field (disabled) Description: 施設名*, Value: 架空施設（隔離UAT専用） / TEST01, ID: :rg:
+							57 container
+								58 text field (settable) Description: JUOG登録番号*, ID: :rm:
+							59 container
+								60 text field (settable) Description: 担当者メールアドレス*, ID: :rs:
+							61 container
+								62 Description: 報告種別*, ID: react-aria2526626243-:r12:
+									63 container
+										64 radio button (settable, integer) Description: 初回報告, Value: 1
+										65 text 初回報告
+									66 container
+										67 radio button (settable, integer) Description: 訂正報告, Value: 0
+										68 text 訂正報告
+							69 container
+								70 Description: Consolidative surgeryの実施*, ID: react-aria2526626243-:r1a:
+									71 container
+										72 radio button (settable, integer) Description: 実施した, Value: 0
+										73 text 実施した
+									74 container
+										75 radio button (settable, integer) Description: 実施しなかった, Value: 1
+										76 text 実施しなかった
+							77 text 2. 手術・入院経過
+							78 heading 手術未施行, Value: 4, ID: 26b9f077
+								79 text 手術未施行
+								80 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#26b9f077
+							81 container
+								82 container Description: EVP最終投与日*, ID: react-aria2526626243-:r7i:
+									83 stepper Description: year, EVP最終投与日*, Value: 0, ID: react-aria2526626243-:r7n:
+									84 stepper Description: month, EVP最終投与日*, Value: 0, ID: react-aria2526626243-:r7r:
+									85 stepper Description: day, EVP最終投与日*, Value: 0, ID: react-aria2526626243-:r7v:
+								86 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
+							333 container
+								334 container Description: 手術予定日*, ID: react-aria2526626243-:rlm:
+									335 stepper Description: year, 手術予定日*, Value: 0, ID: react-aria2526626243-:rlr:
+									336 stepper Description: month, 手術予定日*, Value: 0, ID: react-aria2526626243-:rlv:
+									337 stepper Description: day, 手術予定日*, Value: 0, ID: react-aria2526626243-:rm3:
+								338 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
+							339 container
+								340 combo box (collapsed, settable) Description: 手術未施行理由*, Value: 選択してください, ID: react-aria2526626243-:rmb:, Secondary Actions: Expand
+								341 pop up button (collapsed) Description: Open, ID: react-aria2526626243-:rm7:, Secondary Actions: Expand
+							342 text 3. 術後病理
+							343 text 手術未施行のため病理項目はN/Aです。
+							344 text 4. 術後30日評価
+							244 container
+								245 container Description: 30日評価日*, ID: react-aria2526626243-:r1k:
+									246 stepper Description: year, 30日評価日*, Value: 0, ID: react-aria2526626243-:r1p:
+									247 stepper Description: month, 30日評価日*, Value: 0, ID: react-aria2526626243-:r1t:
+									248 stepper Description: day, 30日評価日*, Value: 0, ID: react-aria2526626243-:r21:
+								249 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
+							345 text 30日評価 血液検査（必須）
+							346 text 30日±14日の期間内で、術後30日目に最も近い採血結果を入力してください。
+							252 container
+								253 container Description: 30日評価に用いた採血日*, ID: react-aria2526626243-:r25:
+									254 stepper Description: year, 30日評価に用いた採血日*, Value: 0, ID: react-aria2526626243-:r2a:
+									255 stepper Description: month, 30日評価に用いた採血日*, Value: 0, ID: react-aria2526626243-:r2e:
+									256 stepper Description: day, 30日評価に用いた採血日*, Value: 0, ID: react-aria2526626243-:r2i:
+								257 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
+							347 text 数値を入力してください。未測定・欠測の項目は空欄で構いません。0 は実測値として保存されます。
+							348 container
+								349 text field (settable) Description: WBC (/μL), ID: :rmk:
+							350 container
+								351 text field (settable) Description: Neutro (%), ID: :rmq:
+							352 container
+								353 text field (settable) Description: Eosino (%), ID: :rn0:
+							354 container
+								355 text field (settable) Description: T-Bil (mg/dL), ID: :rn6:
+							356 container
+								357 text field (settable) Description: ALT (U/L), ID: :rnc:
+							358 container
+								359 text field (settable) Description: Cre (mg/dL), ID: :rni:
+							360 container
+								361 text field (settable) Description: Na (mEq/L), ID: :rno:
+							362 container
+								363 text field (settable) Description: CRP (mg/dL), ID: :rnu:
+							364 container
+								365 text field (settable) Description: Hb (g/dL), ID: :ro4:
+							366 container
+								367 text field (settable) Description: Lympho (%), ID: :roa:
+							368 container
+								369 text field (settable) Description: Baso (%), ID: :rog:
+							370 container
+								371 text field (settable) Description: Alb (g/dL), ID: :rom:
+							372 container
+								373 text field (settable) Description: TP (g/dL), ID: :ros:
+							374 container
+								375 text field (settable) Description: eGFR (mL/min/1.73m²), ID: :rp2:
+							376 container
+								377 text field (settable) Description: K (mEq/L), ID: :rp8:
+							378 container
+								379 text field (settable) Description: PLT (×10^4/μL), ID: :rpe:
+							380 container
+								381 text field (settable) Description: Mono (%), ID: :rpk:
+							382 container
+								383 text field (settable) Description: ALP (U/L), ID: :rpq:
+							384 container
+								385 text field (settable) Description: AST (U/L), ID: :rq0:
+							386 container
+								387 text field (settable) Description: LDH (U/L), ID: :rq6:
+							388 container
+								389 text field (settable) Description: BUN (mg/dL), ID: :rqc:
+							390 container
+								391 text field (settable) Description: Cl (mEq/L), ID: :rqi:
+							306 container
+								307 checkbox (settable, integer) Description: 術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある, Value: 0
+								308 text 術後30日までに報告すべき薬剤関連等AE（CTCAE v6.0）がある
+							392 heading 術後治療, Value: 3, ID: 672d4873
+								393 text 術後治療
+								394 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#672d4873
+							312 container
+								313 combo box (collapsed, settable) Description: 術後治療・今後の予定*, Value: 選択してください, ID: react-aria2526626243-:r6u:, Secondary Actions: Expand
+								314 pop up button (collapsed) Description: Open, ID: react-aria2526626243-:r6q:, Secondary Actions: Expand
+							395 heading 生存状況, Value: 3, ID: c0d5ab69
+								396 text 生存状況
+								397 link Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#c0d5ab69
+							398 container
+								399 Description: 生存状況*, ID: react-aria2526626243-:rqq:
+									400 container
+										401 radio button (settable, integer) Description: 生存, Value: 0
+										402 text 生存
+									403 container
+										404 radio button (settable, integer) Description: 死亡, Value: 0
+										405 text 死亡
+							406 text 5. 送信
+							407 text 入力状況：未入力 10項目
+							408 button (collapsed) 入力状況の詳細を確認, Secondary Actions: Expand
+								409 text 入力状況の詳細を確認
+							410 text 仮保存は正式送信ではありません。
+							331 button (disabled) 事務局へ確定送信
+								332 text 事務局へ確定送信
+		24 button Manage app
+			25 image
+			26 text Manage app
+
+The focused UI element is 75 radio button (settable, integer) Description: 実施しなかった, Value: 1
