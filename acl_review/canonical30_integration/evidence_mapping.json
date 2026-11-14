@@ -1,0 +1,69 @@
+{
+  "formal_counts": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5
+  },
+  "formal_pass_delta": 0,
+  "technical_completed_this_change": {
+    "POST-03": [
+      "Two canonical tri-state branches integrated",
+      "Clinical screen/validation equality to live readonly version proved",
+      "Independent regression completed"
+    ],
+    "POST-04": [
+      "Actual unchanged save-data constructor preserves zero and conditional reason",
+      "Offline pCR unknown/Nx/N0/N1 transitions verified; no new live pCR evidence"
+    ],
+    "POST-02": [
+      "Canonical day31 validation rejects; day30 clears same boundary error"
+    ],
+    "AUTH-04": [
+      "Existing private legacy draft sanitized projection verified without modifying source",
+      "New capture/restore structured/nested identifiers and clinical retention verified on pinned helper"
+    ]
+  },
+  "evidence_mapping": [
+    {
+      "id": "POST-03",
+      "display_live": "../../uat_evidence/crf_readonly_live_20261114/result.json",
+      "display_version": "56bcb1b",
+      "canonical_candidate": "02_perioperative_30d_crf.py",
+      "comparison": "integration_identity.json",
+      "regression": "regression_results.json",
+      "prior_save_audit": "../../uat_evidence/b971_execution_20261114/ASSESSMENT.md",
+      "limit": "B scenarios1-6 V6/V7,7-12 V9. Harness saving and readonly display are different paths. No unified live save proof for new candidate."
+    },
+    {
+      "id": "POST-04",
+      "display_live": "../../uat_evidence/crf_readonly_live_20261114/crf30_final_zero_reason.txt",
+      "prior_saved_zero": "../../uat_evidence/qa_submission_20261114/evidence_gap_results.json",
+      "prior_export": "../../uat_evidence/live_gap_readonly_20261114/native_export_result.json",
+      "offline_pcr": "regression_results.json",
+      "remaining": "pCR-specific real save/read/correction/audit fixture not executed; do not mark live complete."
+    }
+  ],
+  "remaining": {
+    "AUTH-04": [
+      "Old synthetic marker remains append-only history/backups; preserve unchanged",
+      "Native Sheets/XLSX exports do not automatically redact raw history; not a safe external release artifact",
+      "Sanitizer helper success is not end-to-end live read/export success",
+      "Unlabelled free text remains undetectable by current labelled-pattern filter; input restriction or human review needed before use",
+      "Full request-correlated HTTP/host/GAS logs not obtained; no privilege expansion"
+    ],
+    "POST-06": "Formal dedicated-code requirement not located; generic VALIDATION_FAILED acceptance not presumed.",
+    "FUP-01": "9/12/15/18/21/24m real save/read requires prohibited business send; no 6m substitution.",
+    "A": "Role-specific real principal assignments unavailable; no invented users or role changes.",
+    "C": "Reuse synthetic DICOM and partial restore evidence; no permission for new external image path/full restore destination.",
+    "boundary60m": "No verified supervised independent durable worker; do not start another observation."
+  },
+  "additional_approval_required": [
+    "Any deployment of canonical candidate to existing isolated runtime",
+    "Any bounded business save/correction/read integration scenario requiring business gate change",
+    "Any new role/access or restoration resource"
+  ],
+  "preapproval_technical_gate": "Do not request activation before verifying canonical legacy registry transport against the signed Version9 contract. This patch deliberately changes only clinical branches and does not enable business transport.",
+  "external_qa": "All contact, acceptance requests, sharing and permissions deferred by PI. None performed.",
+  "live_changes_this_turn": false
+}

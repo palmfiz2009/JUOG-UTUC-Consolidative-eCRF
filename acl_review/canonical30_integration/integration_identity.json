@@ -1,0 +1,17 @@
+{
+  "base_frontend_commit": "56bcb1b660a63ce1905307fd3b4109e129f88d12",
+  "canonical_before_sha256": "a4c3836882001399a2bd871ee7045d3df4cd31190f383a751a4bf4c2ae7abeb0",
+  "canonical_candidate_sha256": "570b788ab2868e9c50cfce97d7ece8944a45d3ddcea5677094ef2bf6868e758f",
+  "readonly_clinical_rendering_and_validation_identical_after_key_namespace_normalization": true,
+  "readonly_and_canonical_save_data_constructor_identical": true,
+  "canonical_submission_correction_and_audit_call_path_byte_unchanged": true,
+  "differences_preserved": [
+    "canonical uses original common/import, facility selection, widget namespace and real business buttons",
+    "readonly uses blocked transport, TEST01-only facility, disabled business buttons and separate widget namespace",
+    "readonly omits legacy success banners; canonical retains existing legitimate saved-session UI"
+  ],
+  "deployment_performed": false,
+  "new_business_send": false,
+  "independent_review": "review_session independent code comparison and rerun:12/12 pass; no major issue",
+  "scope_limit": "Existing canonical registry transport is not thereby proven to match isolated V9 signed live harness. Do not activate canonical saving without integration verification."
+}

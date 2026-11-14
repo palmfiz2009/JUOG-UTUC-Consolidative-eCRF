@@ -1,0 +1,11 @@
+{
+  "02_perioperative_30d_crf.py": "570b788ab2868e9c50cfce97d7ece8944a45d3ddcea5677094ef2bf6868e758f",
+  "canonical30.patch": "06237725c9a7ea822d70b2d68efe110226f1c91a18ea91129a97b9170a4a197c",
+  "evidence_mapping.json": "b6d191583aad653ecb7bf0a79168456fb1dc1785c3a215942960d210f80a5a38",
+  "integration_identity.json": "53a083b8fb5746836af590ce4b374b0bbe43d8e9bc88834f4ff6454291f6d6b8",
+  "juog_common.py": "2c420f1ebf5ae056846b6d500df69fd44dd8101d1973b2ee4b27209eb78e8f62",
+  "privacy_results.json": "7a1cba8fa88d65bec78eddf47b5f489338bcd6027924a0915f2c1c4e112011fc",
+  "regression_results.json": "e19c40dccaa05a7ffbf3274acd6a6ea5a8cb10a8ff207ce99b4f10335323115c",
+  "test_canonical.py": "64738df40153a386dfad269f515ba3d2f242d3daeb850b5aa620c908894546a0",
+  "test_legacy_privacy.py": "8fc8ad37a0cdb1f45e689f6be896414913979e0b1f88a7670b45b47249f9fb43"
+}
