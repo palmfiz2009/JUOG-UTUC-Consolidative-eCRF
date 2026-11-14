@@ -86,13 +86,18 @@ class Client:
    self._set(digest,'SAVED');self.observed=None
    return {'ok':True,'state':'SAVED','operation_id':row[3],'record_version':matches[0]['record_version']}
   if r.get('state')=='FAILED' and r.get('phase')=='REJECTED_BEFORE_INTENT':self._set(digest,'FAILED')
-  return {'ok':False,'state':r.get('state','UNKNOWN'),'operation_id':row[3]}
+  elif r.get('state')!='UNFINISHED' or r.get('phase') not in ('PREPARED','AUDIT_OR_COMMIT_PENDING'):raise BridgeError('STATUS_PHASE_UNSAFE')
+  return {'ok':False,'state':r['state'],'phase':r['phase'],'operation_id':row[3]}
  def resume(self,digest):
   row=self._row(digest)
   if not row or row[1]!=self.actor or not row[3]:raise BridgeError('ATTEMPT_NOT_OWNED')
   status=self.reconcile(digest)
   if status['state']!='UNFINISHED':return status
-  self._set(digest,'EXECUTING')
+  # Atomically claim the sole client execution attempt. A prior uncertain
+  # execute is status-only; do not send execute again automatically.
+  with self.db:
+   claimed=self.db.execute("UPDATE attempts SET state='EXECUTING' WHERE digest=? AND actor=? AND state='PREPARED'",(digest,self.actor)).rowcount
+  if claimed!=1:raise BridgeError('EXECUTION_UNCERTAIN_STATUS_ONLY')
   self.call('execute_request',{'operation_id':row[3]})
   return self.reconcile(digest)
  def pending(self):

@@ -1,7 +1,7 @@
 {
   "base_version": 9,
   "base_sha256": "6d75109c4fffda3ebe4aedb0d7990f1d694ef3a331dcdb2123c10399279970d6",
-  "candidate_sha256": "5038e127dc2e61aeddbbcc3be9a8f46cfb9f05c7fdcf0558888b5fdb1a80bcf2",
+  "candidate_sha256": "ea70e3970a10a405cebdcf6f049ce2f426a91337dadc8846b5a9886b0a382383",
   "deployed": false,
   "new_resources": 0,
   "current_auth_connect_all_business_routes_still_denied": true,

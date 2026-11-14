@@ -24,7 +24,7 @@ class T(unittest.TestCase):
  def test_changed_content_denied_before_discovery(self):
   d=self.lost();q=copy.deepcopy(BASE);q['data']['pathology']['size_mm']=987
   with self.assertRaisesRegex(BridgeError,'CONTENT_MISMATCH'):self.c.recover_prepare(d,q)
-  self.assertNotIn('list_requests',self.calls);self.assertNotIn('execute_request',self.calls)
+  self.assertEqual(self.calls.count('list_requests'),1);self.assertNotIn('execute_request',self.calls)
  def test_server_content_mismatch_remains_unbound(self):
   d=self.lost();self.corrupt=True
   with self.assertRaisesRegex(BridgeError,'CONTENT_MISMATCH'):self.c.recover_prepare(d,BASE)

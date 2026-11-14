@@ -18,6 +18,14 @@ def recovery_fingerprint(value):
   raise BridgeError('RECOVERY_VALUE_INVALID')
  return hashlib.sha256(json.dumps(typed(value),ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 class RecoverableClient(Client):
+ def write(self,payload):
+  # A new/empty local store is not proof that no earlier request exists.
+  r=self.call('list_requests',{'registration_id':CASE,'facility_code':FACILITY,'record_key':KEY})
+  if r.get('ok') is not True or r.get('read_only') is not True or r.get('record_key')!=KEY or not isinstance(r.get('requests'),list):raise BridgeError('RECOVERY_READ_NOT_CONFIRMED')
+  known={row[0] for row in self.db.execute('SELECT submission_id FROM attempts WHERE actor=?',(self.actor,))}
+  for request in r['requests']:
+   if not isinstance(request,dict) or request.get('submission_id') not in known:raise BridgeError('LOCAL_STATE_LOST_MANUAL_RECONCILIATION')
+  return super().write(payload)
  def recover_prepare(self,digest,payload):
   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')
   row=self._row(digest)
@@ -38,5 +46,10 @@ class RecoverableClient(Client):
   status=self.call('request_status',{'operation_id':oid})
   phases={'UNFINISHED':{'PREPARED','AUDIT_OR_COMMIT_PENDING'},'SAVED':{'COMMITTED'},'FAILED':{'REJECTED_BEFORE_INTENT'}}
   if status.get('ok') is not True or status.get('operation_id')!=oid or status.get('action')!='save_crf' or status.get('phase') not in phases.get(status.get('state'),set()):raise BridgeError('RECOVERY_STATUS_UNCONFIRMED')
-  self._set(digest,'PREPARED',oid)
+  with self.db:
+   claimed=self.db.execute("UPDATE attempts SET state='PREPARED',operation_id=? WHERE digest=? AND actor=? AND state='PREPARING' AND operation_id IS NULL",(oid,digest,self.actor)).rowcount
+  if claimed!=1:
+   current=self._row(digest)
+   if not current or current[1]!=self.actor or current[3]!=oid:raise BridgeError('RECOVERY_BIND_CONFLICT')
+  # A concurrent EXECUTING/SAVED row must never be rewound to PREPARED.
   return self.reconcile(digest)

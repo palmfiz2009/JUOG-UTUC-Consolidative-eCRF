@@ -45,3 +45,22 @@ function juogCanonicalRecoveryContent_(operation){
  }
  return JSON.stringify(typed({action:operation.action,payload:p}));
 }
+
+function juogCanonicalRecoveryPrepareGuard_(store,service,lifecycle,who,operation,c,hash){
+ const p=operation&&operation.payload;
+ if(!operation||operation.action!=='save_crf'||!p||p.record_key!=='JUOG-971|perioperative_30d|30d')return null;
+ const prior=juogCanonicalRecoveryList_(store,service,lifecycle,who,{registration_id:p.registration_id,facility_code:p.facility_code,record_key:p.record_key},c,hash);
+ if(!prior.ok)return {ok:false,error:'RECOVERY_PREPARE_UNVERIFIABLE'};
+ if(prior.requests.some(r=>r.state==='UNFINISHED'))return {ok:false,error:'PENDING_REQUEST_BLOCKS_PREPARE'};
+ return null;
+}
+
+function juogCanonicalRecoveryRequest_(req,c){
+ if(req.action==='session_revoke')return;
+ if(c.canonicalRecoveryReadApproved!==true)throw Error('AUTH04_SCOPE_DENIED');
+ const writeApproved=c.canonicalRecoveryWriteApproved===true&&typeof c.canonicalRecoveryWriteReviewRef==='string'&&!!c.canonicalRecoveryWriteReviewRef.trim();
+ if(!['ui_context','session_revoke','list_requests','read_crf','request_status','prepare_request','execute_request'].includes(req.action))throw Error('AUTH04_SCOPE_DENIED');
+ if(['prepare_request','execute_request'].includes(req.action)&&!writeApproved)throw Error('AUTH04_SCOPE_DENIED');
+ if(req.action==='prepare_request'&&(req.payload.action!=='save_crf'||req.payload.payload.record_key!=='JUOG-971|perioperative_30d|30d'))throw Error('AUTH04_SCOPE_DENIED');
+ if(req.action==='read_crf')juogCanonicalRecoveryScope_(req.payload.payload);
+}
