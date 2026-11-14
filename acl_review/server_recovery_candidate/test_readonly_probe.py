@@ -16,9 +16,9 @@ class Test(unittest.TestCase):
   calls=[]
   def transport(e):
    a,p=e;calls.append(a)
-   if a=='list_requests':return dict(ok=True,read_only=True,record_key=m.SCOPE['record_key'],requests=[dict(operation_id='fake-op',submission_id='fake-sub',state='SAVED',phase='COMMITTED',content_sha256='a'*64)])
+   if a=='list_requests':return dict(ok=True,read_only=True,record_key=m.SCOPE['record_key'],requests=[dict(operation_id='fake-op',submission_id='fake-sub',state='SAVED',phase='COMMITTED',expected_record_version=1,content_sha256='a'*64)])
    if a=='request_status':return dict(ok=True,operation_id='fake-op',action='save_crf',state='SAVED',phase='COMMITTED')
-   return dict(ok=True,read_only=True,result=dict(ok=True,records=[dict(record_version=v,record_key=m.SCOPE['record_key'],submission_id='fake-sub',payload=dict(registration_id='JUOG-971',facility_code='TEST01',crf_type='perioperative_30d',visit='30d',clinical='PRIVATE')) for v in (1,2)]))
+   return dict(ok=True,read_only=True,result=dict(ok=True,records=[dict(record_version=v,record_key=m.SCOPE['record_key'],submission_id='fake-sub' if v==2 else 'legacy-sub',payload=dict(registration_id='JUOG-971',facility_code='TEST01',crf_type='perioperative_30d',visit='30d',clinical='PRIVATE')) for v in (1,2)]))
   with patch.object(m,'signed_request',lambda n,a,p:(a,p)):
    r=m.probe(lambda:object(),transport,self.config(),lambda:1001)
   self.assertEqual(calls,['list_requests','request_status','read_crf']);self.assertEqual(r['latest_version'],2);self.assertNotIn('PRIVATE',str(r));self.assertNotIn('fake-sub',str(r))

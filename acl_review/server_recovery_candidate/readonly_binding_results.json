@@ -1,0 +1,25 @@
+{
+  "live": false,
+  "deployed": false,
+  "changes": [
+    "Reject duplicate submission IDs across CRF versions",
+    "Bind committed requests to returned submission ID and expected version + 1",
+    "Reject record presence for noncommitted requests",
+    "Validate metadata shape without exposing raw data"
+  ],
+  "candidate_gas_source": "acl_review/runtime_snapshot_guard/recovery_candidate.gs",
+  "candidate_gas_sha256": "5b7c086bee4afe98efc8c140204110765f9f8b534422e4ebe273bd85c2a89fbe",
+  "tests_passed": 14,
+  "diagnostic_tests_passed": 5,
+  "remaining_manual_checks": [
+    "Legacy requests missing from scoped journal",
+    "Clinical content and business audit reconciliation",
+    "Actual old-key signature rejection"
+  ],
+  "formal_uat_delta": 0,
+  "files": {
+    "readonly_probe.py": "49a34309c124daf690998b663b18e7cc7389e6d77581825758006b9a5a089ef9",
+    "test_readonly_probe.py": "61e450008f9334f81af16f8bff7bd5f6c182ec2add5ba47bdbb7bdf62a31b4f0",
+    "test_readonly_binding.py": "39898dba6509c2c09ebb612b281b2cf1a0d237a5b4be8a462f4da33c0c686525"
+  }
+}
