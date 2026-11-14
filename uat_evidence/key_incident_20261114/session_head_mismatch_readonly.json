@@ -1,0 +1,37 @@
+{
+  "date_utc": "2026-11-14",
+  "mode": "read_only_investigation",
+  "source": "acl_review/b971_candidate/bundle_prepare_view_candidate.gs",
+  "source_version_claim": 9,
+  "session_events": 362,
+  "chain_validation": "PASS_WITH_PREVIOUSLY_PINNED_GENERATION",
+  "row_structure_validation": "PASS",
+  "duplicate_open_sessions": 0,
+  "repeat_read_unchanged": true,
+  "reported_property_head_sequence": 360,
+  "property_evidence": "administrator_report_only; full head not retrieved",
+  "last_two_events": {
+    "sequences": [361, 362],
+    "kinds": ["OPEN", "USE"],
+    "same_session": true,
+    "same_owner": true,
+    "owner_present_in_earlier_history": true,
+    "new_session": true,
+    "same_deadline": true,
+    "deadline_utc": "2026-11-14T10:41:30Z",
+    "use_jti_not_seen_in_prior_history": true
+  },
+  "business_journal": {"rows": 165, "matches_pinned_baseline": true},
+  "interpretation": "Reported head sequence is inconsistent with intact event chain. Tail has normal OPEN/USE shape, but an unkeyed chain does not authenticate event origin. Actor hashes and event shape are not proof of request signature verification.",
+  "source_write_order": "head property is advanced BEFORE each append; simple interrupted append alone does not explain a head behind the sheet",
+  "unresolved": [
+    "Full head equality with historical row 360 has not been checked",
+    "Live deployed source and current property target not independently reverified this turn",
+    "Execution evidence authenticating tail event origin unavailable",
+    "Cause of head rollback or stale target not established"
+  ],
+  "mutations_performed": false,
+  "repair_authorized_or_performed": false,
+  "stop_required": true,
+  "formal_uat": {"PASS":32,"FAIL":1,"BLOCKED":29,"NOT_RUN":5}
+}
