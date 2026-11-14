@@ -42,9 +42,7 @@ class RecoverableClient(Client):
   canonical=semantic_json(op)
   if hashlib.sha256((self.actor+'|'+canonical).encode()).hexdigest()!=digest:raise BridgeError('RECOVERY_CONTENT_MISMATCH')
   r=self.call('list_requests',{'registration_id':CASE,'facility_code':FACILITY,'record_key':KEY})
-  if r.get('ok') is not True or r.get('read_only') is not True or r.get('record_key')!=KEY or not isinstance(r.get('requests'),list):raise BridgeError('RECOVERY_READ_NOT_CONFIRMED')
-  rows=r['requests']
-  if any(not isinstance(x,dict) for x in rows):raise BridgeError('RECOVERY_READ_NOT_CONFIRMED')
+  rows=validated_rows(r)
   found=[x for x in rows if x.get('submission_id')==row[4]]
   if len(found)!=1:raise BridgeError('RECOVERY_NOT_UNIQUE')
   q=found[0];oid=q.get('operation_id')

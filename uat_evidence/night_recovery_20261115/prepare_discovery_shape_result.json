@@ -1,0 +1,41 @@
+{
+  "base_commit": "2413a703bb80b3571a1f6f61b05143f72f44f7cf",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Lost-prepare recovery did not use strict discovery validation, unlike new-write and manual-discovery paths. It bound an operation from malformed rows despite unknown state, unexpected payload field or duplicate operation ID associated with another submission.",
+  "fix": "Reuse validated_rows before matching retained submission and content hash. Three old shape checks replaced by one common validator.",
+  "new_tests": 3,
+  "pre_fix_failures": 3,
+  "regression": {
+    "recovery_tests": 48,
+    "canonical_tests": 21,
+    "all_passed": true
+  },
+  "assertions": [
+    "Invalid rows rejected with fixed RECOVERY_ROW_INVALID message",
+    "Local attempt remains PREPARING with null operation_id",
+    "No status or execute request is issued after malformed discovery",
+    "In-memory records and audits unchanged",
+    "Existing valid lost-prepare and explicit-resume tests pass"
+  ],
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/recoverable_client.py": "e2711b007962ffad5d903ac8e7dede212800c2f3d6a38d61efa1f6663e400902",
+    "acl_review/server_recovery_candidate/test_prepare_discovery_shape.py": "0d705e89b2f2271a894b3b4673a20f6c0cc95bcf27588f7b0c0ea1eb86dc05ff"
+  },
+  "live_calls": 0,
+  "deployed": false,
+  "independent_review": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "remaining": [
+    "Independent technical review and approved deployment",
+    "Old-key signature rejection and new-key authentication regression",
+    "Live scoped recovery evidence",
+    "Durable sixty-minute observation and formal QA"
+  ],
+  "note": "Malformed responses injected only in local fixture transport; no evidence of such real-server responses or unauthorized access. Live 165 rows not remeasured."
+}
