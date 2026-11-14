@@ -1,0 +1,34 @@
+{
+  "source": "private prior snapshot matching live precheck hash; no fresh app call",
+  "journal_rows": 165,
+  "business_revision": 14,
+  "draft_count": 3,
+  "drafts_with_code_hash": 0,
+  "drafts_with_owner": 3,
+  "draft_schema_versions": {
+    "review-v3-unapproved": 2,
+    "": 1
+  },
+  "draft_record_version_column_present": false,
+  "crf_versions": {
+    "CRF_30d": [
+      1,
+      1,
+      2,
+      2
+    ],
+    "CRF_90d": [
+      1,
+      1
+    ],
+    "CRF_Followup": [
+      1,
+      1,
+      2,
+      3
+    ]
+  },
+  "original_unchanged": true,
+  "secrets_read": false,
+  "reset_draft_code_requests_in_sealed_history": 0
+}

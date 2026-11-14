@@ -1,0 +1,41 @@
+# 隔離鍵露出対応・管理者実行手順（未実行）
+
+対象：隔離 Script 11wSp4ePaP5b5A2b5ITZZSZa3YTe-Ex-Tu6oGlEkkRfkPrMCA4deVSZDy、隔離Streamlitのみ。Version9維持。main・本番・既存TEST変更なし。
+
+## 確定した用途と影響
+- ADMIN_BRIDGE_SIGNING_KEY：Python juog_identity_bridge.signing_keyと一致させるHMAC-SHA256鍵。GAS juogV3DecodeBridge_が検証。B2要求は最大15秒、要求本文hash・本人・ACL・セッション・jti検査あり。漏えいした署名鍵は信頼境界を損なうため、短い期限だけでは安全回復と扱わない。交換後は旧鍵署名が拒否されるが、OIDC Cookie、ACL、既存sessionのREVOKE状態は自動変更されない。
+- ADMIN_RESUME_DERIVATION_KEY：管理者reset_draft_codeのactor＋operation_idから6桁コードを決定的に生成。交換すると同じ操作のコード再配送を保証できない。未完のreset操作を自動再開してはならない。通常saveDraft_はこの生成関数を呼ばない。
+- ADMIN_DRAFT_PEPPER：復旧コードのHMAC保存値。交換前のhashは新pepperで照合不可。データ暗号化鍵ではなく、既存CRF・下書きJSONそのものを復号不能にはしない。
+- 現行provisionIsolatedAuth04KeysReviewは署名鍵からdomain-separated補助鍵を導出する初期設定用。既存値と不一致ならKEY_EXISTING_CONFLICT。無条件再実行や「一度消して再実行」は禁止。
+- Session B2チェーンは署名鍵に依存しない。sessionStoreGenerationはgenesisに含まれるため、世代だけ変更するとSESSION_STORE_INVALID。台帳・head再初期化禁止。
+
+## 下書き在庫
+固定済みprivate snapshot（直前live照合済み165行、revision14）を解析。3件、所有権あり3件、resume_code_hashあり0件。draft表にはrecord_version列なし。schema_versionはreview-v3-unapproved 2件／空欄1件。schema_versionとCRF record_versionを混同しない。
+現行getDraft_は登録メールを照合し、その外側で正規本人ACLとV3_DraftOwnersを照合。コード認証経路として扱わない。現時点ではコード移行対象0件。ただし交換直前の在庫差分があれば停止し再評価する。
+旧監査・バックアップ・架空識別マーカーを含む原本は変更しない。将来コード再発行を要する場合、reset_draft_codeはadmin権限が必要で、現在のfacility ACL/AUTH_CONNECTでは許可されない。別承認の追記処理で実施し、無断ACL昇格・直接行編集は禁止。
+
+## 管理者が行う交換（安全停止を先行）
+1. クラウドブラウザ、画面共有、録画、シェルトレース、HTTPログ、clipboard同期を使わない信頼できる管理端末を確保する。旧鍵を回収しない。値を表示・コピーせず設定できる管理経路を実施者が確認する。現行Apps Scriptプロパティ画面／Streamlit Secrets画面は平文を表示し得るため、この条件を満たす経路としては未確認。モデルによる画面代行は禁止。
+2. 非秘密設定だけでAUTH_CONNECTのauthConnectReviewApproved=falseにし、auth04ScopeReviewed=false、auth04ExecutionApprovalRef=null、b971ExecutionUntil=0、recovery read/write=falseを維持する。管理者が対象限定の非秘密チェックで停止を確認する。これは未実施であり現在の停止を主張しない。アプリの操作を止めるだけでは旧署名者を止められない。
+3. 既存165行、既存監査、V3_SessionEventsとhead整合性を値非露出で保全。本人ACL・有効期限は変更しない。鍵を含む設定全体のdumpは禁止。
+4. 管理者端末でOS CSPRNGの48byteをbase64化し新署名鍵とする。補助鍵は現行と同じdomain separation（ソース3703-3704相当）で新rootから再導出する。添付generatorはパスフレーズ保護されたAES-GCM暗号化bundleのみ保存し秘密値を出力しない。パスフレーズは管理者の安全な保管領域で別管理する。復号結果をstdoutや一時平文ファイルに出す機能は提供しない。安全な設定注入機能は未実装であり、generatorだけで鍵交換完了とはしない。実際の新鍵生成はAI環境では行っていない。
+5. 安全な非表示の設定手段が確認できた場合のみ、停止中にGASの3鍵とStreamlitのjuog_identity_bridge.signing_keyを置換する。補助鍵はGAS専用でPythonへ不要。旧値を残すfallback/key-ringを設けない。Streamlitで旧値をcacheしたプロセスを終了・再起動する。中断／片側失敗は停止維持。旧鍵へのロールバックは禁止、新しい鍵で再度整合させる。
+6. 旧セッションをそのまま信頼しない。既存世代・台帳は保全する。即時の全セッション失効には別途レビュー済み管理処理が必要で現状未実装。既存制御だけで進める場合、交換・全旧signer停止が確認された時刻T0から最低3600秒＋時計確認の余裕を取り停止を維持し、正規logout/loginを行う。期限を延ばさず、旧OIDC Cookieを新ログイン成功の証拠にしない。これは新しい60分境界UAT合格とは扱わない。
+7. 旧鍵の拒否証拠（手順5の切替時に実施し、その後にT0を確定して手順6の待機へ進む）：旧鍵を新たに取り出さない。管理者が旧設定を保持する既存signerから値を返さない試験を行える場合に限り、交換後・有効期限内・新jtiのui_context要求1件を内部発行しAUTH_INVALIDを確認する。停止gate解除は新鍵整合後AUTH_CONNECTだけに限定する。旧signerを終了する前のこの短い管理作業は別途実行順を固定する。期限切れやAUTH_CONNECT_NOT_APPROVEDだけでは旧鍵拒否証拠にならない。旧signer利用不可なら未実測として残し、旧鍵を再入力して作り直さない。
+8. 新鍵で正規OIDC→署名付きui_context→TEST01/facilityを確認。リプレイ拒否、session_revoke後拒否、業務API拒否を確認。業務API否定試験は最小の固定要求のみで、prepare/executeの正当な業務payloadは送らない。session台帳への認証記録と業務監査を分離し、165行hash一致を確認する。秘密値・assertion・本人識別子・raw応答をログにしない。
+9. 全確認が完了するまで限定読取やGAS更新を再開しない。最後にAUTH_CONNECT・業務禁止を非秘密内部チェックで確認。
+
+## 実行に残る具体的な条件
+- 管理者本人による、秘密値を表示／コピーしないGAS・Streamlit設定経路の確定。現在の利用可能コネクタにScript Properties/Streamlit Secretsの安全な更新APIはなく、既存UIによる非表示更新も未確認。generator単体は設定反映ツールではない。
+- 旧signerの内部実行で旧鍵拒否を測れるか確認。鍵を回収しない条件で実施できなければ、その証拠不足を明示する。
+- 信頼できる管理環境での実交換と停止時刻記録。代行実行しない。
+
+## 露出範囲・アクセス記録
+確定：前回mcp__cua_repl.jsのgas.getAXState()がScript Propertiesを含む広いAXツリーを返し、3つの値がツール出力に含まれた。通常のアプリ業務APIのログからの漏えいではない。値を再取得せず、この既知の事象を記録した。
+未確定：ツール出力のバックエンド保存期間、閲覧した人・サービス、共有リンクの閲覧履歴、第三者利用。現セッションにそれらの管理監査APIは提供されていないため確認不能。チャット／ワークスペース管理者またはサービス提供者側での調査が必要。AIは外部問い合わせも資料送付も行っていない。公開GitHubへ秘密値を記録した証拠はないが、全ログの非露出を証明したとはしない。
+
+## 再発防止
+Script Properties/SecretsページではgetAXState、domSnapshot、全入力列挙、スクリーンショット、全設定JSON取得、clipboard読取を一切実施しない。非秘密の固定スキーマ結果（対象一致・stage・key_present・署名試験ok・件数・hash）だけを返す内部チェックを使う。catchは固定エラー文字列、HTTP/console/traceにpayloadを出さない。出力allowlist外は停止。旧鍵の値やhashを証拠へ保存しない。
+
+## 状態
+実交換未実施、旧鍵無効化未確認、新鍵実通信未実施。オフライン15検証のみ合格。限定読取停止継続。正式UAT PASS32/FAIL1/BLOCKED29/NOT RUN5。外部QA連絡なし。

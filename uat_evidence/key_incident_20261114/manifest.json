@@ -1,0 +1,27 @@
+{
+  "status": "CONTAINMENT_AND_ADMIN_ROTATION_NOT_EXECUTED",
+  "live_calls": 0,
+  "new_deployments": 0,
+  "business_writes": 0,
+  "real_secret_reads": 0,
+  "formal_pass_delta": 0,
+  "synthetic_regression_cases": 15,
+  "encrypted_bundle_unit_cases": 2,
+  "unsafe_ui_observation_banned": true,
+  "remaining": [
+    "Administrator-only secure non-display configuration path not established",
+    "Actual coordinated rotation not performed",
+    "Old-key rejection live measurement pending",
+    "Existing-session expiration/revocation confirmation pending",
+    "New-key OIDC/ACL/replay/auth-only regression pending",
+    "Provider-side tool-output retention and reader access logs unavailable"
+  ],
+  "files": {
+    "ROTATION.md": "e479d039bf4a6dbfdda11aad2c144db32156391ab937fd0a0dd6718013cdb39f",
+    "test_bundle_generator.py": "abeeffd20b52261237434cabe7659af68a69041f13afb99da30d19ff62b2d901",
+    "draft_inventory.json": "8596f07616ae37e002dc4931f0db015bbb2569bc66d4761404918d6b3123a647",
+    "rotation_regression.json": "e4539d93823b635e107d093c3694be7f95d484a0c10e2eb89bfd5b293a57737b",
+    "test_rotation_impact.cjs": "00e9d91f3dfcd3c653bdddfc68aba91bf06214dbb9d091a01eeea56a180b0a06",
+    "generate_encrypted_bundle.py": "eab1f1f81206f4622a4f4107d35a399f736f94a933ebc7c3ab0930aa2111b0be"
+  }
+}
