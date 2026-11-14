@@ -1,0 +1,57 @@
+{
+  "mode": "CONTRACT_MAPPING_NOT_LIVE_SAVE_APPROVAL",
+  "rows": [
+    [
+      "OIDC",
+      "Streamlit/Authlib verified st.user -> uat_auth_connect.context -> existing signed_request",
+      "No shared-token fallback; native OIDC fresh login pending"
+    ],
+    [
+      "issuer+subject",
+      "identity_proposal principal pin -> signed claims -> juogV3ReadIndividualAcl_",
+      "No principal persisted in new evidence"
+    ],
+    [
+      "TEST01 ACL",
+      "Fresh GAS ui_context every render -> authorize_context exact facility role/stage",
+      "Local mapping does not replace server authorization"
+    ],
+    [
+      "session/expiry/revocation/replay",
+      "Existing B2 signer and V9 session gate",
+      "Actual pinned entry exercised with synthetic identity/store/clock only this turn"
+    ],
+    [
+      "JUOG/facility",
+      "Candidate allowlist JUOG-971/TEST01 -> domain authorize ACTIVE Registry match",
+      "Real Registry lookup prohibited under AUTH_CONNECT, explicitly unverified"
+    ],
+    [
+      "save_draft/get_draft",
+      "Existing canonical helpers -> V9 operation -> prepare_request or wrapped get_draft",
+      "Runtime is non-sending preview only; actual V9 draft owner logic tested in memory"
+    ],
+    [
+      "save_crf/read_crf",
+      "Same build_submission -> schema normalization -> V9 prepare_request/read_crf contract",
+      "New read_crf response adapter and authenticated observed version required before enabling correction"
+    ],
+    [
+      "initial/correction",
+      "expected_record_version 0 for initial; correction reason + observed version required",
+      "No guessed correction version; empty runtime version map deliberately rejects"
+    ],
+    [
+      "operation_id",
+      "Generated only by GAS lifecycle prepare; unknown prepare blocks retry; reconcile same observed ID",
+      "Current lifecycle runner offline only; durable client reconciliation before real send remains"
+    ],
+    [
+      "audit/old versions",
+      "Actual V9 JuogUnifiedDomainV3 and lifecycle; record v1 retained, v2 append, matching audit",
+      "Memory-store proof only; prior live V9 evidence retained, not claimed as new candidate live pass"
+    ]
+  ],
+  "google_authentication_state": "DEVICE_APPROVAL_PENDING",
+  "formal_pass_delta": 0
+}
