@@ -20,6 +20,8 @@ jobs:
         run: node tests/test_auth04_privacy_guard.mjs
       - name: Real GAS API error boundary must not echo sensitive exception
         run: node tests/test_auth04_error_boundary.mjs
+      - name: Actual GAS screening and CRF draft save-read tests (fictional Sheets)
+        run: node tests/test_auth04_draft_end_to_end.mjs
       - name: Test screening draft DOB exclusion
         run: python -m unittest discover -s tests -p "test_auth04_screening_draft_privacy.py" -v
       - name: Existing screening identity tests
