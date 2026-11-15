@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import uuid
+from copy import deepcopy
 from datetime import date
 import streamlit as st
 
@@ -735,7 +736,7 @@ def _render_screening_form():
         )
     _submit_busy = bool(_pending and _pending.get("status") == "sending")
     if st.button(
-        "📨 中央MDT審査を申請" if not _pending else "📨 同じ申請IDで送信結果を再確認",
+        "📨 中央MDT審査を申請" if not _pending else "📨 同じ申請IDで再送信",
         type="primary", use_container_width=True,
         disabled=bool(L or _submit_busy or (not _pending and (missing or errors or ineligible))),
         key="screening_submit_single_button",
@@ -788,15 +789,23 @@ def _render_screening_form():
             _pending = {
                 "identity": (facility_code, text(local_subject_code)),
                 "submission_id": submission_id,
-                "screening_payload": screening_payload,
-                "request": _request,
+                "screening_payload": deepcopy(screening_payload),
+                "request": deepcopy(_request),
                 "status": "prepared",
             }
             st.session_state["screening_submit_attempt"] = _pending
         _pending["status"] = "sending"
         try:
-            with st.spinner("中央台帳へ送信しています…", show_time=True):
-                reg_result = registry_call("submit_screening", _pending["request"])
+            with st.spinner("接続先と台帳バージョンを確認しています…", show_time=True):
+                _backend = registry_call("backend_info")
+            if not _backend.get("ok") or _backend.get("backend_version") != "v2.2.9":
+                reg_result = {
+                    "ok": False, "error": "BACKEND_VERSION_UNVERIFIED",
+                    "message": "中央台帳のv2.2.9を確認できません。申請は送信していません。事務局へ連絡してください。",
+                }
+            else:
+                with st.spinner("中央台帳へ送信しています…", show_time=True):
+                    reg_result = registry_call("submit_screening", _pending["request"])
         finally:
             # Uncertain failures retain the exact same request UUID for retry.
             _pending["status"] = "needs_confirmation"
@@ -810,7 +819,7 @@ def _render_screening_form():
         else:
             _pending["status"] = "committed"
             screening_id = reg_result.get("screening_id", "")
-            screening_payload = _pending["screening_payload"]
+            screening_payload = deepcopy(_pending["screening_payload"])
             screening_payload["screening_id"] = screening_id
             # Receipt is generated from the confirmed submission payload, never
             # from subsequent widget edits. JSON stays in the central CRF snapshot
