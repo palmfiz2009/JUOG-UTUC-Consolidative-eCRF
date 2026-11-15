@@ -233,7 +233,7 @@ function doPost(e) {
 
     return jsonResponse_({ok: false, error: 'UNKNOWN_ACTION'});
   } catch (err) {
-    return jsonResponse_({ok: false, error: 'SERVER_ERROR', message: String(err)});
+    return jsonResponse_({ok: false, error: 'SERVER_ERROR'});
   }
 }
 
@@ -844,7 +844,7 @@ function getLatestCrfPayload_(sheetName, registrationId, crfType) {
       try {
         payload = JSON.parse(String(row[idx.payload_json] || '{}'));
       } catch (err) {
-        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR', message:String(err)};
+        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR'};
       }
       best = {
         version: version,
@@ -1084,8 +1084,8 @@ function getScreeningDraft_(p) {
       if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
       let draftState = {};
       try { draftState = JSON.parse(String(values[r][idx.draft_json] || '{}')); }
-      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)}; }
-      return {ok:true, source_found:true, updated_at:isoDateTime_(values[r][idx.updated_at]), facility_code:String(values[r][idx.facility_code] || facilityCode), facility_name:String(values[r][idx.facility_name] || ''), reporter_email:storedEmail, schema_version:String(values[r][idx.schema_version] || ''), draft_state:draftState};
+      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR'}; }
+      return {ok:true, source_found:true, updated_at:isoDateTime_(values[r][idx.updated_at]), facility_code:String(values[r][idx.facility_code] || facilityCode), facility_name:String(values[r][idx.facility_name] || ''), reporter_email:storedEmail, schema_version:String(values[r][idx.schema_version] || ''), draft_state:stripDirectIdentifiers_(draftState)};
     }
     return {ok:true, source_found:false};
   } finally { lock.releaseLock(); }
@@ -1215,7 +1215,7 @@ function getDraft_(p) {
       try {
         draftState = JSON.parse(String(values[r][idx.draft_json] || '{}'));
       } catch (err) {
-        return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)};
+        return {ok:false, error:'DRAFT_PARSE_ERROR'};
       }
       return {
         ok:true,
@@ -1228,7 +1228,7 @@ function getDraft_(p) {
         facility_name:String(registry.facility_name || values[r][idx.facility_name] || ''),
         reporter_email:storedEmail,
         schema_version:String(values[r][idx.schema_version] || ''),
-        draft_state:draftState
+        draft_state:stripDirectIdentifiers_(draftState)
       };
     }
     return {ok:true, source_found:false, registration_id:id};
@@ -1624,16 +1624,60 @@ function getBackendInfo_() {
   };
 }
 
-// Privacy safeguard: reject direct identifier keys in submitted payloads.
+// Candidate AUTH-04 privacy guard. Adapted from the validated-isolation revision2
+// fixture; formal approval must verify expected-field compatibility.
+// Full DOB, names, chart numbers and addresses must not be centrally persisted.
+function directIdentifierKey_(key) {
+  const raw = String(key || '').normalize('NFKC');
+  if (/(?:患者氏名|患者姓名|カルテ番号|診療録番号|生年月日)$/.test(raw)) return true;
+  const normalized = raw.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return /(?:^|_)(?:full_patient_name|patient_name|patient_full_name|first_name|last_name|given_name|family_name|patient_surname|mrn|medical_record_number|patient_address|personal_address|patient_phone|birth_date|dob|full_dob|date_of_birth)$/.test(normalized);
+}
+
+function parsedNestedJson_(value) {
+  if (typeof value !== 'string' || !/^\s*[\[{]/.test(value)) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function containsLabeledIdentifierText_(value) {
+  if (typeof value !== 'string') return false;
+  const s = value.normalize('NFKC');
+  return /(?:生年月日|患者氏名|カルテ番号|診療録番号)\s*(?:は|が|[:=])\s*\S/i.test(s) ||
+    /(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S/i.test(s) ||
+    /(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]/i.test(s);
+}
+
 function containsDirectIdentifier_(value) {
-  const prohibited = ['full_patient_name', 'patient_name', 'patient_full_name', 'mrn',
-    'medical_record_number', 'patient_address', 'personal_address', 'patient_phone',
-    'birth_date', 'full_dob', 'date_of_birth'];
+  const parsed = parsedNestedJson_(value);
+  if (parsed) return containsDirectIdentifier_(parsed);
+  if (containsLabeledIdentifierText_(value)) return true;
   if (!value || typeof value !== 'object') return false;
-  return Object.keys(value).some(key => {
-    if (prohibited.indexOf(String(key).trim().toLowerCase()) >= 0) return true;
-    return containsDirectIdentifier_(value[key]);
+  if (Array.isArray(value)) return value.some(containsDirectIdentifier_);
+  return Object.keys(value).some(key =>
+    directIdentifierKey_(key) || containsDirectIdentifier_(value[key]));
+}
+
+/** Remove identifiers from returned copies of older saved drafts without
+ * rewriting historical rows. A controlled historical-data review is still
+ * required before GCP sign-off: read-time masking is not erasure. */
+function stripDirectIdentifiers_(value) {
+  const parsed = parsedNestedJson_(value);
+  if (parsed) return JSON.stringify(stripDirectIdentifiers_(parsed));
+  if (containsLabeledIdentifierText_(value)) return '[REDACTED]';
+  if (Array.isArray(value)) return value.map(stripDirectIdentifiers_);
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  Object.keys(value).forEach(key => {
+    if (!directIdentifierKey_(key)) out[key] = stripDirectIdentifiers_(value[key]);
   });
+  return out;
 }
 
 function isCn1Only_(cT, cN, cM) {
