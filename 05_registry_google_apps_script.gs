@@ -358,6 +358,9 @@ function submitScreening_(p) {
           return {ok:false, error:'SUBMISSION_ID_IDENTITY_MISMATCH'};
         }
         const existingScreeningId = String(row[idx.screening_id]);
+        const currentApplicant = String(row[idx.reporter_email] || '').trim().toLowerCase();
+        if (currentApplicant && currentApplicant !== String(p.reporter_email || '').trim().toLowerCase())
+          return {ok:false, error:'REPORTER_EMAIL_MISMATCH', screening_id:existingScreeningId};
         const existingRound = parseInt(row[idx.review_round] || '1', 10) || 1;
         if (!submissionExistsInSheet_(SCREENING_CRF_SHEET, String(p.submission_id))) {
           const retryPayload = JSON.parse(JSON.stringify(p.crf_payload));
@@ -366,7 +369,7 @@ function submitScreening_(p) {
           const retrySave = savePayloadToSheet_(SCREENING_CRF_SHEET, retryPayload, false);
           if (!retrySave.ok) return {ok: false, error: 'SCREENING_CRF_SAVE_FAILED', message: retrySave.message || retrySave.error};
         }
-        return {ok: true, existing: true, screening_id: existingScreeningId, review_round: existingRound, status: String(row[idx.status]), registration_id: String(row[idx.registration_id] || '')};
+        return {ok: true, existing: true, submission_replay: true, screening_id: existingScreeningId, review_round: existingRound, status: String(row[idx.status]), registration_id: String(row[idx.registration_id] || '')};
       }
     }
 
@@ -377,6 +380,14 @@ function submitScreening_(p) {
       message:'既存のMDT受付番号と識別コードを事務局で確認してください。新しい番号は発行していません。'};
     const existingRow = identity.rowNo || -1;
     const oldRound = identity.review_round || 0;
+    if (existingRow > 0) {
+      const currentApplicant = String(values[existingRow - 1][idx.reporter_email] || '').trim().toLowerCase();
+      if (currentApplicant && currentApplicant !== String(p.reporter_email || '').trim().toLowerCase()) {
+        return {ok:false, error:'REPORTER_EMAIL_MISMATCH',
+          screening_id:identity.screening_id,
+          message:'既存の申請者メールアドレスと一致しません。変更が必要な場合は事務局にご相談ください。'};
+      }
+    }
     if (identity.status === 'REGISTERED') return {ok:false, error:'ALREADY_REGISTERED',
       registration_id:String(values[existingRow-1][idx.registration_id] || ''),
       screening_id:identity.screening_id};
@@ -425,7 +436,7 @@ function submitScreening_(p) {
       facility_code: String(p.facility_code), local_subject_code: String(p.local_subject_code), submission_id: String(p.submission_id)
     });
     SpreadsheetApp.flush();
-    return {ok: true, existing: existingRow > 0, screening_id: screeningId, review_round: reviewRound, status: 'PENDING'};
+    return {ok: true, existing: existingRow > 0, submission_replay: false, screening_id: screeningId, review_round: reviewRound, status: 'PENDING'};
   } finally {
     lock.releaseLock();
   }
