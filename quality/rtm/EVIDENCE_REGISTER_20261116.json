@@ -87,6 +87,42 @@
         "Prior evidence originals not exhaustively independently reverified",
         "Not a pass for newer commits"
       ]
+    },
+    {
+      "id": "EV-PR21-INTEGRATED",
+      "description": "PR19保存/監査/同一UUID + PR20 AUTH04 privacyをGAS一体として検証した隔離候補",
+      "requirement_ids": [
+        "URS-PRIVACY",
+        "URS-AUDIT",
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT",
+        "URS-CRF-LINK",
+        "URS-RETRY"
+      ],
+      "pr_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/21",
+      "candidate_commit_sha": "233308c026b3898e70bd9224d1642ae48b3e24db",
+      "proof_class": "OFFLINE_FICTIONAL_TEST",
+      "technical_test_counts": {
+        "integrated_gas_scenarios": 21,
+        "client_uuid_scenarios": 8,
+        "draft_inmemory_scenarios": 8
+      },
+      "test_provenance": [
+        ".github/workflows/gcp-p0-integrated-candidate.yml",
+        "tests/test_crf_audit_recovery.mjs",
+        "tests/test_auth04_draft_end_to_end.mjs",
+        "tests/test_gcp_pending_submission.py"
+      ],
+      "verified_ci_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/actions/runs/43734701145",
+      "real_isolated_env_executed": false,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Cross-sheet emulated: no true Sheets atomicity",
+        "No real authenticated Web App E2E",
+        "No durable browser-loss replay",
+        "Source branch is draft; requires review of merged GAS and code deployments"
+      ]
     }
   ],
   "unresolved_release_blockers": [
