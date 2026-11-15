@@ -765,12 +765,15 @@ if st.button("📨 中央MDT審査を申請", type="primary", use_container_widt
         _round = int(reg_result.get("review_round") or 1)
         _receipt_text = render_receipt_text(screening_payload, _round)
         _receipt_html = render_receipt_html(screening_payload, _round)
+        _email_html = render_receipt_html(
+            screening_payload, _round, include_print_button=False
+        )
         st.session_state["screening_receipt_html"] = _receipt_html
         sent, err = send_email(
             f"【JUOG-UTUC01】中央MDT申請受付・申請CRF控え【{screening_id}】",
             _receipt_text,
             reporter_email,
-            html_content=_receipt_html,
+            html_content=_email_html,
         )
         # New review rounds notify all three MDT reviewers; a network replay
         # of the same submission UUID does not send duplicate emails.
