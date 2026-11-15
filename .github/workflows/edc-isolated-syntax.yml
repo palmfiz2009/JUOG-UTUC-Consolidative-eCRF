@@ -1,0 +1,20 @@
+name: Isolated EDC syntax smoke (no patient data)
+on:
+  push:
+    branches:
+      - review/edc-integrated-improvements-20261115
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  static-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Python UI pages
+        run: python -m py_compile streamlit_app.py 01_registration_crf.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py 05_admin_mdt_registration.py 06_mdt_reviewer.py juog_common.py
+      - name: Check Apps Script JavaScript syntax
+        run: |
+          cp 05_registry_google_apps_script.gs /tmp/juog_registry_syntax.js
+          node --check /tmp/juog_registry_syntax.js
