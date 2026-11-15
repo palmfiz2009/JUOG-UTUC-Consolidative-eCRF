@@ -1,0 +1,23 @@
+name: CRF local-input fragment (offline UI-only smoke)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  syntax-and-fragment:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile all EDC Python pages
+        run: python -m py_compile streamlit_app.py 01_registration_crf.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py 05_admin_mdt_registration.py 06_mdt_reviewer.py juog_common.py
+      - name: Install Streamlit for offline AppTest
+        run: python -m pip install -r requirements.txt
+      - name: Local fragment checks (no network, no patient data)
+        run: python -m unittest discover -s tests -p "test_crf_fragment_only.py" -v
+      - name: Render and interact with forms locally (fake data, no backend)
+        run: python -m unittest discover -s tests -p "test_crf_app_boot.py" -v
+      - name: Existing MDT regressions (fictional values only)
+        run: python -m unittest discover -s tests -p "test_mdt_integrated_ui.py" -v
