@@ -133,6 +133,17 @@ class CRFSaveUITests(unittest.TestCase):
         self.assertEqual(len(self.saved),1)
         self.assertEqual(len(self.emails),1)
 
+    def test_pending_followup_retry_rejects_changed_visit(self):
+        self.responses = [{"ok":False,"error":"TIMEOUT"}]
+        self.assertFalse(self.helper.submit_crf_with_feedback(
+            page="fu", registration_id="JUOG-901",
+            payload=self.fixture("followup","6m"), visit_display="6ヶ月",
+        ))
+        self.assertFalse(self.helper.submit_crf_with_feedback(
+            page="fu", registration_id="JUOG-901", current_visit="9m",
+        ))
+        self.assertEqual(len(self.saved),1)
+
     def test_status_not_marked_success_when_server_rejects(self):
         self.responses = [{"ok":False, "error":"INITIAL_ALREADY_EXISTS"}]
         self.assertFalse(self.helper.submit_crf_with_feedback(
