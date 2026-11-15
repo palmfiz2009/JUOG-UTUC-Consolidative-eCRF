@@ -443,6 +443,8 @@ def send_email(subject: str, content: str, reporter_email: str | None = None, *,
         addr = reporter_email.strip()
         if addr and addr not in to_addrs:
             to_addrs.append(addr)
+    if html_content is None:
+        return _smtp_send(subject, content, to_addrs)
     return _smtp_send(subject, content, to_addrs, html_content=html_content)
 
 
