@@ -296,4 +296,61 @@ check("integrated: allowed payload audit failure restores on same-UUID replay",(
   assert.equal(b.record_version,1);
   assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),1);
 });
-console.log("ALL 21 OFFLINE INTEGRATED GCP DATA INTEGRITY CASES PASSED");
+check("lost-browser replay with new UUID and identical correction does not create v3",()=>{
+  const f=createFixture();
+  assert.equal(f.saveCrf(make()).ok,true);
+  assert.equal(f.saveCrf(make("corr-v2","訂正報告",{data:{test:"corrected"}})).ok,true);
+  const repeat=make("new-client-uuid","訂正報告",{
+    data:{test:"corrected"},submitted_at:"2026-11-16T07:00:00+09:00"
+  });
+  const response=f.saveCrf(repeat);
+  assert.equal(response.ok,false);
+  assert.equal(response.error,"DUPLICATE_CONTENT_ALREADY_RECORDED");
+  assert.equal(response.record_version,2);
+  assert.equal(f.crfRows(),2);assert.equal(f.auditRows(),2);
+});
+check("changed correction content is a genuinely new v3 with audited history",()=>{
+  const f=createFixture();
+  f.saveCrf(make());
+  f.saveCrf(make("corr-v2","訂正報告",{data:{test:"corrected"}}));
+  const next=f.saveCrf(make("corr-v3","訂正報告",{data:{test:"changed again"}}));
+  assert.equal(next.ok,true);assert.equal(next.record_version,3);
+  assert.equal(f.crfRows(),3);assert.equal(f.auditRows(),3);
+});
+check("missing prior audit blocks new correction before any write",()=>{
+  const f=createFixture(),original=make();
+  f.saveCrf(original);
+  f.t.CRFSubmissionAudit.splice(1,1);
+  const next=f.saveCrf(make("new-correction","訂正報告",{data:{test:"new"}}));
+  assert.equal(next.ok,false);assert.equal(next.error,"PREVIOUS_CRF_AUDIT_UNCONFIRMED");
+  assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),0);
+  const recovered=f.saveCrf(original);
+  assert.equal(recovered.ok,true);assert.equal(recovered.existing,true);
+  const ready=f.saveCrf(make("new-correction","訂正報告",{data:{test:"new"}}));
+  assert.equal(ready.ok,true);assert.equal(ready.record_version,2);
+  assert.equal(f.crfRows(),2);assert.equal(f.auditRows(),2);
+});
+check("tampered previous audit blocks duplicate-content error and new version",()=>{
+  const f=createFixture();
+  f.saveCrf(make());f.saveCrf(make("corr-v2","訂正報告",{data:{test:1}}));
+  f.t.CRFSubmissionAudit[2][ix(f.t.CRFSubmissionAudit[0],"record_version")]=12;
+  const r=f.saveCrf(make("new-uuid","訂正報告",{data:{test:1}}));
+  assert.equal(r.ok,false);assert.equal(r.error,"PREVIOUS_CRF_AUDIT_UNCONFIRMED");
+  assert.equal(f.crfRows(),2);assert.equal(f.auditRows(),2);
+});
+check("corrupt or ambiguous version history blocks any further correction",()=>{
+  const f=createFixture();f.saveCrf(make());f.saveCrf(make("corr-v2","訂正報告",{data:{a:1}}));
+  f.t.CRF_30d[2][ix(f.t.CRF_30d[0],"record_version")]=1;
+  const r=f.saveCrf(make("corr-v3","訂正報告",{data:{a:2}}));
+  assert.equal(r.ok,false);assert.equal(r.error,"PREVIOUS_CRF_HISTORY_INCONSISTENT");
+  assert.equal(f.crfRows(),2);assert.equal(f.auditRows(),2);
+});
+check("different serialized field order is not a new correction version",()=>{
+  const f=createFixture();f.saveCrf(make());
+  f.saveCrf(make("corr-v2","訂正報告",{data:{first:"A",second:"B"}}));
+  const duplicate=f.saveCrf(make("corr-new","訂正報告",{data:{second:"B",first:"A"}}));
+  assert.equal(duplicate.ok,false);
+  assert.equal(duplicate.error,"DUPLICATE_CONTENT_ALREADY_RECORDED");
+  assert.equal(f.crfRows(),2);assert.equal(f.auditRows(),2);
+});
+console.log("ALL 27 OFFLINE INTEGRATED GCP DATA INTEGRITY CASES PASSED");
