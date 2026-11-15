@@ -1430,6 +1430,11 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   const values = sh.getDataRange().getValues();
   const headers = values[0] || [];
   const idx = headerIndex_(headers);
+  // A duplicated UUID is data corruption, not a successful idempotent replay.
+  if (values.slice(1).filter(row =>
+      String(row[idx.submission_id] || '') === submissionId).length > 1) {
+    return {ok:false, error:'CRF_DUPLICATE_UUID'};
+  }
   let priorCount = 0;
   for (let r = 1; r < values.length; r++) {
     const row = values[r];
@@ -1479,6 +1484,23 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
     if (!auditCheck.ok) return auditCheck;
   }
   SpreadsheetApp.flush();
+  if (enforceVersionRules) {
+    // Verify what this backend actually persisted, not just that append did
+    // not throw. On uncertainty, the client retries the same frozen UUID.
+    const saved = sh.getDataRange().getValues();
+    const sIdx = headerIndex_(saved[0] || []);
+    if (['submission_id','record_version','record_key','payload_json'].some(k => sIdx[k] === undefined)) {
+      return {ok:false, error:'CRF_READBACK_SCHEMA_INCOMPLETE'};
+    }
+    const matches = saved.slice(1).filter(row =>
+      String(row[sIdx.submission_id] || '') === submissionId);
+    if (matches.length !== 1 ||
+        Number(matches[0][sIdx.record_version] || 0) !== version ||
+        String(matches[0][sIdx.record_key] || '') !== recordKey ||
+        String(matches[0][sIdx.payload_json] || '') !== JSON.stringify(payload)) {
+      return {ok:false, error:'CRF_READBACK_MISMATCH'};
+    }
+  }
   return {ok: true, existing: false, record_version: version, submission_id: submissionId};
 }
 
@@ -1519,6 +1541,18 @@ function ensureCrfAuditRow_(ss, sheetName, payload, version) {
     facility_code: String(payload.facility_code || '')
   });
   SpreadsheetApp.flush();
+  // A swallowed/partial append must never be acknowledged as audited.
+  const verified = sh.getDataRange().getValues();
+  const found = verified.slice(1).filter(row =>
+    String(row[idx.submission_id] || '') === submissionId);
+  if (found.length !== 1 ||
+      String(found[0][idx.sheet_name] || '') !== String(sheetName) ||
+      String(found[0][idx.record_key] || '') !== String(payload.record_key || '') ||
+      Number(found[0][idx.record_version] || 0) !== Number(version) ||
+      String(found[0][idx.registration_id] || '') !== String(payload.registration_id || '') ||
+      String(found[0][idx.facility_code] || '') !== String(payload.facility_code || '')) {
+    return {ok:false, error:'CRF_AUDIT_READBACK_MISMATCH'};
+  }
   return {ok:true, existing:false};
 }
 
