@@ -38,6 +38,7 @@ def submit_crf_with_feedback(
     email_body: str = "",
     warnings=(),
     visit_display: str = "",
+    current_visit: str = "",
 ):
     """Commit a frozen payload and show local progress next to the action area.
 
@@ -85,6 +86,9 @@ def submit_crf_with_feedback(
         if (attempt.get("registration_id") != registration_id or
                 frozen.get("crf_type") != crf_type):
             st.error("未確認の送信と登録番号が一致しません。別症例として送信せず事務局に確認してください。")
+            return False
+        if current_visit and str(frozen.get("visit") or "") != current_visit:
+            st.error("送信未確認の報告時点と現在の報告時点が異なります。以前の報告を事務局で確認してください。")
             return False
         if frozen.get("record_key") != "|".join((
             registration_id, crf_type, str(frozen.get("visit") or "")
