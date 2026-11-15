@@ -766,6 +766,7 @@ def _render_d90_without_full_page_rerun():
                             "中央Google Sheetへ保存できませんでした："
                             + (save_result.get("message") or save_result.get("error") or "unknown error")
                         )
+                        st.warning("保存結果が未確認の場合があります。この画面を閉じず、入力内容を変更せずに再送してください。画面が閉じられた場合は自己判断で訂正を重ねず、事務局へ確認してください。")
                     else:
                         if save_result.get("existing"):
                             sent, send_err = True, ""
