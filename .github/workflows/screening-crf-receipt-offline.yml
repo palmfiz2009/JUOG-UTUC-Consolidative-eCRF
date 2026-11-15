@@ -19,3 +19,9 @@ jobs:
         run: python -m py_compile 01_registration_crf.py juog_common.py screening_crf_receipt.py
       - name: Receipt tests (fictional data, no email/network)
         run: python -m unittest discover -s tests -p "test_screening_crf_receipt.py" -v
+      - name: Static screening UI interaction and retry contract
+        run: python -m unittest discover -s tests -p "test_screening_ui_contract.py" -v
+      - name: Stable MDT receipt IDs and same UUID replay (fictional in-memory GAS)
+        run: node tests/test_screening_identity.mjs
+      - name: MDT review baseline regressions
+        run: python -m unittest discover -s tests -p "test_mdt_integrated_ui.py" -v
