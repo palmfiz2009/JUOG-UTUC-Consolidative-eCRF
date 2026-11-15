@@ -58,8 +58,8 @@ if "screening_sent" not in st.session_state:
     st.session_state.screening_sent = False
 
 
-def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
-    """Notify the three central MDT reviewers only for the first screening submission.
+def send_mdt_review_requests(screening_id: str, facility_name: str, review_round: int = 1):
+    """Notify the central MDT reviewers whenever a review round starts.
 
     Reviewer addresses are kept in Streamlit Secrets and never in GitHub.
     Clinical details are intentionally excluded from the message body.
@@ -92,10 +92,12 @@ def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
         if not address:
             failures.append(f"{label}: メールアドレス未設定")
             continue
-        subject = f"【JUOG 中央MDT審査依頼】【{screening_id}】{label}"
-        body = f"""JUOG UTUC_Consolidative 中央MDT審査の新規申請が届きました。
+        round_label = "再審査" if review_round > 1 else "審査"
+        subject = f"【JUOG 中央MDT{round_label}依頼】【{screening_id}】【Round {review_round}】{label}"
+        body = f"""JUOG UTUC_Consolidative 中央MDT{round_label}の申請が届きました。
 
 MDT審査受付番号: {screening_id}
+審査ラウンド: {review_round}
 申請施設: {facility_name}
 担当領域: {label}
 
@@ -764,10 +766,13 @@ EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
             report,
             reporter_email,
         )
-        # 3名への審査依頼は初回申請のみ。訂正・再申請では再送しない。
+        # New review rounds notify all three MDT reviewers; a network replay
+        # of the same submission UUID does not send duplicate emails.
         mdt_notify_ok, mdt_notify_err = True, ""
-        if not bool(reg_result.get("existing")):
-            mdt_notify_ok, mdt_notify_err = send_initial_mdt_review_requests(screening_id, facility_name)
+        if not bool(reg_result.get("submission_replay")):
+            mdt_notify_ok, mdt_notify_err = send_mdt_review_requests(
+                screening_id, facility_name, int(reg_result.get("review_round") or 1)
+            )
         _draft_delete = delete_screening_draft(facility_code, local_subject_code)
         st.session_state.screening_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
         st.session_state.screening_sent = True
