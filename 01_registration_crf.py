@@ -801,7 +801,7 @@ def _render_screening_form():
             if not _backend.get("ok") or _backend.get("backend_version") != "v2.2.10":
                 reg_result = {
                     "ok": False, "error": "BACKEND_VERSION_UNVERIFIED",
-                    "message": "中央台帳のv2.2.9を確認できません。申請は送信していません。事務局へ連絡してください。",
+                    "message": "中央台帳のv2.2.10を確認できません。申請は送信していません。事務局へ連絡してください。",
                 }
             else:
                 with st.spinner("中央台帳へ送信しています…", show_time=True):
