@@ -32,6 +32,9 @@ class RecoverableClient(Client):
    if sid in seen or (local[1] is not None and request['operation_id']!=local[1]) or type(request.get('expected_record_version')) is not int or request['expected_record_version']!=local[2]:raise BridgeError('RECOVERY_JOURNAL_BINDING_MISMATCH')
    if local[3] in ('SAVED','FAILED') and request['state']!=local[3]:raise BridgeError('RECOVERY_JOURNAL_BINDING_MISMATCH')
    seen.add(sid)
+  # The scoped server contract returns the complete journal (or rejects it),
+  # never a page. Missing a previously bound request is an unresolved mismatch.
+  if any(local[1] is not None and sid not in seen for sid,local in known.items()):raise BridgeError('RECOVERY_JOURNAL_INCOMPLETE')
   return super().write(payload)
  def recover_prepare(self,digest,payload):
   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')

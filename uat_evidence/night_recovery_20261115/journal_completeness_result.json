@@ -1,0 +1,44 @@
+{
+  "base_commit": "5cf0437d8d4d36c6bc9bcfb8b4e469e6c4bf3f4e",
+  "mode": "OFFLINE_ONLY",
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "defect": "A truncated or empty recovery listing could omit locally bound completed requests while still allowing the next correction to be prepared and executed.",
+  "fix": "Before a new write, require every locally bound submission to occur in the validated scoped server listing. Reject missing requests with RECOVERY_JOURNAL_INCOMPLETE; preserve local state and make no new prepare/execute call.",
+  "contract_basis": "recovery_scope.gs returns all requests for the actor/case/CRF scope, or rejects more than 100; it does not paginate or authorize journal deletion. A future pagination or retention contract requires explicit reconciliation redesign.",
+  "reproduction_before": {
+    "tests": 2,
+    "failures": 2
+  },
+  "regression_after": {
+    "recovery_tests": 50,
+    "canonical_save_tests": 27,
+    "total": 77,
+    "failures": 0
+  },
+  "new_conditions": [
+    "Empty server listing after one confirmed save blocks a new correction.",
+    "Partial listing after two confirmed saves blocks a new correction.",
+    "Both rejection cases preserve offline records, revision and audits and issue no additional prepare or execute."
+  ],
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/recoverable_client.py": "55990f9d70f7cce121f71f2d8699120dba76cc3fb4a15ef6443b890966b3e957",
+    "acl_review/server_recovery_candidate/test_journal_completeness.py": "85f99a1825021a249ba9b529cef5be2c291e95b692eda821e295816c0bc325e5"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Response omission was injected in local fictional fixture transport; no live corruption is asserted.",
+    "Local SQLite is not an approved durable Streamlit store.",
+    "Old-key signature rejection, approved live recovery, sixty-minute observation and formal QA remain incomplete.",
+    "No live 165-row or audit remeasurement, settings changes, deployments or business requests.",
+    "Independent technical review and formal QA are not claimed."
+  ],
+  "continuation": "Retain existing operation/submission bindings when this error occurs. Do not delete local attempts or retry prepare to bypass the mismatch. Obtain authorized read-only journal reconciliation before live resumption; offline success does not permit live activation."
+}
