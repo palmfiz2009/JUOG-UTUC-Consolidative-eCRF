@@ -209,7 +209,7 @@ def _render_screening_form():
                         st.session_state["reg_draft_loaded_at"] = _res.get("updated_at") or "時刻不明"
                         st.rerun(scope="fragment")
 
-    L = False
+    L = bool(st.session_state.get("screening_sent"))
 
     # -------------------- 1. Basic / screening --------------------
     st.markdown('<div class="juog-header">1. 患者背景・スクリーニング</div>', unsafe_allow_html=True)
@@ -782,6 +782,7 @@ def _render_screening_form():
                 "planned_surgery": planned_surgery,
                 "planned_surgery_date": date_str(surgery_date),
                 "crf_payload": screening_payload,
+            }
             # Keep a frozen request with one UUID even if a network response is lost.
             # A retry must not become a second review round.
             _pending = {
@@ -859,21 +860,27 @@ def _render_screening_form():
                 print(f"[JUOG MDT screening] email failed: {err}")
             if not mdt_notify_ok:
                 print(f"[JUOG MDT screening] reviewer notification failed: {mdt_notify_err}")
-            # Keep the entered form visible; only update the status near the
-            # original submit button. No automatic page switch or full rerun.
-            st.success(f"中央MDT審査申請を保存しました：{screening_id} / Round {_round}")
-            st.caption(f"CRF様式：{screening_payload.get('schema_version', '')}　|　申請ID：{submission_id}")
+            # No automatic page change after confirmation: the form remains
+            # visible and submission controls are disabled from now on.
+
+    if st.session_state.get("screening_sent"):
+        _sid = str(st.session_state.get("screening_id") or "")
+        _round = st.session_state.get("screening_round")
+        st.success(f"中央MDT審査申請を保存しました：{_sid} / Round {_round}")
+        st.caption(f"CRF様式：{st.session_state.get('screening_schema_version', '')}")
+        _receipt = st.session_state.get("screening_receipt_html")
+        if _receipt:
             st.download_button(
                 "📄 提出済み申請CRFの控え（印刷・PDF保存用）",
-                data=_receipt_html.encode("utf-8"),
-                file_name=f"{screening_id}_submitted_screening_crf.html",
+                data=_receipt.encode("utf-8"),
+                file_name=f"{_sid}_submitted_screening_crf.html",
                 mime="text/html", use_container_width=True,
                 key="screening_receipt_download_inline",
             )
-            if not sent:
-                st.warning("申請データは保存済みですが、申請控えメールの送信は未確認です。再申請せず事務局へ確認してください。")
-            if not mdt_notify_ok:
-                st.warning("申請データは保存済みですが、MDT委員への通知は未確認です。再申請せず事務局へ確認してください。")
+        if st.session_state.get("screening_email_failed"):
+            st.warning("台帳には保存済みですが、申請者控えメールは送信未確認です。再申請せず事務局へ確認してください。")
+        if st.session_state.get("screening_mdt_notify_failed"):
+            st.warning("台帳には保存済みですが、MDT委員への通知は未確認です。再申請せず事務局へ確認してください。")
 
 
 _render_screening_form()
