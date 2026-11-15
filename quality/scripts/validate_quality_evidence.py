@@ -76,8 +76,23 @@ def validate() -> str:
         for requirement in ids:
             require(requirement in requirements, f"unknown requirement: {requirement} on {name}")
             covered[requirement] += 1
-    require(set(covered) == set(requirements),
-            f"unmapped requirements: {sorted(set(requirements) - set(covered))}")
+    mapped_requirements = {
+        key for key, info in requirements.items()
+        if info.get("uat_coverage_class") == "MAPPED_TO_ORIGINAL_UAT67"
+    }
+    intentional_gap_requirements = {
+        key for key, info in requirements.items()
+        if info.get("uat_coverage_class") == "GAP_NO_CURRENT_UAT_CASE"
+    }
+    require(set(covered) == mapped_requirements,
+            f"mapped UAT requirements unexpectedly changed: {sorted(set(covered) ^ mapped_requirements)}")
+    require(len(intentional_gap_requirements) == 8, "additional GCP gaps must not be hidden")
+    require(not set(covered).intersection(intentional_gap_requirements),
+            "gap requirement incorrectly marked as covered")
+    require(all(requirements[k].get("verification_status") == "NOT_VERIFIED"
+                for k in intentional_gap_requirements),
+            "unmapped GCP requirement asserted verified")
+
 
     require(reg["release_readiness"] == "NOT_READY", "unapproved release readiness change")
     evidence_ids = set()
@@ -121,7 +136,8 @@ def validate() -> str:
         "## GCP/CSV traceability gate — READ ONLY",
         "",
         f"- Baseline UAT: **{len(rows)}** cases (PASS {actual['PASS']} / FAIL {actual['FAIL']} / BLOCKED {actual['BLOCKED']} / NOT RUN {actual['NOT RUN']})",
-        f"- Mapped requirements: **{len(covered)} / {len(requirements)}**",
+        f"- Mapped requirements in original UAT67: **{len(covered)} / {len(requirements)}**",
+        f"- Additional GCP quality requirements without an existing UAT case: **{len(intentional_gap_requirements)}**",
         f"- Indexed candidate/historical evidence items: **{len(reg['evidence'])}**",
         f"- Open release blockers: **{len(blockers)}**",
         "- Technical CI result **does NOT create formal UAT PASS or independent QA approval**.",
@@ -132,6 +148,9 @@ def validate() -> str:
     ]
     for req in sorted(requirements):
         lines.append(f"| {req} | {covered[req]} | {mapped[req]} |")
+    lines += ["", "### No existing UAT case — additional GCP requirements"]
+    for req in sorted(intentional_gap_requirements):
+        lines.append(f"- **{req}**: {requirements[req]['name']} — NOT VERIFIED")
     lines += ["", "### Open blockers"]
     for b in blockers:
         lines.append(f"- **{b['id']}** ({b['severity']}): {b['kind']} — {b['summary']}")
