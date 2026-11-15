@@ -16,7 +16,9 @@
     "candidate_changes_not_applied_to_current_67": true,
     "independent_qa_review": "NOT_COMPLETE",
     "no_live_test_write": true,
-    "ready_to_release": false
+    "ready_to_release": false,
+    "additional_gcp_requirements_without_uat": 8,
+    "all_gcp_requirements_covered_by_67": false
   },
   "counts": {
     "PASS": 32,
@@ -27,59 +29,121 @@
   "requirements_catalog": {
     "URS-IDENTITY": {
       "priority": "P0",
-      "name": "個人ID・役割/施設ACL・アクセス拒否・セッション失効"
+      "name": "個人ID・役割/施設ACL・アクセス拒否・セッション失効",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-PRIVACY": {
       "priority": "P0",
-      "name": "直接識別情報の入力・保存・読出し・ログ非露出"
+      "name": "直接識別情報の入力・保存・読出し・ログ非露出",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-AUDIT": {
       "priority": "P0",
-      "name": "変更主体/時刻/理由/前後履歴と監査証跡の追跡"
+      "name": "変更主体/時刻/理由/前後履歴と監査証跡の追跡",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-RETRY": {
       "priority": "P0",
-      "name": "重複送信防止と障害後の同一要求照合"
+      "name": "重複送信防止と障害後の同一要求照合",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-CONFIG": {
       "priority": "P0",
-      "name": "本番/TEST/隔離の環境・構成・デプロイ同定"
+      "name": "本番/TEST/隔離の環境・構成・デプロイ同定",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-RELEASE": {
       "priority": "P0",
-      "name": "版管理・変更影響・リリース承認・ロールバック"
+      "name": "版管理・変更影響・リリース承認・ロールバック",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-SCREENING": {
       "priority": "P0",
-      "name": "同意・適格性・MDT・登録の臨床的整合性"
+      "name": "同意・適格性・MDT・登録の臨床的整合性",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-QUOTA": {
       "priority": "P0",
-      "name": "登録上限42例/cN1 20例/SD 12例の厳格な制御"
+      "name": "登録上限42例/cN1 20例/SD 12例の厳格な制御",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-CRF-SAVE": {
       "priority": "P0",
-      "name": "各CRFの正規保存・version・内容検証"
+      "name": "各CRFの正規保存・version・内容検証",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-CRF-AUDIT": {
       "priority": "P0",
-      "name": "CRFと監査行の独立読取一致・障害復旧"
+      "name": "CRFと監査行の独立読取一致・障害復旧",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-CRF-LINK": {
       "priority": "P0",
-      "name": "30日CRF参照版の検証と更新競合制御"
+      "name": "30日CRF参照版の検証と更新競合制御",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-BACKUP": {
       "priority": "P0",
-      "name": "保護されたバックアップと復元全件照合"
+      "name": "保護されたバックアップと復元全件照合",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-EXPORT": {
       "priority": "P1",
-      "name": "画像・データの匿名化・検証可能な抽出/保存"
+      "name": "画像・データの匿名化・検証可能な抽出/保存",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
     },
     "URS-VALIDATION": {
       "priority": "P0",
-      "name": "URS/FS→リスク→OQ/PQ/UAT→独立QAの追跡性"
+      "name": "URS/FS→リスク→OQ/PQ/UAT→独立QAの追跡性",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-DURABLE-RETRY": {
+      "priority": "P0",
+      "name": "ブラウザ消失後の未確定要求と元UUIDの永続的再照合・重複防止",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-OPS-SOP": {
+      "priority": "P1",
+      "name": "施設運用・訂正・権限管理・復旧・変更管理の承認済み手順書",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-TRAINING": {
+      "priority": "P1",
+      "name": "施設・事務局・MDT担当のアクセス前研修と履歴",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-VENDOR": {
+      "priority": "P1",
+      "name": "クラウド基盤・外部委託先評価・契約・責任分界・サービス可用性",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-RETENTION": {
+      "priority": "P1",
+      "name": "監査証跡を含む電子記録の保存期間・凍結・アーカイブ・再読取",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-PERIODIC-REVIEW": {
+      "priority": "P1",
+      "name": "定期アクセス権・監査ログ・変更多発/逸脱のレビュー",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-ENV-MONITOR": {
+      "priority": "P1",
+      "name": "監視/障害・セキュリティインシデント・復旧演習・CAPA連携",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-SEC-LOG": {
+      "priority": "P0",
+      "name": "アプリ/GAS/クラウド実ログの識別情報非露出とアクセス証跡",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
     }
   },
   "rows": [
