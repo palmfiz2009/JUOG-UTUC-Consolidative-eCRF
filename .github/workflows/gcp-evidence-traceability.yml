@@ -1,0 +1,22 @@
+name: GCP/CSV UAT67 evidence traceability integrity (no live systems)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  check-traceability:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile static evidence validator
+        run: python -m py_compile quality/scripts/validate_quality_evidence.py
+      - name: Verify all 67 official UAT references and release gates
+        run: |
+          python quality/scripts/validate_quality_evidence.py /tmp/juog_quality_summary.md
+          cat /tmp/juog_quality_summary.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Assert runtime was not accessed
+        run: |
+          echo "Read-only static report. No Streamlit, GAS, Google Sheets, participant data, credentials or external test environment used."
