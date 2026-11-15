@@ -58,7 +58,7 @@ def submit_crf_with_feedback(
     retry. The server must still enforce UUID idempotency and append-only audit.
     """
     import streamlit as st
-    from juog_common import delete_crf_draft, save_crf_payload, send_email
+    from juog_common import delete_crf_draft, registry_call, save_crf_payload, send_email
 
     if page not in _PROFILES:
         raise ValueError("Unknown CRF page")
@@ -108,6 +108,18 @@ def submit_crf_with_feedback(
             return False
 
     # No new metadata or UUID is created when the user presses retry.
+    # Never write this candidate's official CRF to the old production backend.
+    # A coordinated GAS + Streamlit release is required (no schema migration).
+    try:
+        with st.spinner("接続先の台帳バージョンを確認しています…", show_time=True):
+            backend = registry_call("backend_info")
+    except Exception:
+        backend = {}
+    if not backend.get("ok") or backend.get("backend_version") != "v2.2.10":
+        attempt["status"] = "uncertain"
+        st.error("台帳v2.2.10を確認できません。正式保存は実行していません。管理者へ連絡してください。")
+        return False
+
     attempt["status"] = "saving"
     attempt["saving_started_at"] = time.time()
     try:
