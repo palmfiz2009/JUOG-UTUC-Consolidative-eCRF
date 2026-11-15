@@ -130,6 +130,32 @@
         "Content-identical correction is blocked after browser loss, but unknown/mutated previous request cannot be durably reconstructed",
         "A same-UUID existing confirmation does not prove that original email was delivered; no automatic duplicate notification"
       ]
+    },
+    {
+      "id": "EV-MAIN-FACILITY-ACL-GAP",
+      "description": "現行GASの施設操作は共有tokenのみで個人IDの強制がないことを、実ソース関数のオフライン負/正コントロールで確認。これはGCP P0未達の検出であり合格ではない。",
+      "requirement_ids": [
+        "URS-IDENTITY",
+        "URS-AUDIT"
+      ],
+      "source_ref": "main@c5580662be09f914cad372aa4e4df0ed62cdf2e8",
+      "proof_class": "OFFLINE_FICTIONAL_TEST",
+      "technical_test_counts": {
+        "facility_endpoints_no_individual_actor_required": 9,
+        "privileged_endpoints_no_actor_rejected": 4
+      },
+      "test_provenance": [
+        "quality/scripts/test_facility_acl_gap.mjs",
+        ".github/workflows/gcp-evidence-traceability.yml"
+      ],
+      "real_isolated_env_executed": false,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Shared API token alone does not attribute individual principal",
+        "Isolated OIDC/ACL implementation exists separately but is not integrated into production",
+        "No authenticated real-environment ACL negative tests or signed QA approval"
+      ]
     }
   ],
   "unresolved_release_blockers": [
