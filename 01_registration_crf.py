@@ -223,6 +223,7 @@ physical_detail = st.text_area("身体所見の詳細*" if physical_abnormal == 
 h1, h2 = st.columns(2)
 with h1:
     past_history = render_required_text_or_none("既往歴", "reg_past_history", disabled=L)
+    st.caption("他がんの既往、経過観察中のリンパ節腫大、転移との鑑別に重要な臨床経過があれば、既往歴欄に記載してください。")
     comorbidity = render_required_text_or_none("現在の合併症", "reg_comorbidity", disabled=L)
 with h2:
     concomitant_meds = render_required_text_or_none("現在の併用薬", "reg_concomitant_meds", disabled=L)
