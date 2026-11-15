@@ -8,6 +8,7 @@ submission UUID and payload rather than creating a new version.
 from __future__ import annotations
 
 from copy import deepcopy
+import time
 
 _PROFILES = {
     "peri": ("perioperative_30d", "30d", "周術期・術後30日"),
@@ -26,12 +27,14 @@ def pending_attempt(page: str, session_state):
     state = session_state.get(attempt_key(page))
     if not isinstance(state, dict):
         return None
-    # A previous server request could be interrupted before its final rerun.
-    # On the next user interaction allow a same-UUID confirmation retry instead
-    # of leaving the submit button permanently disabled.
+    # Keep the button disabled while an active network request may still run.
+    # A truly abandoned request can be confirmed with its original UUID after
+    # two minutes, rather than triggering a second write on an ordinary rerun.
     if state.get("status") == "saving":
-        state["status"] = "uncertain"
-    return state if state.get("status") in ("prepared", "uncertain") else None
+        start = float(state.get("saving_started_at") or 0)
+        if start and time.time() - start >= 120:
+            state["status"] = "uncertain"
+    return state if state.get("status") in ("prepared", "uncertain", "saving", "committed") else None
 
 
 def submit_crf_with_feedback(
@@ -103,6 +106,7 @@ def submit_crf_with_feedback(
 
     # No new metadata or UUID is created when the user presses retry.
     attempt["status"] = "saving"
+    attempt["saving_started_at"] = time.time()
     try:
         with st.spinner("中央Google Sheetsへ保存しています…", show_time=True):
             result = save_crf_payload(deepcopy(attempt["payload"]))
@@ -120,6 +124,7 @@ def submit_crf_with_feedback(
         )
         return False
 
+    attempt["record_version"] = str(result.get("record_version") or "")
     attempt["status"] = "committed"
     # If this UUID already existed, an earlier request may have sent mail.
     # Never send a duplicate; don't falsely report a mail failure either.
