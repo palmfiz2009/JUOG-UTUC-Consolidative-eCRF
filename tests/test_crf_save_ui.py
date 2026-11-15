@@ -62,6 +62,9 @@ class CRFSaveUITests(unittest.TestCase):
         import juog_common
         self.patchers = (
             patch.dict(sys.modules, {"streamlit": self.st}),
+            patch.object(juog_common, "registry_call",
+                         lambda action, payload=None: {"ok":True,"backend_version":"v2.2.10"}
+                         if action=="backend_info" else {"ok":False}),
             patch.object(juog_common, "save_crf_payload", save),
             patch.object(juog_common, "send_email", mail),
             patch.object(juog_common, "delete_crf_draft", delete),
@@ -195,6 +198,18 @@ class CRFSaveUITests(unittest.TestCase):
         self.assertEqual(state["status"],"uncertain")
         self.assertTrue(self.helper.submit_crf_with_feedback(page="d90",registration_id="JUOG-901"))
         self.assertEqual(len(self.saved),1)
+
+    def test_old_gas_backend_is_rejected_before_save(self):
+        import juog_common
+        with patch.object(juog_common,"registry_call",
+                          lambda action,payload=None:{"ok":True,"backend_version":"v2.2.9"}):
+            ok=self.helper.submit_crf_with_feedback(
+                page="peri",registration_id="JUOG-901",payload=self.fixture(),
+            )
+        self.assertFalse(ok)
+        self.assertEqual(len(self.saved),0)
+        self.assertEqual(self.emails,[])
+        self.assertEqual(self.deleted,[])
 
     def test_status_not_marked_success_when_server_rejects(self):
         self.responses = [{"ok":False, "error":"INITIAL_ALREADY_EXISTS"}]
