@@ -18,7 +18,7 @@ class ScreeningUiContractTests(unittest.TestCase):
 
     def test_registration_uses_fragment_instead_of_full_page_widget_reruns(self):
         fn = next(
-            n for n in cls.ast_tree.body
+            n for n in self.ast_tree.body
             if isinstance(n, ast.FunctionDef) and n.name == "_render_screening_form"
         )
         self.assertTrue(any(
