@@ -16,10 +16,12 @@ jobs:
           cp 05_registry_google_apps_script.gs /tmp/juog_integrated_gas.js
           node --check /tmp/juog_integrated_gas.js
           python -m py_compile juog_common.py 01_registration_crf.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py
-      - name: Combined AUTH04 + GAS CRF/Audit save under simulated failures (21 scenarios)
+      - name: Combined AUTH04 + GAS CRF/Audit save under simulated failures (27 scenarios)
         run: node tests/test_crf_audit_recovery.mjs
       - name: Frozen request UUID across all CRF frontend retries
         run: python -m unittest discover -s tests -p "test_gcp_pending_submission.py" -v
+      - name: Browser restart correction replay and no duplicate email UI policy
+        run: python -m unittest discover -s tests -p "test_crf_restart_replay_ui.py" -v
       - name: Actual GAS draft save/read and historical privacy masking
         run: node tests/test_auth04_draft_end_to_end.mjs
       - name: Actual GAS API error and privacy boundaries
