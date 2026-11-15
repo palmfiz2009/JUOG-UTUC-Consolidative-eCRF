@@ -144,6 +144,18 @@ class CRFSaveUITests(unittest.TestCase):
         ))
         self.assertEqual(len(self.saved),1)
 
+    def test_interrupted_request_status_recovers_for_same_id_retry(self):
+        self.st.session_state[self.helper.attempt_key("d90")] = {
+            "status": "saving", "registration_id": "JUOG-901",
+            "payload": self.fixture("day90", "90d"),
+            "email_subject": "fictional", "email_body": "fictional",
+            "had_warnings": False, "visit_display": "",
+        }
+        state = self.helper.pending_attempt("d90", self.st.session_state)
+        self.assertEqual(state["status"],"uncertain")
+        self.assertTrue(self.helper.submit_crf_with_feedback(page="d90",registration_id="JUOG-901"))
+        self.assertEqual(len(self.saved),1)
+
     def test_status_not_marked_success_when_server_rejects(self):
         self.responses = [{"ok":False, "error":"INITIAL_ALREADY_EXISTS"}]
         self.assertFalse(self.helper.submit_crf_with_feedback(
