@@ -123,7 +123,7 @@ console.log("PASS follow-up source linkage / changed reference / manual 90-day")
   // Streamlit check. Fictional ID only; no Google API is contacted.
   const infoCode=extract("function getBackendInfo_() {", "// Privacy safeguard:");
   const getBackendInfo=new Function("getSpreadsheet_","BACKEND_VERSION","TIMEZONE","Utilities",
-    infoCode+"\\nreturn getBackendInfo_;"
+    infoCode+";return getBackendInfo_;"
   )(
     ()=>({getName:()=>"TEST_FICTIONAL_EDC",getId:()=>"isolated-fixture-sheet"}),
     "v2.2.10","Asia/Tokyo",
