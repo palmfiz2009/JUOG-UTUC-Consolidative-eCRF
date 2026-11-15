@@ -38,7 +38,7 @@ for(const [name,payload] of denied){
 const accepted=[
   ["age and birth month", {birth_year_month:"1980-01",age_at_consent:45}],
   ["other clinical dates", {consent_date:"2026-11-01",operation_date:"2026-11-10"}],
-  ["unlabeled clinical date", {notes:"2026-11-01"]},
+  ["unlabeled clinical date", {notes:"2026-11-01"}],
   ["clinical history without identifier", {notes:"既往歴：高血圧、糖尿病"}],
   ["explicit instruction not DOB", {notes:"生年月日を入力しないでください。"}],
   ["ordinary screening fields", {reg_ecog:{type:"value",value:"0"},reg_age:{type:"value",value:45}}],
