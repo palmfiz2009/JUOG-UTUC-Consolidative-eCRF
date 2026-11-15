@@ -314,127 +314,138 @@ if unanimous:
 else:
     st.warning("3名の個別判定が一致していません。中央MDTで協議し、構成委員の合意を形成してください。多数決による自動判定は行いません。")
 
-st.header("4. 中央MDT最終合意・正式登録")
+# Only the final-decision widgets rerun when a field changes; keep the
+# authorized case overview and backend preflight visible above the fragment.
+# No clinical rules, GAS calls, submission IDs, or notification recipients change.
+@st.fragment
+def _render_admin_final_decision(
+    screening_id: str,
+    case: dict,
+    individual: list,
+    unanimous: bool,
+    radiology_recist: str,
+):
+    st.header("4. 中央MDT最終合意・正式登録")
 
-# v2.2.8 UI fix:
-# Do not use st.form here. The final MDT controls need immediate reruns so that
-# radio/checkbox state is reflected before the single final submit action.
-widget_suffix = f"{screening_id}_{case.get('review_round')}"
+    # v2.2.8 UI fix:
+    # Do not use st.form here. The final MDT controls need immediate reruns so that
+    # radio/checkbox state is reflected before the single final submit action.
+    widget_suffix = f"{screening_id}_{case.get('review_round')}"
 
-b1, b2 = st.columns(2)
-with b1:
-    mdt_date = st.date_input(
-        "中央MDT最終判定日*",
-        value=today_jst(),
-        max_value=today_jst(),
-        key=f"final_mdt_date_{widget_suffix}",
-    )
-    # A disabled text_input with a stable key can show an old review version.
-    # Display the latest server-derived RECIST as text instead of a widget.
-    st.write(f"**中央RECIST（放射線診断医判定・最新版）**：{radiology_recist or '—'}")
-    site_r = str(case.get("site_recist", "") or "").upper()
-    central_r = str(radiology_recist or "").upper()
-    if site_r and central_r and site_r != central_r:
-        st.warning(f"施設判定 {site_r} と中央判定 {central_r} に乖離があります。適格性に用いるRECISTは中央判定です。")
-    elif site_r and central_r:
-        st.caption(f"施設判定と中央判定は一致（{central_r}）")
-
-with b2:
-    decision_jp = st.radio(
-        "中央MDT最終合意*",
-        ["適格（手術適応あり）", "不適格", "保留"],
-        index=None,
-        key=f"final_decision_{widget_suffix}",
-    )
-    admin_user = st.text_input(
-        "記録者（事務局）*",
-        key=f"final_admin_user_{widget_suffix}",
-    )
-
-reason = st.text_area(
-    "不適格・保留の理由*" if decision_jp in {"不適格", "保留"} else "理由/備考（任意）",
-    key=f"final_reason_{widget_suffix}",
-)
-
-decision_map = {
-    "適格（手術適応あり）": "ELIGIBLE",
-    "不適格": "INELIGIBLE",
-    "保留": "HOLD",
-}
-selected_decision_code = decision_map.get(decision_jp)
-
-consensus_note_required = (
-    not unanimous
-    or (
-        selected_decision_code
-        and selected_decision_code != individual[0]
-    )
-)
-
-consensus_note = st.text_area(
-    "合意形成記録*" if consensus_note_required else "合意形成記録（任意）",
-    help="個別判定が不一致だった場合や、最終合意が個別判定と異なる場合は、協議後にどのように合意したかを簡潔に記録してください。",
-    key=f"final_consensus_note_{widget_suffix}",
-)
-
-consensus_confirmed = st.checkbox(
-    "中央MDT構成委員3名の合意が得られたことを確認しました。",
-    key=f"final_consensus_confirmed_{widget_suffix}",
-)
-
-formal_confirm = st.checkbox(
-    "適格の場合、正式登録してJUOG登録番号を発行することを確認しました。",
-    help="適格として正式登録する場合にチェックしてください。不適格・保留ではチェック不要です。",
-    key=f"final_formal_confirm_{widget_suffix}",
-)
-
-submitted = st.button(
-    "中央MDT最終判定を確定／正式登録",
-    type="primary",
-    use_container_width=True,
-    key=f"final_submit_{widget_suffix}",
-)
-
-if submitted:
-    errors = []
-    if decision_jp is None:
-        errors.append("中央MDT最終合意を選択してください")
-    if not text(admin_user):
-        errors.append("記録者を入力してください")
-    if not consensus_confirmed:
-        errors.append("3名の合意確認が必要です")
-    decision_code = {"適格（手術適応あり）": "ELIGIBLE", "不適格": "INELIGIBLE", "保留": "HOLD"}.get(decision_jp)
-    if decision_jp in {"不適格", "保留"} and not text(reason):
-        errors.append("不適格・保留の理由を入力してください")
-    if (not unanimous or (decision_code and decision_code != individual[0])) and not text(consensus_note):
-        errors.append("個別判定と最終合意が一致しないため、合意形成記録が必要です")
-    if decision_code == "ELIGIBLE" and radiology_recist not in {"CR", "PR", "SD"}:
-        errors.append("適格として正式登録する場合、中央RECISTはCR/PR/SDである必要があります")
-    if decision_code == "ELIGIBLE" and not formal_confirm:
-        errors.append("正式登録・発番の確認チェックが必要です")
-
-    if errors:
-        st.error("\n".join(f"・{x}" for x in errors))
-    else:
-        result = registry_call(
-            "finalize_mdt",
-            {
-                "screening_id": screening_id,
-                "mdt_date": date_str(mdt_date),
-                "decision": decision_code,
-                "reason": text(reason),
-                "consensus_note": text(consensus_note),
-                "consensus_confirmed": True,
-                "admin_user": text(admin_user),
-            },
+    b1, b2 = st.columns(2)
+    with b1:
+        mdt_date = st.date_input(
+            "中央MDT最終判定日*",
+            value=today_jst(),
+            max_value=today_jst(),
+            key=f"final_mdt_date_{widget_suffix}",
         )
-        if not result.get("ok"):
-            st.error("最終判定を確定できませんでした：" + (result.get("message") or result.get("error") or "unknown error"))
+        # A disabled text_input with a stable key can show an old review version.
+        # Display the latest server-derived RECIST as text instead of a widget.
+        st.write(f"**中央RECIST（放射線診断医判定・最新版）**：{radiology_recist or '—'}")
+        site_r = str(case.get("site_recist", "") or "").upper()
+        central_r = str(radiology_recist or "").upper()
+        if site_r and central_r and site_r != central_r:
+            st.warning(f"施設判定 {site_r} と中央判定 {central_r} に乖離があります。適格性に用いるRECISTは中央判定です。")
+        elif site_r and central_r:
+            st.caption(f"施設判定と中央判定は一致（{central_r}）")
+
+    with b2:
+        decision_jp = st.radio(
+            "中央MDT最終合意*",
+            ["適格（手術適応あり）", "不適格", "保留"],
+            index=None,
+            key=f"final_decision_{widget_suffix}",
+        )
+        admin_user = st.text_input(
+            "記録者（事務局）*",
+            key=f"final_admin_user_{widget_suffix}",
+        )
+
+    reason = st.text_area(
+        "不適格・保留の理由*" if decision_jp in {"不適格", "保留"} else "理由/備考（任意）",
+        key=f"final_reason_{widget_suffix}",
+    )
+
+    decision_map = {
+        "適格（手術適応あり）": "ELIGIBLE",
+        "不適格": "INELIGIBLE",
+        "保留": "HOLD",
+    }
+    selected_decision_code = decision_map.get(decision_jp)
+
+    consensus_note_required = (
+        not unanimous
+        or (
+            selected_decision_code
+            and selected_decision_code != individual[0]
+        )
+    )
+
+    consensus_note = st.text_area(
+        "合意形成記録*" if consensus_note_required else "合意形成記録（任意）",
+        help="個別判定が不一致だった場合や、最終合意が個別判定と異なる場合は、協議後にどのように合意したかを簡潔に記録してください。",
+        key=f"final_consensus_note_{widget_suffix}",
+    )
+
+    consensus_confirmed = st.checkbox(
+        "中央MDT構成委員3名の合意が得られたことを確認しました。",
+        key=f"final_consensus_confirmed_{widget_suffix}",
+    )
+
+    formal_confirm = st.checkbox(
+        "適格の場合、正式登録してJUOG登録番号を発行することを確認しました。",
+        help="適格として正式登録する場合にチェックしてください。不適格・保留ではチェック不要です。",
+        key=f"final_formal_confirm_{widget_suffix}",
+    )
+
+    submitted = st.button(
+        "中央MDT最終判定を確定／正式登録",
+        type="primary",
+        use_container_width=True,
+        key=f"final_submit_{widget_suffix}",
+    )
+
+    if submitted:
+        errors = []
+        if decision_jp is None:
+            errors.append("中央MDT最終合意を選択してください")
+        if not text(admin_user):
+            errors.append("記録者を入力してください")
+        if not consensus_confirmed:
+            errors.append("3名の合意確認が必要です")
+        decision_code = {"適格（手術適応あり）": "ELIGIBLE", "不適格": "INELIGIBLE", "保留": "HOLD"}.get(decision_jp)
+        if decision_jp in {"不適格", "保留"} and not text(reason):
+            errors.append("不適格・保留の理由を入力してください")
+        if (not unanimous or (decision_code and decision_code != individual[0])) and not text(consensus_note):
+            errors.append("個別判定と最終合意が一致しないため、合意形成記録が必要です")
+        if decision_code == "ELIGIBLE" and radiology_recist not in {"CR", "PR", "SD"}:
+            errors.append("適格として正式登録する場合、中央RECISTはCR/PR/SDである必要があります")
+        if decision_code == "ELIGIBLE" and not formal_confirm:
+            errors.append("正式登録・発番の確認チェックが必要です")
+
+        if errors:
+            st.error("\n".join(f"・{x}" for x in errors))
         else:
-            reporter_email = case.get("reporter_email", "")
-            if decision_code == "ELIGIBLE":
-                registration_id = result.get("registration_id", "")
-                body = f"""【JUOG UTUC_Consolidative 中央MDT結果】
+            result = registry_call(
+                "finalize_mdt",
+                {
+                    "screening_id": screening_id,
+                    "mdt_date": date_str(mdt_date),
+                    "decision": decision_code,
+                    "reason": text(reason),
+                    "consensus_note": text(consensus_note),
+                    "consensus_confirmed": True,
+                    "admin_user": text(admin_user),
+                },
+            )
+            if not result.get("ok"):
+                st.error("最終判定を確定できませんでした：" + (result.get("message") or result.get("error") or "unknown error"))
+            else:
+                reporter_email = case.get("reporter_email", "")
+                if decision_code == "ELIGIBLE":
+                    registration_id = result.get("registration_id", "")
+                    body = f"""【JUOG UTUC_Consolidative 中央MDT結果】
 MDT審査受付番号: {screening_id}
 施設: {case.get('facility_name','')}
 施設内研究対象者識別コード: {case.get('local_subject_code','')}
@@ -447,17 +458,17 @@ MDT審査受付番号: {screening_id}
 
 以後の周術期・90日・定期経過CRFでは、このJUOG登録番号を使用してください。
 """
-                sent, mail_err = send_email(f"【JUOG 正式登録】【{registration_id}】【{case.get('facility_name','')}】", body, reporter_email)
-                st.success(f"正式登録しました：{registration_id}")
-                if result.get("counts_after"):
-                    ca = result["counts_after"]
-                    st.info(f"登録後集積：全体 {ca.get('total')}例 / cN1 {ca.get('cN1')}例 / SD {ca.get('SD')}例")
-                if not sent:
-                    st.warning("正式登録は完了していますが、結果通知メールの送信に失敗しました。JUOG番号は再発行しないでください。")
-                    st.code(mail_err or "mail error")
-            else:
-                label = "不適格" if decision_code == "INELIGIBLE" else "保留"
-                body = f"""【JUOG UTUC_Consolidative 中央MDT結果】
+                    sent, mail_err = send_email(f"【JUOG 正式登録】【{registration_id}】【{case.get('facility_name','')}】", body, reporter_email)
+                    st.success(f"正式登録しました：{registration_id}")
+                    if result.get("counts_after"):
+                        ca = result["counts_after"]
+                        st.info(f"登録後集積：全体 {ca.get('total')}例 / cN1 {ca.get('cN1')}例 / SD {ca.get('SD')}例")
+                    if not sent:
+                        st.warning("正式登録は完了していますが、結果通知メールの送信に失敗しました。JUOG番号は再発行しないでください。")
+                        st.code(mail_err or "mail error")
+                else:
+                    label = "不適格" if decision_code == "INELIGIBLE" else "保留"
+                    body = f"""【JUOG UTUC_Consolidative 中央MDT結果】
 MDT審査受付番号: {screening_id}
 施設: {case.get('facility_name','')}
 施設内研究対象者識別コード: {case.get('local_subject_code','')}
@@ -468,24 +479,31 @@ MDT審査受付番号: {screening_id}
 
 JUOG正式登録番号は発行されていません。
 """
-                sent, mail_err = send_email(f"【JUOG MDT結果】【{screening_id}】【{label}】", body, reporter_email)
-                if decision_code == "INELIGIBLE":
-                    st.success("不適格として確定しました。正式登録番号は発行されていません。Screening記録は保持されます。")
+                    if decision_code == "INELIGIBLE":
+                        body += (
+                            "\n今回はご登録に至りませんでしたが、今後も適応となる症例がございましたら、"
+                            "ぜひご紹介いただけますと幸いです。\n"
+                        )
+                    sent, mail_err = send_email(f"【JUOG MDT結果】【{screening_id}】【{label}】", body, reporter_email)
+                    if decision_code == "INELIGIBLE":
+                        st.success("不適格として確定しました。正式登録番号は発行されていません。Screening記録は保持されます。")
+                    else:
+                        st.success("保留として確定しました。追加情報再提出後に新しい審査ラウンドで再審査できます。")
+                    if not sent:
+                        st.warning("判定記録は完了していますが、結果通知メールの送信に失敗しました。")
+                        st.code(mail_err or "mail error")
+                # Final status is already committed in GAS. A mail issue must never
+                # trigger a second finalize_mdt submission or a new registration ID.
+                mdt_label = "適格" if decision_code == "ELIGIBLE" else ("不適格" if decision_code == "INELIGIBLE" else "保留")
+                mdt_ok, mdt_error = notify_mdt_final_result(
+                    screening_id, str(case.get("facility_name") or ""), mdt_label,
+                    text(reason) if decision_code != "ELIGIBLE" else "",
+                )
+                if mdt_ok:
+                    st.success("中央MDT委員3名への最終判定通知を送信しました。")
                 else:
-                    st.success("保留として確定しました。追加情報再提出後に新しい審査ラウンドで再審査できます。")
-                if not sent:
-                    st.warning("判定記録は完了していますが、結果通知メールの送信に失敗しました。")
-                    st.code(mail_err or "mail error")
-            # Final status is already committed in GAS. A mail issue must never
-            # trigger a second finalize_mdt submission or a new registration ID.
-            mdt_label = "適格" if decision_code == "ELIGIBLE" else ("不適格" if decision_code == "INELIGIBLE" else "保留")
-            mdt_ok, mdt_error = notify_mdt_final_result(
-                screening_id, str(case.get("facility_name") or ""), mdt_label,
-                text(reason) if decision_code != "ELIGIBLE" else "",
-            )
-            if mdt_ok:
-                st.success("中央MDT委員3名への最終判定通知を送信しました。")
-            else:
-                st.warning("最終判定は確定済みですが、中央MDT委員へのメール通知を完了できませんでした。")
-                st.caption(mdt_error)
+                    st.warning("最終判定は確定済みですが、中央MDT委員へのメール通知を完了できませんでした。")
+                    st.caption(mdt_error)
 
+
+_render_admin_final_decision(screening_id, case, individual, unanimous, radiology_recist)
