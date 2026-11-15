@@ -91,6 +91,8 @@ if st.session_state.peri_sent:
         st.caption("周術期・術後30日CRFを保存しました。")
     if st.session_state.get("peri_sent_had_warnings"):
         st.info("確認事項も中央データに保存されています。")
+    if st.session_state.get("peri_sent_email_unverified"):
+        st.warning("すでに保存されている送信IDを確認したため、通知メールを重複送信しませんでした。前回の通知状況が不明な場合は事務局で確認してください。")
     if st.session_state.get("peri_sent_email_failed"):
         st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
     if st.session_state.get("peri_sent_draft_delete_failed"):
@@ -992,17 +994,25 @@ def _render_peri_without_full_page_rerun():
     {json_block(payload)}
     """
                 save_result = save_crf_payload(payload)
-                if not save_result.get("ok"):
+                if save_result.get("error") == "DUPLICATE_CONTENT_ALREADY_RECORDED":
+                    release_crf_attempt_if_certainly_rejected(st.session_state, "_crf_pending_peri", save_result)
+                    st.warning("同じ内容の訂正報告がすでに保存済みです。新しい版は作成せず、メールも再送していません。保存状態は事務局にご確認ください。")
+                elif not save_result.get("ok"):
                     release_crf_attempt_if_certainly_rejected(st.session_state, "_crf_pending_peri", save_result)
                     st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
                 else:
                     draft_delete = delete_crf_draft(registration_id, "perioperative_30d", "30d")
                     st.session_state.peri_sent_draft_delete_failed = not bool(draft_delete.get("ok"))
-                    sent, send_err = send_email(
-                        f"【JUOG CRF】【perioperative_30d】【{registration_id}】",
-                        report,
-                        reporter_email,
-                    )
+                    if save_result.get("existing"):
+                        sent, send_err = True, ""
+                        st.session_state["peri_sent_email_unverified"] = True
+                    else:
+                        sent, send_err = send_email(
+                            f"【JUOG CRF】【perioperative_30d】【{registration_id}】",
+                            report,
+                            reporter_email,
+                        )
+                        st.session_state["peri_sent_email_unverified"] = False
                     st.session_state.peri_sent = True
                     st.session_state.peri_sent_registration_id = registration_id
                     st.session_state.peri_sent_version = str(save_result.get("record_version", "") or "")
