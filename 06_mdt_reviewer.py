@@ -155,6 +155,11 @@ q3.write(f"**予定術式**：{case.get('planned_surgery','') or '—'}")
 
 st.header("2. 申請情報")
 with st.expander("患者背景・EVP・画像情報を確認", expanded=True):
+    st.markdown("**中央MDTで共有する臨床背景（申請施設記載）**")
+    st.write(f"**既往歴**：{data.get('past_history') or '記載なし'}")
+    st.write(f"**現在の合併症**：{data.get('comorbidity') or '記載なし'}")
+    st.write(f"**活動性重複がんの申請評価**：{data.get('other_cancer') or '記載なし'}")
+    st.caption("上記は申請施設の記載内容です。画像所見や他の判定者の独立判定とは区別して評価してください。")
     x1, x2 = st.columns(2)
     with x1:
         st.write(f"同意取得日：{data.get('consent_date','')}")
@@ -264,22 +269,32 @@ if prior:
             st.session_state[correction_key] = False
             st.rerun()
 
+def _previous_index(options, field):
+    """Prefill only when explicitly correcting a prior review."""
+    previous = str(prior.get(field) or "") if prior and correction_mode else ""
+    return options.index(previous) if previous in options else 0
+
+
 st.header("3. 独立判定")
 with st.form(f"review_form_{role}_{screening_id}_{review_round}"):
-    reviewer_name = st.text_input("判定者氏名*")
+    reviewer_name = st.text_input(
+        "判定者氏名*", value=str(prior.get("reviewer_name") or "") if prior and correction_mode else ""
+    )
 
     role_payload = {}
     if role == "radiology":
         central_recist = st.selectbox(
             "中央RECIST v1.1総合判定*",
             ["選択してください", "CR", "PR", "SD", "PD", "NE"],
+            index=_previous_index(["選択してください", "CR", "PR", "SD", "PD", "NE"], "central_recist"),
             help="施設判定とは別に、中央放射線診断医としてRECIST v1.1に基づき判定してください。この中央判定を適格性確認時の正式RECISTとして扱います。",
         )
-        organ_invasion = st.selectbox("他臓器直接浸潤の画像評価*", ["選択してください", "切除不能/危険な浸潤なし", "切除不能/危険な浸潤あり", "判定困難"])
-        vessel_invasion = st.selectbox("大血管浸潤の画像評価*", ["選択してください", "切除不能/危険な浸潤なし", "切除不能/危険な浸潤あり", "判定困難"])
+        organ_invasion = st.selectbox("他臓器直接浸潤の画像評価*", ["選択してください", "切除不能/危険な浸潤なし", "切除不能/危険な浸潤あり", "判定困難"], index=_previous_index(["選択してください", "切除不能/危険な浸潤なし", "切除不能/危険な浸潤あり", "判定困難"], "organ_invasion"))
+        vessel_invasion = st.selectbox("大血管浸潤の画像評価*", ["選択してください", "切除不能/危険な浸潤なし", "切除不能/危険な浸潤あり", "判定困難"], index=_previous_index(["選択してください", "切除不能/危険な浸潤なし", "切除不能/危険な浸潤あり", "判定困難"], "vessel_invasion"))
         cm1_status = st.selectbox(
             "診断時cM1例の活動性遠隔病変*",
             ["選択してください", "非cM1のため該当なし", "活動性病変消失/cNED", "活動性病変あり", "判定困難"],
+            index=_previous_index(["選択してください", "非cM1のため該当なし", "活動性病変消失/cNED", "活動性病変あり", "判定困難"], "cm1_status"),
         )
         role_payload = {
             "central_recist": central_recist,
@@ -291,16 +306,19 @@ with st.form(f"review_form_{role}_{screening_id}_{review_round}"):
         g3_ae_recovered = st.selectbox(
             "申請情報上、EVP関連Grade 3以上AEの未回復がないこと*",
             ["選択してください", "確認できる", "未回復AEあり", "追加情報が必要"],
+            index=_previous_index(["選択してください", "確認できる", "未回復AEあり", "追加情報が必要"], "g3_ae_recovered"),
             help="申請施設から提出されたAE情報を確認します。判定者による直接診察を意味しません。",
         )
         ecog_0_1 = st.selectbox(
             "申請情報上、ECOG PS 0–1であること*",
             ["選択してください", "確認できる", "ECOG PS 2以上と報告", "追加情報が必要"],
+            index=_previous_index(["選択してください", "確認できる", "ECOG PS 2以上と報告", "追加情報が必要"], "ecog_0_1"),
             help="申請施設が報告したECOG PSを確認します。中央判定者が患者を直接診察して採点する項目ではありません。",
         )
         medical_safety = st.selectbox(
             "提出された臨床情報・検査値を踏まえた内科的な手術移行安全性*",
             ["選択してください", "手術移行可能", "手術移行不適", "追加情報/回復待ち"],
+            index=_previous_index(["選択してください", "手術移行可能", "手術移行不適", "追加情報/回復待ち"], "medical_safety"),
             help="採血、バイタル、併存疾患、EVP関連AE/irAEの回復状況等を総合して判定してください。",
         )
         role_payload = {
@@ -309,15 +327,28 @@ with st.form(f"review_form_{role}_{screening_id}_{review_round}"):
             "medical_safety": medical_safety,
         }
     else:
-        technically_resectable = st.selectbox("申請情報・画像に基づく技術的切除可能性*", ["選択してください", "切除可能", "切除不能/危険", "追加情報が必要"])
-        surgery_appropriate = st.selectbox("提出情報に基づくConsolidative surgeryの外科的妥当性*", ["選択してください", "適応あり", "適応なし", "保留"])
+        technically_resectable = st.selectbox("申請情報・画像に基づく技術的切除可能性*", ["選択してください", "切除可能", "切除不能/危険", "追加情報が必要"], index=_previous_index(["選択してください", "切除可能", "切除不能/危険", "追加情報が必要"], "technically_resectable"))
+        surgery_appropriate = st.selectbox("提出情報に基づくConsolidative surgeryの外科的妥当性*", ["選択してください", "適応あり", "適応なし", "保留"], index=_previous_index(["選択してください", "適応あり", "適応なし", "保留"], "surgery_appropriate"))
         role_payload = {
             "technically_resectable": technically_resectable,
             "surgery_appropriate": surgery_appropriate,
         }
 
-    decision_jp = st.radio("担当領域としての判定*", ["適格", "不適格", "保留"], index=None, horizontal=True)
-    comment = st.text_area("コメント" + ("*" if decision_jp in {"不適格", "保留"} else "（任意）"))
+    prior_decision = (
+        {"ELIGIBLE": "適格", "INELIGIBLE": "不適格", "HOLD": "保留"}.get(str(prior.get("decision") or "").upper())
+        if prior and correction_mode else None
+    )
+    decision_jp = st.radio(
+        "担当領域としての判定*", ["適格", "不適格", "保留"],
+        index=["適格", "不適格", "保留"].index(prior_decision) if prior_decision else None,
+        horizontal=True,
+    )
+    # Keep the widget label stable: changing its label with a conditional decision
+    # would reset comment input state when the form is submitted.
+    comment = st.text_area(
+        "コメント（不適格・保留の場合は必須）",
+        value=str(prior.get("comment") or "") if prior and correction_mode else "",
+    )
     is_correction = bool(prior) and correction_mode
     correction_reason = st.text_input("訂正理由*") if is_correction else ""
     confirm = st.checkbox("申請資料を確認し、自分の担当領域として独立して判定しました。")
