@@ -1,0 +1,19 @@
+name: Admin MDT local form and wording (offline checks)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  admin-mdt-ui:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile Python pages
+        run: python -m py_compile 05_admin_mdt_registration.py 01_registration_crf.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py
+      - name: Admin fragment and ineligible message safety checks
+        run: python -m unittest discover -s tests -p "test_admin_final_fragment.py" -v
+      - name: Existing MDT notification/correction regression
+        run: python -m unittest discover -s tests -p "test_mdt_integrated_ui.py" -v
