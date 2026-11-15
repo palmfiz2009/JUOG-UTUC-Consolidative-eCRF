@@ -600,12 +600,14 @@ def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
             if exc.code not in retryable_http or attempt == 2:
                 return last_error
             time.sleep(0.6 * (attempt + 1))
-        except Exception as exc:
-            last_error = {"ok": False, "error": f"REGISTRY_ERROR:{exc}"}
+        except Exception:
+            # Network/JSON exceptions can contain URLs or response fragments.
+            # Do not send raw exception text to the facility browser or logs.
+            last_error = {"ok": False, "error": "REGISTRY_CONNECTION_FAILED"}
             if attempt == 2:
                 return last_error
             time.sleep(0.6 * (attempt + 1))
-    return last_error or {"ok": False, "error": "REGISTRY_ERROR:UNKNOWN"}
+    return last_error or {"ok": False, "error": "REGISTRY_CONNECTION_FAILED"}
 
 
 
