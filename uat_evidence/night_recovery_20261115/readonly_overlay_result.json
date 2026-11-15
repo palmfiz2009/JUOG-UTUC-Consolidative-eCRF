@@ -1,0 +1,41 @@
+{
+  "kind": "OFFLINE_PACKAGING_ONLY",
+  "baseline_commit": "f9ac508dfbd181d66e6dea9d812f0fbcb707e438",
+  "gap": "Existing two-file reflection recipe omits content_fingerprint.py introduced by c245d82; readonly_probe import then fails. Earlier evidence identified dependency packaging as outstanding.",
+  "fix": "Local-only overlay builder includes the entry, probe and fingerprint module; records required existing code hashes; refuses existing destinations or output inside the base app. No recursive app/settings copy, activation or deployment.",
+  "evidence": [
+    "Reconstructed two-file recipe in temporary directory: isolated Python import failed with missing content_fingerprint.",
+    "Three-file overlay: isolated Python import of readonly_probe and transitive dependencies succeeds. Entry syntax compiles; entry is NOT executed.",
+    "Existing base code byte-for-byte unchanged.",
+    "Missing dependency, existing destination and output under base app all reject."
+  ],
+  "tests": {
+    "command": "python -W ignore::ResourceWarning -m unittest discover -s acl_review/server_recovery_candidate -p test_readonly_overlay.py",
+    "tests": 4,
+    "failures": 0,
+    "errors": 0
+  },
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/build_readonly_overlay.py": "3a09dda68b251d8a11b9af3580f992a70d5201ddf8bbf18857e910a68662cbca",
+    "acl_review/server_recovery_candidate/test_readonly_overlay.py": "1df22da9e018c1ab131ffd14cec52d6b5efa1653b3b4eb9a1ccd27c8b9569f35"
+  },
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT RUN": 5
+  },
+  "new_formal_pass": 0,
+  "limitations": [
+    "Uses repository candidate dependencies in a temporary local directory, not the current hosted app.",
+    "Old approval document is historical and not rewritten; its two-file recipe and old hashes must not be used as authorization for current candidates.",
+    "Source alignment, independent review and new scoped reflection approval remain required.",
+    "Old-key signature rejection and new-key/authentication/ACL/live recovery evidence remain incomplete.",
+    "60-minute persistent observation and formal QA remain incomplete.",
+    "No live 165-row or audit measurement; live data untouched."
+  ],
+  "continuation": "Use build_readonly_overlay.py for future local candidate packaging and hash comparison. Do not deploy its output without separate review/approval or treat import success as live UAT."
+}
