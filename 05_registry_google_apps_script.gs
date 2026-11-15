@@ -1386,9 +1386,8 @@ function saveCrf_(p) {
   const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
   if (!validation.ok) return validation;
 
-  const sourceCheck = validateDay90SourceLink_(payload);
-  if (!sourceCheck.ok) return sourceCheck;
-
+  // Linked-source version must be checked under the same write lock.
+  // Identical submission retries are handled without changing prior history.
   const hardCheck = validateCrfHardStops_(payload, validation);
   if (!hardCheck.ok) return hardCheck;
 
@@ -1402,66 +1401,172 @@ function saveCrf_(p) {
 }
 
 function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
-  // Only for official CRFs: ensure the record key matches the actual study subject.
+  // The existing caller holds the GAS ScriptLock. Keep one submission_id for
+  // one logical CRF version, and do not report success until both CRF and audit
+  // have been verified. Sheets does not support atomic cross-sheet transactions.
   if (enforceVersionRules) {
     const expectedKey = [String(payload.registration_id || ''), String(payload.crf_type || ''), String(payload.visit || '')].join('|');
     if (String(payload.record_key || '') !== expectedKey) return {ok:false, error:'RECORD_KEY_MISMATCH'};
   }
   const ss = getSpreadsheet_();
   const sh = ss.getSheetByName(sheetName);
+  if (!sh) return {ok:false, error:'CRF_SHEET_NOT_FOUND'};
   const submissionId = String(payload.submission_id || '').trim();
   const recordKey = String(payload.record_key || '').trim();
   const kind = String(payload.submission_kind || (sheetName === SCREENING_CRF_SHEET ? '初回報告' : '')).trim();
   if (!submissionId || !recordKey) return {ok: false, error: 'MISSING_SUBMISSION_METADATA'};
 
   const values = sh.getDataRange().getValues();
-  const headers = values[0] || [];
-  const idx = headerIndex_(headers);
-  let priorCount = 0;
-  for (let r = 1; r < values.length; r++) {
-    const row = values[r];
-    if (String(row[idx.submission_id] || '') === submissionId) {
-      if (enforceVersionRules) {
-        const isSameKey = String(row[idx.record_key] || '') === recordKey;
-        const isSameSubject = String(row[idx.registration_id] || '') === String(payload.registration_id || '');
-        const isSameSite = String(row[idx.facility_code] || '') === String(payload.facility_code || '');
-        const isSamePayload = String(row[idx.payload_json] || '') === JSON.stringify(payload);
-        if (!isSameKey || !isSameSubject || !isSameSite || !isSamePayload) return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
+  const idx = headerIndex_(values[0] || []);
+  const required = ['submission_id', 'record_key', 'record_version', 'payload_json',
+    'registration_id', 'facility_code'];
+  if (enforceVersionRules && required.some(k => idx[k] === undefined)) {
+    return {ok:false, error:'CRF_SCHEMA_INCOMPLETE'};
+  }
+  const matches = values.slice(1).filter(row =>
+    String(row[idx.submission_id] || '') === submissionId);
+  if (matches.length > 1) return {ok:false, error:'CRF_DUPLICATE_SUBMISSION_ID'};
+
+  if (matches.length === 1) {
+    const row = matches[0];
+    if (enforceVersionRules) {
+      if (String(row[idx.record_key] || '') !== recordKey ||
+          String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+          String(row[idx.facility_code] || '') !== String(payload.facility_code || '') ||
+          String(row[idx.payload_json] || '') !== JSON.stringify(payload)) {
+        return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
       }
-      return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId};
+      // This is the critical recovery path. After a prior audit write failure,
+      // same-UUID retry must complete or verify the audit without adding CRF v3.
+      const previousVersion = Number(row[idx.record_version]);
+      if (!Number.isSafeInteger(previousVersion) || previousVersion < 1) {
+        return {ok:false, error:'CRF_VERSION_INVALID'};
+      }
+      const audited = ensureCrfAuditRow_(ss, sheetName, payload, previousVersion);
+      if (!audited.ok) return audited;
     }
-    if (String(row[idx.record_key] || '') === recordKey) priorCount++;
+    return {ok:true, existing:true, record_version:Number(row[idx.record_version] || 1), submission_id:submissionId};
   }
 
+  const priorCount = values.slice(1).filter(row =>
+    String(row[idx.record_key] || '') === recordKey).length;
   if (enforceVersionRules) {
-    if (kind === '初回報告' && priorCount > 0) return {ok: false, error: 'INITIAL_ALREADY_EXISTS', message: 'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
-    if (kind === '訂正報告' && priorCount === 0) return {ok: false, error: 'NO_PRIOR_RECORD_FOR_CORRECTION', message: '訂正対象となる既存報告がありません。'};
-    if (kind === '訂正報告' && !String(payload.correction_reason || '').trim()) return {ok: false, error: 'MISSING_CORRECTION_REASON'};
+    // Prevent time-of-check/time-of-use races between 30d edits and 90d/FUP saves.
+    // The existing saveCrf_ ScriptLock is still held here. Prior UUID replay is
+    // handled above, so a confirmed old submission can be safely recovered.
+    const sourceCheck = validateDay90SourceLink_(payload);
+    if (!sourceCheck.ok) return sourceCheck;
+    if (kind === '初回報告' && priorCount > 0)
+      return {ok:false, error:'INITIAL_ALREADY_EXISTS', message:'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
+    if (kind === '訂正報告' && priorCount === 0)
+      return {ok:false, error:'NO_PRIOR_RECORD_FOR_CORRECTION', message:'訂正対象となる既存報告がありません。'};
+    if (kind === '訂正報告' && !String(payload.correction_reason || '').trim())
+      return {ok:false, error:'MISSING_CORRECTION_REASON'};
   }
 
   const version = priorCount + 1;
   const flat = flattenObject_(payload);
   const rowObj = {
-    saved_at: new Date(), record_version: version,
-    submission_id: submissionId, record_key: recordKey, submission_kind: kind,
-    correction_reason: String(payload.correction_reason || ''), submitted_at: String(payload.submitted_at || ''),
-    registration_id: String(payload.registration_id || ''), facility_code: String(payload.facility_code || ''),
-    facility_name: String(payload.facility_name || ''), reporter_email: String(payload.reporter_email || ''),
-    crf_type: String(payload.crf_type || ''), visit: String(payload.visit || ''), schema_version: String(payload.schema_version || ''),
-    study_code: String(payload.study_code || ''), payload_json: JSON.stringify(payload)
+    saved_at:new Date(), record_version:version,
+    submission_id:submissionId, record_key:recordKey, submission_kind:kind,
+    correction_reason:String(payload.correction_reason || ''), submitted_at:String(payload.submitted_at || ''),
+    registration_id:String(payload.registration_id || ''), facility_code:String(payload.facility_code || ''),
+    facility_name:String(payload.facility_name || ''), reporter_email:String(payload.reporter_email || ''),
+    crf_type:String(payload.crf_type || ''), visit:String(payload.visit || ''),
+    schema_version:String(payload.schema_version || ''), study_code:String(payload.study_code || ''),
+    payload_json:JSON.stringify(payload)
   };
-  Object.keys(flat).forEach(k => { if (!Object.prototype.hasOwnProperty.call(rowObj, k)) rowObj[k] = flat[k]; });
+  Object.keys(flat).forEach(k => {
+    if (!Object.prototype.hasOwnProperty.call(rowObj, k)) rowObj[k] = flat[k];
+  });
   ensureDynamicHeaders_(sh, Object.keys(rowObj));
   appendByHeaders_(sh, rowObj);
-
-  if (sheetName !== SCREENING_CRF_SHEET) {
-    appendByHeaders_(ss.getSheetByName(CRF_AUDIT_SHEET), {
-      saved_at: new Date(), sheet_name: sheetName, record_key: recordKey, record_version: version,
-      submission_id: submissionId, submission_kind: kind, registration_id: String(payload.registration_id || ''), facility_code: String(payload.facility_code || '')
-    });
+  if (enforceVersionRules) {
+    // Return an error (never success) when sheet readback is missing or altered.
+    const verified = verifySavedCrfRow_(sh, payload, version);
+    if (!verified.ok) return verified;
+    const audited = ensureCrfAuditRow_(ss, sheetName, payload, version);
+    if (!audited.ok) return audited;
   }
   SpreadsheetApp.flush();
-  return {ok: true, existing: false, record_version: version, submission_id: submissionId};
+  return {ok:true, existing:false, record_version:version, submission_id:submissionId};
+}
+
+/** Check the CRF persisted exactly once before acknowledging or auditing it. */
+function verifySavedCrfRow_(sh, payload, version) {
+  try {
+    SpreadsheetApp.flush();
+    const rows = sh.getDataRange().getValues();
+    const idx = headerIndex_(rows[0] || []);
+    const needed = ['submission_id', 'record_key', 'record_version', 'payload_json',
+      'registration_id', 'facility_code'];
+    if (needed.some(k => idx[k] === undefined)) return {ok:false, error:'CRF_READBACK_SCHEMA_INCOMPLETE'};
+    const matches = rows.slice(1).filter(row =>
+      String(row[idx.submission_id] || '') === String(payload.submission_id || ''));
+    if (matches.length !== 1) return {ok:false, error:'CRF_READBACK_COUNT_MISMATCH', retryable:true};
+    const row = matches[0];
+    if (String(row[idx.record_key] || '') !== String(payload.record_key || '') ||
+        Number(row[idx.record_version]) !== Number(version) ||
+        String(row[idx.payload_json] || '') !== JSON.stringify(payload) ||
+        String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+        String(row[idx.facility_code] || '') !== String(payload.facility_code || '')) {
+      return {ok:false, error:'CRF_READBACK_CONTENT_MISMATCH'};
+    }
+    return {ok:true};
+  } catch (_err) {
+    // Do not leak patient data or internal spreadsheet exception text to client.
+    return {ok:false, error:'CRF_READBACK_UNCONFIRMED', retryable:true};
+  }
+}
+
+/** Validate and repair a missing audit row on same-UUID retry under ScriptLock.
+ * If a matching audit row exists, never add another audit event.
+ * If an audit row conflicts or the readback is missing, do not report success. */
+function ensureCrfAuditRow_(ss, sheetName, payload, version) {
+  try {
+    const sh = ss.getSheetByName(CRF_AUDIT_SHEET);
+    if (!sh) return {ok:false, error:'CRF_AUDIT_SHEET_NOT_FOUND'};
+    const scan = () => {
+      const rows = sh.getDataRange().getValues();
+      const idx = headerIndex_(rows[0] || []);
+      const needed = ['submission_id', 'sheet_name', 'record_key', 'record_version',
+        'registration_id', 'facility_code', 'submission_kind'];
+      if (needed.some(k => idx[k] === undefined))
+        return {ok:false, error:'CRF_AUDIT_SCHEMA_INCOMPLETE'};
+      const matches = rows.slice(1).filter(row =>
+        String(row[idx.submission_id] || '') === String(payload.submission_id || ''));
+      if (matches.length > 1) return {ok:false, error:'CRF_AUDIT_DUPLICATE_UUID'};
+      if (matches.length === 1) {
+        const row = matches[0];
+        if (String(row[idx.sheet_name] || '') !== String(sheetName) ||
+            String(row[idx.record_key] || '') !== String(payload.record_key || '') ||
+            Number(row[idx.record_version]) !== Number(version) ||
+            String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+            String(row[idx.facility_code] || '') !== String(payload.facility_code || '') ||
+            String(row[idx.submission_kind] || '') !== String(payload.submission_kind || '')) {
+          return {ok:false, error:'CRF_AUDIT_UUID_CONFLICT'};
+        }
+        return {ok:true, existing:true};
+      }
+      return {ok:true, existing:false};
+    };
+    const first = scan();
+    if (!first.ok || first.existing) return first;
+    appendByHeaders_(sh, {
+      saved_at:new Date(), sheet_name:sheetName, record_key:String(payload.record_key || ''),
+      record_version:Number(version), submission_id:String(payload.submission_id || ''),
+      submission_kind:String(payload.submission_kind || ''),
+      registration_id:String(payload.registration_id || ''),
+      facility_code:String(payload.facility_code || '')
+    });
+    SpreadsheetApp.flush();
+    const checked = scan();
+    if (!checked.ok) return checked;
+    if (!checked.existing) return {ok:false, error:'CRF_AUDIT_READBACK_MISSING', retryable:true};
+    return {ok:true, existing:false};
+  } catch (_err) {
+    return {ok:false, error:'CRF_AUDIT_UNCONFIRMED', retryable:true};
+  }
 }
 
 function submissionExistsInSheet_(sheetName, submissionId) {

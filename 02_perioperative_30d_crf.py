@@ -16,6 +16,8 @@ from juog_common import (
     get_crf_draft,
     json_block,
     make_submission_metadata,
+    freeze_crf_submission_attempt,
+    release_crf_attempt_if_certainly_rejected,
     render_facility,
     render_submission_kind,
     restore_draft_state,
@@ -959,6 +961,12 @@ def _render_peri_without_full_page_rerun():
                     "death_cause": death_cause,
                 }
                 payload = {**meta, "data": data}
+                payload, _gcp_pending_error = freeze_crf_submission_attempt(
+                    st.session_state, "_crf_pending_peri", payload
+                )
+                if _gcp_pending_error:
+                    st.error(_gcp_pending_error)
+                    st.stop()
                 report = f"""【JUOG 周術期・30日報告】
     JUOG登録番号: {registration_id}
     施設: {facility_name}
@@ -985,6 +993,7 @@ def _render_peri_without_full_page_rerun():
     """
                 save_result = save_crf_payload(payload)
                 if not save_result.get("ok"):
+                    release_crf_attempt_if_certainly_rejected(st.session_state, "_crf_pending_peri", save_result)
                     st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
                 else:
                     draft_delete = delete_crf_draft(registration_id, "perioperative_30d", "30d")
