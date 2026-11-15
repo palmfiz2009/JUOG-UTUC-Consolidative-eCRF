@@ -1,0 +1,1424 @@
+{
+  "schema_version": "gcp-rtm-uatrecord-v1",
+  "created_at_jst": "2026-11-16",
+  "status": "INITIAL_UNAPPROVED_READONLY_IMPORT",
+  "source": {
+    "repo": "palmfiz2009/JUOG-UTUC-Consolidative-eCRF",
+    "ref": "review/acl-connection-20261112",
+    "path": "uat_evidence/uat67_execution_20261113/UAT67_formal_reconciliation.json",
+    "source_blob_sha": "8f2c0893442feccc1834a4341bbdf1bcaf809c72",
+    "official_register_reported_sha256": "663ed0ada91b7f570364615131dfbacfb1863de3c5f6dd1cef70a3b9d031dee1",
+    "source_kind": "FORMAL_REVIEW_MATRIX_NOT_NEW_LIVE_PASS"
+  },
+  "interpretation": {
+    "statuses_are_existing_official_not_new": true,
+    "prior_evidence_refs_not_reverified": true,
+    "candidate_changes_not_applied_to_current_67": true,
+    "independent_qa_review": "NOT_COMPLETE",
+    "no_live_test_write": true,
+    "ready_to_release": false,
+    "additional_gcp_requirements_without_uat": 8,
+    "all_gcp_requirements_covered_by_67": false
+  },
+  "counts": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT RUN": 5
+  },
+  "requirements_catalog": {
+    "URS-IDENTITY": {
+      "priority": "P0",
+      "name": "個人ID・役割/施設ACL・アクセス拒否・セッション失効",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-PRIVACY": {
+      "priority": "P0",
+      "name": "直接識別情報の入力・保存・読出し・ログ非露出",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-AUDIT": {
+      "priority": "P0",
+      "name": "変更主体/時刻/理由/前後履歴と監査証跡の追跡",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-RETRY": {
+      "priority": "P0",
+      "name": "重複送信防止と障害後の同一要求照合",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-CONFIG": {
+      "priority": "P0",
+      "name": "本番/TEST/隔離の環境・構成・デプロイ同定",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-RELEASE": {
+      "priority": "P0",
+      "name": "版管理・変更影響・リリース承認・ロールバック",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-SCREENING": {
+      "priority": "P0",
+      "name": "同意・適格性・MDT・登録の臨床的整合性",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-QUOTA": {
+      "priority": "P0",
+      "name": "登録上限42例/cN1 20例/SD 12例の厳格な制御",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-CRF-SAVE": {
+      "priority": "P0",
+      "name": "各CRFの正規保存・version・内容検証",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-CRF-AUDIT": {
+      "priority": "P0",
+      "name": "CRFと監査行の独立読取一致・障害復旧",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-CRF-LINK": {
+      "priority": "P0",
+      "name": "30日CRF参照版の検証と更新競合制御",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-BACKUP": {
+      "priority": "P0",
+      "name": "保護されたバックアップと復元全件照合",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-EXPORT": {
+      "priority": "P1",
+      "name": "画像・データの匿名化・検証可能な抽出/保存",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-VALIDATION": {
+      "priority": "P0",
+      "name": "URS/FS→リスク→OQ/PQ/UAT→独立QAの追跡性",
+      "uat_coverage_class": "MAPPED_TO_ORIGINAL_UAT67"
+    },
+    "URS-DURABLE-RETRY": {
+      "priority": "P0",
+      "name": "ブラウザ消失後の未確定要求と元UUIDの永続的再照合・重複防止",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-OPS-SOP": {
+      "priority": "P1",
+      "name": "施設運用・訂正・権限管理・復旧・変更管理の承認済み手順書",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-TRAINING": {
+      "priority": "P1",
+      "name": "施設・事務局・MDT担当のアクセス前研修と履歴",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-VENDOR": {
+      "priority": "P1",
+      "name": "クラウド基盤・外部委託先評価・契約・責任分界・サービス可用性",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-RETENTION": {
+      "priority": "P1",
+      "name": "監査証跡を含む電子記録の保存期間・凍結・アーカイブ・再読取",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-PERIODIC-REVIEW": {
+      "priority": "P1",
+      "name": "定期アクセス権・監査ログ・変更多発/逸脱のレビュー",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-ENV-MONITOR": {
+      "priority": "P1",
+      "name": "監視/障害・セキュリティインシデント・復旧演習・CAPA連携",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    },
+    "URS-SEC-LOG": {
+      "priority": "P0",
+      "name": "アプリ/GAS/クラウド実ログの識別情報非露出とアクセス証跡",
+      "uat_coverage_class": "GAP_NO_CURRENT_UAT_CASE",
+      "verification_status": "NOT_VERIFIED"
+    }
+  },
+  "rows": [
+    {
+      "test_id": "ENV-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-CONFIG",
+        "URS-RELEASE"
+      ],
+      "acceptance_criterion": "SPREADSHEET_IDがPRODUCTIONと異なるTEST専用シートを指す。",
+      "tested_version": "新規専用GAS・589b374e参照／2026-11-09追補",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_UAT_ENV01_20261109.md／既保存ENV01 Evidence ZIP",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "ENV-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-CONFIG",
+        "URS-RELEASE"
+      ],
+      "acceptance_criterion": "TESTがPRODUCTIONデプロイID・本番台帳を参照しない。",
+      "tested_version": "既存TEST Streamlit validation-v2.2.8 / GAS固定version1 / Git commit 589b374e2d4be45efec6ef258157a7bac5c0fd83",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_run4_ENV02_backend.txt/.jpg、ENV02_deployment.txt/.jpg、ENV02_registered.txt/.jpg（同接頭辞）；run4_sheet_metadata.json；run4_admin_reference.py；Run5_review_block.txt；run6_sheet_ids.json; run10_admin_confirmation.json; run11_ENV02_comparison.json; run11_version1_history.txt; run11_GAS_version1_code.gs; run11_github_tree.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "ENV-03",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G0",
+      "requirement_ids": [
+        "URS-CONFIG",
+        "URS-RELEASE"
+      ],
+      "acceptance_criterion": "テスト時に参加施設の実メール・本番提出先へ送らない。",
+      "tested_version": "既存TEST実画面2026-11-10 JST、参照SHA589b374e2d4be45efec6ef258157a7bac5c0fd83",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "JUOG_run5_ENV03_mail_disabled.txt/.jpg、reference_sources/、ENV03_routes.md；run6_manual_evidence.json（libfile_af4416f2ac78819194b32f407e949a71、version5）；run6_dropbox_metadata.json; run12_ENV03_evidence.json; run12_dropbox_requests.json; run12_ENV03_runtime_view.txt; run12_notification_source_excerpts.txt; run13_mdt_v1_saved.txt",
+      "remaining_action": "現在の隔離Streamlit/GASのSMTP/外部アップロード無効化と非到達を検証。画像提出を使わない限定範囲と旧基準との差を明記。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "ENV-04",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G5",
+      "requirement_ids": [
+        "URS-CONFIG",
+        "URS-RELEASE"
+      ],
+      "acceptance_criterion": "現在のテスト対象版と本番版が識別可能。変更履歴が保存される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "JUOG_run4_ENV02_deployment.txt/.jpg、JUOG_run4_ENV02_backend.txt/.jpg; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "新隔離のcommit/deployment/source hashを結び、既存本番版の承認記録と識別する。未承認本番操作はしない。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "PROD-01",
+      "official_status": "NOT RUN",
+      "baseline_status": "NOT RUN",
+      "risk": "High",
+      "group": "G6",
+      "requirement_ids": [
+        "URS-CONFIG",
+        "URS-RELEASE"
+      ],
+      "acceptance_criterion": "PRODUCTIONが正常応答し、登録件数がRegistryと一致。書込みを行わない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "本番読取の別承認工程（変更禁止）",
+      "existing_evidence_reference": "—",
+      "remaining_action": "別承認された読取範囲で環境表示/登録総数照合。本番変更は不可。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "PROD-02",
+      "official_status": "NOT RUN",
+      "baseline_status": "NOT RUN",
+      "risk": "Medium",
+      "group": "G6",
+      "requirement_ids": [
+        "URS-CONFIG",
+        "URS-RELEASE"
+      ],
+      "acceptance_criterion": "サーバーエラーなく表示される。実患者情報は外部共有しない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "本番読取の別承認工程（変更禁止）",
+      "existing_evidence_reference": "—",
+      "remaining_action": "別承認された読取範囲で画面遷移。患者情報を証拠に含めない。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "同意要件を満たさない申請は正式受付されない。",
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_run2_SCR01_no_consent.txt/.jpg、JUOG_run2_SCR01_consent_restored.txt",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "診断時Stage IVを満たさないため適格候補にならない。",
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_run2_SCR02.txt/.jpg、JUOG_run2_positive_control.txt/.jpg",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-03",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "Stage IV経路として受け付け可能（最終MDTは別判定）。",
+      "tested_version": "既存TEST Streamlit validation-v2.2.8／GAS active version1（ENV-02証拠継承）、2026-11-10実測",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-04",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "Stage IV経路として受け付け可能。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E01/E03",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-05",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "中央画像・臨床情報による条件確認ができる。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—",
+      "remaining_action": "cM1/遠隔CRの架空中央画像・臨床条件を正規各役割で確認し登録結果を照合。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-06",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "3か月以上の条件確認ができる。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—",
+      "remaining_action": "局所治療後cNEDの3か月以上条件を中央審査から登録まで確認。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-07",
+      "official_status": "NOT RUN",
+      "baseline_status": "NOT RUN",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "条件不充足例が正式登録されない。",
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "JUOG_run2_SCR07_no_basis.txt、JUOG_run2_SCR07_cNED_short.txt/.jpg; Run9_SCR07_exact3months.txt / Run9_SCR07_one_day_short.txt / Run9_SCR07_future.txt / Run9_SCR07_future.png",
+      "remaining_action": "遠隔病変残存/cNED不足の正式登録要求が拒否される証拠を取得。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-08",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "19歳は除外、20歳は年齢条件を通過。",
+      "tested_version": "既存TEST実画面・validation-v2.2.8参照SHA 589b374e2d4be45efec6ef258157a7bac5c0fd83／稼働SHA独立照合はENV-04に残る",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_SCR08_age19_20261109.jpg（画面部分記録）／boundary_observations age20／JUOG_SCR08_age20_20261110.txt、jpg／実行時ブラウザ観測",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-09",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "ECOG 2は適格候補にならない。",
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_run2_SCR09_PS2.txt/.jpg、JUOG_run2_SCR09_PS1_and_SCR10_63_reason.txt",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-10",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "プロトコルに定める例外条件を満たす場合のみ進める。",
+      "tested_version": "既存TEST https://juog-utuc01-uat.streamlit.app/ ・2026-11-10 JST実画面。参照validation-v2.2.8/589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHAの独立照合未了（ENV-04）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_run2_SCR10_62_reason.txt/.jpg、62_no_reason.txt、63_no_reason.txt、63_reason_restored.txt（同接頭辞）",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-11",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "診断時・最終投与後の画像と症例識別コードが照合可能。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—",
+      "remaining_action": "架空2時点DICOM・症例コード・受領記録を隔離経路で照合。外部画像送信は現承認外。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "SCR-12",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "欠損・異常は仕様どおり警告／拒否、0は0として保存される。",
+      "tested_version": "既存TEST validation-v2.2.8 / GAS固定version1 / 589b374e",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run18_results.json; run18_before.json; run18_after_screening.json; run18_scr12_blank.txt; run18_scr12_abnormal.txt; run18_scr12_na_no_reason.txt; run18_scr12_saved.txt/png",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "JUOG-SCR-xxxのみ発行。正式JUOG-xxxは未発番。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E01/E03",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "二重受付や重複行が作られない。",
+      "tested_version": "既存TEST GAS固定デプロイversion1／v2.2.8-candidate、2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-03",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "同一Screening IDのreview_roundが更新され履歴が残る。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E01/E03",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "判定者ロールと日時、結果が区別され保存される。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E02",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "3名未完了でJUOG番号は発番されない。",
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8 / 未デプロイRun20限定コード",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt; run17_results.json; run18_after_radiology.json; UAT_Run18_MDT02_PENDING_APPROVAL.gs; run19_results.json; run19_before.json; run19_after.json; run19_execution_log.txt; run19_execution_stopped.png; run19_installed_code.gs; run20_readonly_diagnosis.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_before.json; run19_after.json; run19_execution_log.txt; run21_results.json; run20_before_live.json; run21_after_live.json; UAT_Run20_MDT02_FINALIZE_ONLY_PENDING_APPROVAL.gs; run19_after.json; Apps Script実行ログ（20:01:34–20:01:48 JST）",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-03",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "中央RECIST PD/NEでは正式登録できない。",
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run16_results.json; run16_before.json; run16_after_second_review.json; run16_before_NE_attempt.json; run16_after_NE_attempt.json; run16_before_PD_attempt.json; run16_after_PD_attempt.json; run16_mdt02_two_reviews.txt; run16_mdt03_NE_rejected.txt; run16_mdt03_PD_rejected.txt",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-04",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "中央RECISTが正式登録判定へ正しく使用される。",
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED; run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575; run28_MDT04_oncology_saved.json; run30_MDT04_SD_registration.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-05",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "不一致の場合は合意形成記録が必要。",
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS固定version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-06",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "理由と状態が記録され、正式番号未発行。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E01",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "MDT-07",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "正式番号未発行、正式登録件数は増加しない。",
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS固定version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-04",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "JUOG-xxxが一つ発行されRegistryとScreening双方で追跡可。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E01/E02/E04",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-05",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "既存登録番号を保持し、新しいJUOG番号が発行されない。",
+      "tested_version": "既存TEST validation-v2.2.8 / Backend v2.2.8-candidate / GAS固定version1。2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run17_results.json; run17_before_duplicate.json; run17_after_duplicate.json; run17_after_no_consensus.json; run17_after_ineligible.json; run17_reg05_before.txt; run17_reg05_rejected.txt; run17_mdt05_no_consensus.txt; run17_mdt05_07_saved.txt",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-06",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "LockServiceによりJUOG番号が重複しない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—",
+      "remaining_action": "異なる架空適格例の同時登録を正規認証で競合させ、番号一意・監査一意を実測。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-07",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "SURGERY_BEFORE_MDTで拒否される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575",
+      "remaining_action": "MDT日より前の手術予定要求を正規登録APIへ送りSURGERY_BEFORE_MDTと無登録を確認。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-08",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "SURGERY_BEFORE_REGISTRATIONで拒否される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; run25_readonly_auth_and_ledger.json; GitHub validation-v2.2.8 06_mdt_reviewer.py lines 48-73; GAS固定version1 chronology lines 560-575",
+      "remaining_action": "正式登録日より前の手術予定要求を拒否し台帳不変を確認。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REG-09",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "requirement_ids": [
+        "URS-SCREENING",
+        "URS-AUDIT"
+      ],
+      "acceptance_criterion": "4週以上・原則8週以内、合理的理由で最大12週の規定を運用で逸脱なく判定。システム自動判定の範囲も記録。",
+      "tested_version": "既存TEST実画面2026-11-10／参照SHA589b374e2d4be45efec6ef258157a7bac5c0fd83、稼働SHA独立照合未了",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "JUOG_run7_REG09_*weeks*.txt/.jpg；run6_manual_evidence.json；REG09_source_excerpt.txt；JUOG_UAT_Approval_Pack_Run8.docx；monitoring_source.json",
+      "remaining_action": "既済8画面境界を再利用し、例外理由の医学的判断・承認手順・保存証跡を正式確定。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "cN1-only枠のみ+1（全体+1）。",
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "—; run22_before_live.json; run22_after_urology.json; run23_current_before_admin.json; run23_after_pr_registration.json; 正規TEST画面応答 JUOG-002 / UAT_EMAIL_DISABLED",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "cN1-only枠は増えず、全体のみ+1。",
+      "tested_version": "既存TEST GAS固定version1 / Streamlit validation-v2.2.8",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run24_before_cr_screening.json; run24_after_cr_screening.json; run24_after_cr_radiology.json; run24_after_cr_oncology.json; run24_before_cr_finalize.json; run24_after_cr_finalize.json; run24_before_sd_screening.json; run24_after_sd_screening.json; run24_after_sd_two_reviews.json; 正規TEST画面応答 JUOG-SCR-004/JUOG-003、JUOG-SCR-005、UAT_EMAIL_DISABLED",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-03",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "cN1-only枠は増えず、全体のみ+1。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "独立架空fixtureでcN1-only枠は増えず、全体のみ+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-04",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "cN1-only枠は増えない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "独立架空fixtureでcN1-only枠は増えない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-05",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "cN1-only枠は+1。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "独立架空fixtureでcN1-only枠は+1。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-06",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "20例まで計上、21例目はCN1_CAP_REACHED。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "独立架空fixtureで20例まで計上、21例目はCN1_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-07",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "42例は許容、43例目はTOTAL_CAP_REACHED。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "独立架空fixtureで42例は許容、43例目はTOTAL_CAP_REACHED。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-08",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G2",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "SD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "独立架空fixtureでSD12例到達後は新規SD登録を保留し、解除なしで13例目を許可しない。 正規admin経路・前後集計/監査を実測し、fixture生成や時計変更を臨床運用合格に代用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-09",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "確定した分類が上限管理に反映、または監査可能な手作業管理手順を承認。現コードの自動修正有無は未確認。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "中央判定変更後のアクティブ集計・監査を検証。手作業代替はPIの正式承認なしに採用しない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "CAP-10",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "requirement_ids": [
+        "URS-QUOTA",
+        "URS-SCREENING"
+      ],
+      "acceptance_criterion": "VOIDは正式登録総数・cN1-only・SDのアクティブ件数から除外。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "別架空症例に承認済みVOID経路を実行し総数/cN1-only/SD除外と旧版・理由監査を照合。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "POST-01",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT"
+      ],
+      "acceptance_criterion": "イベント・日付・Gradeが正確に保存され集計へ取得可能。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+      "remaining_action": "手術実施の30d/90d架空fixtureを追加しイベント・日付・Gradeの保存/読取/抽出を検証。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "POST-02",
+      "official_status": "NOT RUN",
+      "baseline_status": "NOT RUN",
+      "risk": "Critical",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT"
+      ],
+      "acceptance_criterion": "術後30日以内の主要評価イベントに誤算入されない。",
+      "tested_version": "既存TEST実画面 2026-11-10 JST／参照SHA 589b374e2d4be45efec6ef258157a7bac5c0fd83。稼働SHA独立照合はENV-04未了",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "JUOG_run3_POST02_day31.txt/.jpg、JUOG_run3_POST02_day30.txt; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+      "remaining_action": "術後30日/31日境界を保存/集計まで検証。現行非手術fixtureはこの判定に使わない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "POST-03",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT"
+      ],
+      "acceptance_criterion": "N/Aと実施記録が区別され、必須項目整合性を維持。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_integration_readonly.json; 30d_noop_chronology_evidence.json",
+      "remaining_action": "手術なしN/A対照と手術あり対照の保存・必須条件・読取を確認。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "POST-04",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT"
+      ],
+      "acceptance_criterion": "数値0や病理結果が失われず、データ矛盾が検出される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_integration_readonly.json",
+      "remaining_action": "血液検査0・病理条件付き必須等を保存/読取し、不正値でCRF無保存を確認。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "POST-05",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT"
+      ],
+      "acceptance_criterion": "同一JUOG番号・施設と連携し、出典CRFを追跡できる。",
+      "tested_version": "既存実TEST・validation-v2.2.8／589b374e（稼働SHA独立照合待ち）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E06/E04",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "POST-06",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT"
+      ],
+      "acceptance_criterion": "SOURCE_CRF_UPDATED等で不整合が検出される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_integration_readonly.json",
+      "remaining_action": "30d sourceの訂正後に90d/追跡の古いsource指定を拒否、実版への再結合を検証。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "FUP-01",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-LINK"
+      ],
+      "acceptance_criterion": "訪問時期、検査、再発・進行、生存情報が正確に取得可能。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_integration_readonly.json",
+      "remaining_action": "6m以降の架空fixtureで検査・再発/進行・生存を保存/読取・集計。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "FUP-02",
+      "official_status": "NOT RUN",
+      "baseline_status": "NOT RUN",
+      "risk": "High",
+      "group": "G1",
+      "requirement_ids": [
+        "URS-CRF-SAVE",
+        "URS-CRF-LINK"
+      ],
+      "acceptance_criterion": "規定の入力制御・警告が機能し、確定値を追跡可能。",
+      "tested_version": "既存TEST実画面2026-11-10 JST／参照SHA589b374e2d4be45efec6ef258157a7bac5c0fd83・稼働SHA未確証",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "JUOG_run4_FUP02_required_complete.txt/.jpg、FUP02_PD_after_assessment.txt/.jpg、FUP02_restored.txt（同接頭辞）; uat_integration_readonly.json",
+      "remaining_action": "矛盾入力→拒否→正しい入力復元→正常保存・版/監査を確認。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUD-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-AUDIT",
+        "URS-RETRY"
+      ],
+      "acceptance_criterion": "append-only記録・record_version・提出者/時刻・理由で差分が追える。",
+      "tested_version": "既存実TEST・履歴2026-11-08／schema 2026-09-14-v2.2.2（デプロイSHA未確証）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E04",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUD-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-AUDIT",
+        "URS-RETRY"
+      ],
+      "acceptance_criterion": "旧判定・新判定・理由・版が残り上書き消去されない。",
+      "tested_version": "既存TEST Streamlit validation-v2.2.8／GAS active version1（ENV-02証拠継承）、2026-11-10実測",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run13_execution_evidence.json; run13_before.json; run13_after_screening.json; run13_mdt_v1.json; run13_after_mdt.json; run13_screening_saved.txt; run13_mdt_v1_saved.txt; run13_mdt_v2_saved.txt; run10_auth03_after.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUD-03",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-AUDIT",
+        "URS-RETRY"
+      ],
+      "acceptance_criterion": "メール不一致ではアクセスを拒否する。",
+      "tested_version": "既存実TEST・validation-v2.2.8／589b374e（稼働SHA独立照合待ち）",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "E05",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUTH-01",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-IDENTITY",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "管理画面・データ・登録操作へのアクセス拒否。",
+      "tested_version": "既存TEST実画面・validation-v2.2.8参照SHA 589b374e2d4be45efec6ef258157a7bac5c0fd83／稼働SHA独立照合はENV-04に残る",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "JUOG_AUTH01_20261109.jpg／実行時ブラウザ観測",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUTH-02",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-IDENTITY",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "ロール外の操作を許可しない。",
+      "tested_version": "既存TEST GAS固定デプロイversion1／v2.2.8-candidate、2026-11-10 JST。ENV-02証拠継承。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run15_UAT_Run14_HTTP.gs; run15_api_execution_log.txt; run15_results.json; run15_before.json; run15_after.json; run15_change_record.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUTH-03",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "Critical",
+      "group": "P",
+      "requirement_ids": [
+        "URS-IDENTITY",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "UNAUTHORIZEDを返し書込みは生じない。",
+      "tested_version": "既存TEST 実GAS deployment version1（管理者確認）。稼働ソース対応はENV-02で未完了。",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run10_auth03_before.json / run10_auth03_responses.json / run10_auth03_after.json / run10_auth03_comparison.json",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "AUTH-04",
+      "official_status": "FAIL",
+      "baseline_status": "FAIL",
+      "risk": "Critical",
+      "group": "G0",
+      "requirement_ids": [
+        "URS-IDENTITY",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "氏名・MRN等は承認外で収集・露出せず、コードによる仮名化を維持。",
+      "tested_version": "既存TEST／validation-v2.2.8／GAS active v1",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "run27_AUTH04_privacy_FAIL.json; TEST CRF_Drafts!A3:P3; validation source 01_registration_crf.py:199,632-642 / juog_common.py:649-674 / GAS v1:937-963,1430-1439; AUTH04_proposed.patch; AUTH04_assessment.md; AUTH04_predeployment_gate_20261111.md; AUTH04_prechange_10tabs.json; uat_integration_readonly.json",
+      "remaining_action": "既存の16条件拒否・下書き・所有権・CRF・監査の証拠を正式要求へ追跡し、ログ/画面/臨床値保持の残る範囲を評価。独立正式QAの判定までFAILを維持。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "IMG-01",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G3",
+      "requirement_ids": [
+        "URS-EXPORT",
+        "URS-PRIVACY"
+      ],
+      "acceptance_criterion": "DICOM内部メタデータ・焼込み文字・ファイル名の識別情報がない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—",
+      "remaining_action": "完全架空DICOMのメタデータ・焼込み・ファイル名を検査し正規受領/閲覧ACLを確認。外部送信は承認外。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "DATA-01",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G4",
+      "requirement_ids": [
+        "URS-BACKUP",
+        "URS-EXPORT"
+      ],
+      "acceptance_criterion": "定めた手順で復旧可能なバックアップが取得される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "実保持SOP/権限/頻度とsnapshot再取得・別隔離先復元を照合。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "DATA-02",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Critical",
+      "group": "G4",
+      "requirement_ids": [
+        "URS-BACKUP",
+        "URS-EXPORT"
+      ],
+      "acceptance_criterion": "登録・CRF・監査履歴・添付紐付けの件数と内容が一致。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "復元後の登録/全CRF/監査/添付対応の全件照合。CRF一件だけで合格にしない。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "DATA-03",
+      "official_status": "PASS",
+      "baseline_status": "PASS",
+      "risk": "High",
+      "group": "P",
+      "requirement_ids": [
+        "URS-BACKUP",
+        "URS-EXPORT"
+      ],
+      "acceptance_criterion": "主要解析用データが欠損・重複・改変なく抽出される。",
+      "tested_version": "既存UAT STAGING ID 1R1a55w19qfS7XTa6Ran7EnuTNZpFkGoXIFfqesv7zoc、2026-11-10 JST実Google Sheets XLSXエクスポート（hash別添）。アプリ/GAS変更なし",
+      "test_environment": "元の証拠に記載された環境/版（再利用は対象コード・条件一致時のみ）",
+      "existing_evidence_reference": "run6_export.xlsx、run6_live_values.json、run6_DATA03_result.json、run6_compare.py；本報告の抽出範囲表",
+      "remaining_action": "既存証拠のSHA/条件一致確認。影響のある場合だけ回帰。",
+      "primary_gap": "既済PASS（対象版への適用範囲を維持）",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "DATA-04",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G4",
+      "requirement_ids": [
+        "URS-BACKUP",
+        "URS-EXPORT"
+      ],
+      "acceptance_criterion": "連絡先、代替手順、復旧後照合、データ逸失防止が文書化される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—",
+      "remaining_action": "障害後status照合・同operation再開・重複防止に加え連絡/代替手順の実演記録。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REL-01",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G5",
+      "requirement_ids": [
+        "URS-RELEASE",
+        "URS-VALIDATION"
+      ],
+      "acceptance_criterion": "cN1-only以外の既存機能の挙動を変えていない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_integration_readonly.json",
+      "remaining_action": "影響範囲の原UI/API回帰を対象SHAへ対応付け、過去PASSの無条件繰越を避ける。",
+      "primary_gap": "実機証拠不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REL-02",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "High",
+      "group": "G5",
+      "requirement_ids": [
+        "URS-RELEASE",
+        "URS-VALIDATION"
+      ],
+      "acceptance_criterion": "変更記録が追跡でき、未実施テストをPASSにしていない。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "—; uat_unblock/backup_verification.json; cap_results.json; execution_and_handoff.txt",
+      "remaining_action": "旧GAS v6を含む既存変更記録と新隔離版の対応/未実施区分を確認。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    },
+    {
+      "test_id": "REL-03",
+      "official_status": "BLOCKED",
+      "baseline_status": "BLOCKED",
+      "risk": "Medium",
+      "group": "G5",
+      "requirement_ids": [
+        "URS-RELEASE",
+        "URS-VALIDATION"
+      ],
+      "acceptance_criterion": "必要な操作手順が関係者へ伝わり、版・教育記録が保管される。",
+      "tested_version": "未実行／実行時に固定",
+      "test_environment": "新隔離GAS/Streamlit/Sheets・TEST01のみ",
+      "existing_evidence_reference": "reference_README_JA.md（参照SHA固定）；run6_manual_evidence.json",
+      "remaining_action": "正本マニュアル・MDT手順・配布/教育記録・版の正式確認。",
+      "primary_gap": "独立QA・承認不足",
+      "evidence_verification": "SOURCE_REFERENCE_ONLY",
+      "new_formal_pass_in_this_import": false
+    }
+  ]
+}

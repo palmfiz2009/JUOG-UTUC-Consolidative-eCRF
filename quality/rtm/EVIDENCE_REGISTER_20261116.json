@@ -1,0 +1,241 @@
+{
+  "schema_version": "gcp-csv-evidence-register-v1",
+  "snapshot_date_jst": "2026-11-16",
+  "review_status": "DRAFT_NOT_QA_APPROVED",
+  "linked_uat_baseline": "quality/rtm/UAT67_BASELINE_20261116.json",
+  "release_readiness": "NOT_READY",
+  "evidence": [
+    {
+      "id": "EV-PR19-SAVE-AUDIT",
+      "description": "GAS同一UUID・保存/監査書込・読取確認・障害再送の候補",
+      "requirement_ids": [
+        "URS-RETRY",
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT",
+        "URS-CRF-LINK"
+      ],
+      "pr_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/19",
+      "candidate_commit_sha": "e4fa1019285f0f67343d75b825ac612ace57692e",
+      "proof_class": "OFFLINE_FICTIONAL_TEST",
+      "technical_test_counts": {
+        "javascript": 18,
+        "python": 8
+      },
+      "test_provenance": [
+        "tests/test_crf_audit_recovery.mjs",
+        "tests/test_gcp_pending_submission.py",
+        ".github/workflows/gcp-audit-recovery-offline.yml"
+      ],
+      "real_isolated_env_executed": false,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Cross-sheet nontransactional",
+        "Streamlit pending request is session-local, not durable",
+        "Unknown v2 test response/Sheet disagreement unresolved"
+      ]
+    },
+    {
+      "id": "EV-PR20-PRIVACY",
+      "description": "AUTH-04直接識別子拒否・下書きマスク・例外応答秘匿候補",
+      "requirement_ids": [
+        "URS-PRIVACY",
+        "URS-IDENTITY"
+      ],
+      "pr_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/20",
+      "candidate_commit_sha": "b75032ab2338deb0849f9efe42f7508bb0570912",
+      "proof_class": "OFFLINE_FICTIONAL_TEST_AND_BOUNDED_TEST_READONLY",
+      "technical_test_counts": {
+        "forbidden_fixtures": 18,
+        "allowed_fixtures": 6,
+        "draft_mock_scenarios": 8
+      },
+      "test_provenance": [
+        "tests/test_auth04_privacy_guard.mjs",
+        "tests/test_auth04_draft_end_to_end.mjs",
+        "tests/test_auth04_error_boundary.mjs",
+        "quality/AUTH04_READONLY_EVIDENCE_20261116.md",
+        "quality/CAPA_AUTH04_TEST_DOB_RESIDUAL_20261116.md"
+      ],
+      "real_isolated_env_executed": false,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Historical TEST drafts contain full DOB formatted values",
+        "No Cloud/GAS live log inspection",
+        "Free text filter cannot guarantee all unlabeled identifiers"
+      ]
+    },
+    {
+      "id": "EV-HISTORICAL-UAT67",
+      "description": "過去の正式UAT67件の判定と証拠参照。新リリースの正式承認ではない",
+      "requirement_ids": [
+        "URS-VALIDATION"
+      ],
+      "source_ref": "review/acl-connection-20261112/uat_evidence/uat67_execution_20261113/UAT67_formal_reconciliation.json",
+      "proof_class": "HISTORICAL_FORMAL_STATUS_REFERENCE_ONLY",
+      "historical_status_count": {
+        "PASS": 32,
+        "FAIL": 1,
+        "BLOCKED": 29,
+        "NOT RUN": 5
+      },
+      "real_isolated_env_executed": null,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Prior evidence originals not exhaustively independently reverified",
+        "Not a pass for newer commits"
+      ]
+    },
+    {
+      "id": "EV-PR21-INTEGRATED",
+      "description": "PR19保存/監査/同一UUID + PR20 AUTH04 privacyをGAS一体として検証した隔離候補",
+      "requirement_ids": [
+        "URS-PRIVACY",
+        "URS-AUDIT",
+        "URS-CRF-SAVE",
+        "URS-CRF-AUDIT",
+        "URS-CRF-LINK",
+        "URS-RETRY"
+      ],
+      "pr_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/21",
+      "candidate_commit_sha": "19428c7f0a18a696e56e32b06676012a4b4b1d2f",
+      "proof_class": "OFFLINE_FICTIONAL_TEST",
+      "technical_test_counts": {
+        "integrated_gas_scenarios": 27,
+        "client_uuid_scenarios": 8,
+        "draft_inmemory_scenarios": 8,
+        "browser_restart_and_mail_policies": 3,
+        "sanitized_transport_error_cases": 4
+      },
+      "test_provenance": [
+        ".github/workflows/gcp-p0-integrated-candidate.yml",
+        "tests/test_crf_audit_recovery.mjs",
+        "tests/test_auth04_draft_end_to_end.mjs",
+        "tests/test_gcp_pending_submission.py",
+        "tests/test_crf_restart_replay_ui.py",
+        "tests/test_registry_error_sanitization.py",
+        "quality/CHANGE_IMPACT_CRFGCP_RETRY_20261116.md"
+      ],
+      "verified_ci_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/actions/runs/43765959813",
+      "real_isolated_env_executed": false,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Cross-sheet emulated: no true Sheets atomicity",
+        "No real authenticated Web App E2E",
+        "No durable browser-loss replay",
+        "Source branch is draft; requires review of merged GAS and code deployments",
+        "Content-identical correction is blocked after browser loss, but unknown/mutated previous request cannot be durably reconstructed",
+        "A same-UUID existing confirmation does not prove that original email was delivered; no automatic duplicate notification"
+      ]
+    },
+    {
+      "id": "EV-MAIN-FACILITY-ACL-GAP",
+      "description": "現行GASの施設操作は共有tokenのみで個人IDの強制がないことを、実ソース関数のオフライン負/正コントロールで確認。これはGCP P0未達の検出であり合格ではない。",
+      "requirement_ids": [
+        "URS-IDENTITY",
+        "URS-AUDIT"
+      ],
+      "source_ref": "main@c5580662be09f914cad372aa4e4df0ed62cdf2e8",
+      "proof_class": "OFFLINE_FICTIONAL_TEST",
+      "technical_test_counts": {
+        "facility_endpoints_no_individual_actor_required": 9,
+        "privileged_endpoints_no_actor_rejected": 4
+      },
+      "test_provenance": [
+        "quality/scripts/test_facility_acl_gap.mjs",
+        ".github/workflows/gcp-evidence-traceability.yml"
+      ],
+      "real_isolated_env_executed": false,
+      "qa_approved": false,
+      "official_uat_pass_added": 0,
+      "limitations": [
+        "Shared API token alone does not attribute individual principal",
+        "Isolated OIDC/ACL implementation exists separately but is not integrated into production",
+        "No authenticated real-environment ACL negative tests or signed QA approval"
+      ]
+    }
+  ],
+  "unresolved_release_blockers": [
+    {
+      "id": "BLK-01",
+      "kind": "AUTH04_PRIVACY",
+      "severity": "CRITICAL",
+      "summary": "旧TEST仮保存2環境のfull-DOB残存と未実施の隔離実機/ログ検証",
+      "mapped_tests": [
+        "AUTH-04"
+      ],
+      "status": "OPEN",
+      "evidence_ref": "quality/AUTH04_READONLY_EVIDENCE_20261116.md"
+    },
+    {
+      "id": "BLK-02",
+      "kind": "SAVE_CONFIRMATION_CONFLICT",
+      "severity": "CRITICAL",
+      "summary": "TEST v2.2.10のCRF保存ok: true / Sheet v1のみ観測の不一致。元UUIDを確認するまで再送しない",
+      "mapped_tests": [
+        "POST-01",
+        "POST-02"
+      ],
+      "status": "OPEN",
+      "evidence_ref": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/15"
+    },
+    {
+      "id": "BLK-03",
+      "kind": "IDENTITY_AND_SESSION_ACL",
+      "severity": "CRITICAL",
+      "summary": "個人ID/施設ACL・本番アクセス制御・セッション境界の統合QA未承認",
+      "mapped_tests": [
+        "AUTH-04",
+        "ENV-03"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "id": "BLK-04",
+      "kind": "DURABLE_PENDING_RETRY",
+      "severity": "HIGH",
+      "summary": "ブラウザセッション喪失後の元UUIDと要求内容の安全な復旧の設計検証未完",
+      "mapped_tests": [
+        "POST-01",
+        "DATA-04"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "id": "BLK-05",
+      "kind": "VALIDATION_QA_RELEASE",
+      "severity": "CRITICAL",
+      "summary": "URS/FS/DS、IQ/OQ/PQ、RTM、SOP、独立QA・最終リリース承認未完了",
+      "mapped_tests": [
+        "REL-01",
+        "REL-02",
+        "REL-03"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "id": "BLK-06",
+      "kind": "FACILITY_ACTION_INDIVIDUAL_AUTH_MISSING",
+      "severity": "CRITICAL",
+      "summary": "本番型GASのsave_crf/get_draft等は共有APIトークンだけでfacility操作を許可するため、個人/施設ごとのOIDC主体・ACLと保存監査の紐付けが未達。隔離OIDC候補を正規統合し、認証拒否と監査帰属を実機検証するまで正式リリース不可。",
+      "mapped_tests": [
+        "AUTH-04",
+        "ENV-03",
+        "REL-01"
+      ],
+      "status": "OPEN"
+    }
+  ],
+  "release_gates": {
+    "production_change_allowed": false,
+    "formal_gcp_claim_allowed": false,
+    "all_mandatory_uat_pass": false,
+    "independent_qa_approval": false,
+    "validated_deployment_approved": false,
+    "candidate_code_in_main": false,
+    "real_patient_data_written_in_this_project": false
+  }
+}
