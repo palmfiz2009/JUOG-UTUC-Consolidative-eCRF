@@ -386,7 +386,7 @@ def _office_email_addresses():
         return fallback
 
 
-def _smtp_send(subject: str, content: str, to_addrs: list[str]):
+def _smtp_send(subject: str, content: str, to_addrs: list[str], html_content: str | None = None):
     import streamlit as st
     try:
         mail_user = st.secrets["email"]["user"]
@@ -399,11 +399,15 @@ def _smtp_send(subject: str, content: str, to_addrs: list[str]):
         if not clean:
             return False, "NO_RECIPIENTS"
 
-        msg = MIMEMultipart()
+        # HTML for human-readable, printable CRF copies. Always attach plain-text
+        # fallback for clients that do not support HTML. No external resources.
+        msg = MIMEMultipart("alternative") if html_content is not None else MIMEMultipart()
         msg["From"] = mail_user
         msg["To"] = ", ".join(clean)
         msg["Subject"] = subject
         msg.attach(MIMEText(content, "plain", "utf-8"))
+        if html_content is not None:
+            msg.attach(MIMEText(html_content, "html", "utf-8"))
 
         import smtplib
         with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
@@ -432,14 +436,14 @@ def send_direct_email(to_addr: str, subject: str, content: str):
     return _smtp_send(subject, content, [addr])
 
 
-def send_email(subject: str, content: str, reporter_email: str | None = None):
+def send_email(subject: str, content: str, reporter_email: str | None = None, *, html_content: str | None = None):
     """Send an office notification, optionally also to the submitting facility."""
     to_addrs = _office_email_addresses()
     if reporter_email:
         addr = reporter_email.strip()
         if addr and addr not in to_addrs:
             to_addrs.append(addr)
-    return _smtp_send(subject, content, to_addrs)
+    return _smtp_send(subject, content, to_addrs, html_content=html_content)
 
 
 
