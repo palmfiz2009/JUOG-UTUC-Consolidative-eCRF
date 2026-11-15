@@ -50,3 +50,26 @@ Confirm that an authorised CRF save (30-day, 90-day, follow-up) is acknowledged 
 
 ## Exit criteria
 QA-approved traceability (URS/FS→risk→script→evidence); no unresolved critical discrepancy; independent review of deployed application + server code; validated durable retry design; verified audit consistency and recovery; backup restore/ACL/SOP evidence; separately authorised release.
+
+## 追加リスク：ブラウザ消失後の訂正重複と通知の二重送信（2026-11-16追補）
+
+PR #21の統合候補では、同一症例・同一visitに対する**直前の訂正報告**を、送信IDと送信時刻だけを除いて全項目で比較する。比較対象の直前記録は元CRF+監査が一致したものに限り、同じ内容が別UUIDで届いた場合は`DUPLICATE_CONTENT_ALREADY_RECORDED`として**新しい版・監査行・メールを作成しない**。正常な別内容の訂正はVersionを追加できる。
+
+これは**ブラウザ消失後に同じ内容を再入力した場合の追加保護**である。元のUUIDや途中保存状態を永続的に保持・復元する仕組みではなく、内容を変更した再送や未保存の前回要求を完全自動で照合することはできない。正式な「永続的再送復旧」要件は未完のまま保持する。
+
+### 追加OQケース（いずれも実機未実施）
+
+| Case | 完全架空の事前条件・操作 | 合格基準 |
+| --- | --- | --- |
+| OQ-16 | 初回v1→訂正v2を監査一致で保存後、別セッション/別UUID・別送信時刻で同一訂正内容を再送する | `DUPLICATE_CONTENT_ALREADY_RECORDED`、v3なし、監査行増加0、通知送信0 |
+| OQ-17 | v2確定後に異なる訂正内容・正式な訂正理由で再送する | 正当なv3を作り、v1/v2は変更せず、CRF v3と監査v3を一致させる |
+| OQ-18 | v1またはv2の監査行を、隔離の障害注入で欠落させて別UUIDで訂正を送る | `PREVIOUS_CRF_AUDIT_UNCONFIRMED`、新規CRF/監査書込なし。元UUIDで復旧するまで新訂正禁止 |
+| OQ-19 | 直前の監査に同一UUID重複、版/施設相違、またはCRF版重複が存在 | どの経路でも新規版作成を拒否し、原本を保持、CAPA/データ管理者へ通知 |
+| OQ-20 | 同一UUIDの再試行で既存CRF+監査が一致する | 保存済みと判定し、通知メールは**重複送信しない**。通知状況は確認が必要と明示 |
+| OQ-21 | ブラウザを閉じ、同じ訂正を別UUIDで再入力したが前回の結果が未確定 | 同一内容かつ監査一致なら新規作成拒否。内容が異なる/監査未確認なら人による照合が必要であり、完全な自動復旧とは評価しない |
+
+### 追補されたオフライン証拠
+
+- 実GASソースに対する27条件の架空データ障害試験（前回21条件に6件追加）。
+- 3つのCRF画面のAST検証：同一UUIDでの保存済み応答では新たな通知メールを送らず、同一内容の訂正では新版を作成しない。
+- 以前の認証・権限試験と独立QA、実際の隔離GAS/SheetsでのOQは未完了。**CI PASSを正式OQ合格・GCP適合と扱わない。**
