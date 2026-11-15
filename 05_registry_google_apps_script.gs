@@ -24,7 +24,7 @@ const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
 const CRF_DRAFT_SHEET = 'CRF_Drafts';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
-const BACKEND_VERSION = 'v2.2.9';
+const BACKEND_VERSION = 'v2.2.10';
 
 const REVIEWER_ROLES = ['radiology', 'medical_oncology', 'urology'];
 
