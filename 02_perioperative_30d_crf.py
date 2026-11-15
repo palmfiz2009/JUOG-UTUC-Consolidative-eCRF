@@ -1000,6 +1000,7 @@ def _render_peri_without_full_page_rerun():
                 elif not save_result.get("ok"):
                     release_crf_attempt_if_certainly_rejected(st.session_state, "_crf_pending_peri", save_result)
                     st.error("中央Google Sheetへ保存できませんでした：" + (save_result.get("message") or save_result.get("error") or "unknown error"))
+                    st.warning("保存結果が未確認の場合があります。この画面を閉じず、入力内容を変更せずに再送してください。画面が閉じられた場合は自己判断で訂正を重ねず、事務局へ確認してください。")
                 else:
                     draft_delete = delete_crf_draft(registration_id, "perioperative_30d", "30d")
                     st.session_state.peri_sent_draft_delete_failed = not bool(draft_delete.get("ok"))
