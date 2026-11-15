@@ -140,6 +140,7 @@ def receipt_sections(payload: dict, review_round: int | None = None):
         ("施設内研究対象者識別コード", _display(payload.get("local_subject_code"))),
         ("申請担当者メール", _display(payload.get("reporter_email"))),
         ("申請日時", _display(payload.get("submitted_at"))),
+        ("CRF様式バージョン", _display(payload.get("schema_version"))),
         ("申請ID（照合用）", _display(payload.get("submission_id"))),
     ]
     sections = [("申請情報", meta)]
