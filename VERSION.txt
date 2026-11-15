@@ -1,4 +1,4 @@
-JUOG UTUC Consolidative eCRF v2.2.8
-STATUS: PRODUCTION RELEASE CANDIDATE / NOT DEPLOYED
-Backend role authorization, cN1-only cap accounting, CRF integrity and privacy safeguards.
-DEPLOYMENT GATES: configure production-only role tokens, verify production sheet and GAS URL, validate outbound email with non-patient data, approve release and verify after deployment.
+JUOG UTUC Consolidative eCRF v2.2.9
+STATUS: INTEGRATED REVIEW CANDIDATE / NOT DEPLOYED
+Contains existing v2.2.8 behavior plus MDT clinical-history visibility, stable screening IDs, correction prefills, stale RECIST display mitigation and final MDT result emails.
+DEPLOYMENT GATES: isolated app/sheet integration tests, production GAS version deployment, correct Streamlit branch, role tokens, approved notification recipients and owner sign-off. No change to eligibility criteria.
