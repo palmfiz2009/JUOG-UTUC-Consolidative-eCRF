@@ -32,7 +32,10 @@ def pending_attempt(page: str, session_state):
     # two minutes, rather than triggering a second write on an ordinary rerun.
     if state.get("status") == "saving":
         start = float(state.get("saving_started_at") or 0)
-        if start and time.time() - start >= 120:
+        # Older sessions can lack the timestamp; they cannot represent a
+        # currently timed request created by this version of the helper.
+        # Confirm them with the same frozen UUID rather than deadlocking save.
+        if not start or time.time() - start >= 120:
             state["status"] = "uncertain"
     return state if state.get("status") in ("prepared", "uncertain", "saving", "committed") else None
 
