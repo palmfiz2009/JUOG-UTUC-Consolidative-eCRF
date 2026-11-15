@@ -21,7 +21,13 @@ class SignedChannel:
   return native
  def identity(self):
   self._native();return dict(self.bound)
+ def _send(self,action,payload):
+  result=self.envelope_transport(signed_request(self._native(),action,payload))
+  # Direct channel callers do not have Client.call's post-response checks.
+  # Do not return delayed data after native authority or approval is lost.
+  self.guard();self._native()
+  return result
  def __call__(self,action,payload):
   self.guard()
   if action not in ALLOWED:raise BridgeError('ACTION_NOT_ALLOWED')
-  return self.envelope_transport(signed_request(self._native(),action,payload))
+  return self._send(action,payload)

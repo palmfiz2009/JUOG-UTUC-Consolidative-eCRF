@@ -1,0 +1,44 @@
+{
+  "kind": "OFFLINE_ONLY",
+  "baseline_commit": "aa5a336c946eb5b0e3b248125489c4104bb95c15",
+  "gap": "Direct discover(RecoveryChannel) does not pass through Client.call or readonly_probe. Its last response was returned after native logout, actor switch, native token expiry or recovery approval loss. Existing post-response protections in other callers did not cover this path.",
+  "fix": "SignedChannel rechecks its guard and native bound identity after transport. RecoveryChannel also rechecks the scoped recovery guard before returning list_requests. No automatic retries or additional transported envelopes.",
+  "before": {
+    "tests": 5,
+    "failures": 4,
+    "passed": 1
+  },
+  "after": {
+    "recovery_tests": 69,
+    "canonical_save_tests": 27,
+    "failures": 0
+  },
+  "commands": [
+    "python -W ignore::ResourceWarning -m unittest discover -s acl_review/server_recovery_candidate -p 'test_*.py'",
+    "python -W ignore::ResourceWarning -m unittest discover -s acl_review/canonical_v9_save_candidate -p 'test_*.py'"
+  ],
+  "method": "Use existing fictional native fixture and actual offline signer. Fake transport changes only in-memory native claims or approval boolean while returning an empty read-only journal. Four negative cases reject, unchanged context returns no prepare/execute permission. Every case transports list_requests exactly once. Expiry is simulated, not a sixty-minute observation.",
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/signed_channel.py": "b5257edea093474881f06f21116300a477d8676313f1bab5479dc3dea35c76e9",
+    "acl_review/server_recovery_candidate/recovery_channel.py": "4000953b406a8e149f0fa3b3a7a0d52cfde386185dda1621a842f26d4b76de1d",
+    "acl_review/server_recovery_candidate/test_discovery_auth_lifetime.py": "1d216a3a6e34711edb5b513b39b8ab7eb482b33b20f66ec08ebf036295505a5b"
+  },
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT RUN": 5
+  },
+  "new_formal_pass": 0,
+  "remaining": [
+    "Independent candidate review and separately approved deployment/live recovery test.",
+    "Old-key signature rejection NOT_MEASURED; live new-key/authentication/ACL regression evidence incomplete.",
+    "No confirmed persistent worker/storage for sixty-minute observation.",
+    "Local-state total loss requires manual reconciliation; formal QA remains unapproved.",
+    "Live 165 rows/audit untouched and not freshly remeasured."
+  ],
+  "continuation": "Reuse direct-discovery authentication lifetime tests; do not count these or other offline passes as formal/live UAT."
+}
