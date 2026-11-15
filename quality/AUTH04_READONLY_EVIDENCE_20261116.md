@@ -33,3 +33,19 @@
 5. 合格/失敗の証拠をバージョン固定したRTMへ追加し、別人のQA担当が適切に評価する。正式リリースやUAT判定変更は承認後に行う。
 
 **判定:** Restricted read-only scan COMPLETE; live write/read/audit/non-leak E2E NOT EXECUTED; INDEPENDENT QA NOT DONE; AUTH-04 FAIL remains unchanged.
+
+## 追補：隔離ACL構造およびAPI例外応答の安全化
+
+- 隔離環境の`V3_Users!D2:G100`を読み取り専用で限定調査：1行存在し、enabled 1件、facilityロール 1件、TEST01施設への権限記載 1件、従前PI指定の2026-11-19を含む有効期限記載 1件。issuer/subject/user_id（A–C列）は読み出していない。**実ログイン・有効なセッション・GASへの到達・実機保存の証明ではない**。
+- 本番mainのGASには、内部例外の生メッセージをAPIへ返す経路があったため、PR #20候補では `SERVER_ERROR` / `DRAFT_PARSE_ERROR` / `SOURCE_PAYLOAD_PARSE_ERROR` の応答を固定コードに変更（生の例外文字列を出さない）。
+- `tests/test_auth04_error_boundary.mjs` で、実際の`doPost`関数を架空の秘密値を含む例外で呼び出し、応答が`SERVER_ERROR`だけで秘密値を返さないことを検証。GitHub Actionsのオフラインテストで成功。
+- 実際のGAS・Google Cloud・Streamlit運用ログは接続していない。監査ジャーナルの限定文字列走査と、架空例外に対する単体テストを**実機ログ漏洩検証と同一視しない**。
+- 実保存・読出し・独立QAについては、専用隔離デプロイへ正規認証して操作できるブラウザ実行環境と、独立QA担当者の正式指定/承認が必要。現利用可能な無料Google Sheets/GitHub操作にはGAS Web Appを認証して操作する機能がなく、別途有料ブラウザ実行は事前の費用制約に基づき利用していない。
+
+### 追補後の状態
+- TEST旧データ残存: **検出**（匿名化した集計証拠のみ）
+- 新コードのPrivacy/例外応答オフライン検証: **PASS**
+- 隔離GAS + Streamlitの実入力→保存→復元→監査照合: **NOT EXECUTED**
+- GAS/Cloud/HTTP実ログの非漏洩確認: **NOT EXECUTED**
+- 独立QA: **NOT ASSIGNED / NOT APPROVED**
+- 正式UAT AUTH-04: **FAIL継続**
