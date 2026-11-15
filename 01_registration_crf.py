@@ -224,7 +224,7 @@ def _render_screening_form():
          key="reg_local_subject_code")
         reporter_email = st.text_input("担当者メールアドレス*", disabled=L, key="reg_reporter_email")
         consent_date = st.date_input("本人同意取得日*", value=None, disabled=L, key="reg_consent_date")
-        birth_date = st.date_input("生年月日*", value=None, min_value=date(1900, 1, 1), max_value=today_jst(), disabled=L, help="研究計画書 8.1.1 の患者背景項目。氏名・カルテ番号は入力しません。", key="reg_birth_date")
+        birth_date = st.date_input("生年月日*", value=None, min_value=date(1900, 1, 1), max_value=today_jst(), disabled=L, help="年齢の計算にのみ利用します。完全な生年月日は中央台帳・仮保存に送信せず、仮保存から再開した場合は再入力が必要です。", key="reg_birth_date")
         age = age_on_date(birth_date, consent_date)
         if age is not None:
             st.caption(f"同意取得時年齢（自動計算）：{age}歳")
@@ -661,7 +661,10 @@ def _render_screening_form():
         else:
             _state = capture_draft_state(
                 "reg_",
-                exclude_prefixes=("reg_draft",),
+                # Full DOB is needed only in this browser session for age calculation.
+                # Never serialise it into the persistent screening draft. After a
+                # reload the operator must re-enter DOB to revalidate age.
+                exclude_prefixes=("reg_draft", "reg_birth_date"),
                 overrides={
                     "reg_facility": facility_name,
                     "reg_local_subject_code": local_subject_code,

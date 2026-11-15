@@ -233,7 +233,7 @@ function doPost(e) {
 
     return jsonResponse_({ok: false, error: 'UNKNOWN_ACTION'});
   } catch (err) {
-    return jsonResponse_({ok: false, error: 'SERVER_ERROR', message: String(err)});
+    return jsonResponse_({ok: false, error: 'SERVER_ERROR'});
   }
 }
 
@@ -844,7 +844,7 @@ function getLatestCrfPayload_(sheetName, registrationId, crfType) {
       try {
         payload = JSON.parse(String(row[idx.payload_json] || '{}'));
       } catch (err) {
-        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR', message:String(err)};
+        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR'};
       }
       best = {
         version: version,
@@ -1084,8 +1084,8 @@ function getScreeningDraft_(p) {
       if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
       let draftState = {};
       try { draftState = JSON.parse(String(values[r][idx.draft_json] || '{}')); }
-      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)}; }
-      return {ok:true, source_found:true, updated_at:isoDateTime_(values[r][idx.updated_at]), facility_code:String(values[r][idx.facility_code] || facilityCode), facility_name:String(values[r][idx.facility_name] || ''), reporter_email:storedEmail, schema_version:String(values[r][idx.schema_version] || ''), draft_state:draftState};
+      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR'}; }
+      return {ok:true, source_found:true, updated_at:isoDateTime_(values[r][idx.updated_at]), facility_code:String(values[r][idx.facility_code] || facilityCode), facility_name:String(values[r][idx.facility_name] || ''), reporter_email:storedEmail, schema_version:String(values[r][idx.schema_version] || ''), draft_state:stripDirectIdentifiers_(draftState)};
     }
     return {ok:true, source_found:false};
   } finally { lock.releaseLock(); }
@@ -1215,7 +1215,7 @@ function getDraft_(p) {
       try {
         draftState = JSON.parse(String(values[r][idx.draft_json] || '{}'));
       } catch (err) {
-        return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)};
+        return {ok:false, error:'DRAFT_PARSE_ERROR'};
       }
       return {
         ok:true,
@@ -1228,7 +1228,7 @@ function getDraft_(p) {
         facility_name:String(registry.facility_name || values[r][idx.facility_name] || ''),
         reporter_email:storedEmail,
         schema_version:String(values[r][idx.schema_version] || ''),
-        draft_state:draftState
+        draft_state:stripDirectIdentifiers_(draftState)
       };
     }
     return {ok:true, source_found:false, registration_id:id};
@@ -1386,9 +1386,8 @@ function saveCrf_(p) {
   const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
   if (!validation.ok) return validation;
 
-  const sourceCheck = validateDay90SourceLink_(payload);
-  if (!sourceCheck.ok) return sourceCheck;
-
+  // Linked-source version must be checked under the same write lock.
+  // Identical submission retries are handled without changing prior history.
   const hardCheck = validateCrfHardStops_(payload, validation);
   if (!hardCheck.ok) return hardCheck;
 
@@ -1402,66 +1401,236 @@ function saveCrf_(p) {
 }
 
 function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
-  // Only for official CRFs: ensure the record key matches the actual study subject.
+  // The existing caller holds the GAS ScriptLock. Keep one submission_id for
+  // one logical CRF version, and do not report success until both CRF and audit
+  // have been verified. Sheets does not support atomic cross-sheet transactions.
   if (enforceVersionRules) {
     const expectedKey = [String(payload.registration_id || ''), String(payload.crf_type || ''), String(payload.visit || '')].join('|');
     if (String(payload.record_key || '') !== expectedKey) return {ok:false, error:'RECORD_KEY_MISMATCH'};
   }
   const ss = getSpreadsheet_();
   const sh = ss.getSheetByName(sheetName);
+  if (!sh) return {ok:false, error:'CRF_SHEET_NOT_FOUND'};
   const submissionId = String(payload.submission_id || '').trim();
   const recordKey = String(payload.record_key || '').trim();
   const kind = String(payload.submission_kind || (sheetName === SCREENING_CRF_SHEET ? '初回報告' : '')).trim();
   if (!submissionId || !recordKey) return {ok: false, error: 'MISSING_SUBMISSION_METADATA'};
 
   const values = sh.getDataRange().getValues();
-  const headers = values[0] || [];
-  const idx = headerIndex_(headers);
-  let priorCount = 0;
-  for (let r = 1; r < values.length; r++) {
-    const row = values[r];
-    if (String(row[idx.submission_id] || '') === submissionId) {
-      if (enforceVersionRules) {
-        const isSameKey = String(row[idx.record_key] || '') === recordKey;
-        const isSameSubject = String(row[idx.registration_id] || '') === String(payload.registration_id || '');
-        const isSameSite = String(row[idx.facility_code] || '') === String(payload.facility_code || '');
-        const isSamePayload = String(row[idx.payload_json] || '') === JSON.stringify(payload);
-        if (!isSameKey || !isSameSubject || !isSameSite || !isSamePayload) return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
+  const idx = headerIndex_(values[0] || []);
+  const required = ['submission_id', 'record_key', 'record_version', 'payload_json',
+    'registration_id', 'facility_code'];
+  if (enforceVersionRules && required.some(k => idx[k] === undefined)) {
+    return {ok:false, error:'CRF_SCHEMA_INCOMPLETE'};
+  }
+  const matches = values.slice(1).filter(row =>
+    String(row[idx.submission_id] || '') === submissionId);
+  if (matches.length > 1) return {ok:false, error:'CRF_DUPLICATE_SUBMISSION_ID'};
+
+  if (matches.length === 1) {
+    const row = matches[0];
+    if (enforceVersionRules) {
+      if (String(row[idx.record_key] || '') !== recordKey ||
+          String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+          String(row[idx.facility_code] || '') !== String(payload.facility_code || '') ||
+          String(row[idx.payload_json] || '') !== JSON.stringify(payload)) {
+        return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
       }
-      return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId};
+      // This is the critical recovery path. After a prior audit write failure,
+      // same-UUID retry must complete or verify the audit without adding CRF v3.
+      const previousVersion = Number(row[idx.record_version]);
+      if (!Number.isSafeInteger(previousVersion) || previousVersion < 1) {
+        return {ok:false, error:'CRF_VERSION_INVALID'};
+      }
+      const audited = ensureCrfAuditRow_(ss, sheetName, payload, previousVersion);
+      if (!audited.ok) return audited;
     }
-    if (String(row[idx.record_key] || '') === recordKey) priorCount++;
+    return {ok:true, existing:true, record_version:Number(row[idx.record_version] || 1), submission_id:submissionId};
   }
 
+  const priorRows = values.slice(1).filter(row =>
+    String(row[idx.record_key] || '') === recordKey);
+  const priorCount = priorRows.length;
   if (enforceVersionRules) {
-    if (kind === '初回報告' && priorCount > 0) return {ok: false, error: 'INITIAL_ALREADY_EXISTS', message: 'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
-    if (kind === '訂正報告' && priorCount === 0) return {ok: false, error: 'NO_PRIOR_RECORD_FOR_CORRECTION', message: '訂正対象となる既存報告がありません。'};
-    if (kind === '訂正報告' && !String(payload.correction_reason || '').trim()) return {ok: false, error: 'MISSING_CORRECTION_REASON'};
+    if (kind === '初回報告' && priorCount > 0)
+      return {ok:false, error:'INITIAL_ALREADY_EXISTS', message:'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
+    if (kind === '訂正報告' && priorCount === 0)
+      return {ok:false, error:'NO_PRIOR_RECORD_FOR_CORRECTION', message:'訂正対象となる既存報告がありません。'};
+    if (kind === '訂正報告' && !String(payload.correction_reason || '').trim())
+      return {ok:false, error:'MISSING_CORRECTION_REASON'};
+
+    if (kind === '訂正報告') {
+      // Browser/session loss can lose the original UUID. Compare against the
+      // latest fully audited CRF without exposing clinical data or writing a
+      // new version. This cannot recover a DIFFERENT pending request.
+      const versions = priorRows.map(row => Number(row[idx.record_version]));
+      if (versions.some(v => !Number.isSafeInteger(v) || v < 1) ||
+          new Set(versions).size !== versions.length ||
+          Math.max(...versions) !== priorCount) {
+        return {ok:false, error:'PREVIOUS_CRF_HISTORY_INCONSISTENT'};
+      }
+      const lastVersion = priorCount;
+      const lastRow = priorRows.find(row => Number(row[idx.record_version]) === lastVersion);
+      let previous;
+      try {
+        previous = JSON.parse(String(lastRow[idx.payload_json] || ''));
+      } catch (_err) {
+        return {ok:false, error:'PREVIOUS_CRF_PAYLOAD_UNREADABLE'};
+      }
+      if (!previous || typeof previous !== 'object' || Array.isArray(previous) ||
+          String(previous.submission_id || '') !== String(lastRow[idx.submission_id] || '') ||
+          String(previous.record_key || '') !== recordKey ||
+          String(previous.registration_id || '') !== String(payload.registration_id || '') ||
+          String(previous.facility_code || '') !== String(payload.facility_code || '')) {
+        return {ok:false, error:'PREVIOUS_CRF_PAYLOAD_MISMATCH'};
+      }
+      // Inspect only: a different request must NOT silently repair/alter a
+      // preceding unconfirmed submission. Same-UUID retry can repair it.
+      const previousAudit = ensureCrfAuditRow_(ss, sheetName, previous,
+        lastVersion, {repairMissing:false});
+      if (!previousAudit.ok) {
+        return {ok:false, error:'PREVIOUS_CRF_AUDIT_UNCONFIRMED'};
+      }
+      if (semanticallySameCrf_(previous, payload)) {
+        return {ok:false, error:'DUPLICATE_CONTENT_ALREADY_RECORDED',
+          record_version:lastVersion, existing:true};
+      }
+    }
+    // Prevent time-of-check/time-of-use races between 30d edits and 90d/FUP
+    // saves. The ScriptLock is held and the source is checked for new writes.
+    const sourceCheck = validateDay90SourceLink_(payload);
+    if (!sourceCheck.ok) return sourceCheck;
   }
 
   const version = priorCount + 1;
   const flat = flattenObject_(payload);
   const rowObj = {
-    saved_at: new Date(), record_version: version,
-    submission_id: submissionId, record_key: recordKey, submission_kind: kind,
-    correction_reason: String(payload.correction_reason || ''), submitted_at: String(payload.submitted_at || ''),
-    registration_id: String(payload.registration_id || ''), facility_code: String(payload.facility_code || ''),
-    facility_name: String(payload.facility_name || ''), reporter_email: String(payload.reporter_email || ''),
-    crf_type: String(payload.crf_type || ''), visit: String(payload.visit || ''), schema_version: String(payload.schema_version || ''),
-    study_code: String(payload.study_code || ''), payload_json: JSON.stringify(payload)
+    saved_at:new Date(), record_version:version,
+    submission_id:submissionId, record_key:recordKey, submission_kind:kind,
+    correction_reason:String(payload.correction_reason || ''), submitted_at:String(payload.submitted_at || ''),
+    registration_id:String(payload.registration_id || ''), facility_code:String(payload.facility_code || ''),
+    facility_name:String(payload.facility_name || ''), reporter_email:String(payload.reporter_email || ''),
+    crf_type:String(payload.crf_type || ''), visit:String(payload.visit || ''),
+    schema_version:String(payload.schema_version || ''), study_code:String(payload.study_code || ''),
+    payload_json:JSON.stringify(payload)
   };
-  Object.keys(flat).forEach(k => { if (!Object.prototype.hasOwnProperty.call(rowObj, k)) rowObj[k] = flat[k]; });
+  Object.keys(flat).forEach(k => {
+    if (!Object.prototype.hasOwnProperty.call(rowObj, k)) rowObj[k] = flat[k];
+  });
   ensureDynamicHeaders_(sh, Object.keys(rowObj));
   appendByHeaders_(sh, rowObj);
-
-  if (sheetName !== SCREENING_CRF_SHEET) {
-    appendByHeaders_(ss.getSheetByName(CRF_AUDIT_SHEET), {
-      saved_at: new Date(), sheet_name: sheetName, record_key: recordKey, record_version: version,
-      submission_id: submissionId, submission_kind: kind, registration_id: String(payload.registration_id || ''), facility_code: String(payload.facility_code || '')
-    });
+  if (enforceVersionRules) {
+    // Return an error (never success) when sheet readback is missing or altered.
+    const verified = verifySavedCrfRow_(sh, payload, version);
+    if (!verified.ok) return verified;
+    const audited = ensureCrfAuditRow_(ss, sheetName, payload, version);
+    if (!audited.ok) return audited;
   }
   SpreadsheetApp.flush();
-  return {ok: true, existing: false, record_version: version, submission_id: submissionId};
+  return {ok:true, existing:false, record_version:version, submission_id:submissionId};
+}
+
+/** Compare clinical/metadata content while excluding only ephemeral request ID
+ * and submitted_at timestamp. Do not compare just a hash/partial field subset. */
+function semanticallySameCrf_(a, b) {
+  const canonical = value => {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value && typeof value === 'object') {
+      const out = {};
+      Object.keys(value).sort().forEach(k => {
+        if (value[k] !== undefined) out[k] = canonical(value[k]);
+      });
+      return out;
+    }
+    return value;
+  };
+  const removeTransport = value => {
+    const obj = Object.assign({}, value || {});
+    delete obj.submission_id;
+    delete obj.submitted_at;
+    return canonical(obj);
+  };
+  return JSON.stringify(removeTransport(a)) === JSON.stringify(removeTransport(b));
+}
+
+/** Check the CRF persisted exactly once before acknowledging or auditing it. */
+function verifySavedCrfRow_(sh, payload, version) {
+  try {
+    SpreadsheetApp.flush();
+    const rows = sh.getDataRange().getValues();
+    const idx = headerIndex_(rows[0] || []);
+    const needed = ['submission_id', 'record_key', 'record_version', 'payload_json',
+      'registration_id', 'facility_code'];
+    if (needed.some(k => idx[k] === undefined)) return {ok:false, error:'CRF_READBACK_SCHEMA_INCOMPLETE'};
+    const matches = rows.slice(1).filter(row =>
+      String(row[idx.submission_id] || '') === String(payload.submission_id || ''));
+    if (matches.length !== 1) return {ok:false, error:'CRF_READBACK_COUNT_MISMATCH', retryable:true};
+    const row = matches[0];
+    if (String(row[idx.record_key] || '') !== String(payload.record_key || '') ||
+        Number(row[idx.record_version]) !== Number(version) ||
+        String(row[idx.payload_json] || '') !== JSON.stringify(payload) ||
+        String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+        String(row[idx.facility_code] || '') !== String(payload.facility_code || '')) {
+      return {ok:false, error:'CRF_READBACK_CONTENT_MISMATCH'};
+    }
+    return {ok:true};
+  } catch (_err) {
+    // Do not leak patient data or internal spreadsheet exception text to client.
+    return {ok:false, error:'CRF_READBACK_UNCONFIRMED', retryable:true};
+  }
+}
+
+/** Validate and repair a missing audit row on same-UUID retry under ScriptLock.
+ * If a matching audit row exists, never add another audit event.
+ * If an audit row conflicts or the readback is missing, do not report success. */
+function ensureCrfAuditRow_(ss, sheetName, payload, version, options) {
+  try {
+    const sh = ss.getSheetByName(CRF_AUDIT_SHEET);
+    if (!sh) return {ok:false, error:'CRF_AUDIT_SHEET_NOT_FOUND'};
+    const scan = () => {
+      const rows = sh.getDataRange().getValues();
+      const idx = headerIndex_(rows[0] || []);
+      const needed = ['submission_id', 'sheet_name', 'record_key', 'record_version',
+        'registration_id', 'facility_code', 'submission_kind'];
+      if (needed.some(k => idx[k] === undefined))
+        return {ok:false, error:'CRF_AUDIT_SCHEMA_INCOMPLETE'};
+      const matches = rows.slice(1).filter(row =>
+        String(row[idx.submission_id] || '') === String(payload.submission_id || ''));
+      if (matches.length > 1) return {ok:false, error:'CRF_AUDIT_DUPLICATE_UUID'};
+      if (matches.length === 1) {
+        const row = matches[0];
+        if (String(row[idx.sheet_name] || '') !== String(sheetName) ||
+            String(row[idx.record_key] || '') !== String(payload.record_key || '') ||
+            Number(row[idx.record_version]) !== Number(version) ||
+            String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+            String(row[idx.facility_code] || '') !== String(payload.facility_code || '') ||
+            String(row[idx.submission_kind] || '') !== String(payload.submission_kind || '')) {
+          return {ok:false, error:'CRF_AUDIT_UUID_CONFLICT'};
+        }
+        return {ok:true, existing:true};
+      }
+      return {ok:true, existing:false};
+    };
+    const first = scan();
+    if (!first.ok || first.existing) return first;
+    if (options && options.repairMissing === false) {
+      return {ok:false, error:'CRF_AUDIT_MISSING_PREVIOUS'};
+    }
+    appendByHeaders_(sh, {
+      saved_at:new Date(), sheet_name:sheetName, record_key:String(payload.record_key || ''),
+      record_version:Number(version), submission_id:String(payload.submission_id || ''),
+      submission_kind:String(payload.submission_kind || ''),
+      registration_id:String(payload.registration_id || ''),
+      facility_code:String(payload.facility_code || '')
+    });
+    SpreadsheetApp.flush();
+    const checked = scan();
+    if (!checked.ok) return checked;
+    if (!checked.existing) return {ok:false, error:'CRF_AUDIT_READBACK_MISSING', retryable:true};
+    return {ok:true, existing:false};
+  } catch (_err) {
+    return {ok:false, error:'CRF_AUDIT_UNCONFIRMED', retryable:true};
+  }
 }
 
 function submissionExistsInSheet_(sheetName, submissionId) {
@@ -1519,16 +1688,60 @@ function getBackendInfo_() {
   };
 }
 
-// Privacy safeguard: reject direct identifier keys in submitted payloads.
+// Candidate AUTH-04 privacy guard. Adapted from the validated-isolation revision2
+// fixture; formal approval must verify expected-field compatibility.
+// Full DOB, names, chart numbers and addresses must not be centrally persisted.
+function directIdentifierKey_(key) {
+  const raw = String(key || '').normalize('NFKC');
+  if (/(?:患者氏名|患者姓名|カルテ番号|診療録番号|生年月日)$/.test(raw)) return true;
+  const normalized = raw.replace(/([A-Z]+)([A-Z][a-z])/g, '$1_$2')
+    .replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+  return /(?:^|_)(?:full_patient_name|patient_name|patient_full_name|first_name|last_name|given_name|family_name|patient_surname|mrn|medical_record_number|patient_address|personal_address|patient_phone|birth_date|dob|full_dob|date_of_birth)$/.test(normalized);
+}
+
+function parsedNestedJson_(value) {
+  if (typeof value !== 'string' || !/^\s*[\[{]/.test(value)) return null;
+  try {
+    const parsed = JSON.parse(value);
+    return parsed && typeof parsed === 'object' ? parsed : null;
+  } catch (_err) {
+    return null;
+  }
+}
+
+function containsLabeledIdentifierText_(value) {
+  if (typeof value !== 'string') return false;
+  const s = value.normalize('NFKC');
+  return /(?:生年月日|患者氏名|カルテ番号|診療録番号)\s*(?:は|が|[:=])\s*\S/i.test(s) ||
+    /(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S/i.test(s) ||
+    /(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]/i.test(s);
+}
+
 function containsDirectIdentifier_(value) {
-  const prohibited = ['full_patient_name', 'patient_name', 'patient_full_name', 'mrn',
-    'medical_record_number', 'patient_address', 'personal_address', 'patient_phone',
-    'birth_date', 'full_dob', 'date_of_birth'];
+  const parsed = parsedNestedJson_(value);
+  if (parsed) return containsDirectIdentifier_(parsed);
+  if (containsLabeledIdentifierText_(value)) return true;
   if (!value || typeof value !== 'object') return false;
-  return Object.keys(value).some(key => {
-    if (prohibited.indexOf(String(key).trim().toLowerCase()) >= 0) return true;
-    return containsDirectIdentifier_(value[key]);
+  if (Array.isArray(value)) return value.some(containsDirectIdentifier_);
+  return Object.keys(value).some(key =>
+    directIdentifierKey_(key) || containsDirectIdentifier_(value[key]));
+}
+
+/** Remove identifiers from returned copies of older saved drafts without
+ * rewriting historical rows. A controlled historical-data review is still
+ * required before GCP sign-off: read-time masking is not erasure. */
+function stripDirectIdentifiers_(value) {
+  const parsed = parsedNestedJson_(value);
+  if (parsed) return JSON.stringify(stripDirectIdentifiers_(parsed));
+  if (containsLabeledIdentifierText_(value)) return '[REDACTED]';
+  if (Array.isArray(value)) return value.map(stripDirectIdentifiers_);
+  if (!value || typeof value !== 'object') return value;
+  const out = {};
+  Object.keys(value).forEach(key => {
+    if (!directIdentifierKey_(key)) out[key] = stripDirectIdentifiers_(value[key]);
   });
+  return out;
 }
 
 function isCn1Only_(cT, cN, cM) {

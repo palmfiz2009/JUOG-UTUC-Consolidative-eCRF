@@ -15,6 +15,8 @@ from juog_common import (
     date_str,
     json_block,
     make_submission_metadata,
+    freeze_crf_submission_attempt,
+    release_crf_attempt_if_certainly_rejected,
     render_lab_panel,
     render_submission_kind,
     render_cytology,
@@ -84,6 +86,8 @@ if st.session_state.fu_sent:
         st.caption("定期経過CRFを保存しました。")
     if st.session_state.get("fu_sent_had_warnings"):
         st.info("確認事項も中央データに保存されています。")
+    if st.session_state.get("fu_sent_email_unverified"):
+        st.warning("すでに保存されている送信IDを確認したため、通知メールを重複送信しませんでした。前回の通知状況が不明な場合は事務局で確認してください。")
     if st.session_state.get("fu_sent_email_failed"):
         st.warning("中央Google Sheetへの保存は完了していますが、通知メール送信に失敗しました。再入力はせず事務局へ連絡してください。")
     if st.session_state.get("fu_sent_draft_delete_failed"):
@@ -619,6 +623,12 @@ def _render_followup_without_full_page_rerun():
                         "death_cause": death_cause,
                     }
                     payload = {**meta, "data": data}
+                    payload, _gcp_pending_error = freeze_crf_submission_attempt(
+                        st.session_state, "_crf_pending_fu", payload
+                    )
+                    if _gcp_pending_error:
+                        st.error(_gcp_pending_error)
+                        st.stop()
                     base_label = "実手術日" if surgery_performed == "実施した" else "手術予定日"
                     report = f"""【JUOG 定期経過報告】
     JUOG登録番号: {registration_id}
@@ -639,17 +649,27 @@ def _render_followup_without_full_page_rerun():
     {json_block(payload)}
     """
                     save_result = save_crf_payload(payload)
-                    if not save_result.get("ok"):
+                    if save_result.get("error") == "DUPLICATE_CONTENT_ALREADY_RECORDED":
+                        release_crf_attempt_if_certainly_rejected(st.session_state, "_crf_pending_fu", save_result)
+                        st.warning("同じ内容の訂正報告がすでに保存済みです。新しい版は作成せず、メールも再送していません。保存状態は事務局にご確認ください。")
+                    elif not save_result.get("ok"):
+                        release_crf_attempt_if_certainly_rejected(st.session_state, "_crf_pending_fu", save_result)
                         st.error(
                             "中央Google Sheetへ保存できませんでした："
                             + (save_result.get("message") or save_result.get("error") or "unknown error")
                         )
+                        st.warning("保存結果が未確認の場合があります。この画面を閉じず、入力内容を変更せずに再送してください。画面が閉じられた場合は自己判断で訂正を重ねず、事務局へ確認してください。")
                     else:
-                        sent, send_err = send_email(
-                            f"【JUOG CRF】【followup-{visit_key}】【{registration_id}】",
-                            report,
-                            reporter_email,
-                        )
+                        if save_result.get("existing"):
+                            sent, send_err = True, ""
+                            st.session_state["fu_sent_email_unverified"] = True
+                        else:
+                            sent, send_err = send_email(
+                                f"【JUOG CRF】【followup-{visit_key}】【{registration_id}】",
+                                report,
+                                reporter_email,
+                            )
+                            st.session_state["fu_sent_email_unverified"] = False
                         _draft_delete = delete_crf_draft(registration_id, "followup", "followup")
                         st.session_state.fu_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
                         st.session_state.fu_sent = True

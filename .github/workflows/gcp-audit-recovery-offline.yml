@@ -1,0 +1,25 @@
+name: GCP CRF audit recovery (fictional offline evidence)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrity-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate actual GAS JS syntax
+        run: |
+          cp 05_registry_google_apps_script.gs /tmp/juog_gcp_audit_syntax.js
+          node --check /tmp/juog_gcp_audit_syntax.js
+      - name: Real GAS save/audit helpers against in-memory failure injection
+        run: node tests/test_crf_audit_recovery.mjs
+      - name: Compile Python UI and common library
+        run: python -m py_compile juog_common.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py
+      - name: Frozen CRF submission UUID and safe retry contracts (no network)
+        run: python -m unittest discover -s tests -p "test_gcp_pending_submission.py" -v
+      - name: Existing screening ID regressions
+        run: node tests/test_screening_identity.mjs
