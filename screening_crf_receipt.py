@@ -143,7 +143,7 @@ def receipt_sections(payload: dict, review_round: int | None = None):
         ("申請ID（照合用）", _display(payload.get("submission_id"))),
     ]
     sections = [("申請情報", meta)]
-    handled = set()
+    handled = {"local_subject_code"}
     for title, fields in _SECTIONS:
         rows = []
         for spec in fields:
@@ -188,7 +188,7 @@ def render_receipt_text(payload: dict, review_round: int | None = None) -> str:
     return "\n".join(lines)
 
 
-def render_receipt_html(payload: dict, review_round: int | None = None) -> str:
+def render_receipt_html(payload: dict, review_round: int | None = None, *, include_print_button: bool = True) -> str:
     """Complete standalone HTML, suitable for email and offline A4 printing."""
     sections_html = []
     for title, rows in receipt_sections(payload, review_round):
@@ -219,7 +219,8 @@ footer{font-size:11px;color:#64748b;border-top:1px solid #ddd;margin-top:28px;pa
 @page{size:A4;margin:14mm}
 @media print{main{padding:0;max-width:100%}.print-button{display:none}section{margin:13px 0}h2{print-color-adjust:exact;-webkit-print-color-adjust:exact}}
 </style></head><body><main>
-<button type="button" class="print-button" onclick="window.print()">印刷／PDF保存</button>
+""" + ('<button type="button" class="print-button" onclick="window.print()">印刷／PDF保存</button>'
+       if include_print_button else '') + """
 <h1>JUOG-UTUC01 中央MDT審査申請 CRF（申請者控え）</h1>
 <p class="lead">中央MDTへの申請控えです。正式登録・手術適応の確定通知ではありません。<br>
 提出時点の内容を表示しています。申請内容の修正はシステムの正式な手続きで行ってください。</p>
