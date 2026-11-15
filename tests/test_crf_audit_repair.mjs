@@ -30,6 +30,7 @@ const fixture={
 };
 
 function fakeFixture(payload=fixture, opts={}) {
+  const flags={...opts};
   const crf=[crfFields,crfFields.map(k => ({
     record_version:1,
     submission_id:payload.submission_id,
@@ -48,6 +49,8 @@ function fakeFixture(payload=fixture, opts={}) {
   const getSpreadsheet_=()=>({getSheetByName:n=>sheets[n]});
   const headerIndex_=h=>Object.fromEntries(h.map((key,i)=>[key,i]));
   const appendByHeaders_=(sh,obj)=>{
+    if ((flags.dropAuditAppend && sh === sheets[CRF_AUDIT_SHEET]) ||
+        (flags.dropCrfAppend && sh === sheets.CRF_30d)) return;
     sh.rows.push(sh.rows[0].map(k=>obj[k]??""));
   };
   const compiled=new Function(
@@ -59,7 +62,7 @@ function fakeFixture(payload=fixture, opts={}) {
     getSpreadsheet_,headerIndex_,()=>({}),()=>{},appendByHeaders_,
     ()=>({ok:true}),{flush:()=>{}},CRF_AUDIT_SHEET,SCREENING_CRF_SHEET
   );
-  return { ...compiled, sheets, appendByHeaders_ };
+  return { ...compiled, sheets, appendByHeaders_, flags };
 }
 
 {
@@ -72,6 +75,43 @@ function fakeFixture(payload=fixture, opts={}) {
   assert(second.ok && second.existing);
   assert.equal(x.sheets[CRF_AUDIT_SHEET].rows.length,2,"replay may not duplicate audit");
   console.log("PASS audit repair + repeat replay");
+}
+{
+  const x=fakeFixture(fixture,{dropAuditAppend:true});
+  const rejected=x.savePayloadToSheet_("CRF_30d",fixture,true);
+  assert.equal(rejected.ok,false);
+  assert.equal(rejected.error,"CRF_AUDIT_READBACK_MISMATCH");
+  assert.equal(x.sheets.CRF_30d.rows.length,2,"failed audit cannot duplicate CRF body");
+  x.flags.dropAuditAppend=false;
+  const retried=x.savePayloadToSheet_("CRF_30d",fixture,true);
+  assert(retried.ok && retried.existing);
+  assert.equal(x.sheets.CRF_30d.rows.length,2);
+  assert.equal(x.sheets[CRF_AUDIT_SHEET].rows.length,2);
+  console.log("PASS silent audit write failure blocks success; same UUID repairs");
+}
+{
+  const corrected={...fixture, submission_id:"fictional-correction-uuid",
+    submission_kind:"訂正報告", correction_reason:"検証用の訂正"};
+  const x=fakeFixture(fixture,{dropCrfAppend:true});
+  const rejected=x.savePayloadToSheet_("CRF_30d",corrected,true);
+  assert.equal(rejected.ok,false);
+  assert.equal(rejected.error,"CRF_READBACK_MISMATCH");
+  assert.equal(x.sheets.CRF_30d.rows.length,2);
+  x.flags.dropCrfAppend=false;
+  const retried=x.savePayloadToSheet_("CRF_30d",corrected,true);
+  assert(retried.ok && !retried.existing && retried.record_version===2);
+  assert.equal(x.sheets.CRF_30d.rows.length,3);
+  assert.equal(x.sheets[CRF_AUDIT_SHEET].rows.length,2);
+  console.log("PASS silent CRF write failure blocks success; correction recovers");
+}
+{
+  const x=fakeFixture();
+  x.sheets.CRF_30d.rows.push(x.sheets.CRF_30d.rows[1].slice());
+  const got=x.savePayloadToSheet_("CRF_30d",fixture,true);
+  assert.equal(got.ok,false);
+  assert.equal(got.error,"CRF_DUPLICATE_UUID");
+  assert.equal(x.sheets[CRF_AUDIT_SHEET].rows.length,1);
+  console.log("PASS duplicate CRF UUID is rejected");
 }
 {
   const x=fakeFixture();
