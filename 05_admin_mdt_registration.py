@@ -275,12 +275,9 @@ with b1:
         max_value=today_jst(),
         key=f"final_mdt_date_{widget_suffix}",
     )
-    st.text_input(
-        "中央RECIST（放射線診断医判定）",
-        value=radiology_recist,
-        disabled=True,
-        key=f"central_recist_display_{widget_suffix}",
-    )
+    # A disabled text_input with a stable key can show an old review version.
+    # Display the latest server-derived RECIST as text instead of a widget.
+    st.write(f"**中央RECIST（放射線診断医判定・最新版）**：{radiology_recist or '—'}")
     site_r = str(case.get("site_recist", "") or "").upper()
     central_r = str(radiology_recist or "").upper()
     if site_r and central_r and site_r != central_r:
