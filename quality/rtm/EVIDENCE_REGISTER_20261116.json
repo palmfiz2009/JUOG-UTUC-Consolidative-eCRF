@@ -100,20 +100,25 @@
         "URS-RETRY"
       ],
       "pr_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/21",
-      "candidate_commit_sha": "233308c026b3898e70bd9224d1642ae48b3e24db",
+      "candidate_commit_sha": "19428c7f0a18a696e56e32b06676012a4b4b1d2f",
       "proof_class": "OFFLINE_FICTIONAL_TEST",
       "technical_test_counts": {
-        "integrated_gas_scenarios": 21,
+        "integrated_gas_scenarios": 27,
         "client_uuid_scenarios": 8,
-        "draft_inmemory_scenarios": 8
+        "draft_inmemory_scenarios": 8,
+        "browser_restart_and_mail_policies": 3,
+        "sanitized_transport_error_cases": 4
       },
       "test_provenance": [
         ".github/workflows/gcp-p0-integrated-candidate.yml",
         "tests/test_crf_audit_recovery.mjs",
         "tests/test_auth04_draft_end_to_end.mjs",
-        "tests/test_gcp_pending_submission.py"
+        "tests/test_gcp_pending_submission.py",
+        "tests/test_crf_restart_replay_ui.py",
+        "tests/test_registry_error_sanitization.py",
+        "quality/CHANGE_IMPACT_CRFGCP_RETRY_20261116.md"
       ],
-      "verified_ci_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/actions/runs/43734701145",
+      "verified_ci_url": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/actions/runs/43765959813",
       "real_isolated_env_executed": false,
       "qa_approved": false,
       "official_uat_pass_added": 0,
@@ -121,7 +126,9 @@
         "Cross-sheet emulated: no true Sheets atomicity",
         "No real authenticated Web App E2E",
         "No durable browser-loss replay",
-        "Source branch is draft; requires review of merged GAS and code deployments"
+        "Source branch is draft; requires review of merged GAS and code deployments",
+        "Content-identical correction is blocked after browser loss, but unknown/mutated previous request cannot be durably reconstructed",
+        "A same-UUID existing confirmation does not prove that original email was delivered; no automatic duplicate notification"
       ]
     }
   ],
@@ -180,6 +187,18 @@
         "REL-01",
         "REL-02",
         "REL-03"
+      ],
+      "status": "OPEN"
+    },
+    {
+      "id": "BLK-06",
+      "kind": "FACILITY_ACTION_INDIVIDUAL_AUTH_MISSING",
+      "severity": "CRITICAL",
+      "summary": "本番型GASのsave_crf/get_draft等は共有APIトークンだけでfacility操作を許可するため、個人/施設ごとのOIDC主体・ACLと保存監査の紐付けが未達。隔離OIDC候補を正規統合し、認証拒否と監査帰属を実機検証するまで正式リリース不可。",
+      "mapped_tests": [
+        "AUTH-04",
+        "ENV-03",
+        "REL-01"
       ],
       "status": "OPEN"
     }
