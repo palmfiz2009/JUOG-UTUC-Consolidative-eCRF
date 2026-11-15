@@ -233,7 +233,7 @@ function doPost(e) {
 
     return jsonResponse_({ok: false, error: 'UNKNOWN_ACTION'});
   } catch (err) {
-    return jsonResponse_({ok: false, error: 'SERVER_ERROR', message: String(err)});
+    return jsonResponse_({ok: false, error: 'SERVER_ERROR'});
   }
 }
 
@@ -844,7 +844,7 @@ function getLatestCrfPayload_(sheetName, registrationId, crfType) {
       try {
         payload = JSON.parse(String(row[idx.payload_json] || '{}'));
       } catch (err) {
-        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR', message:String(err)};
+        return {ok:false, error:'SOURCE_PAYLOAD_PARSE_ERROR'};
       }
       best = {
         version: version,
@@ -1084,7 +1084,7 @@ function getScreeningDraft_(p) {
       if (suppliedEmail !== storedEmail) return {ok:false, error:'DRAFT_EMAIL_MISMATCH'};
       let draftState = {};
       try { draftState = JSON.parse(String(values[r][idx.draft_json] || '{}')); }
-      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)}; }
+      catch (err) { return {ok:false, error:'DRAFT_PARSE_ERROR'}; }
       return {ok:true, source_found:true, updated_at:isoDateTime_(values[r][idx.updated_at]), facility_code:String(values[r][idx.facility_code] || facilityCode), facility_name:String(values[r][idx.facility_name] || ''), reporter_email:storedEmail, schema_version:String(values[r][idx.schema_version] || ''), draft_state:stripDirectIdentifiers_(draftState)};
     }
     return {ok:true, source_found:false};
@@ -1215,7 +1215,7 @@ function getDraft_(p) {
       try {
         draftState = JSON.parse(String(values[r][idx.draft_json] || '{}'));
       } catch (err) {
-        return {ok:false, error:'DRAFT_PARSE_ERROR', message:String(err)};
+        return {ok:false, error:'DRAFT_PARSE_ERROR'};
       }
       return {
         ok:true,
