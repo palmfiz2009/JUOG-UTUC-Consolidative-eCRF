@@ -35,3 +35,4 @@ jobs:
           cp 05_registry_google_apps_script.gs /tmp/juog_backend_check.js
           node --check /tmp/juog_backend_check.js
           node tests/test_screening_identity.mjs
+          node tests/test_crf_audit_repair.mjs
