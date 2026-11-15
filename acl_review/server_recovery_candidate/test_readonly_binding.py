@@ -23,6 +23,7 @@ class Binding(unittest.TestCase):
   q=dict(operation_id='fake-op',submission_id='fake-sub',state='SAVED',phase='COMMITTED',expected_record_version=0,content_sha256='a'*64)
   r=dict(record_key=m.SCOPE['record_key'],record_version=1,submission_id='fake-sub',payload=dict(registration_id='JUOG-971',facility_code='TEST01',crf_type='perioperative_30d',visit='30d',clinical='FICTIONAL_PRIVATE_MARKER'))
   q['content_sha256']=m.recovery_fingerprint({'action':'save_crf','payload':r['payload']})
+  r['transaction_id']='fake-sub';r['payload']['submission_id']='fake-sub'
   return q,r
  def test_good_binding_no_raw_data(self):
   q,r=self.data();result,calls=self.run_probe([q],[r])

@@ -1,0 +1,45 @@
+{
+  "kind": "OFFLINE_ONLY",
+  "baseline_commit": "c245d823fb2e36efb00860fc03fdd14100aa03b1",
+  "issue": "The read-only probe omitted nested submission_id from the content fingerprint without binding it or transaction_id to the committed request. Mismatched or missing metadata was accepted.",
+  "fix": "For journal-listed SAVED records require transaction_id and payload.submission_id to equal the journal submission_id before content hashing. Legacy records without a listed request still require manual reconciliation.",
+  "before": {
+    "command": "python -W ignore::ResourceWarning -m unittest discover -s acl_review/server_recovery_candidate -p test_probe_submission.py",
+    "tests": 4,
+    "failures": 4,
+    "reason": "Expected rejection was not raised for changed/missing nested submission_id and changed/missing transaction_id."
+  },
+  "after": {
+    "command": "python -W ignore::ResourceWarning -m unittest discover -s acl_review/server_recovery_candidate -p 'test_*.py'",
+    "tests": 60,
+    "failures": 0,
+    "errors": 0
+  },
+  "test_method": "Actual pinned GAS domain through local in-memory Node RPC with fictional fixture; mutate only read responses. Signer is stubbed in these four binding tests; no live authentication claim. Each test confirms only list_requests/request_status/read_crf and unchanged offline store inspection. Existing actual-domain matching-content positive test reused.",
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/readonly_probe.py": "611d2fb4d8d78c2fcca9237f415686833423d9bcf10d419019e375296188fd03",
+    "acl_review/server_recovery_candidate/test_probe_submission.py": "64695722a9883d8185fdd68ec686503013136a292e3ddfaab143c9e4422b70ff",
+    "acl_review/server_recovery_candidate/test_readonly_binding.py": "2a13180cd96db453c3b767889586b759057a87b6638c8728aadf60b7968eb036",
+    "acl_review/server_recovery_candidate/test_readonly_probe.py": "9c81e41257e9ce66026b36a0cdaa2404e10c2a80f32eb9346199e00e3950eea6"
+  },
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT RUN": 5
+  },
+  "new_formal_pass": 0,
+  "live_ledger_165_rows": "Untouched; not freshly measured.",
+  "remaining": [
+    "Candidate deployment and scoped live recovery read require separate approval and independent technical review.",
+    "Candidate packaging must include content_fingerprint.py and its canonical_v9_bridge dependency. No deployment or package activation performed.",
+    "Old-key signature rejection remains NOT_MEASURED. Mode/expiry rejection is not a substitute.",
+    "Live authentication/ACL and approved save/recovery evidence remain incomplete.",
+    "60-minute observation requires a confirmed persistent worker/storage.",
+    "Legacy request/content/audit completeness and formal QA remain unapproved."
+  ],
+  "continuation": "Use this commit as baseline. Do not repeat the four binding regressions as new progress or change formal UAT based on this offline result."
+}

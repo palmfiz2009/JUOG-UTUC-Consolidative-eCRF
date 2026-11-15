@@ -75,6 +75,9 @@ def probe(native_provider,transport,cfg,clock=time.time):
         record=by_submission.get(row['submission_id'])
         if row['state']=='SAVED':
             if record is None or record['record_version']!=row['expected_record_version']+1:raise PermissionError('COMMITTED_RECORD_MISMATCH')
+            # The content fingerprint intentionally excludes submission metadata.
+            # Bind both saved identifiers to the journal before omitting them.
+            if record.get('transaction_id')!=row['submission_id'] or record['payload'].get('submission_id')!=row['submission_id']:raise PermissionError('COMMITTED_SUBMISSION_MISMATCH')
             payload=dict(record['payload'])
             payload.pop('submission_id',None);payload.pop('submitted_at',None)
             if recovery_fingerprint({'action':'save_crf','payload':payload})!=row['content_sha256']:raise PermissionError('COMMITTED_CONTENT_MISMATCH')
