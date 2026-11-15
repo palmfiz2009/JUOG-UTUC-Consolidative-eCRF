@@ -17,5 +17,9 @@ jobs:
           node --check /tmp/juog_gcp_audit_syntax.js
       - name: Real GAS save/audit helpers against in-memory failure injection
         run: node tests/test_crf_audit_recovery.mjs
+      - name: Compile Python UI and common library
+        run: python -m py_compile juog_common.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py
+      - name: Frozen CRF submission UUID and safe retry contracts (no network)
+        run: python -m unittest discover -s tests -p "test_gcp_pending_submission.py" -v
       - name: Existing screening ID regressions
         run: node tests/test_screening_identity.mjs
