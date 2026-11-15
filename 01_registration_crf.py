@@ -798,7 +798,7 @@ def _render_screening_form():
         try:
             with st.spinner("接続先と台帳バージョンを確認しています…", show_time=True):
                 _backend = registry_call("backend_info")
-            if not _backend.get("ok") or _backend.get("backend_version") != "v2.2.9":
+            if not _backend.get("ok") or _backend.get("backend_version") != "v2.2.10":
                 reg_result = {
                     "ok": False, "error": "BACKEND_VERSION_UNVERIFIED",
                     "message": "中央台帳のv2.2.9を確認できません。申請は送信していません。事務局へ連絡してください。",
