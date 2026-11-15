@@ -1573,6 +1573,9 @@ function getBackendInfo_() {
     backend_version: BACKEND_VERSION,
     environment: environment,
     spreadsheet_name: sheetName,
+    // Returned only after API-token authentication; the UI checks the exact
+    // configured workbook before allowing an official CRF submission.
+    spreadsheet_id: ss.getId(),
     server_time: Utilities.formatDate(new Date(), TIMEZONE, "yyyy-MM-dd'T'HH:mm:ssXXX")
   };
 }
