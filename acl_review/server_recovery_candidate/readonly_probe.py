@@ -15,10 +15,8 @@ def gate(cfg,now):
 
 def probe(native_provider,transport,cfg,clock=time.time):
     bound_identity=None
-    def call(action,payload):
+    def checked_envelope(action,payload):
         nonlocal bound_identity
-        gate(cfg,int(clock()))
-        if action not in ('list_requests','read_crf','request_status'):raise PermissionError('READ_SCOPE')
         native=native_provider()
         envelope=signed_request(native,action,payload)
         # The signer validates each native context; also prohibit mixing actors
@@ -30,8 +28,15 @@ def probe(native_provider,transport,cfg,clock=time.time):
         if any(not isinstance(value,str) or not value for value in identity):raise PermissionError('PROBE_IDENTITY_INVALID')
         if bound_identity is None:bound_identity=identity
         elif identity!=bound_identity:raise PermissionError('PROBE_PRINCIPAL_CHANGED')
-        result=transport(envelope)
+        return envelope
+    def call(action,payload):
         gate(cfg,int(clock()))
+        if action not in ('list_requests','read_crf','request_status'):raise PermissionError('READ_SCOPE')
+        result=transport(checked_envelope(action,payload))
+        gate(cfg,int(clock()))
+        # Revalidate native expiry/login and actor before using even the final
+        # response. This validation envelope is discarded, never transported.
+        checked_envelope('ui_context',{'id':'probe_response_check','action':'ui_context','payload':{'registration_id':''}})
         if not isinstance(result,dict) or result.get('ok') is not True:raise PermissionError('READ_NOT_CONFIRMED')
         return result
     listing=call('list_requests',dict(SCOPE))

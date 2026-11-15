@@ -1,0 +1,41 @@
+{
+  "base_commit": "8ba2c9b4e4497c7208131fc9b7be7091121f24f1",
+  "mode": "OFFLINE_ONLY",
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "defect": "Standalone readonly_probe could return a successful final summary after native logout, token expiry or principal change during the final read transport. The earlier Client.call fix does not cover this separate entry.",
+  "fix": "Reuse one checked envelope helper before transport and after each response. The response-side validation envelope is discarded and never sent; invalid authentication or a changed principal prevents the result reaching the UI.",
+  "reproduction_before": {
+    "tests": 3,
+    "failures": 3
+  },
+  "regression_after": {
+    "recovery_tests": 53,
+    "failures": 0
+  },
+  "new_conditions": [
+    "Principal switch during the final read returns no success summary.",
+    "Native logout during the final read returns no success summary.",
+    "Native token expiry during the final read returns no success summary.",
+    "Each new case transports only list_requests and read_crf, without retries or business actions."
+  ],
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/readonly_probe.py": "19df7a020090db17574a1f6660f880ee46850d4fa85b4886d155966434883cd3",
+    "acl_review/server_recovery_candidate/test_probe_final_auth.py": "b40071bb91203de7de88f2729dc97042499a22975009218fa6d95e1449489112"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Synthetic authentication state changes and offline native signing only; no Google authentication operation or real keys were used.",
+    "This is not a real sixty-minute boundary test, live session-revocation test or old-key rejection test.",
+    "No settings, ACL, deployment, business data or audit history changed. Live 165-row invariance was not remeasured.",
+    "Recovery APIs remain undeployed, durable observation infrastructure unresolved, independent review and formal QA outstanding."
+  ],
+  "continuation": "Use this updated standalone read candidate for future approved review; do not treat the offline result as authorization to enable communication or deploy."
+}
