@@ -144,6 +144,46 @@ class CRFSaveUITests(unittest.TestCase):
         ))
         self.assertEqual(len(self.saved),1)
 
+    def test_saving_state_stays_locked_during_active_request(self):
+        import time
+        key=self.helper.attempt_key("d90")
+        self.st.session_state[key]={
+            "status":"saving","saving_started_at":time.time(),
+            "registration_id":"JUOG-901","payload":self.fixture("day90","90d"),
+        }
+        pending=self.helper.pending_attempt("d90", self.st.session_state)
+        self.assertEqual(pending["status"],"saving")
+        self.assertEqual(len(self.saved),0)
+
+    def test_old_abandoned_save_reuses_same_uuid(self):
+        import time
+        key=self.helper.attempt_key("d90")
+        self.st.session_state[key]={
+            "status":"saving","saving_started_at":time.time()-130,
+            "registration_id":"JUOG-901","payload":self.fixture("day90","90d","old-uuid"),
+            "email_subject":"FAKE","email_body":"FAKE","had_warnings":False,
+            "visit_display":"",
+        }
+        pending=self.helper.pending_attempt("d90",self.st.session_state)
+        self.assertEqual(pending["status"],"uncertain")
+        self.responses=[{"ok":True,"existing":True,"record_version":1}]
+        self.assertTrue(self.helper.submit_crf_with_feedback(page="d90",registration_id="JUOG-901"))
+        self.assertEqual(self.saved[0]["submission_id"],"old-uuid")
+        self.assertEqual(len(self.emails),0)
+
+    def test_committed_but_not_finalized_save_can_be_confirmed(self):
+        self.st.session_state[self.helper.attempt_key("peri")]={
+            "status":"committed","record_version":"1",
+            "registration_id":"JUOG-901","payload":self.fixture(),
+            "email_subject":"FAKE","email_body":"FAKE","had_warnings":False,
+            "visit_display":"",
+        }
+        self.assertIsNotNone(self.helper.pending_attempt("peri",self.st.session_state))
+        self.responses=[{"ok":True,"existing":True,"record_version":1}]
+        self.assertTrue(self.helper.submit_crf_with_feedback(page="peri",registration_id="JUOG-901"))
+        self.assertEqual(len(self.saved),1)
+        self.assertEqual(len(self.emails),0)
+
     def test_interrupted_request_status_recovers_for_same_id_retry(self):
         self.st.session_state[self.helper.attempt_key("d90")] = {
             "status": "saving", "registration_id": "JUOG-901",
