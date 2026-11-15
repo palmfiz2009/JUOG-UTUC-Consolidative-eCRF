@@ -1,0 +1,18 @@
+name: Printable screening CRF receipt checks (fictional data only)
+on:
+  push:
+    branches:
+      - review/screening-crf-readable-receipt-20261115
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  receipt-offline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile changed Python files
+        run: python -m py_compile 01_registration_crf.py juog_common.py screening_crf_receipt.py
+      - name: Receipt tests (fictional data, no email/network)
+        run: python -m unittest discover -s tests -p "test_screening_crf_receipt.py" -v
