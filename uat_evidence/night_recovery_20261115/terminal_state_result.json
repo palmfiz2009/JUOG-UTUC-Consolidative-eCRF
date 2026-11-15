@@ -1,0 +1,39 @@
+{
+  "base_commit": "71fa926b66df077be2d698923fa2bdbd6c8bea92",
+  "mode": "OFFLINE_ONLY",
+  "finding": "Reconciliation could overwrite confirmed SAVED with a conflicting FAILED response, including when concurrent reconciliation had completed while the response was pending. Conflicting UNFINISHED could also be reported after SAVED.",
+  "fix": "Re-read local state after status response, reject contradictions with confirmed terminal state, and use atomic terminal updates that reject an opposing terminal outcome.",
+  "new_tests": 2,
+  "pre_fix_failures": 3,
+  "regression": {
+    "canonical_save_tests": 23,
+    "recovery_tests": 48,
+    "all_passed": true
+  },
+  "assertions": [
+    "Contradictory FAILED/UNFINISHED after SAVED rejected",
+    "Concurrent successful confirmation is not overwritten by delayed failure",
+    "Subsequent consistent status succeeds without repeat execute",
+    "Existing in-memory CRF and audit unchanged"
+  ],
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/client.py": "c5b8d93036d38d0d8f20c9f219c391cdbc70dc4a08d883ae0a1a5d8d9ae17818",
+    "acl_review/canonical_v9_save_candidate/test_terminal_state.py": "6e86828b0cd9cf8c875adb8bfae470352fdf074e976e9385269ac0453734f73f"
+  },
+  "deployed": false,
+  "independent_review": false,
+  "live_calls": 0,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Contradictory responses injected in local fixture transport, not observed on the real server",
+    "Local SQLite is a regression store, not an approved Streamlit durable store",
+    "Old-key rejection, approved live recovery, sixty-minute evidence and formal QA remain incomplete",
+    "Live 165 rows and audit were not remeasured"
+  ]
+}

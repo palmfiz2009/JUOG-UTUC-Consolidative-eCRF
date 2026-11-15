@@ -47,6 +47,12 @@ class Client:
  def _row(self,digest):return self.db.execute('SELECT digest,actor,state,operation_id,submission_id,base FROM attempts WHERE digest=?',(digest,)).fetchone()
  def _set(self,digest,state,opid=None):
   self.db.execute('UPDATE attempts SET state=?,operation_id=COALESCE(?,operation_id) WHERE digest=?',(state,opid,digest));self.db.commit()
+ def _set_terminal(self,digest,state):
+  # Atomic terminal transition: never erase an opposing confirmed outcome.
+  other='FAILED' if state=='SAVED' else 'SAVED'
+  with self.db:
+   changed=self.db.execute('UPDATE attempts SET state=? WHERE digest=? AND actor=? AND state<>?',(state,digest,self.actor,other)).rowcount
+   if changed!=1:raise BridgeError('TERMINAL_STATE_CONFLICT')
  def write(self,payload):
   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')
   if self.observed is None:raise BridgeError('AUTHENTICATED_READ_REQUIRED')
@@ -89,6 +95,9 @@ class Client:
   if not row[3]:raise BridgeError('PREPARE_RESPONSE_LOST_MANUAL_RECONCILIATION')
   r=self.call('request_status',{'operation_id':row[3]})
   if r.get('ok') is not True or r.get('operation_id')!=row[3] or r.get('action')!='save_crf':raise BridgeError('STATUS_NOT_CONFIRMED')
+  current=self._row(digest)
+  if not current or current[1]!=self.actor:raise BridgeError('ATTEMPT_NOT_OWNED')
+  if current[2] in ('SAVED','FAILED') and r.get('state')!=current[2]:raise BridgeError('TERMINAL_STATE_CONFLICT')
   if r.get('state')=='SAVED' and r.get('phase')=='COMMITTED':
    # Masking is a display safeguard, not proof of persisted content integrity.
    records=self._read_records();matches=[x for x in records if x.get('submission_id')==row[4]]
@@ -97,9 +106,9 @@ class Client:
    if matches[0].get('transaction_id')!=row[4] or matches[0]['payload'].get('submission_id')!=row[4]:raise BridgeError('SAVE_SUBMISSION_MISMATCH')
    confirmed=copy.deepcopy(matches[0]['payload']);confirmed.pop('submission_id',None);confirmed.pop('submitted_at',None)
    if hashlib.sha256((self.actor+'|'+semantic_json({'action':'save_crf','payload':confirmed})).encode()).hexdigest()!=digest:raise BridgeError('SAVE_CONTENT_MISMATCH')
-   self._set(digest,'SAVED');self.observed=None
+   self._set_terminal(digest,'SAVED');self.observed=None
    return {'ok':True,'state':'SAVED','operation_id':row[3],'record_version':matches[0]['record_version']}
-  if r.get('state')=='FAILED' and r.get('phase')=='REJECTED_BEFORE_INTENT':self._set(digest,'FAILED')
+  if r.get('state')=='FAILED' and r.get('phase')=='REJECTED_BEFORE_INTENT':self._set_terminal(digest,'FAILED')
   elif r.get('state')!='UNFINISHED' or r.get('phase') not in ('PREPARED','AUDIT_OR_COMMIT_PENDING'):raise BridgeError('STATUS_PHASE_UNSAFE')
   return {'ok':False,'state':r['state'],'phase':r['phase'],'operation_id':row[3]}
  def resume(self,digest):
