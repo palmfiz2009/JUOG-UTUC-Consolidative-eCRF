@@ -1,0 +1,41 @@
+{
+  "kind": "OFFLINE_ONLY",
+  "baseline_commit": "40d4bd4e4cd8063ef4b8ebd25a3062ef1edf8564",
+  "issue": "Lost-prepare recovery accepted a PREPARED status after its scoped listing had reported SAVED, FAILED, or AUDIT_OR_COMMIT_PENDING, then bound the local attempt as PREPARED.",
+  "fix": "Reject contradictory terminal state or started-to-PREPARED regression before local operation binding. Permit forward progress from PREPARED to a verified committed save.",
+  "before": {
+    "tests": 4,
+    "failures": 3,
+    "passed": 1
+  },
+  "after": {
+    "command": "python -W ignore::ResourceWarning -m unittest discover -s acl_review/server_recovery_candidate -p 'test_*.py'",
+    "tests": 64,
+    "failures": 0,
+    "errors": 0
+  },
+  "method": "Fictional local Node GAS-domain RPC. Negative cases alter only returned listing status, retain real request status, assert local PREPARING/unbound, no execute calls and unchanged offline store inspection. Positive case simulates an existing worker completing the same request between list and status; exactly one prepare, one execute and one audit. No live OIDC/ACL test.",
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/recoverable_client.py": "acc6981d52243031ac87e131b66ee6c53e78f4ffb3080538846f6fca9331a816",
+    "acl_review/server_recovery_candidate/test_prepare_status_regression.py": "8ab2648e6a496234d944e0d911a17c0a76e06dccc098fe4d6f4d57bcc657fe9f"
+  },
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT RUN": 5
+  },
+  "new_formal_pass": 0,
+  "remaining": [
+    "Candidate independent review and approved live recovery validation remain incomplete.",
+    "Old-key signature rejection remains NOT_MEASURED; expiry/mode rejection cannot substitute.",
+    "Authentication/ACL, authorized save/recovery evidence and formal QA still required.",
+    "Persistent worker/storage for sixty-minute observation not confirmed; no observation started.",
+    "Local-store total loss still requires manual reconciliation.",
+    "Live 165 rows/audit untouched, not remeasured."
+  ],
+  "continuation": "This change covers list-to-status contradictions during lost-prepare recovery. Reuse existing tests; do not count offline fixes as formal UAT completion."
+}

@@ -43,6 +43,9 @@ class RecoverableClient(Client):
   status=self.call('request_status',{'operation_id':oid})
   phases={'UNFINISHED':{'PREPARED','AUDIT_OR_COMMIT_PENDING'},'SAVED':{'COMMITTED'},'FAILED':{'REJECTED_BEFORE_INTENT'}}
   if status.get('ok') is not True or status.get('operation_id')!=oid or status.get('action')!='save_crf' or status.get('phase') not in phases.get(status.get('state'),set()):raise BridgeError('RECOVERY_STATUS_UNCONFIRMED')
+  # A newer status may advance, but cannot contradict a terminal listing or
+  # turn an already-started execution back into a safely executable request.
+  if (q['state'] in ('SAVED','FAILED') and status['state']!=q['state']) or (q['phase']=='AUDIT_OR_COMMIT_PENDING' and status['phase']=='PREPARED'):raise BridgeError('RECOVERY_STATUS_REGRESSION')
   with self.db:
    claimed=self.db.execute("UPDATE attempts SET state='PREPARED',operation_id=? WHERE digest=? AND actor=? AND state='PREPARING' AND operation_id IS NULL",(oid,digest,self.actor)).rowcount
   if claimed!=1:
