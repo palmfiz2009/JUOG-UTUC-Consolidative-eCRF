@@ -17,6 +17,7 @@ class FakeSt(types.ModuleType):
     def __init__(self):
         super().__init__("streamlit")
         self.session_state = {}
+        self.secrets = {"registry": {"expected_spreadsheet_id": "isolated-fixture-sheet"}}
         self.messages = []
 
     @contextmanager
@@ -49,7 +50,10 @@ class CRFSaveUITests(unittest.TestCase):
 
         def save(payload):
             self.saved.append(deepcopy(payload))
-            return self.responses.pop(0)
+            response = self.responses.pop(0)
+            if response.get("ok") and "submission_id" not in response:
+                return {"submission_id": payload["submission_id"], **response}
+            return response
 
         def mail(subject, body, receiver):
             self.emails.append((subject, body, receiver))
@@ -63,8 +67,10 @@ class CRFSaveUITests(unittest.TestCase):
         self.patchers = (
             patch.dict(sys.modules, {"streamlit": self.st}),
             patch.object(juog_common, "registry_call",
-                         lambda action, payload=None: {"ok":True,"backend_version":"v2.2.10"}
-                         if action=="backend_info" else {"ok":False}),
+                         lambda action, payload=None: {
+                             "ok": True, "backend_version": "v2.2.10",
+                             "spreadsheet_id": "isolated-fixture-sheet"
+                         } if action == "backend_info" else {"ok": False}),
             patch.object(juog_common, "save_crf_payload", save),
             patch.object(juog_common, "send_email", mail),
             patch.object(juog_common, "delete_crf_draft", delete),
@@ -210,6 +216,77 @@ class CRFSaveUITests(unittest.TestCase):
         self.assertEqual(len(self.saved),0)
         self.assertEqual(self.emails,[])
         self.assertEqual(self.deleted,[])
+
+    def test_missing_pinned_workbook_fails_without_writes_or_mail(self):
+        self.st.secrets = {"registry": {}}
+        self.assertFalse(self.helper.submit_crf_with_feedback(
+            page="peri", registration_id="JUOG-901", payload=self.fixture()))
+        self.assertEqual(self.saved, [])
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.deleted, [])
+
+    def test_backend_workbook_id_mismatch_fails_closed(self):
+        import juog_common
+        with patch.object(juog_common, "registry_call",
+                          lambda action, payload=None: {
+                              "ok": True, "backend_version": "v2.2.10",
+                              "spreadsheet_id": "wrong-workbook"
+                          }):
+            ok = self.helper.submit_crf_with_feedback(
+                page="peri", registration_id="JUOG-901", payload=self.fixture())
+        self.assertFalse(ok)
+        self.assertEqual(self.saved, [])
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.deleted, [])
+
+    def test_backend_missing_workbook_echo_fails_closed(self):
+        import juog_common
+        with patch.object(juog_common, "registry_call",
+                          lambda action, payload=None: {
+                              "ok": True, "backend_version": "v2.2.10"
+                          }):
+            ok = self.helper.submit_crf_with_feedback(
+                page="peri", registration_id="JUOG-901", payload=self.fixture())
+        self.assertFalse(ok)
+        self.assertEqual(self.saved, [])
+
+    def test_wrong_uuid_success_reply_is_unconfirmed_and_retry_reuses_uuid(self):
+        self.responses = [
+            {"ok": True, "record_version": 2, "existing": False,
+             "submission_id": "other-submission"},
+            {"ok": True, "record_version": 2, "existing": True,
+             "submission_id": "locked-uuid"},
+        ]
+        payload = self.fixture("day90", "90d", "locked-uuid")
+        self.assertFalse(self.helper.submit_crf_with_feedback(
+            page="d90", registration_id="JUOG-901", payload=payload))
+        self.assertEqual(self.helper.pending_attempt("d90", self.st.session_state)["status"],
+                         "uncertain")
+        self.assertFalse(self.st.session_state.get("d90_sent", False))
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.deleted, [])
+        self.assertTrue(self.helper.submit_crf_with_feedback(
+            page="d90", registration_id="JUOG-901"))
+        self.assertEqual([p["submission_id"] for p in self.saved],
+                         ["locked-uuid", "locked-uuid"])
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.st.session_state["d90_sent_version"], "2")
+
+    def test_missing_version_ack_fails_without_deleting_draft(self):
+        self.responses = [{"ok": True, "existing": False}]
+        self.assertFalse(self.helper.submit_crf_with_feedback(
+            page="peri", registration_id="JUOG-901", payload=self.fixture()))
+        self.assertEqual(len(self.saved), 1)
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.deleted, [])
+        self.assertFalse(self.st.session_state.get("peri_sent", False))
+
+    def test_missing_existing_flag_is_not_considered_confirmed(self):
+        self.responses = [{"ok": True, "record_version": 1}]
+        self.assertFalse(self.helper.submit_crf_with_feedback(
+            page="peri", registration_id="JUOG-901", payload=self.fixture()))
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.deleted, [])
 
     def test_status_not_marked_success_when_server_rejects(self):
         self.responses = [{"ok":False, "error":"INITIAL_ALREADY_EXISTS"}]
