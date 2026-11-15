@@ -32,6 +32,9 @@ function createFixture() {
     corruptCrfAfterAppend: false, suppressCrfReadbackOnce: false,
   };
   const flush = {count:0};
+  const sourceEvents = [];
+  flags.lockHeld = false;
+  flags.blockSource = false;
   const sheet = name => ({
     getDataRange() {
       return {getValues: () => {
@@ -74,6 +77,10 @@ function createFixture() {
       sh.appendRow(rowFields.map(key=>obj[key]??""));
     },
     flattenObject_:()=>({}),
+    validateDay90SourceLink_:()=>{
+      sourceEvents.push(Boolean(flags.lockHeld));
+      return flags.blockSource ? {ok:false, error:"SOURCE_VERSION_CHANGED"} : {ok:true};
+    },
     CRF_AUDIT_SHEET:"CRFSubmissionAudit",
     SCREENING_CRF_SHEET:"ScreeningCRF",
     SpreadsheetApp:{flush:()=>{flush.count++;}},
@@ -81,9 +88,27 @@ function createFixture() {
   const run = new Function(...Object.keys(deps),source+
     "\nreturn {save:savePayloadToSheet_, audit:ensureCrfAuditRow_, verify:verifySavedCrfRow_};"
   )(...Object.values(deps));
+  const crfSourceStart = code.indexOf("function saveCrf_(p) {");
+  assert(crfSourceStart >= 0 && crfSourceStart < start);
+  const crfSource = code.slice(crfSourceStart, start);
+  const saveDeps = {
+    containsDirectIdentifier_:()=>false,
+    crfSheetForType_:()=> "CRF_30d",
+    validateSubject_:()=>({ok:true}),
+    validateCrfHardStops_:()=>({ok:true}),
+    LockService:{getScriptLock:()=>({
+      tryLock:()=>{flags.lockHeld=true; return true},
+      releaseLock:()=>{flags.lockHeld=false}
+    })},
+    savePayloadToSheet_:run.save,
+  };
+  const actualSaveCrf = new Function(...Object.keys(saveDeps),crfSource+
+    "\nreturn saveCrf_;"
+  )(...Object.values(saveDeps));
   return {
-    t,flags,flush,
+    t,flags,flush,sourceEvents,
     submit:(payload,crf="CRF_30d")=>run.save(crf,payload,true),
+    saveCrf:payload=>actualSaveCrf({payload}),
     audit:run.audit,
     crfRows:()=>t.CRF_30d.length-1,
     auditRows:()=>t.CRFSubmissionAudit.length-1,
@@ -211,4 +236,26 @@ check("missing required metadata rejects without writes",()=>{
   assert.equal(a.ok,false);assert.equal(a.error,"MISSING_SUBMISSION_METADATA");
   assert.equal(f.crfRows(),0);assert.equal(f.auditRows(),0);
 });
-console.log("ALL 16 OFFLINE GCP DATA INTEGRITY CASES PASSED");
+check("new linked CRF validated while ScriptLock is held",()=>{
+  const f=createFixture(),p=make();
+  const res=f.saveCrf(p);
+  assert.equal(res.ok,true);
+  assert.deepEqual(f.sourceEvents,[true]);
+  assert.equal(f.flags.lockHeld,false);
+});
+check("stale source rejected under lock, but same UUID replay bypasses fresh check",()=>{
+  const f=createFixture(),p=make();
+  f.flags.blockSource=true;
+  const before=f.saveCrf(p);
+  assert.equal(before.ok,false);assert.equal(before.error,"SOURCE_VERSION_CHANGED");
+  assert.equal(f.crfRows(),0);assert.equal(f.flags.lockHeld,false);
+  f.flags.blockSource=false;
+  const saved=f.saveCrf(p);
+  assert.equal(saved.ok,true);assert.equal(f.crfRows(),1);
+  f.flags.blockSource=true;
+  const replay=f.saveCrf(p);
+  assert.equal(replay.ok,true);assert.equal(replay.existing,true);
+  assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),1);
+  assert.deepEqual(f.sourceEvents,[true,true]);
+});
+console.log("ALL 18 OFFLINE GCP DATA INTEGRITY CASES PASSED");
