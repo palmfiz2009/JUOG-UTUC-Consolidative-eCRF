@@ -115,9 +115,22 @@ def submit_crf_with_feedback(
             backend = registry_call("backend_info")
     except Exception:
         backend = {}
-    if not backend.get("ok") or backend.get("backend_version") != "v2.2.10":
+    # A valid backend version does not prove which spreadsheet is bound.
+    # Pin the exact workbook ID in the existing app's registry secrets.
+    # If this value or the backend echo is absent, fail closed.
+    try:
+        expected_sheet_id = str(st.secrets["registry"]["expected_spreadsheet_id"]).strip()
+    except Exception:
+        expected_sheet_id = ""
+    if not expected_sheet_id:
         attempt["status"] = "uncertain"
-        st.error("台帳v2.2.10を確認できません。正式保存は実行していません。管理者へ連絡してください。")
+        st.error("保存先台帳のIDが未設定です。正式保存は実行していません。管理者へ連絡してください。")
+        return False
+    if (not backend.get("ok")
+            or backend.get("backend_version") != "v2.2.10"
+            or str(backend.get("spreadsheet_id") or "").strip() != expected_sheet_id):
+        attempt["status"] = "uncertain"
+        st.error("保存先台帳のバージョンまたはIDが一致しません。正式保存は実行していません。管理者へ連絡してください。")
         return False
 
     attempt["status"] = "saving"
@@ -130,6 +143,8 @@ def submit_crf_with_feedback(
         st.error("保存結果を確認できません。再送する場合は同じ送信IDを使います。事務局に確認してください。")
         return False
 
+    if not isinstance(result, dict):
+        result = {}
     if not result.get("ok"):
         attempt["status"] = "uncertain"
         st.error(
@@ -139,7 +154,17 @@ def submit_crf_with_feedback(
         )
         return False
 
-    attempt["record_version"] = str(result.get("record_version") or "")
+    # Never show "saved", send mail or delete a draft on an ambiguous or
+    # mismatched server response. A retry must retain this frozen UUID.
+    if (result.get("submission_id") != attempt["payload"]["submission_id"]
+            or type(result.get("record_version")) is not int
+            or result["record_version"] < 1
+            or type(result.get("existing")) is not bool):
+        attempt["status"] = "uncertain"
+        st.error("保存応答の送信ID・Versionを照合できません。確定扱いせず、同じ送信IDで確認してください。")
+        return False
+
+    attempt["record_version"] = str(result["record_version"])
     attempt["status"] = "committed"
     # If this UUID already existed, an earlier request may have sent mail.
     # Never send a duplicate; don't falsely report a mail failure either.
