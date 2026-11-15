@@ -3,7 +3,7 @@ from __future__ import annotations
 import hmac
 import streamlit as st
 
-from juog_common import date_str, registry_call, send_direct_email, send_email, text, today_jst, valid_email, valid_registration_id
+from juog_common import _smtp_send, date_str, registry_call, send_email, text, today_jst, valid_email, valid_registration_id
 
 ROLE_LABELS = {
     "radiology": "放射線診断専門医",
@@ -59,13 +59,11 @@ def notify_mdt_final_result(screening_id: str, facility_name: str, decision_labe
         "※診療録番号、患者氏名等は記載していません。\n"
     )
 
-    failed = []
-    for address in recipients:
-        ok, _ = send_direct_email(address, subject, body)
-        if not ok:
-            failed.append(address)
-    if failed:
-        return False, f"MDT委員への通知に失敗した宛先が{len(failed)}件あります。再確定せず事務局で確認してください。"
+    # One SMTP connection for the full MDT, so a slow mail gateway does not
+    # produce three sequential 30-second timeouts after a successful registry write.
+    ok, _mail_error = _smtp_send(subject, body, recipients)
+    if not ok:
+        return False, "MDT委員への通知メール送信に失敗しました。最終判定を再確定せず、事務局で送信履歴を確認してください。"
     return True, ""
 
 
