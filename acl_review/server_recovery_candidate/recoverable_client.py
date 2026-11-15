@@ -2,22 +2,11 @@
 Requires retained local attempt plus independently re-supplied identical content.
 Total loss of the local store still requires manual reconciliation; not a live store.
 """
-import copy,hashlib,re,struct,math,json
+import copy,hashlib,re
 from client import Client,KEY,semantic_json
 from recovery_client import validated_rows
 from canonical_v9_bridge import BridgeError,operation,CASE,FACILITY
-def recovery_fingerprint(value):
- def typed(v):
-  if v is None:return ['null']
-  if isinstance(v,bool):return ['boolean',v]
-  if isinstance(v,str):return ['string',v]
-  if isinstance(v,(int,float)):
-   if not math.isfinite(v):raise BridgeError('RECOVERY_NUMBER_INVALID')
-   return ['number',struct.pack('>d',0.0 if v==0 else float(v)).hex()]
-  if isinstance(v,list):return ['array',[typed(x) for x in v]]
-  if isinstance(v,dict):return ['object',[[k,typed(v[k])] for k in sorted(v,key=lambda x:x.encode('utf-16-be','surrogatepass'))]]
-  raise BridgeError('RECOVERY_VALUE_INVALID')
- return hashlib.sha256(json.dumps(typed(value),ensure_ascii=False,separators=(',',':'),allow_nan=False).encode()).hexdigest()
+from content_fingerprint import recovery_fingerprint
 class RecoverableClient(Client):
  def write(self,payload):
   # A new/empty local store is not proof that no earlier request exists.

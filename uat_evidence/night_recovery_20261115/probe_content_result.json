@@ -1,0 +1,48 @@
+{
+  "base_commit": "d496b967c9fe07491cd76a14ef3808bb1945ab93",
+  "mode": "OFFLINE_ONLY",
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "gap_closed": "The read-only probe checked submission/version structure but did not recompute listed SAVED request hashes from returned clinical content.",
+  "implementation": "Extract existing GAS-compatible recovery_fingerprint unchanged into a shared module. Recompute from raw read payload minus submission_id/submitted_at and require equality before returning the probe summary. Return only metadata; keep manual legacy/submission/audit reconciliation required.",
+  "reproduction_before": {
+    "tests": 3,
+    "failures": 2,
+    "passed": 1
+  },
+  "regression_after": {
+    "recovery_tests": 56,
+    "failures": 0
+  },
+  "new_evidence": [
+    "Unmodified payload saved through pinned V9 domain and recovery candidate agrees with the GAS-generated request fingerprint.",
+    "Changed clinical numeric value is rejected with COMMITTED_CONTENT_MISMATCH.",
+    "Added wholly fictional identifier marker is rejected before any summary, without masking before comparison.",
+    "Only list_requests/request_status/read_crf are called during each probe; offline records, revision and audits are unchanged."
+  ],
+  "fixture_maintenance": "Two existing positive probe fixtures now use content-matching hashes instead of placeholder hashes; their original structural/privacy expectations are retained.",
+  "source_sha256": {
+    "acl_review/server_recovery_candidate/content_fingerprint.py": "7740b99482e4172d09f39013fa3bb7ee6cd0629bfdef74dee54a7170d4e81e96",
+    "acl_review/server_recovery_candidate/recoverable_client.py": "6a79dedad553288b437d6c642f2a0ea3c0bfd9c909771fe69ac92a65c754c9c5",
+    "acl_review/server_recovery_candidate/readonly_probe.py": "35ecc6e88ec783fb39497305e0841b6e5a158c5bb3ca8cde2ce570d139c1636b",
+    "acl_review/server_recovery_candidate/test_probe_content.py": "75176fda7d7dda90f8f9dfeba01ae90e92f3b9c047e040ad130baa8c8462851e",
+    "acl_review/server_recovery_candidate/test_readonly_binding.py": "b34358085797dfde215077d8638a8f24bcb985903e4f77aee03c1c324b985592",
+    "acl_review/server_recovery_candidate/test_readonly_probe.py": "0299e7787845ad1b86bab81e3b451ce686a3780d96ec5b88490ab01e69392bcb"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "No live hash comparison, business transmission, keys or configuration access.",
+    "Legacy records without a listed request and audit-chain reconciliation remain manual; this does not establish listing completeness or authorize a v3 correction.",
+    "Candidate packaging must include the new content_fingerprint.py dependency before any separately approved reflection. Existing independent review does not cover this change.",
+    "Old-key rejection, approved live recovery, durable sixty-minute observation and formal QA remain incomplete.",
+    "Live 165 rows and audit were not remeasured."
+  ],
+  "continuation": "Reuse this content check and the actual-domain fixture evidence; do not claim formal UAT or live activation from offline success."
+}

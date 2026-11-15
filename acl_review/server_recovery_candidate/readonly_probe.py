@@ -1,6 +1,7 @@
 """Undeployed signed read-only probe. No business writes, no raw clinical output."""
 import time, hashlib, re
 from uat_b2_auth_bridge import signed_request
+from content_fingerprint import recovery_fingerprint
 SCOPE={'registration_id':'JUOG-971','facility_code':'TEST01','record_key':'JUOG-971|perioperative_30d|30d'}
 SHA='5b7c086bee4afe98efc8c140204110765f9f8b534422e4ebe273bd85c2a89fbe'
 ACL_END=1795100340  # 2026-11-19 23:59 JST
@@ -74,6 +75,9 @@ def probe(native_provider,transport,cfg,clock=time.time):
         record=by_submission.get(row['submission_id'])
         if row['state']=='SAVED':
             if record is None or record['record_version']!=row['expected_record_version']+1:raise PermissionError('COMMITTED_RECORD_MISMATCH')
+            payload=dict(record['payload'])
+            payload.pop('submission_id',None);payload.pop('submitted_at',None)
+            if recovery_fingerprint({'action':'save_crf','payload':payload})!=row['content_sha256']:raise PermissionError('COMMITTED_CONTENT_MISMATCH')
         elif record is not None:
             raise PermissionError('REQUEST_RECORD_STATE_MISMATCH')
     # Return only metadata; human reconciliation of legacy submissions is explicit.
