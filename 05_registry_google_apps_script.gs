@@ -344,9 +344,19 @@ function submitScreening_(p) {
     for (let r = 1; r < values.length; r++) {
       const row = values[r];
       if (String(row[idx.submission_id]) === String(p.submission_id)) {
-        const matched = findScreeningIdentity_(values, idx, p.facility_code, p.local_subject_code);
-        if (matched.error) return {ok:false, error:matched.error, screening_id:matched.screening_id || ''};
-        if (matched.rowNo !== r + 1) return {ok:false, error:'SUBMISSION_ID_IDENTITY_MISMATCH'};
+        // The same submission UUID may be retried after Screening was written
+        // but before ScreeningCRF was appended. In that case the original JSON
+        // snapshot is missing, so use this UUID + facility + candidate subject
+        // text check instead of requiring that missing snapshot.
+        const sameFacility = String(row[idx.facility_code] || '').trim().toUpperCase() ===
+          String(p.facility_code || '').trim().toUpperCase();
+        const storedCode = String(row[idx.local_subject_code] ?? '').trim();
+        const suppliedCode = String(p.local_subject_code ?? '').trim();
+        const numericAlias = /^\d+$/.test(storedCode) && /^\d+$/.test(suppliedCode) &&
+          storedCode.replace(/^0+(?=\d)/, '') === suppliedCode.replace(/^0+(?=\d)/, '');
+        if (!sameFacility || !(storedCode === suppliedCode || numericAlias)) {
+          return {ok:false, error:'SUBMISSION_ID_IDENTITY_MISMATCH'};
+        }
         const existingScreeningId = String(row[idx.screening_id]);
         const existingRound = parseInt(row[idx.review_round] || '1', 10) || 1;
         if (!submissionExistsInSheet_(SCREENING_CRF_SHEET, String(p.submission_id))) {
