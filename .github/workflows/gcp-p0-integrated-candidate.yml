@@ -1,0 +1,41 @@
+name: P0 integrated GCP data integrity + AUTH04 privacy (fictional, offline)
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  integrated-p0:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile the integrated candidate
+        run: |
+          cp 05_registry_google_apps_script.gs /tmp/juog_integrated_gas.js
+          node --check /tmp/juog_integrated_gas.js
+          python -m py_compile juog_common.py 01_registration_crf.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py
+      - name: Combined AUTH04 + GAS CRF/Audit save under simulated failures (21 scenarios)
+        run: node tests/test_crf_audit_recovery.mjs
+      - name: Frozen request UUID across all CRF frontend retries
+        run: python -m unittest discover -s tests -p "test_gcp_pending_submission.py" -v
+      - name: Actual GAS draft save/read and historical privacy masking
+        run: node tests/test_auth04_draft_end_to_end.mjs
+      - name: Actual GAS API error and privacy boundaries
+        run: |
+          node tests/test_auth04_error_boundary.mjs
+          node tests/test_auth04_privacy_guard.mjs
+          python -m unittest discover -s tests -p "test_auth04_screening_draft_privacy.py" -v
+      - name: Core screening and MDT regression tests
+        run: |
+          node tests/test_screening_identity.mjs
+          python -m unittest discover -s tests -p "test_mdt_integrated_ui.py" -v
+      - name: Evidence class and release status
+        run: |
+          echo "### INTEGRATED GCP P0 — OFFLINE ONLY" >> "$GITHUB_STEP_SUMMARY"
+          echo "PR branch source: PR #19 + PR #20 isolated candidates" >> "$GITHUB_STEP_SUMMARY"
+          echo "Real Streamlit/GAS/Sheets authenticated save/read/audit: **NOT EXECUTED**" >> "$GITHUB_STEP_SUMMARY"
+          echo "Independent QA acceptance: **NOT PERFORMED**" >> "$GITHUB_STEP_SUMMARY"
+          echo "Official UAT: PASS 32 / FAIL 1 / BLOCKED 29 / NOT RUN 5" >> "$GITHUB_STEP_SUMMARY"
+          echo "No actual patient records, credentials, web calls or spreadsheets were accessed." >> "$GITHUB_STEP_SUMMARY"
