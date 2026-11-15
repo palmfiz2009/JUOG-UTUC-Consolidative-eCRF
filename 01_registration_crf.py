@@ -4,6 +4,8 @@ import uuid
 from datetime import date
 import streamlit as st
 
+from screening_crf_receipt import render_receipt_html, render_receipt_text
+
 from juog_common import (
     FACILITY_NAMES,
     FACILITY_NAME_TO_CODE,
@@ -132,6 +134,18 @@ if st.session_state.screening_sent:
     if st.session_state.get("screening_id_reused"):
         st.info("既存のMDT受付番号を再利用しました。新しい受付番号は発行していません。")
     st.caption("正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。")
+    _receipt_html = st.session_state.get("screening_receipt_html")
+    if _receipt_html:
+        _safe_id = str(sid).replace("/", "_").replace("\\", "_")
+        st.download_button(
+            "📄 提出済み申請CRFの控えを保存（印刷・PDF保存用）",
+            data=_receipt_html.encode("utf-8"),
+            file_name=f"{_safe_id}_submitted_screening_crf.html",
+            mime="text/html",
+            use_container_width=True,
+            key="screening_receipt_download",
+        )
+        st.caption("保存したHTMLファイルをブラウザーで開くと、印刷またはPDF保存ができます。")
     if st.session_state.get("screening_email_failed"):
         st.warning("中央台帳への保存は完了していますが、通知メール送信に失敗しました。再申請はせず事務局へ連絡してください。")
     if st.session_state.get("screening_mdt_notify_failed"):
@@ -745,26 +759,18 @@ if st.button("📨 中央MDT審査を申請", type="primary", use_container_widt
     else:
         screening_id = reg_result.get("screening_id", "")
         screening_payload["screening_id"] = screening_id
-        report = f"""【JUOG 中央MDT審査申請】
-MDT審査受付番号: {screening_id}
-施設: {facility_name}
-施設内研究対象者識別コード: {text(local_subject_code)}
-担当者: {text(reporter_email)}
-申請ID: {submission_id}
-
-EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
-最良総合効果: {best_effect}
-最初の病勢制御確認日: {date_str(first_control_date)}
-施設判定RECIST: {central_recist}
-予定術式: {planned_surgery}
-手術予定日: {date_str(surgery_date)}
-
-{json_block(screening_payload)}
-"""
+        # Receipt is generated from the confirmed submission payload, never
+        # from subsequent widget edits. JSON stays in the central CRF snapshot
+        # and audit record; it is not dumped into applicants' emails.
+        _round = int(reg_result.get("review_round") or 1)
+        _receipt_text = render_receipt_text(screening_payload, _round)
+        _receipt_html = render_receipt_html(screening_payload, _round)
+        st.session_state["screening_receipt_html"] = _receipt_html
         sent, err = send_email(
-            f"【JUOG MDT申請】【{screening_id}】【{facility_name}】",
-            report,
+            f"【JUOG-UTUC01】中央MDT申請受付・申請CRF控え【{screening_id}】",
+            _receipt_text,
             reporter_email,
+            html_content=_receipt_html,
         )
         # New review rounds notify all three MDT reviewers; a network replay
         # of the same submission UUID does not send duplicate emails.
