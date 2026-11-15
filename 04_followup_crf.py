@@ -543,7 +543,10 @@ def _render_followup_crf():
         key="fu_submit_button",
     )
     if submit_clicked and _pending:
-        submit_crf_with_feedback(page="fu", registration_id=registration_id)
+        submit_crf_with_feedback(
+        page="fu", registration_id=registration_id,
+        current_visit=visit_month.replace("ヶ月（終了）", "m").replace("ヶ月", "m"),
+    )
     elif submit_clicked:
         if missing or errors:
             st.error("未入力または入力エラーを修正してください。")
