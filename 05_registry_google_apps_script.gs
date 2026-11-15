@@ -1448,20 +1448,58 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
     return {ok:true, existing:true, record_version:Number(row[idx.record_version] || 1), submission_id:submissionId};
   }
 
-  const priorCount = values.slice(1).filter(row =>
-    String(row[idx.record_key] || '') === recordKey).length;
+  const priorRows = values.slice(1).filter(row =>
+    String(row[idx.record_key] || '') === recordKey);
+  const priorCount = priorRows.length;
   if (enforceVersionRules) {
-    // Prevent time-of-check/time-of-use races between 30d edits and 90d/FUP saves.
-    // The existing saveCrf_ ScriptLock is still held here. Prior UUID replay is
-    // handled above, so a confirmed old submission can be safely recovered.
-    const sourceCheck = validateDay90SourceLink_(payload);
-    if (!sourceCheck.ok) return sourceCheck;
     if (kind === '初回報告' && priorCount > 0)
       return {ok:false, error:'INITIAL_ALREADY_EXISTS', message:'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
     if (kind === '訂正報告' && priorCount === 0)
       return {ok:false, error:'NO_PRIOR_RECORD_FOR_CORRECTION', message:'訂正対象となる既存報告がありません。'};
     if (kind === '訂正報告' && !String(payload.correction_reason || '').trim())
       return {ok:false, error:'MISSING_CORRECTION_REASON'};
+
+    if (kind === '訂正報告') {
+      // Browser/session loss can lose the original UUID. Compare against the
+      // latest fully audited CRF without exposing clinical data or writing a
+      // new version. This cannot recover a DIFFERENT pending request.
+      const versions = priorRows.map(row => Number(row[idx.record_version]));
+      if (versions.some(v => !Number.isSafeInteger(v) || v < 1) ||
+          new Set(versions).size !== versions.length ||
+          Math.max(...versions) !== priorCount) {
+        return {ok:false, error:'PREVIOUS_CRF_HISTORY_INCONSISTENT'};
+      }
+      const lastVersion = priorCount;
+      const lastRow = priorRows.find(row => Number(row[idx.record_version]) === lastVersion);
+      let previous;
+      try {
+        previous = JSON.parse(String(lastRow[idx.payload_json] || ''));
+      } catch (_err) {
+        return {ok:false, error:'PREVIOUS_CRF_PAYLOAD_UNREADABLE'};
+      }
+      if (!previous || typeof previous !== 'object' || Array.isArray(previous) ||
+          String(previous.submission_id || '') !== String(lastRow[idx.submission_id] || '') ||
+          String(previous.record_key || '') !== recordKey ||
+          String(previous.registration_id || '') !== String(payload.registration_id || '') ||
+          String(previous.facility_code || '') !== String(payload.facility_code || '')) {
+        return {ok:false, error:'PREVIOUS_CRF_PAYLOAD_MISMATCH'};
+      }
+      // Inspect only: a different request must NOT silently repair/alter a
+      // preceding unconfirmed submission. Same-UUID retry can repair it.
+      const previousAudit = ensureCrfAuditRow_(ss, sheetName, previous,
+        lastVersion, {repairMissing:false});
+      if (!previousAudit.ok) {
+        return {ok:false, error:'PREVIOUS_CRF_AUDIT_UNCONFIRMED'};
+      }
+      if (semanticallySameCrf_(previous, payload)) {
+        return {ok:false, error:'DUPLICATE_CONTENT_ALREADY_RECORDED',
+          record_version:lastVersion, existing:true};
+      }
+    }
+    // Prevent time-of-check/time-of-use races between 30d edits and 90d/FUP
+    // saves. The ScriptLock is held and the source is checked for new writes.
+    const sourceCheck = validateDay90SourceLink_(payload);
+    if (!sourceCheck.ok) return sourceCheck;
   }
 
   const version = priorCount + 1;
@@ -1490,6 +1528,29 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   }
   SpreadsheetApp.flush();
   return {ok:true, existing:false, record_version:version, submission_id:submissionId};
+}
+
+/** Compare clinical/metadata content while excluding only ephemeral request ID
+ * and submitted_at timestamp. Do not compare just a hash/partial field subset. */
+function semanticallySameCrf_(a, b) {
+  const canonical = value => {
+    if (Array.isArray(value)) return value.map(canonical);
+    if (value && typeof value === 'object') {
+      const out = {};
+      Object.keys(value).sort().forEach(k => {
+        if (value[k] !== undefined) out[k] = canonical(value[k]);
+      });
+      return out;
+    }
+    return value;
+  };
+  const removeTransport = value => {
+    const obj = Object.assign({}, value || {});
+    delete obj.submission_id;
+    delete obj.submitted_at;
+    return canonical(obj);
+  };
+  return JSON.stringify(removeTransport(a)) === JSON.stringify(removeTransport(b));
 }
 
 /** Check the CRF persisted exactly once before acknowledging or auditing it. */
@@ -1522,7 +1583,7 @@ function verifySavedCrfRow_(sh, payload, version) {
 /** Validate and repair a missing audit row on same-UUID retry under ScriptLock.
  * If a matching audit row exists, never add another audit event.
  * If an audit row conflicts or the readback is missing, do not report success. */
-function ensureCrfAuditRow_(ss, sheetName, payload, version) {
+function ensureCrfAuditRow_(ss, sheetName, payload, version, options) {
   try {
     const sh = ss.getSheetByName(CRF_AUDIT_SHEET);
     if (!sh) return {ok:false, error:'CRF_AUDIT_SHEET_NOT_FOUND'};
@@ -1552,6 +1613,9 @@ function ensureCrfAuditRow_(ss, sheetName, payload, version) {
     };
     const first = scan();
     if (!first.ok || first.existing) return first;
+    if (options && options.repairMissing === false) {
+      return {ok:false, error:'CRF_AUDIT_MISSING_PREVIOUS'};
+    }
     appendByHeaders_(sh, {
       saved_at:new Date(), sheet_name:sheetName, record_key:String(payload.record_key || ''),
       record_version:Number(version), submission_id:String(payload.submission_id || ''),
