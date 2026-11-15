@@ -26,7 +26,12 @@ def pending_attempt(page: str, session_state):
     state = session_state.get(attempt_key(page))
     if not isinstance(state, dict):
         return None
-    return state if state.get("status") in ("prepared", "uncertain", "saving") else None
+    # A previous server request could be interrupted before its final rerun.
+    # On the next user interaction allow a same-UUID confirmation retry instead
+    # of leaving the submit button permanently disabled.
+    if state.get("status") == "saving":
+        state["status"] = "uncertain"
+    return state if state.get("status") in ("prepared", "uncertain") else None
 
 
 def submit_crf_with_feedback(
