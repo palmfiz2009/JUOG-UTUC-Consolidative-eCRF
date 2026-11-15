@@ -8,6 +8,13 @@ const start = code.indexOf("function savePayloadToSheet_(sheetName, payload, enf
 const stop = code.indexOf("function submissionExistsInSheet_(sheetName, submissionId) {", start);
 assert(start >= 0 && stop > start, "must test the REAL GAS save and audit functions");
 const source = code.slice(start, stop);
+const privacyStart = code.indexOf("function directIdentifierKey_(key) {");
+const privacyStop = code.indexOf("function isCn1Only_(cT, cN, cM) {",privacyStart);
+assert(privacyStart > 0 && privacyStop > privacyStart,"integrated AUTH-04 privacy guard required");
+const containsDirectIdentifier = new Function(
+  code.slice(privacyStart,privacyStop)+"\nreturn containsDirectIdentifier_;"
+)();
+
 
 const CRF_FIELDS = [
   "saved_at", "record_version", "submission_id", "record_key", "submission_kind",
@@ -92,7 +99,7 @@ function createFixture() {
   assert(crfSourceStart >= 0 && crfSourceStart < start);
   const crfSource = code.slice(crfSourceStart, start);
   const saveDeps = {
-    containsDirectIdentifier_:()=>false,
+    containsDirectIdentifier_:containsDirectIdentifier,
     crfSheetForType_:()=> "CRF_30d",
     validateSubject_:()=>({ok:true}),
     validateCrfHardStops_:()=>({ok:true}),
@@ -258,4 +265,35 @@ check("stale source rejected under lock, but same UUID replay bypasses fresh che
   assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),1);
   assert.deepEqual(f.sourceEvents,[true,true]);
 });
-console.log("ALL 18 OFFLINE GCP DATA INTEGRITY CASES PASSED");
+check("integrated: direct identifier is blocked before CRF/audit write",()=>{
+  const f=createFixture();
+  const forbidden=make("fictional-privacy-denial","初回報告",{
+    data:{reg_birth_date:{type:"date",value:"1980-01-02"}}
+  });
+  const a=f.saveCrf(forbidden);
+  assert.equal(a.ok,false);
+  assert.equal(a.error,"DIRECT_IDENTIFIER_NOT_ALLOWED");
+  assert.equal(f.crfRows(),0);assert.equal(f.auditRows(),0);
+  assert.deepEqual(f.sourceEvents,[]);
+  assert.equal(f.flags.lockHeld,false);
+});
+check("integrated: permitted clinical date writes once with verified audit",()=>{
+  const f=createFixture(),p=make("fictional-clinical-date","初回報告",{
+    data:{consent_date:"2026-11-01",birth_year_month:"1980-01",age_at_consent:46}
+  });
+  const a=f.saveCrf(p);
+  assert.equal(a.ok,true);assert.equal(a.record_version,1);
+  assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),1);
+});
+check("integrated: allowed payload audit failure restores on same-UUID replay",()=>{
+  const f=createFixture(),p=make("fictional-retry-after-audit-error");
+  f.flags.throwAuditOnce=true;
+  const a=f.saveCrf(p);
+  assert.equal(a.ok,false);assert.equal(a.error,"CRF_AUDIT_UNCONFIRMED");
+  assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),0);
+  const b=f.saveCrf(p);
+  assert.equal(b.ok,true);assert.equal(b.existing,true);
+  assert.equal(b.record_version,1);
+  assert.equal(f.crfRows(),1);assert.equal(f.auditRows(),1);
+});
+console.log("ALL 21 OFFLINE INTEGRATED GCP DATA INTEGRITY CASES PASSED");
