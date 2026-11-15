@@ -117,3 +117,22 @@ assert.equal(verified({...original,payload:{data:{surgery_performed:"実施し�
 assert.equal(verified(original)({...followup,data:{source_30d_linked:false}}).error,"SOURCE_CRF_LINK_REQUIRED");
 assert(verified(original)({crf_type:"day90",data:{source_30d_linked:false}}).ok);
 console.log("PASS follow-up source linkage / changed reference / manual 90-day");
+
+{
+  // Confirm backend_info exposes the exact bound workbook for the pinned
+  // Streamlit check. Fictional ID only; no Google API is contacted.
+  const infoCode=extract("function getBackendInfo_() {", "// Privacy safeguard:");
+  const getBackendInfo=new Function("getSpreadsheet_","BACKEND_VERSION","TIMEZONE","Utilities",
+    infoCode+"\\nreturn getBackendInfo_;"
+  )(
+    ()=>({getName:()=>"TEST_FICTIONAL_EDC",getId:()=>"isolated-fixture-sheet"}),
+    "v2.2.10","Asia/Tokyo",
+    {formatDate:()=>"2026-11-16T07:00:00+09:00"}
+  );
+  const info=getBackendInfo();
+  assert.equal(info.ok,true);
+  assert.equal(info.backend_version,"v2.2.10");
+  assert.equal(info.spreadsheet_id,"isolated-fixture-sheet");
+  assert.equal(info.environment,"TEST");
+  console.log("PASS authenticated backend workbook binding (fictional)");
+}
