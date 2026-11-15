@@ -1,4 +1,5 @@
-JUOG UTUC Consolidative eCRF v2.2.9
-STATUS: INTEGRATED REVIEW CANDIDATE / NOT DEPLOYED
-Contains existing v2.2.8 behavior plus MDT clinical-history visibility, stable screening IDs, correction prefills, stale RECIST display mitigation and final MDT result emails.
-DEPLOYMENT GATES: isolated app/sheet integration tests, production GAS version deployment, correct Streamlit branch, role tokens, approved notification recipients and owner sign-off. No change to eligibility criteria.
+JUOG UTUC Consolidative eCRF v2.2.10-candidate
+STATUS: DRAFT REVIEW ONLY / NOT DEPLOYED
+Requires coordinated deployment of Streamlit frontend and GAS backend v2.2.10; previous production v2.2.9 is intentionally not accepted for official submit after this candidate is activated.
+Unified fragment UI / local save progress for perioperative_30d, day90 and followup forms. Same-UUID retry is session-scoped. GAS candidate repairs missing audit on replay, validates followup 30-day linkage under save lock. Existing data and clinical schema unchanged.
+RELEASE GATES: isolated real GAS/Sheets/Streamlit/SMTP UAT, manual QA and owner signoff, backup and rollback rehearsal, deployment matching confirmed, no outstanding critical defects. Never use real patient data for UAT.
