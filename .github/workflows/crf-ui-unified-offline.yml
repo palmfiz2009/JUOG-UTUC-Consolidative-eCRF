@@ -1,0 +1,38 @@
+name: Shared CRF UX checks — isolated fictional data
+on:
+  push:
+    branches:
+      - review/crf30-90-followup-unified-save-20261115
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  crf-ui-static:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python syntax — all EDC pages and UI helper
+        run: python -m py_compile streamlit_app.py 01_registration_crf.py 02_perioperative_30d_crf.py 03_day90_crf.py 04_followup_crf.py 05_admin_mdt_registration.py 06_mdt_reviewer.py juog_common.py juog_crf_save_ui.py
+      - name: Install Streamlit for isolated render smoke
+        run: python -m pip install -r requirements.txt
+      - name: Bootstrap each CRF through Streamlit AppTest (no submissions)
+        run: python -m unittest discover -s tests -p "test_crf_app_boot.py" -v
+      - name: Post-registration CRF interaction tests (fictional, offline)
+        run: python -m unittest discover -s tests -p "test_crf_save_ui.py" -v
+      - name: Three-page fragment/static guard tests
+        run: python -m unittest discover -s tests -p "test_all_crf_fragments.py" -v
+      - name: Screening and MDT baseline tests
+        run: |
+          python -m unittest discover -s tests -p "test_screening_crf_receipt.py" -v
+          python -m unittest discover -s tests -p "test_screening_ui_contract.py" -v
+          python -m unittest discover -s tests -p "test_mdt_integrated_ui.py" -v
+      - name: Registry backend syntax and screening UUID replay regressions
+        run: |
+          cp 05_registry_google_apps_script.gs /tmp/juog_backend_check.js
+          node --check /tmp/juog_backend_check.js
+          node tests/test_screening_identity.mjs
+          node tests/test_crf_audit_repair.mjs

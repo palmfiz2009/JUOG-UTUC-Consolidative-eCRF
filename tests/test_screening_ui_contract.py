@@ -43,7 +43,7 @@ class ScreeningUiContractTests(unittest.TestCase):
     def test_backend_version_is_verified_before_mutation(self):
         text = self.source
         self.assertIn('registry_call("backend_info")', text)
-        self.assertIn('_backend.get("backend_version") != "v2.2.9"', text)
+        self.assertIn('_backend.get("backend_version") != "v2.2.10"', text)
         self.assertLess(
             text.rfind('registry_call("backend_info")'),
             text.rfind('registry_call("submit_screening", _pending["request"])'),

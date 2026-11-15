@@ -24,7 +24,7 @@ const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
 const CRF_DRAFT_SHEET = 'CRF_Drafts';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
-const BACKEND_VERSION = 'v2.2.9';
+const BACKEND_VERSION = 'v2.2.10';
 
 const REVIEWER_ROLES = ['radiology', 'medical_oncology', 'urology'];
 
@@ -943,33 +943,49 @@ function getCrfLinkage_(p) {
 
 
 function validateDay90SourceLink_(payload) {
+  // Both 90-day and follow-up CRFs depend on the most recent 30-day CRF.
+  // Check under the save lock, not before it; revisions cannot interleave.
+  const type = String(payload.crf_type || '');
+  if (type !== 'day90' && type !== 'followup') return {ok:true};
   const data = payload.data || {};
-  if (String(payload.crf_type || '') !== 'day90') return {ok:true};
-  if (data.source_30d_linked !== true) return {ok:true};
+  if (type === 'day90' && data.source_30d_linked !== true) return {ok:true};
+  if (type === 'followup' && data.source_30d_linked !== true) {
+    return {ok:false, error:'SOURCE_CRF_LINK_REQUIRED', message:'定期経過CRFは30日CRFとの連携が必要です。'};
+  }
 
   const id = String(payload.registration_id || '').trim().toUpperCase();
   const latest = getLatestCrfPayload_(CRF_30D_SHEET, id, 'perioperative_30d');
   if (!latest.ok) return latest;
-  if (!latest.found) {
-    return {ok:false, error:'SOURCE_CRF_MISSING', message:'参照元の周術期・30日CRFが見つかりません。'};
-  }
-
+  if (!latest.found) return {
+    ok:false, error:'SOURCE_CRF_MISSING', message:'参照元の周術期・30日CRFが見つかりません。'
+  };
   const expectedVersion = Number(data.source_30d_record_version || 0);
   const expectedSubmissionId = String(data.source_30d_submission_id || '');
-
-  if (
-    Number(latest.record_version || 0) !== expectedVersion ||
-    String(latest.submission_id || '') !== expectedSubmissionId
-  ) {
+  if (Number(latest.record_version || 0) !== expectedVersion ||
+      String(latest.submission_id || '') !== expectedSubmissionId) {
     return {
-      ok:false,
-      error:'SOURCE_CRF_UPDATED',
-      message:'参照元の周術期・30日CRFが更新されています。90日CRFで「既存情報を取得」をやり直してください。'
+      ok:false, error:'SOURCE_CRF_UPDATED',
+      message:'参照元の周術期・30日CRFが更新されています。既存情報を再取得してください。'
     };
+  }
+
+  if (type === 'followup') {
+    const original = (latest.payload && latest.payload.data) || {};
+    const surgery = String(original.surgery_performed || '');
+    const reference = surgery === '実施した'
+      ? String(original.operation_date || original.reference_date || '')
+      : String(original.reference_date || '');
+    if (String(payload.facility_code || '') !== String(latest.facility_code || '') ||
+        surgery !== String(data.surgery_performed || '') ||
+        reference.slice(0,10) !== String(data.reference_date || '').slice(0,10)) {
+      return {
+        ok:false, error:'SOURCE_CRF_LINK_MISMATCH',
+        message:'30日CRFの施設・手術実施情報・基準日が一致しません。既存情報を再取得してください。'
+      };
+    }
   }
   return {ok:true};
 }
-
 
 function draftKey_(registrationId, crfType, visit) {
   return [
@@ -1386,9 +1402,6 @@ function saveCrf_(p) {
   const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
   if (!validation.ok) return validation;
 
-  const sourceCheck = validateDay90SourceLink_(payload);
-  if (!sourceCheck.ok) return sourceCheck;
-
   const hardCheck = validateCrfHardStops_(payload, validation);
   if (!hardCheck.ok) return hardCheck;
 
@@ -1428,12 +1441,19 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
         const isSamePayload = String(row[idx.payload_json] || '') === JSON.stringify(payload);
         if (!isSameKey || !isSameSubject || !isSameSite || !isSamePayload) return {ok:false, error:'SUBMISSION_ID_CONFLICT'};
       }
+      if (enforceVersionRules) {
+        const auditCheck = ensureCrfAuditRow_(ss, sheetName, payload,
+          Number(row[idx.record_version] || 1));
+        if (!auditCheck.ok) return auditCheck;
+      }
       return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId};
     }
     if (String(row[idx.record_key] || '') === recordKey) priorCount++;
   }
 
   if (enforceVersionRules) {
+    const sourceCheck = validateDay90SourceLink_(payload);
+    if (!sourceCheck.ok) return sourceCheck;
     if (kind === '初回報告' && priorCount > 0) return {ok: false, error: 'INITIAL_ALREADY_EXISTS', message: 'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
     if (kind === '訂正報告' && priorCount === 0) return {ok: false, error: 'NO_PRIOR_RECORD_FOR_CORRECTION', message: '訂正対象となる既存報告がありません。'};
     if (kind === '訂正報告' && !String(payload.correction_reason || '').trim()) return {ok: false, error: 'MISSING_CORRECTION_REASON'};
@@ -1454,14 +1474,52 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   ensureDynamicHeaders_(sh, Object.keys(rowObj));
   appendByHeaders_(sh, rowObj);
 
-  if (sheetName !== SCREENING_CRF_SHEET) {
-    appendByHeaders_(ss.getSheetByName(CRF_AUDIT_SHEET), {
-      saved_at: new Date(), sheet_name: sheetName, record_key: recordKey, record_version: version,
-      submission_id: submissionId, submission_kind: kind, registration_id: String(payload.registration_id || ''), facility_code: String(payload.facility_code || '')
-    });
+  if (enforceVersionRules) {
+    const auditCheck = ensureCrfAuditRow_(ss, sheetName, payload, version);
+    if (!auditCheck.ok) return auditCheck;
   }
   SpreadsheetApp.flush();
   return {ok: true, existing: false, record_version: version, submission_id: submissionId};
+}
+
+/** Recover a missing audit row after the CRF body was saved but auditing failed.
+ * Executed under saveCrf_ ScriptLock; never creates another CRF version. */
+function ensureCrfAuditRow_(ss, sheetName, payload, version) {
+  const sh = ss.getSheetByName(CRF_AUDIT_SHEET);
+  if (!sh) return {ok:false, error:'CRF_AUDIT_SHEET_NOT_FOUND'};
+  const rows = sh.getDataRange().getValues();
+  if (!rows || rows.length < 1) return {ok:false, error:'CRF_AUDIT_SCHEMA_MISSING'};
+  const idx = headerIndex_(rows[0]);
+  const necessary = ['submission_id','sheet_name','record_key','record_version',
+    'registration_id','facility_code'];
+  if (necessary.some(k => idx[k] === undefined)) {
+    return {ok:false, error:'CRF_AUDIT_SCHEMA_INCOMPLETE'};
+  }
+  const submissionId = String(payload.submission_id || '').trim();
+  const matches = rows.slice(1).filter(row =>
+    String(row[idx.submission_id] || '') === submissionId);
+  if (matches.length > 1) return {ok:false, error:'CRF_AUDIT_DUPLICATE_UUID'};
+  if (matches.length === 1) {
+    const row = matches[0];
+    if (String(row[idx.sheet_name] || '') !== String(sheetName) ||
+        String(row[idx.record_key] || '') !== String(payload.record_key || '') ||
+        Number(row[idx.record_version] || 0) !== Number(version) ||
+        String(row[idx.registration_id] || '') !== String(payload.registration_id || '') ||
+        String(row[idx.facility_code] || '') !== String(payload.facility_code || '')) {
+      return {ok:false, error:'CRF_AUDIT_UUID_CONFLICT'};
+    }
+    return {ok:true, existing:true};
+  }
+  appendByHeaders_(sh, {
+    saved_at: new Date(), sheet_name: sheetName,
+    record_key: String(payload.record_key || ''), record_version: Number(version),
+    submission_id: submissionId,
+    submission_kind: String(payload.submission_kind || ''),
+    registration_id: String(payload.registration_id || ''),
+    facility_code: String(payload.facility_code || '')
+  });
+  SpreadsheetApp.flush();
+  return {ok:true, existing:false};
 }
 
 function submissionExistsInSheet_(sheetName, submissionId) {
