@@ -1,0 +1,53 @@
+{
+  "base_commit": "137a9404a6840df1ef901a27fb78746b10204be7",
+  "mode": "OFFLINE_ONLY",
+  "deployed": false,
+  "live_calls": 0,
+  "independent_review": false,
+  "defect": "A response arriving after the verified identity changed or disappeared could be accepted; reads returned records and prepare responses advanced local state before the next authentication check.",
+  "fix": "Revalidate the bound identity after transport returns and before consuming the response. On failure invalidate the observed record version, retain any uncertain attempt, and raise a constant error. No retries or execute calls are added.",
+  "reproduction_before": {
+    "tests": 4,
+    "failures": 3,
+    "passed": 1
+  },
+  "regression_after": {
+    "canonical_save_tests": 27,
+    "recovery_tests": 48,
+    "total": 75,
+    "failures": 0
+  },
+  "new_conditions": [
+    "Delayed read response is rejected after a synthetic principal change; no result returned and observed version remains unset.",
+    "Delayed read response is rejected after native identity disappears; no result returned and observed version remains unset.",
+    "Delayed prepare response after principal change leaves PREPARING with no operation binding, sends no execute and creates no business audit.",
+    "Unchanged synthetic identity still completes save and readback with one audit."
+  ],
+  "safety": {
+    "network_transport": "local Node subprocess with fictional in-memory fixture only",
+    "configuration_changed": false,
+    "acl_changed": false,
+    "uat_ledger_changed": false,
+    "live_165_rows_accessed": false
+  },
+  "source_sha256": {
+    "acl_review/canonical_v9_save_candidate/client.py": "5db1234868c927a26911442c9342e4243adaac5cfc0ca724995b2606726ab612",
+    "acl_review/canonical_v9_save_candidate/test_response_identity.py": "608726f75e303f13c599d41fcb4ee69fb3acf5f3970fbd5707f584ecd04ba983"
+  },
+  "formal_uat": {
+    "PASS": 32,
+    "FAIL": 1,
+    "BLOCKED": 29,
+    "NOT_RUN": 5,
+    "new_pass": 0
+  },
+  "limitations": [
+    "Timing changes were injected in offline transport, not observed in production or isolated live infrastructure.",
+    "Identity validation relies on the native provider; this change does not prove live logout, key rotation or ACL behavior.",
+    "Local SQLite remains a regression store, not an approved durable Streamlit store.",
+    "Old-key signature rejection, approved live recovery, durable sixty-minute observation and formal QA remain incomplete.",
+    "Live 165 rows and audit were not remeasured; no live environment was accessed.",
+    "No deployment or independent technical/QA approval is claimed."
+  ],
+  "continuation": "Do not repeat these tests as new UAT progress. Recovery candidates remain undeployed; retain communication stop. Review other response/state boundaries only where a new defect is demonstrated."
+}

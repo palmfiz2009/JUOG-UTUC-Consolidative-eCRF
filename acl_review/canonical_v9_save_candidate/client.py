@@ -25,7 +25,15 @@ class Client:
   return hashlib.sha256(canonical(identity).encode()).hexdigest()
  def call(self,action,payload):
   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')
-  return self.transport(action,payload)
+  result=self.transport(action,payload)
+  # A delayed response belongs to the actor that sent the request. Recheck
+  # native authentication before exposing it or advancing local recovery state.
+  try:
+   if self._identity_hash()!=self.actor:raise BridgeError('PRINCIPAL_CHANGED')
+  except Exception:
+   self.observed=None
+   raise
+  return result
  def close(self):self.db.close()
  def _read_records(self):
   """Internal integrity check input; never return unredacted content to UI."""
