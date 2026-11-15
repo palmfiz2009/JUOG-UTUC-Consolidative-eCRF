@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from copy import deepcopy
 import re
 import ssl
 import urllib.request
@@ -347,6 +348,55 @@ def make_submission_metadata(crf_type: str, visit: str, registration_id: str, fa
         "reporter_email": reporter_email,
     }
 
+
+
+# The backend uses submission_id as the idempotency key. Until a failed save
+# has been reconciled, retries must reuse the exact SAME request body and UUID.
+# This is session-local protection, not durable across a lost browser session.
+def freeze_crf_submission_attempt(session_state, slot: str, proposed_payload: dict):
+    """Return a frozen payload for a same-content retry, or a safe blocking error.
+
+    If the save result is unknown (network/audit error), do not accept changed
+    data under an old UUID or create a fresh UUID that could create a second
+    CRF version. The caller must not regenerate/modify the returned snapshot.
+    """
+    proposed = deepcopy(proposed_payload)
+    comparison = deepcopy(proposed)
+    comparison.pop("submission_id", None)
+    comparison.pop("submitted_at", None)
+    semantic = json.dumps(comparison, ensure_ascii=False, sort_keys=True, default=str)
+    pending = session_state.get(slot)
+    if pending is not None:
+        if not isinstance(pending, dict) or not isinstance(pending.get("payload"), dict):
+            return None, "以前の送信状態を照合できません。事務局にご連絡ください。"
+        if pending.get("semantic") != semantic:
+            return None, (
+                "前回の保存結果が未確認です。入力内容を変更して再送信すると"
+                "重複登録につながるおそれがあります。同じ内容で再送するか、"
+                "事務局に保存状態を確認してください。"
+            )
+        return deepcopy(pending["payload"]), ""
+    session_state[slot] = {"semantic": semantic, "payload": proposed}
+    return deepcopy(proposed), ""
+
+
+# Errors returned before any CRF write by the GAS implementation.
+# Unknown errors, audit failures, timeouts, etc. MUST retain the frozen UUID.
+_CRV_DEFINITIVE_NO_WRITE_ERRORS = frozenset({
+    "MISSING_PAYLOAD", "DIRECT_IDENTIFIER_NOT_ALLOWED", "UNSUPPORTED_CRF_TYPE",
+    "INVALID_ID_FORMAT", "MISSING_SUBMISSION_METADATA", "RECORD_KEY_MISMATCH",
+    "INITIAL_ALREADY_EXISTS", "NO_PRIOR_RECORD_FOR_CORRECTION",
+    "MISSING_CORRECTION_REASON", "VALIDATION_FAILED",
+})
+
+
+def release_crf_attempt_if_certainly_rejected(session_state, slot: str, result: dict):
+    """Permit edited retry only for explicit pre-write, definitive rejections."""
+    error = str((result or {}).get("error") or "")
+    if not (result or {}).get("ok") and error in _CRV_DEFINITIVE_NO_WRITE_ERRORS:
+        session_state.pop(slot, None)
+        return True
+    return False
 
 def json_block(payload: dict) -> str:
     return "--- MACHINE_READABLE_JSON_START ---\n" + json.dumps(payload, ensure_ascii=False, separators=(",", ":"), default=str) + "\n--- MACHINE_READABLE_JSON_END ---"
