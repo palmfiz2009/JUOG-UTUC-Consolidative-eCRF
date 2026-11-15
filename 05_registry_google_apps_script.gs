@@ -237,6 +237,73 @@ function doPost(e) {
   }
 }
 
+
+/** Look up the uncoerced subject code in the submitted, append-only CRF JSON.
+ * The Screening sheet can silently change "01" into numeric 1. */
+function screeningOriginalSubjectCodes_(ids) {
+  const requested = new Set(ids.map(x => String(x || '').trim().toUpperCase()));
+  const found = {}, conflict = new Set();
+  if (!requested.size) return {found:found, conflict:conflict};
+  const sh = getSpreadsheet_().getSheetByName(SCREENING_CRF_SHEET);
+  if (!sh || sh.getLastRow() < 2) return {found:found, conflict:conflict};
+  const rows = sh.getDataRange().getValues(), idx = headerIndex_(rows[0]);
+  if (idx.screening_id === undefined || idx.payload_json === undefined)
+    return {found:found, conflict:conflict};
+  rows.slice(1).forEach(row => {
+    const id = String(row[idx.screening_id] || '').trim().toUpperCase();
+    if (!requested.has(id)) return;
+    try {
+      const payload = JSON.parse(String(row[idx.payload_json] || '{}'));
+      const code = String(payload.local_subject_code ||
+        (payload.data || {}).local_subject_code || '').trim();
+      if (!code || (Object.prototype.hasOwnProperty.call(found, id) && found[id] !== code))
+        conflict.add(id);
+      else found[id] = code;
+    } catch (_e) { conflict.add(id); }
+  });
+  return {found:found, conflict:conflict};
+}
+
+/** Select the existing active JUOG-SCR ID; never recycle a VOID or create a
+ * new identifier while an ambiguous historical identifier is unresolved. */
+function findScreeningIdentity_(rows, idx, facilityRaw, subjectRaw) {
+  const facility = String(facilityRaw || '').trim().toUpperCase();
+  const subject = String(subjectRaw || '').trim();
+  const numberLike = /^\d+$/.test(subject);
+  const compact = value => String(value).replace(/^0+(?=\d)/, '');
+  const hits = [];
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (String(row[idx.facility_code] || '').trim().toUpperCase() !== facility) continue;
+    const stored = String(row[idx.local_subject_code] ?? '').trim();
+    if (stored !== subject &&
+        !(numberLike && /^\d+$/.test(stored) && compact(stored) === compact(subject))) continue;
+    hits.push({rowNo:r+1, row:row, stored:stored,
+      id:String(row[idx.screening_id] || '').trim().toUpperCase()});
+  }
+  if (!hits.length) return {rowNo:0};
+  const numeric = hits.filter(x => numberLike && /^\d+$/.test(x.stored));
+  const originals = screeningOriginalSubjectCodes_(numeric.map(x => x.id));
+  const matches = [];
+  for (const hit of hits) {
+    if (numberLike && /^\d+$/.test(hit.stored)) {
+      if (originals.conflict.has(hit.id) || !Object.prototype.hasOwnProperty.call(originals.found, hit.id))
+        return {error:'SCREENING_IDENTITY_UNVERIFIABLE', screening_id:hit.id};
+      if (originals.found[hit.id] !== subject) continue;
+    }
+    matches.push(hit);
+  }
+  if (!matches.length) return {rowNo:0};
+  const active = matches.filter(x => String(x.row[idx.status] || 'PENDING').toUpperCase() !== 'VOID');
+  if (active.length > 1) return {error:'DUPLICATE_ACTIVE_SCREENING_IDENTITY'};
+  if (!active.length) return {error:'SCREENING_IDENTITY_VOIDED',
+    screening_id:matches[matches.length-1].id};
+  const hit = active[0];
+  return {rowNo:hit.rowNo, screening_id:hit.id,
+    review_round:parseInt(hit.row[idx.review_round] || '1', 10) || 1,
+    status:String(hit.row[idx.status] || 'PENDING').toUpperCase()};
+}
+
 function submitScreening_(p) {
   const required = [
     'facility_code', 'facility_name', 'local_subject_code', 'reporter_email',
@@ -277,6 +344,9 @@ function submitScreening_(p) {
     for (let r = 1; r < values.length; r++) {
       const row = values[r];
       if (String(row[idx.submission_id]) === String(p.submission_id)) {
+        const matched = findScreeningIdentity_(values, idx, p.facility_code, p.local_subject_code);
+        if (matched.error) return {ok:false, error:matched.error, screening_id:matched.screening_id || ''};
+        if (matched.rowNo !== r + 1) return {ok:false, error:'SUBMISSION_ID_IDENTITY_MISMATCH'};
         const existingScreeningId = String(row[idx.screening_id]);
         const existingRound = parseInt(row[idx.review_round] || '1', 10) || 1;
         if (!submissionExistsInSheet_(SCREENING_CRF_SHEET, String(p.submission_id))) {
@@ -290,19 +360,19 @@ function submitScreening_(p) {
       }
     }
 
-    let existingRow = -1;
-    let oldRound = 0;
-    for (let r = 1; r < values.length; r++) {
-      const row = values[r];
-      if (String(row[idx.facility_code]) === String(p.facility_code) && String(row[idx.local_subject_code]) === String(p.local_subject_code)) {
-        existingRow = r + 1;
-        const status = String(row[idx.status] || 'PENDING').toUpperCase();
-        oldRound = parseInt(row[idx.review_round] || '1', 10) || 1;
-        if (status === 'REGISTERED') return {ok: false, error: 'ALREADY_REGISTERED', registration_id: String(row[idx.registration_id] || '')};
-        if (status === 'INELIGIBLE') return {ok: false, error: 'SCREENING_CLOSED', message: '中央MDTで不適格確定済みです。', screening_id: String(row[idx.screening_id])};
-        break;
-      }
-    }
+    // Reuse a single screening ID for this facility and original subject code.
+    const identity = findScreeningIdentity_(values, idx, p.facility_code, p.local_subject_code);
+    if (identity.error) return {ok:false, error:identity.error,
+      screening_id:identity.screening_id || '',
+      message:'既存のMDT受付番号と識別コードを事務局で確認してください。新しい番号は発行していません。'};
+    const existingRow = identity.rowNo || -1;
+    const oldRound = identity.review_round || 0;
+    if (identity.status === 'REGISTERED') return {ok:false, error:'ALREADY_REGISTERED',
+      registration_id:String(values[existingRow-1][idx.registration_id] || ''),
+      screening_id:identity.screening_id};
+    if (identity.status === 'INELIGIBLE') return {ok:false, error:'SCREENING_CLOSED',
+      message:'中央MDTで不適格確定済みです。再申請については事務局にご相談ください。',
+      screening_id:identity.screening_id};
 
     const now = new Date();
     let screeningId;
@@ -322,6 +392,8 @@ function submitScreening_(p) {
     } else {
       screeningId = nextScreeningId_(values, idx);
       reviewRound = 1;
+      // Preserve leading zeros when new identifiers are written to Sheets.
+      screenSh.getRange(screenSh.getLastRow() + 1, idx.local_subject_code + 1).setNumberFormat('@');
       appendByHeaders_(screenSh, {
         screening_id: screeningId, created_at: now, updated_at: now, status: 'PENDING', review_round: reviewRound,
         facility_code: String(p.facility_code), facility_name: String(p.facility_name), local_subject_code: String(p.local_subject_code),
