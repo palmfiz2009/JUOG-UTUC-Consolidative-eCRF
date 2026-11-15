@@ -3,7 +3,7 @@ from __future__ import annotations
 import hmac
 import streamlit as st
 
-from juog_common import date_str, registry_call, send_email, text, today_jst, valid_email, valid_registration_id
+from juog_common import _smtp_send, date_str, registry_call, send_email, text, today_jst, valid_email, valid_registration_id
 
 ROLE_LABELS = {
     "radiology": "放射線診断専門医",
@@ -11,7 +11,61 @@ ROLE_LABELS = {
     "urology": "泌尿器科専門医",
 }
 DECISION_JP = {"ELIGIBLE": "適格", "INELIGIBLE": "不適格", "HOLD": "保留"}
-EXPECTED_BACKEND_VERSION = "v2.2.8"
+EXPECTED_BACKEND_VERSION = "v2.2.9"
+
+
+def notify_mdt_final_result(screening_id: str, facility_name: str, decision_label: str, public_reason: str = ""):
+    """Notify the three MDT specialists after confirmed finalization.
+
+    The applicant-facing reason may be shared. Internal consensus notes, patient
+    identifiers, and independently submitted reviewer details are never emailed.
+    """
+    try:
+        configured = st.secrets["mdt_reviewers"]
+    except Exception:
+        return False, "MDT委員の通知先が設定されていません。"
+
+    labels = {
+        "radiology": "放射線診断専門医",
+        "medical_oncology": "腫瘍内科専門医",
+        "urology": "泌尿器科専門医",
+    }
+    recipients = []
+    errors = []
+    for role, label in labels.items():
+        try:
+            address = str(configured.get(f"{role}_email") or "").strip()
+        except Exception:
+            address = ""
+        if not valid_email(address):
+            errors.append(f"{label}：通知先未設定")
+        elif address not in recipients:
+            recipients.append(address)
+    if errors:
+        # Do not send only to a subset if configuration itself is incomplete.
+        return False, "／".join(errors)
+
+    subject = f"【JUOG 中央MDT最終判定】【{screening_id}】{decision_label}"
+    body = (
+        "JUOG-UTUC01 中央MDT最終判定のご連絡\n\n"
+        f"MDT受付番号：{screening_id}\n"
+        f"申請施設：{facility_name}\n"
+        f"最終判定：{decision_label}\n"
+    )
+    if public_reason:
+        body += f"\n申請施設への判定理由：\n{public_reason}\n"
+    body += (
+        "\n※中央MDTの合意形成記録や各委員の独立判定内容は本メールには含めていません。\n"
+        "※診療録番号、患者氏名等は記載していません。\n"
+    )
+
+    # One SMTP connection for the full MDT, so a slow mail gateway does not
+    # produce three sequential 30-second timeouts after a successful registry write.
+    ok, _mail_error = _smtp_send(subject, body, recipients)
+    if not ok:
+        return False, "MDT委員への通知メール送信に失敗しました。最終判定を再確定せず、事務局で送信履歴を確認してください。"
+    return True, ""
+
 
 st.markdown(
     """
@@ -275,12 +329,9 @@ with b1:
         max_value=today_jst(),
         key=f"final_mdt_date_{widget_suffix}",
     )
-    st.text_input(
-        "中央RECIST（放射線診断医判定）",
-        value=radiology_recist,
-        disabled=True,
-        key=f"central_recist_display_{widget_suffix}",
-    )
+    # A disabled text_input with a stable key can show an old review version.
+    # Display the latest server-derived RECIST as text instead of a widget.
+    st.write(f"**中央RECIST（放射線診断医判定・最新版）**：{radiology_recist or '—'}")
     site_r = str(case.get("site_recist", "") or "").upper()
     central_r = str(radiology_recist or "").upper()
     if site_r and central_r and site_r != central_r:
@@ -425,3 +476,16 @@ JUOG正式登録番号は発行されていません。
                 if not sent:
                     st.warning("判定記録は完了していますが、結果通知メールの送信に失敗しました。")
                     st.code(mail_err or "mail error")
+            # Final status is already committed in GAS. A mail issue must never
+            # trigger a second finalize_mdt submission or a new registration ID.
+            mdt_label = "適格" if decision_code == "ELIGIBLE" else ("不適格" if decision_code == "INELIGIBLE" else "保留")
+            mdt_ok, mdt_error = notify_mdt_final_result(
+                screening_id, str(case.get("facility_name") or ""), mdt_label,
+                text(reason) if decision_code != "ELIGIBLE" else "",
+            )
+            if mdt_ok:
+                st.success("中央MDT委員3名への最終判定通知を送信しました。")
+            else:
+                st.warning("最終判定は確定済みですが、中央MDT委員へのメール通知を完了できませんでした。")
+                st.caption(mdt_error)
+

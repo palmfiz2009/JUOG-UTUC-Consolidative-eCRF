@@ -58,8 +58,8 @@ if "screening_sent" not in st.session_state:
     st.session_state.screening_sent = False
 
 
-def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
-    """Notify the three central MDT reviewers only for the first screening submission.
+def send_mdt_review_requests(screening_id: str, facility_name: str, review_round: int = 1):
+    """Notify the central MDT reviewers whenever a review round starts.
 
     Reviewer addresses are kept in Streamlit Secrets and never in GitHub.
     Clinical details are intentionally excluded from the message body.
@@ -92,10 +92,12 @@ def send_initial_mdt_review_requests(screening_id: str, facility_name: str):
         if not address:
             failures.append(f"{label}: メールアドレス未設定")
             continue
-        subject = f"【JUOG 中央MDT審査依頼】【{screening_id}】{label}"
-        body = f"""JUOG UTUC_Consolidative 中央MDT審査の新規申請が届きました。
+        round_label = "再審査" if review_round > 1 else "審査"
+        subject = f"【JUOG 中央MDT{round_label}依頼】【{screening_id}】【Round {review_round}】{label}"
+        body = f"""JUOG UTUC_Consolidative 中央MDT{round_label}の申請が届きました。
 
 MDT審査受付番号: {screening_id}
+審査ラウンド: {review_round}
 申請施設: {facility_name}
 担当領域: {label}
 
@@ -127,6 +129,8 @@ if st.session_state.screening_sent:
     st.success("中央MDT審査申請を送信しました。")
     if sid:
         st.write(f"**MDT審査受付番号：{sid}**")
+    if st.session_state.get("screening_id_reused"):
+        st.info("既存のMDT受付番号を再利用しました。新しい受付番号は発行していません。")
     st.caption("正式登録およびJUOG登録番号の発行は、中央MDTで適格と判定された後に研究事務局が行います。")
     if st.session_state.get("screening_email_failed"):
         st.warning("中央台帳への保存は完了していますが、通知メール送信に失敗しました。再申請はせず事務局へ連絡してください。")
@@ -223,6 +227,7 @@ physical_detail = st.text_area("身体所見の詳細*" if physical_abnormal == 
 h1, h2 = st.columns(2)
 with h1:
     past_history = render_required_text_or_none("既往歴", "reg_past_history", disabled=L)
+    st.caption("他がんの既往、経過観察中のリンパ節腫大、転移との鑑別に重要な臨床経過があれば、既往歴欄に記載してください。")
     comorbidity = render_required_text_or_none("現在の合併症", "reg_comorbidity", disabled=L)
 with h2:
     concomitant_meds = render_required_text_or_none("現在の併用薬", "reg_concomitant_meds", disabled=L)
@@ -734,6 +739,8 @@ if st.button("📨 中央MDT審査を申請", type="primary", use_container_widt
         msg = reg_result.get("message") or reg_result.get("error") or "中央台帳への登録に失敗しました"
         if reg_result.get("registration_id"):
             msg += f"（既登録番号: {reg_result.get('registration_id')}）"
+        if reg_result.get("screening_id"):
+            msg += f"（既存MDT受付番号: {reg_result.get('screening_id')}）"
         st.error(f"中央MDT審査申請を確定できませんでした：{msg}")
     else:
         screening_id = reg_result.get("screening_id", "")
@@ -759,14 +766,18 @@ EVP: {date_str(evp_start)} ～ {date_str(evp_end)} / {courses}コース
             report,
             reporter_email,
         )
-        # 3名への審査依頼は初回申請のみ。訂正・再申請では再送しない。
+        # New review rounds notify all three MDT reviewers; a network replay
+        # of the same submission UUID does not send duplicate emails.
         mdt_notify_ok, mdt_notify_err = True, ""
-        if not bool(reg_result.get("existing")):
-            mdt_notify_ok, mdt_notify_err = send_initial_mdt_review_requests(screening_id, facility_name)
+        if not bool(reg_result.get("submission_replay")):
+            mdt_notify_ok, mdt_notify_err = send_mdt_review_requests(
+                screening_id, facility_name, int(reg_result.get("review_round") or 1)
+            )
         _draft_delete = delete_screening_draft(facility_code, local_subject_code)
         st.session_state.screening_sent_draft_delete_failed = not bool(_draft_delete.get("ok"))
         st.session_state.screening_sent = True
         st.session_state.screening_id = screening_id
+        st.session_state.screening_id_reused = bool(reg_result.get("existing"))
         st.session_state.screening_email_failed = not sent
         st.session_state.screening_mdt_notify_failed = not mdt_notify_ok
         st.session_state.screening_mdt_notify_error = mdt_notify_err

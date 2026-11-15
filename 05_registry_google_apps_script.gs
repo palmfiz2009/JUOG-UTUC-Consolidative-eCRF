@@ -1,5 +1,5 @@
 /**
- * JUOG UTUC_Consolidative central eCRF service (v2.2.8)
+ * JUOG UTUC_Consolidative central eCRF service (v2.2.9)
  * Google Apps Script Web App bound to a dedicated Google Sheet.
  *
  * Workflow:
@@ -24,7 +24,7 @@ const CRF_AUDIT_SHEET = 'CRFSubmissionAudit';
 const CRF_DRAFT_SHEET = 'CRF_Drafts';
 const SETTINGS_SHEET = 'Settings';
 const TIMEZONE = 'Asia/Tokyo';
-const BACKEND_VERSION = 'v2.2.8';
+const BACKEND_VERSION = 'v2.2.9';
 
 const REVIEWER_ROLES = ['radiology', 'medical_oncology', 'urology'];
 
@@ -237,6 +237,73 @@ function doPost(e) {
   }
 }
 
+
+/** Look up the uncoerced subject code in the submitted, append-only CRF JSON.
+ * The Screening sheet can silently change "01" into numeric 1. */
+function screeningOriginalSubjectCodes_(ids) {
+  const requested = new Set(ids.map(x => String(x || '').trim().toUpperCase()));
+  const found = {}, conflict = new Set();
+  if (!requested.size) return {found:found, conflict:conflict};
+  const sh = getSpreadsheet_().getSheetByName(SCREENING_CRF_SHEET);
+  if (!sh || sh.getLastRow() < 2) return {found:found, conflict:conflict};
+  const rows = sh.getDataRange().getValues(), idx = headerIndex_(rows[0]);
+  if (idx.screening_id === undefined || idx.payload_json === undefined)
+    return {found:found, conflict:conflict};
+  rows.slice(1).forEach(row => {
+    const id = String(row[idx.screening_id] || '').trim().toUpperCase();
+    if (!requested.has(id)) return;
+    try {
+      const payload = JSON.parse(String(row[idx.payload_json] || '{}'));
+      const code = String(payload.local_subject_code ||
+        (payload.data || {}).local_subject_code || '').trim();
+      if (!code || (Object.prototype.hasOwnProperty.call(found, id) && found[id] !== code))
+        conflict.add(id);
+      else found[id] = code;
+    } catch (_e) { conflict.add(id); }
+  });
+  return {found:found, conflict:conflict};
+}
+
+/** Select the existing active JUOG-SCR ID; never recycle a VOID or create a
+ * new identifier while an ambiguous historical identifier is unresolved. */
+function findScreeningIdentity_(rows, idx, facilityRaw, subjectRaw) {
+  const facility = String(facilityRaw || '').trim().toUpperCase();
+  const subject = String(subjectRaw || '').trim();
+  const numberLike = /^\d+$/.test(subject);
+  const compact = value => String(value).replace(/^0+(?=\d)/, '');
+  const hits = [];
+  for (let r = 1; r < rows.length; r++) {
+    const row = rows[r];
+    if (String(row[idx.facility_code] || '').trim().toUpperCase() !== facility) continue;
+    const stored = String(row[idx.local_subject_code] ?? '').trim();
+    if (stored !== subject &&
+        !(numberLike && /^\d+$/.test(stored) && compact(stored) === compact(subject))) continue;
+    hits.push({rowNo:r+1, row:row, stored:stored,
+      id:String(row[idx.screening_id] || '').trim().toUpperCase()});
+  }
+  if (!hits.length) return {rowNo:0};
+  const numeric = hits.filter(x => numberLike && /^\d+$/.test(x.stored));
+  const originals = screeningOriginalSubjectCodes_(numeric.map(x => x.id));
+  const matches = [];
+  for (const hit of hits) {
+    if (numberLike && /^\d+$/.test(hit.stored)) {
+      if (originals.conflict.has(hit.id) || !Object.prototype.hasOwnProperty.call(originals.found, hit.id))
+        return {error:'SCREENING_IDENTITY_UNVERIFIABLE', screening_id:hit.id};
+      if (originals.found[hit.id] !== subject) continue;
+    }
+    matches.push(hit);
+  }
+  if (!matches.length) return {rowNo:0};
+  const active = matches.filter(x => String(x.row[idx.status] || 'PENDING').toUpperCase() !== 'VOID');
+  if (active.length > 1) return {error:'DUPLICATE_ACTIVE_SCREENING_IDENTITY'};
+  if (!active.length) return {error:'SCREENING_IDENTITY_VOIDED',
+    screening_id:matches[matches.length-1].id};
+  const hit = active[0];
+  return {rowNo:hit.rowNo, screening_id:hit.id,
+    review_round:parseInt(hit.row[idx.review_round] || '1', 10) || 1,
+    status:String(hit.row[idx.status] || 'PENDING').toUpperCase()};
+}
+
 function submitScreening_(p) {
   const required = [
     'facility_code', 'facility_name', 'local_subject_code', 'reporter_email',
@@ -277,7 +344,23 @@ function submitScreening_(p) {
     for (let r = 1; r < values.length; r++) {
       const row = values[r];
       if (String(row[idx.submission_id]) === String(p.submission_id)) {
+        // The same submission UUID may be retried after Screening was written
+        // but before ScreeningCRF was appended. In that case the original JSON
+        // snapshot is missing, so use this UUID + facility + candidate subject
+        // text check instead of requiring that missing snapshot.
+        const sameFacility = String(row[idx.facility_code] || '').trim().toUpperCase() ===
+          String(p.facility_code || '').trim().toUpperCase();
+        const storedCode = String(row[idx.local_subject_code] ?? '').trim();
+        const suppliedCode = String(p.local_subject_code ?? '').trim();
+        const numericAlias = /^\d+$/.test(storedCode) && /^\d+$/.test(suppliedCode) &&
+          storedCode.replace(/^0+(?=\d)/, '') === suppliedCode.replace(/^0+(?=\d)/, '');
+        if (!sameFacility || !(storedCode === suppliedCode || numericAlias)) {
+          return {ok:false, error:'SUBMISSION_ID_IDENTITY_MISMATCH'};
+        }
         const existingScreeningId = String(row[idx.screening_id]);
+        const currentApplicant = String(row[idx.reporter_email] || '').trim().toLowerCase();
+        if (currentApplicant && currentApplicant !== String(p.reporter_email || '').trim().toLowerCase())
+          return {ok:false, error:'REPORTER_EMAIL_MISMATCH', screening_id:existingScreeningId};
         const existingRound = parseInt(row[idx.review_round] || '1', 10) || 1;
         if (!submissionExistsInSheet_(SCREENING_CRF_SHEET, String(p.submission_id))) {
           const retryPayload = JSON.parse(JSON.stringify(p.crf_payload));
@@ -286,23 +369,31 @@ function submitScreening_(p) {
           const retrySave = savePayloadToSheet_(SCREENING_CRF_SHEET, retryPayload, false);
           if (!retrySave.ok) return {ok: false, error: 'SCREENING_CRF_SAVE_FAILED', message: retrySave.message || retrySave.error};
         }
-        return {ok: true, existing: true, screening_id: existingScreeningId, review_round: existingRound, status: String(row[idx.status]), registration_id: String(row[idx.registration_id] || '')};
+        return {ok: true, existing: true, submission_replay: true, screening_id: existingScreeningId, review_round: existingRound, status: String(row[idx.status]), registration_id: String(row[idx.registration_id] || '')};
       }
     }
 
-    let existingRow = -1;
-    let oldRound = 0;
-    for (let r = 1; r < values.length; r++) {
-      const row = values[r];
-      if (String(row[idx.facility_code]) === String(p.facility_code) && String(row[idx.local_subject_code]) === String(p.local_subject_code)) {
-        existingRow = r + 1;
-        const status = String(row[idx.status] || 'PENDING').toUpperCase();
-        oldRound = parseInt(row[idx.review_round] || '1', 10) || 1;
-        if (status === 'REGISTERED') return {ok: false, error: 'ALREADY_REGISTERED', registration_id: String(row[idx.registration_id] || '')};
-        if (status === 'INELIGIBLE') return {ok: false, error: 'SCREENING_CLOSED', message: '中央MDTで不適格確定済みです。', screening_id: String(row[idx.screening_id])};
-        break;
+    // Reuse a single screening ID for this facility and original subject code.
+    const identity = findScreeningIdentity_(values, idx, p.facility_code, p.local_subject_code);
+    if (identity.error) return {ok:false, error:identity.error,
+      screening_id:identity.screening_id || '',
+      message:'既存のMDT受付番号と識別コードを事務局で確認してください。新しい番号は発行していません。'};
+    const existingRow = identity.rowNo || -1;
+    const oldRound = identity.review_round || 0;
+    if (existingRow > 0) {
+      const currentApplicant = String(values[existingRow - 1][idx.reporter_email] || '').trim().toLowerCase();
+      if (currentApplicant && currentApplicant !== String(p.reporter_email || '').trim().toLowerCase()) {
+        return {ok:false, error:'REPORTER_EMAIL_MISMATCH',
+          screening_id:identity.screening_id,
+          message:'既存の申請者メールアドレスと一致しません。変更が必要な場合は事務局にご相談ください。'};
       }
     }
+    if (identity.status === 'REGISTERED') return {ok:false, error:'ALREADY_REGISTERED',
+      registration_id:String(values[existingRow-1][idx.registration_id] || ''),
+      screening_id:identity.screening_id};
+    if (identity.status === 'INELIGIBLE') return {ok:false, error:'SCREENING_CLOSED',
+      message:'中央MDTで不適格確定済みです。再申請については事務局にご相談ください。',
+      screening_id:identity.screening_id};
 
     const now = new Date();
     let screeningId;
@@ -322,6 +413,8 @@ function submitScreening_(p) {
     } else {
       screeningId = nextScreeningId_(values, idx);
       reviewRound = 1;
+      // Preserve leading zeros when new identifiers are written to Sheets.
+      screenSh.getRange(screenSh.getLastRow() + 1, idx.local_subject_code + 1).setNumberFormat('@');
       appendByHeaders_(screenSh, {
         screening_id: screeningId, created_at: now, updated_at: now, status: 'PENDING', review_round: reviewRound,
         facility_code: String(p.facility_code), facility_name: String(p.facility_name), local_subject_code: String(p.local_subject_code),
@@ -343,7 +436,7 @@ function submitScreening_(p) {
       facility_code: String(p.facility_code), local_subject_code: String(p.local_subject_code), submission_id: String(p.submission_id)
     });
     SpreadsheetApp.flush();
-    return {ok: true, existing: existingRow > 0, screening_id: screeningId, review_round: reviewRound, status: 'PENDING'};
+    return {ok: true, existing: existingRow > 0, submission_replay: false, screening_id: screeningId, review_round: reviewRound, status: 'PENDING'};
   } finally {
     lock.releaseLock();
   }
