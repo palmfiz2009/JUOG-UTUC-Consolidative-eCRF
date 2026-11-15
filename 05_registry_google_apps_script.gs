@@ -1386,9 +1386,8 @@ function saveCrf_(p) {
   const validation = validateSubject_({registration_id: payload.registration_id, facility_code: payload.facility_code});
   if (!validation.ok) return validation;
 
-  const sourceCheck = validateDay90SourceLink_(payload);
-  if (!sourceCheck.ok) return sourceCheck;
-
+  // Linked-source version must be checked under the same write lock.
+  // Identical submission retries are handled without changing prior history.
   const hardCheck = validateCrfHardStops_(payload, validation);
   if (!hardCheck.ok) return hardCheck;
 
@@ -1452,6 +1451,11 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
   const priorCount = values.slice(1).filter(row =>
     String(row[idx.record_key] || '') === recordKey).length;
   if (enforceVersionRules) {
+    // Prevent time-of-check/time-of-use races between 30d edits and 90d/FUP saves.
+    // The existing saveCrf_ ScriptLock is still held here. Prior UUID replay is
+    // handled above, so a confirmed old submission can be safely recovered.
+    const sourceCheck = validateDay90SourceLink_(payload);
+    if (!sourceCheck.ok) return sourceCheck;
     if (kind === '初回報告' && priorCount > 0)
       return {ok:false, error:'INITIAL_ALREADY_EXISTS', message:'この時点の初回報告はすでに保存されています。訂正報告を選択してください。'};
     if (kind === '訂正報告' && priorCount === 0)
