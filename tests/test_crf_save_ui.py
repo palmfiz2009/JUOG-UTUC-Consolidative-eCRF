@@ -51,8 +51,16 @@ class CRFSaveUITests(unittest.TestCase):
         def save(payload):
             self.saved.append(deepcopy(payload))
             response = self.responses.pop(0)
-            if response.get("ok") and "submission_id" not in response:
-                return {"submission_id": payload["submission_id"], **response}
+            if response.get("ok"):
+                receipt = {
+                    "submission_id": payload["submission_id"],
+                    "record_key": payload["record_key"],
+                    "crf_type": payload["crf_type"],
+                    "visit": payload["visit"],
+                    "spreadsheet_id": "isolated-fixture-sheet",
+                    "audit_verified": True,
+                }
+                return {**receipt, **response}
             return response
 
         def mail(subject, body, receiver):
@@ -287,6 +295,42 @@ class CRFSaveUITests(unittest.TestCase):
             page="peri", registration_id="JUOG-901", payload=self.fixture()))
         self.assertEqual(self.emails, [])
         self.assertEqual(self.deleted, [])
+
+    def test_missing_or_mismatched_receipt_blocks_mail_and_draft_delete(self):
+        for key, value in (
+            ("spreadsheet_id", "wrong-sheet"),
+            ("record_key", "JUOG-901|day90|90d"),
+            ("crf_type", "day90"),
+            ("visit", "90d"),
+            ("audit_verified", False),
+            ("audit_verified", None),
+        ):
+            with self.subTest(field=key, value=value):
+                self.st.session_state.clear()
+                self.saved.clear()
+                self.deleted.clear()
+                self.emails.clear()
+                self.responses = [{"ok": True, "record_version": 2,
+                                   "existing": False, key: value}]
+                ok = self.helper.submit_crf_with_feedback(
+                    page="peri", registration_id="JUOG-901",
+                    payload=self.fixture())
+                self.assertFalse(ok)
+                self.assertEqual(len(self.saved), 1)
+                self.assertEqual(self.emails, [])
+                self.assertEqual(self.deleted, [])
+                self.assertEqual(self.helper.pending_attempt(
+                    "peri", self.st.session_state)["status"], "uncertain")
+                self.assertFalse(self.st.session_state.get("peri_sent", False))
+
+    def test_valid_replay_receipt_does_not_duplicate_email(self):
+        self.responses = [{"ok": True, "record_version": 2,
+                           "existing": True}]
+        self.assertTrue(self.helper.submit_crf_with_feedback(
+            page="peri", registration_id="JUOG-901",
+            payload=self.fixture()))
+        self.assertEqual(self.emails, [])
+        self.assertEqual(self.st.session_state["peri_sent_version"], "2")
 
     def test_status_not_marked_success_when_server_rejects(self):
         self.responses = [{"ok":False, "error":"INITIAL_ALREADY_EXISTS"}]
