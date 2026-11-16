@@ -170,6 +170,33 @@ for (const [sheetName,crfType,visit] of [
   console.log("PASS missing audit sheet fails closed");
 }
 
+// Validate cross-type UUID isolation under the same logical save lock.
+// This is a pure in-memory fixture; the real registration and access checks
+// remain in saveCrf_ and must be assessed separately by independent UAT.
+{
+  const scopeCode=extract("function verifyCrfUuidScope_(", "function savePayloadToSheet_(");
+  const x=fakeFixture();
+  const scope=new Function(
+    "getSpreadsheet_","headerIndex_","CRF_30D_SHEET","CRF_90D_SHEET","CRF_FOLLOWUP_SHEET",
+    scopeCode+";return verifyCrfUuidScope_;"
+  )(
+    ()=>({getSheetByName:name=>x.sheets[name]}),
+    h=>Object.fromEntries(h.map((k,i)=>[k,i])),
+    "CRF_30d","CRF_90d","CRF_Followup"
+  );
+  const other={...fixture,crf_type:"day90",visit:"90d"};
+  assert.equal(scope("CRF_30d",fixture).ok,true,"same-type UUID replay remains allowed");
+  assert.equal(scope("CRF_90d",other).error,"CRF_UUID_CROSS_TYPE_CONFLICT");
+  assert.equal(scope("CRF_Followup",other).error,"CRF_UUID_CROSS_TYPE_CONFLICT");
+  const newUuid={...other,submission_id:"independent-90d-uuid"};
+  assert.equal(scope("CRF_90d",newUuid).ok,true);
+  x.sheets.CRF_30d.rows.push(x.sheets.CRF_30d.rows[1].slice());
+  assert.equal(scope("CRF_30d",fixture).error,"CRF_DUPLICATE_UUID");
+  x.sheets.CRF_90d.rows[0]=x.sheets.CRF_90d.rows[0].filter(k=>k!=="submission_id");
+  assert.equal(scope("CRF_90d",newUuid).error,"CRF_UUID_SCHEMA_MISSING");
+  console.log("PASS cross-type UUID collision, independent UUID, duplicated row, schema fail-closed");
+}
+
 const verifyCode=extract("function validateDay90SourceLink_(payload) {","function draftKey_(");
 const verified=(latest)=>new Function("getLatestCrfPayload_","CRF_30D_SHEET",
   verifyCode+"\nreturn validateDay90SourceLink_;"
