@@ -1477,7 +1477,9 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
           Number(row[idx.record_version] || 1));
         if (!auditCheck.ok) return auditCheck;
       }
-      return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId};
+      return {ok: true, existing: true, record_version: Number(row[idx.record_version] || 1), submission_id: submissionId,
+        record_key: recordKey, crf_type: String(payload.crf_type || ''), visit: String(payload.visit || ''),
+        spreadsheet_id: ss.getId(), audit_verified: Boolean(enforceVersionRules)};
     }
     if (String(row[idx.record_key] || '') === recordKey) priorCount++;
   }
@@ -1527,7 +1529,9 @@ function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
       return {ok:false, error:'CRF_READBACK_MISMATCH'};
     }
   }
-  return {ok: true, existing: false, record_version: version, submission_id: submissionId};
+  return {ok: true, existing: false, record_version: version, submission_id: submissionId,
+    record_key: recordKey, crf_type: String(payload.crf_type || ''), visit: String(payload.visit || ''),
+    spreadsheet_id: ss.getId(), audit_verified: Boolean(enforceVersionRules)};
 }
 
 /** Recover a missing audit row after the CRF body was saved but auditing failed.
