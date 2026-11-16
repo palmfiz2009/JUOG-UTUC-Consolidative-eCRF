@@ -43,6 +43,8 @@ function fakeFixture(payload=fixture, opts={}) {
   const sheet=rows=>({rows,getDataRange:()=>({getValues:()=>rows.map(r=>r.slice())})});
   const sheets={
     CRF_30d:sheet(crf),
+    CRF_90d:sheet([crfFields]),
+    CRF_Followup:sheet([crfFields]),
     [CRF_AUDIT_SHEET]:sheet(audit),
   };
   if(opts.auditMissing)delete sheets[CRF_AUDIT_SHEET];
@@ -50,7 +52,7 @@ function fakeFixture(payload=fixture, opts={}) {
   const headerIndex_=h=>Object.fromEntries(h.map((key,i)=>[key,i]));
   const appendByHeaders_=(sh,obj)=>{
     if ((flags.dropAuditAppend && sh === sheets[CRF_AUDIT_SHEET]) ||
-        (flags.dropCrfAppend && sh === sheets.CRF_30d)) return;
+        (flags.dropCrfAppend && [sheets.CRF_30d,sheets.CRF_90d,sheets.CRF_Followup].includes(sh))) return;
     sh.rows.push(sh.rows[0].map(k=>obj[k]??""));
   };
   const compiled=new Function(
@@ -63,6 +65,42 @@ function fakeFixture(payload=fixture, opts={}) {
     ()=>({ok:true}),{flush:()=>{}},CRF_AUDIT_SHEET,SCREENING_CRF_SHEET
   );
   return { ...compiled, sheets, appendByHeaders_, flags };
+}
+
+// In-memory 90-day and 6–24m follow-up save/replay/correction round-trip.
+// The linked 30-day source itself is tested separately below.
+for (const [sheetName,crfType,visit] of [
+  ["CRF_90d","day90","90d"],
+  ["CRF_Followup","followup","6m"],
+  ["CRF_Followup","followup","12m"],
+  ["CRF_Followup","followup","24m"],
+]) {
+  const x=fakeFixture();
+  const initial={...fixture,
+    crf_type:crfType,visit,
+    record_key:`JUOG-901|${crfType}|${visit}`,
+    submission_id:`fictional-${visit}-v1`,
+    submission_kind:"初回報告",
+  };
+  const correction={...initial,
+    submission_id:`fictional-${visit}-v2`,
+    submission_kind:"訂正報告",correction_reason:"検証用訂正",
+  };
+  const first=x.savePayloadToSheet_(sheetName,initial,true);
+  assert(first.ok && !first.existing && first.record_version===1,sheetName+" initial");
+  assert.equal(x.sheets[sheetName].rows.length,2);
+  const replay=x.savePayloadToSheet_(sheetName,initial,true);
+  assert(replay.ok && replay.existing && replay.record_version===1,sheetName+" replay");
+  assert.equal(x.sheets[sheetName].rows.length,2,sheetName+" replay cannot duplicate");
+  const second=x.savePayloadToSheet_(sheetName,correction,true);
+  assert(second.ok && !second.existing && second.record_version===2,sheetName+" correction");
+  assert.equal(x.sheets[sheetName].rows.length,3);
+  assert.equal(x.sheets[CRF_AUDIT_SHEET].rows.length,3,sheetName+" audit for v1+v2");
+  const secondReplay=x.savePayloadToSheet_(sheetName,correction,true);
+  assert(secondReplay.ok && secondReplay.existing && secondReplay.record_version===2);
+  assert.equal(x.sheets[sheetName].rows.length,3);
+  assert.equal(x.sheets[CRF_AUDIT_SHEET].rows.length,3);
+  console.log("PASS",sheetName,visit,"v1/v2/replay/audit (fictional)");
 }
 
 {
