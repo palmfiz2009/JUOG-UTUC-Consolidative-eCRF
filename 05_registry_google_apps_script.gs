@@ -1408,10 +1408,36 @@ function saveCrf_(p) {
   const lock = LockService.getScriptLock();
   if (!lock.tryLock(30000)) return {ok: false, error: 'LOCK_TIMEOUT'};
   try {
+    // A retry UUID must belong to one CRF row and one type/visit only.
+    // Enforce this across all three CRF tabs while holding the same save lock.
+    const uuidScope = verifyCrfUuidScope_(sheetName, payload);
+    if (!uuidScope.ok) return uuidScope;
     return savePayloadToSheet_(sheetName, payload, true);
   } finally {
     lock.releaseLock();
   }
+}
+
+function verifyCrfUuidScope_(targetSheetName, payload) {
+  const uuid = String(payload.submission_id || '').trim();
+  if (!uuid) return {ok:false, error:'MISSING_SUBMISSION_METADATA'};
+  const ss = getSpreadsheet_();
+  const sheets = [CRF_30D_SHEET, CRF_90D_SHEET, CRF_FOLLOWUP_SHEET];
+  for (const name of sheets) {
+    const sh = ss.getSheetByName(name);
+    if (!sh) return {ok:false, error:'CRF_SHEET_NOT_FOUND'};
+    const rows = sh.getDataRange().getValues();
+    const idx = headerIndex_(rows[0] || []);
+    if (idx.submission_id === undefined) return {ok:false, error:'CRF_UUID_SCHEMA_MISSING'};
+    let count = 0;
+    for (let r = 1; r < rows.length; r++) {
+      if (String(rows[r][idx.submission_id] || '').trim() !== uuid) continue;
+      count++;
+      if (name !== targetSheetName) return {ok:false, error:'CRF_UUID_CROSS_TYPE_CONFLICT'};
+    }
+    if (count > 1) return {ok:false, error:'CRF_DUPLICATE_UUID'};
+  }
+  return {ok:true};
 }
 
 function savePayloadToSheet_(sheetName, payload, enforceVersionRules) {
