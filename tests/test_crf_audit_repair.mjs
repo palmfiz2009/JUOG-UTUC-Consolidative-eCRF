@@ -48,7 +48,7 @@ function fakeFixture(payload=fixture, opts={}) {
     [CRF_AUDIT_SHEET]:sheet(audit),
   };
   if(opts.auditMissing)delete sheets[CRF_AUDIT_SHEET];
-  const getSpreadsheet_=()=>({getSheetByName:n=>sheets[n]});
+  const getSpreadsheet_=()=>({getSheetByName:n=>sheets[n],getId:()=>"isolated-fixture-sheet"});
   const headerIndex_=h=>Object.fromEntries(h.map((key,i)=>[key,i]));
   const appendByHeaders_=(sh,obj)=>{
     if ((flags.dropAuditAppend && sh === sheets[CRF_AUDIT_SHEET]) ||
@@ -88,9 +88,17 @@ for (const [sheetName,crfType,visit] of [
   };
   const first=x.savePayloadToSheet_(sheetName,initial,true);
   assert(first.ok && !first.existing && first.record_version===1,sheetName+" initial");
+  assert.equal(first.record_key,initial.record_key);
+  assert.equal(first.crf_type,crfType);
+  assert.equal(first.visit,visit);
+  assert.equal(first.spreadsheet_id,"isolated-fixture-sheet");
+  assert.equal(first.audit_verified,true);
   assert.equal(x.sheets[sheetName].rows.length,2);
   const replay=x.savePayloadToSheet_(sheetName,initial,true);
   assert(replay.ok && replay.existing && replay.record_version===1,sheetName+" replay");
+  assert.equal(replay.record_key,initial.record_key);
+  assert.equal(replay.spreadsheet_id,"isolated-fixture-sheet");
+  assert.equal(replay.audit_verified,true);
   assert.equal(x.sheets[sheetName].rows.length,2,sheetName+" replay cannot duplicate");
   const second=x.savePayloadToSheet_(sheetName,correction,true);
   assert(second.ok && !second.existing && second.record_version===2,sheetName+" correction");
