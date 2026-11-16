@@ -65,6 +65,15 @@ def submit_crf_with_feedback(
     crf_type, draft_visit, display_name = _PROFILES[page]
     key = attempt_key(page)
     attempt = st.session_state.get(key)
+    from isolated_crf_adapter import actor_key
+    try:
+        actor = actor_key(st)
+    except Exception:
+        st.error("本人認証・期限・承認条件を確認できないため保存を停止しました。")
+        return False
+    if attempt is not None and attempt.get("actor_key") != actor:
+        st.error("保存要求の本人が一致しません。事務局で未確定要求を照合してください。")
+        return False
 
     if attempt is None:
         if not isinstance(payload, dict):
@@ -80,6 +89,7 @@ def submit_crf_with_feedback(
             st.error("送信IDまたは記録キーが不明です。保存を中止しました。")
             return False
         attempt = {
+            "actor_key": actor,
             "status": "prepared",
             "payload": deepcopy(payload),
             "registration_id": registration_id,
@@ -216,3 +226,4 @@ def submit_crf_with_feedback(
     if draft_delete_failed:
         st.info("確定データは保存済みですが、仮保存の削除は未確認です。")
     return True
+

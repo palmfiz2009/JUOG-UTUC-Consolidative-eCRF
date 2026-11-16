@@ -40,6 +40,9 @@ class FakeSt(types.ModuleType):
 
 class CRFSaveUITests(unittest.TestCase):
     def setUp(self):
+        actor_patch = patch("isolated_crf_adapter.actor_key", return_value="offline-native-actor")
+        actor_patch.start()
+        self.addCleanup(actor_patch.stop)
         import juog_crf_save_ui
         self.helper = importlib.reload(juog_crf_save_ui)
         self.st = FakeSt()
@@ -165,7 +168,7 @@ class CRFSaveUITests(unittest.TestCase):
         import time
         key=self.helper.attempt_key("d90")
         self.st.session_state[key]={
-            "status":"saving","saving_started_at":time.time(),
+            "actor_key":"offline-native-actor", "status":"saving","saving_started_at":time.time(),
             "registration_id":"JUOG-901","payload":self.fixture("day90","90d"),
         }
         pending=self.helper.pending_attempt("d90", self.st.session_state)
@@ -176,7 +179,7 @@ class CRFSaveUITests(unittest.TestCase):
         import time
         key=self.helper.attempt_key("d90")
         self.st.session_state[key]={
-            "status":"saving","saving_started_at":time.time()-130,
+            "actor_key":"offline-native-actor", "status":"saving","saving_started_at":time.time()-130,
             "registration_id":"JUOG-901","payload":self.fixture("day90","90d","old-uuid"),
             "email_subject":"FAKE","email_body":"FAKE","had_warnings":False,
             "visit_display":"",
@@ -190,7 +193,7 @@ class CRFSaveUITests(unittest.TestCase):
 
     def test_committed_but_not_finalized_save_can_be_confirmed(self):
         self.st.session_state[self.helper.attempt_key("peri")]={
-            "status":"committed","record_version":"1",
+            "actor_key":"offline-native-actor", "status":"committed","record_version":"1",
             "registration_id":"JUOG-901","payload":self.fixture(),
             "email_subject":"FAKE","email_body":"FAKE","had_warnings":False,
             "visit_display":"",
@@ -203,7 +206,7 @@ class CRFSaveUITests(unittest.TestCase):
 
     def test_interrupted_request_status_recovers_for_same_id_retry(self):
         self.st.session_state[self.helper.attempt_key("d90")] = {
-            "status": "saving", "registration_id": "JUOG-901",
+            "actor_key": "offline-native-actor", "status": "saving", "registration_id": "JUOG-901",
             "payload": self.fixture("day90", "90d"),
             "email_subject": "fictional", "email_body": "fictional",
             "had_warnings": False, "visit_display": "",
@@ -344,3 +347,4 @@ class CRFSaveUITests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

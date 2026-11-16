@@ -1,0 +1,210 @@
+[
+  {
+    "path": "uat_b2_auth_bridge.py",
+    "sha256": "5ebd75981ca4990d4e6aa43983fef97f7bdd47bf74c6471c5c175cd2e2acb7a8"
+  },
+  {
+    "path": "isolated_crf_endpoint.gs",
+    "sha256": "41315bcaeac63151f4cbc6900960f5a7dad1d27898ee0fc094f21fbc697315a1"
+  },
+  {
+    "path": "isolated_crf_profile.json",
+    "sha256": "5892ba16eb04dfc1dede98e23288bf29c573004c8d6f6390d8c0b533ca76f6b1"
+  },
+  {
+    "path": "INTEGRATION_REVIEW.md",
+    "sha256": "65c990fd95422d33abd65e10168b5cd2332dbfd259543740bbc623d98fd321fd"
+  },
+  {
+    "path": "juog_crf_save_ui.py",
+    "sha256": "755353c47a0f17dd2ae2788fe161f4956fab0b70c40546208ca0b7c8a4275633"
+  },
+  {
+    "path": "run_offline.py",
+    "sha256": "5ab6ac60fdb696c42d09d60287481b69155cffb1ed3b5005cb666232bd002779"
+  },
+  {
+    "path": "isolated_crf_adapter.py",
+    "sha256": "f0c8163fbea7f5f92e21e597daff18f8325e71ae5023ae23cec94a5e2a979963"
+  },
+  {
+    "path": "juog_common.py",
+    "sha256": "508a3ebc0457b81a869b1415b8ce7ac0e6ee831ec15257769979e1c013122b77"
+  },
+  {
+    "path": "isolated_auth_bridge.gs",
+    "sha256": "b33bc116559e4860a3a63890750104ac82442bcab13b26f28510e3f2e9e0063a"
+  },
+  {
+    "path": "uat_identity_proposal.py",
+    "sha256": "49c13d9e36b78f235d9cbf14efdfcd4f3f45857c25fae16960c81bcc0ac14891"
+  },
+  {
+    "path": "integration_schema.json",
+    "sha256": "49b7cbf519b594ee72b863e3e64389f09f9bd21215a4e93fcec6b39c6b6c9f3b"
+  },
+  {
+    "path": "05_registry_google_apps_script.gs",
+    "sha256": "0c3a89d40123e7d8adb5da1848f57a0b80dd8847cfbd718dc421f8251e6d4968"
+  },
+  {
+    "path": "uat_b2_session.py",
+    "sha256": "4b88a4e86360eee5e89676de198bf1ccc7e0f34bc7fa91f8df38184a125e7bd2"
+  },
+  {
+    "path": "requirements.txt",
+    "sha256": "7c4de8dafb20f5c6610da81e42c105fdcd968211a6fb9af8c598fe1da6f4ae70"
+  },
+  {
+    "path": "streamlit_app.py",
+    "sha256": "fd3d982800381643fa83eb89428f39bf3c404b9134050727b95b9509272ecde6"
+  },
+  {
+    "path": "isolated_privacy.py",
+    "sha256": "5cf6049c99f83a2a3c5ed825f7d6d65b2de0ed63bcf4450e7b5a5a931411e431"
+  },
+  {
+    "path": "isolated_session_store.gs",
+    "sha256": "03cc5d2b14cf986c0a31f513ad8a6a74373038f969121b9d7566c7fb6171c43c"
+  },
+  {
+    "path": "tests/test_crf_save_ui.py",
+    "sha256": "a766908b57703504c6f979ad6abe3ac6b9d345e36f6dbf044907648058820044"
+  },
+  {
+    "path": "integration_evidence/endpoint.log",
+    "sha256": "1ea219d1a3fb026434d1c0a5f49149c595275be0fc5e6196c94066cb51645362"
+  },
+  {
+    "path": "integration_evidence/endpoint_results.json",
+    "sha256": "5998126a4d4192726b6d3f294e72b7ccc6a150cebe082753cb01c00593f7ceda"
+  },
+  {
+    "path": "integration_evidence/summary.json",
+    "sha256": "3358a2654ec24e1777929fbb8d74ba4167def36b9d33b46b64a623612df99d1e"
+  },
+  {
+    "path": "integration_evidence/pr_gas.log",
+    "sha256": "2ebcfa73bde61a9f9e7ff64d7b4d4380e1bc4ad0ee1e4ae2417f7a3c58514965"
+  },
+  {
+    "path": "integration_evidence/UAT_MAPPING.csv",
+    "sha256": "cd94e240680163449959a85fdd4a48d76ce3c07e374bc043abe90c384868a75c"
+  },
+  {
+    "path": "integration_evidence/python_dependencies.txt",
+    "sha256": "27961b60c62a26d45f74e03e4516585b4ccb964367541f7596cbf6586bb10518"
+  },
+  {
+    "path": "integration_evidence/adapter.log",
+    "sha256": "ed76775265809177d98fb272831f6d8fb8fd1bba9940f816280f053cc41a0476"
+  },
+  {
+    "path": "integration_evidence/fixture_bridge_entry.log",
+    "sha256": "1d977da7d3a219a7cfb6edcf90d4814d58a34fb2eefcade3183bd54a95f6564c"
+  },
+  {
+    "path": "integration_evidence/fixture.log",
+    "sha256": "59d45cf351e232a72a873af8d25edbea3059ff6f9171ff33a324145f0d444d6f"
+  },
+  {
+    "path": "integration_evidence/pr_identity.log",
+    "sha256": "0370d9004fe5bc66abb9e56ab1ea6a798dfb355075e756b2f10de01bdaafa1ed"
+  },
+  {
+    "path": "integration_evidence/pr.log",
+    "sha256": "c7d991fc4ca8c853de3bfaf2e7579ed065e23dbb08df73f13757620740850cb0"
+  },
+  {
+    "path": "integration_tests/test_endpoint.cjs",
+    "sha256": "fb5e9c7339c5ea43a43aaeed4bb8ead73e2e061edab41574bd5e3dce9a02e385"
+  },
+  {
+    "path": "integration_tests/test_entry.py",
+    "sha256": "37987968bd4744e096632bc3977eeb53be7ebcec8996e9b9b13aae0f3919ebcd"
+  },
+  {
+    "path": "integration_tests/test_adapter.py",
+    "sha256": "5bd4a4d00d219ce3ec5e1bfe57ccfeb215d19a2f4b327880715c331e4374a2d5"
+  },
+  {
+    "path": "fixture_regression/uat_b2_auth_bridge.py",
+    "sha256": "5ebd75981ca4990d4e6aa43983fef97f7bdd47bf74c6471c5c175cd2e2acb7a8"
+  },
+  {
+    "path": "fixture_regression/uat_auth04_fixture.json",
+    "sha256": "9a518895a6bb0b989705e330061620b02ee1593479d3672d6c2fbbcb5be598f1"
+  },
+  {
+    "path": "fixture_regression/uat_auth_connect.py",
+    "sha256": "d9fbce3ce34b5f84187a7f7b191b033f1f6d8ca1574cef7e20218326242461a2"
+  },
+  {
+    "path": "fixture_regression/test_uat_auth_connect.py",
+    "sha256": "57147885e448f9d0e89602b86847fa0de7d053847856e80bff07a20538afae4f"
+  },
+  {
+    "path": "fixture_regression/auth04_config.py",
+    "sha256": "77cef078c8889b2ebcf367c4dcfaf21e95c9e872a3839e9061f7103d20ddee9a"
+  },
+  {
+    "path": "fixture_regression/offline_test_bridge.py",
+    "sha256": "694bd19747579a4288551bb1c1dd8b01b134eede77a3d352b332450f0ef15507"
+  },
+  {
+    "path": "fixture_regression/offline_test_entry.py",
+    "sha256": "94613cd03f79273aa889a55244f29ade2a0222eaf399fe28257d440e2cd633ce"
+  },
+  {
+    "path": "fixture_regression/02_perioperative_30d_crf.py",
+    "sha256": "feb916c456462d4151da9e93243488fdc3d3e19e390679a0896e6e99a985bf94"
+  },
+  {
+    "path": "fixture_regression/test_uat_boundary_probe.py",
+    "sha256": "8df98fb662294410019ca9bb7474615a39363578bd3d467eb5b7dfaa76993b91"
+  },
+  {
+    "path": "fixture_regression/juog_common.py",
+    "sha256": "2cf71dd84615c40f5d4702c2d2b6fab3ed8900eb56b66b32f90d8ca6f5406d03"
+  },
+  {
+    "path": "fixture_regression/test_uat_auth04_live.py",
+    "sha256": "871502b5a783a124a01a16ca37c7dcdc2c5a669ceed7ea13f5889a1825bf8e1d"
+  },
+  {
+    "path": "fixture_regression/auth04_runtime.json",
+    "sha256": "53268e7435504b49a90faf42bc66e8891e5151c99b36695ea67051254b55ec8d"
+  },
+  {
+    "path": "fixture_regression/uat_identity_proposal.py",
+    "sha256": "49c13d9e36b78f235d9cbf14efdfcd4f3f45857c25fae16960c81bcc0ac14891"
+  },
+  {
+    "path": "fixture_regression/uat_boundary_probe.py",
+    "sha256": "78518a8d78e2e38d2802c62cfde1a5e9fea9c421f6ea64eac1e97a9bd533dafc"
+  },
+  {
+    "path": "fixture_regression/uat_b2_session.py",
+    "sha256": "4b88a4e86360eee5e89676de198bf1ccc7e0f34bc7fa91f8df38184a125e7bd2"
+  },
+  {
+    "path": "fixture_regression/streamlit_app.py",
+    "sha256": "3f99a057d2ec8b36a51c02073f08896f427619a8b579f11a7a3a4f35b9f7f448"
+  },
+  {
+    "path": "fixture_regression/canonical_v9_bridge.py",
+    "sha256": "4cc4b869dd7023d5fb841496724fbee577d5f1d10b6ffd60ae259de03edbcef0"
+  },
+  {
+    "path": "fixture_regression/auth_diagnostics.py",
+    "sha256": "9e266f9220e228beaae286cb1cae322cdd1cd4fe9ba0bccb25710ec1a04ed93c"
+  },
+  {
+    "path": "fixture_regression/test_auth04_config.py",
+    "sha256": "f192bfb4fa0404c06d4947eda3d9cde8a7b8108726eb6c959465d3021e7a862f"
+  },
+  {
+    "path": "fixture_regression/uat_auth04_live.py",
+    "sha256": "fbd3cfd7028844be133be36c4824646dcc959522b58d749e7a8825b56f611ac6"
+  }
+]

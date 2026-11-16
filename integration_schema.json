@@ -1,0 +1,142 @@
+{
+  "status": "PROPOSED_NOT_PROVISIONED",
+  "schema_version": "PR15_ISOLATED_CRFS_r1",
+  "headers": {
+    "Registry": [
+      "registered_at",
+      "registration_id",
+      "status",
+      "facility_code",
+      "facility_name",
+      "local_subject_code",
+      "reporter_email",
+      "consent_date",
+      "mdt_date",
+      "cN",
+      "best_effect",
+      "site_recist",
+      "screening_id",
+      "central_recist",
+      "recist_concordance"
+    ],
+    "CRF_30d": [
+      "saved_at",
+      "record_version",
+      "submission_id",
+      "record_key",
+      "submission_kind",
+      "correction_reason",
+      "submitted_at",
+      "registration_id",
+      "facility_code",
+      "facility_name",
+      "reporter_email",
+      "crf_type",
+      "visit",
+      "schema_version",
+      "study_code",
+      "payload_json"
+    ],
+    "CRF_90d": [
+      "saved_at",
+      "record_version",
+      "submission_id",
+      "record_key",
+      "submission_kind",
+      "correction_reason",
+      "submitted_at",
+      "registration_id",
+      "facility_code",
+      "facility_name",
+      "reporter_email",
+      "crf_type",
+      "visit",
+      "schema_version",
+      "study_code",
+      "payload_json"
+    ],
+    "CRF_Followup": [
+      "saved_at",
+      "record_version",
+      "submission_id",
+      "record_key",
+      "submission_kind",
+      "correction_reason",
+      "submitted_at",
+      "registration_id",
+      "facility_code",
+      "facility_name",
+      "reporter_email",
+      "crf_type",
+      "visit",
+      "schema_version",
+      "study_code",
+      "payload_json"
+    ],
+    "CRFSubmissionAudit": [
+      "saved_at",
+      "sheet_name",
+      "record_key",
+      "record_version",
+      "submission_id",
+      "submission_kind",
+      "registration_id",
+      "facility_code"
+    ],
+    "CRF_Drafts": [
+      "draft_key",
+      "updated_at",
+      "registration_id",
+      "crf_type",
+      "visit",
+      "facility_code",
+      "facility_name",
+      "reporter_email",
+      "schema_version",
+      "draft_json",
+      "resume_code_hash",
+      "failed_attempts",
+      "locked_until",
+      "code_reset_at",
+      "code_reset_by",
+      "email_reset_at",
+      "email_reset_by"
+    ],
+    "V3_Users": [
+      "issuer",
+      "subject",
+      "user_id",
+      "enabled",
+      "role",
+      "facility_ids_json",
+      "valid_until"
+    ],
+    "V3_SessionEvents": [
+      "sequence",
+      "event_json",
+      "chain_sha256"
+    ],
+    "R1_CaseOwners": [
+      "registration_id",
+      "facility_code",
+      "user_id",
+      "enabled"
+    ],
+    "R1_Operations": [
+      "sequence",
+      "event_json",
+      "digest"
+    ],
+    "R1_DraftOwners": [
+      "draft_key",
+      "user_id"
+    ],
+    "R1_DraftEvents": [
+      "event_json",
+      "digest"
+    ]
+  },
+  "b2_genesis": "sha256(JUOG-B2|<spreadsheetId>|<newGeneration>)",
+  "b2_head_property": "JUOG_B2_HEAD_<spreadsheetId> = 0:<genesis>",
+  "approval": "No actual approval or secret in this file"
+}

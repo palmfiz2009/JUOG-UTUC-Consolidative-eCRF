@@ -1,0 +1,75 @@
+﻿ID,visit,操作,合格基準,状態,offline_evidence,live_status,formal_pass_delta
+30d-D,30d,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+30d-V1,30d,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+30d-V2,30d,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+30d-R,30d,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+30d-N,30d,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+30d-L,30d,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+90d-D,90d,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+90d-V1,90d,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+90d-V2,90d,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+90d-R,90d,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+90d-N,90d,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+90d-L,90d,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+6m-D,6m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+6m-V1,6m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+6m-V2,6m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+6m-R,6m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+6m-N,6m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+6m-L,6m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+9m-D,9m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+9m-V1,9m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+9m-V2,9m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+9m-R,9m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+9m-N,9m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+9m-L,9m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+12m-D,12m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+12m-V1,12m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+12m-V2,12m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+12m-R,12m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+12m-N,12m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+12m-L,12m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+15m-D,15m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+15m-V1,15m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+15m-V2,15m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+15m-R,15m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+15m-N,15m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+15m-L,15m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+18m-D,18m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+18m-V1,18m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+18m-V2,18m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+18m-R,18m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+18m-N,18m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+18m-L,18m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+21m-D,21m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+21m-V1,21m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+21m-V2,21m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+21m-R,21m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+21m-N,21m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+21m-L,21m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+24m-D,24m,仮保存・ブラウザ終了・再開,同じ本人のみ再開可能。入力・false/0/未選択を保持。別人/別施設拒否,NOT RUN,endpoint: draft save/resume/delete (30d generic path); fixture_bridge_entry; other visits require live coverage,NOT RUN,0
+24m-V1,24m,初回正式保存,UUID/Sheet/record key/visit/version1/audit一致。draft後処理確認,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+24m-V2,24m,訂正Version2,理由必須、expected version1、v1不変、v2と監査追記,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+24m-R,24m,同UUID再送・二重クリック,同payloadで新versionなし、同UUID異payload拒否、メール重複なし,NOT RUN,endpoint: all nine visits; UUID content/version conflict; pr_gas; pr:test_crf_save_ui,NOT RUN,0
+24m-N,24m,必須・未来日・識別情報・参照矛盾,不正値は書込み0、正規値へ戻すと保存可,NOT RUN,partial only: privacy/empty payload/vital baseline; CLINICAL PARITY GAP,NOT RUN,0
+24m-L,24m,30日基準日・後続参照,実手術/予定日・未施行・参照更新の分岐一致、別症例混入なし,NOT RUN,endpoint: all nine visits; pr_gas: linkage; not full clinical validation,NOT RUN,0
+AUTH-01,共通,未認証・偽署名・改ざんhash・旧共有token,全拒否、業務読取/書込0,NOT RUN,endpoint auth/ACL/replay/expiry/owner; adapter native signer/entry; real OIDC not run,NOT RUN,0
+AUTH-02,共通,未登録・重複ACL・別施設・不正role・期限切れ・disabled,全拒否、本人由来監査actor,NOT RUN,endpoint auth/ACL/replay/expiry/owner; adapter native signer/entry; real OIDC not run,NOT RUN,0
+AUTH-03,共通,15秒境界・60分境界・再読込・logout・cookie再利用,期限延長なし、旧assertion/session拒否,NOT RUN,endpoint auth/ACL/replay/expiry/owner; adapter native signer/entry; real OIDC not run,NOT RUN,0
+AUTH-04,共通,jti再利用とUUID再送,旧jti拒否、新jti+同UUIDは安全に照合,NOT RUN,endpoint auth/ACL/replay/expiry/owner; adapter native signer/entry; real OIDC not run,NOT RUN,0
+AUTH-05,共通,別人再ログインと他人draft/pending,所有権違反拒否、データ非表示,NOT RUN,endpoint auth/ACL/replay/expiry/owner; adapter native signer/entry; real OIDC not run,NOT RUN,0
+CONC-01,共通,同UUID同時送信,CRF/監査は各1組、重複通知なし,NOT RUN,endpoint lock contention + serialized version conflict; cross-project/cloud concurrency not run,NOT RUN,0
+CONC-02,共通,異なるUUIDによる同版の同時訂正,片方のみ新version、もう片方version conflict,NOT RUN,endpoint lock contention + serialized version conflict; cross-project/cloud concurrency not run,NOT RUN,0
+CONC-03,共通,旧GAS/deployment/trigger経路,すべて書込不可、件数/hash不変,NOT RUN,endpoint lock contention + serialized version conflict; cross-project/cloud concurrency not run,NOT RUN,0
+NET-01,共通,送信前通信断,未保存と確認できる場合のみ同UUIDで再送,NOT RUN,endpoint partial-write repair + adapter no auto retry; NET-04 recovery flow incomplete,NOT RUN,0
+NET-02,共通,CRF追記後・監査前断,成功にしない。同UUIDで修復・照合し重複なし,NOT RUN,endpoint partial-write repair + adapter no auto retry; NET-04 recovery flow incomplete,NOT RUN,0
+NET-03,共通,監査後・応答前断,同UUID照合で既存receipt、二重保存なし,NOT RUN,endpoint partial-write repair + adapter no auto retry; NET-04 recovery flow incomplete,NOT RUN,0
+NET-04,共通,ブラウザ終了・session消失・失効中断,再認証後サーバ状態照合。UUID不明時は保存停止,NOT RUN,endpoint partial-write repair + adapter no auto retry; NET-04 recovery flow incomplete,NOT RUN,0
+MAIL-01,共通,通知停止,SMTP/API呼出0、画面と証拠に停止を表示,NOT RUN,SMTP disabled; actual success/failure not implemented or run,NOT RUN,0
+MAIL-02,共通,メール成功,別途承認された既存の管理者試験メールボックスだけへ1通。受信確認,NOT RUN,SMTP disabled; actual success/failure not implemented or run,NOT RUN,0
+MAIL-03,共通,SMTP拒否・タイムアウト・送信後応答消失,保存成功/通知失敗または不明を分離。自動重送しない,NOT RUN,SMTP disabled; actual success/failure not implemented or run,NOT RUN,0
+AUDIT-01,共通,監査欠落・UUID競合・重複行・書込無反応,成功応答なし、適切に隔離/修復,NOT RUN,endpoint corruption/missing audit/readback; pr_gas,NOT RUN,0
+BACKUP-01,共通,復元リハーサル,成功済記録欠損0、全hash/監査整合、旧session失効,NOT RUN,NOT RUN: independent QA or real backup rehearsal required,NOT RUN,0
+ENV-01,共通,backend identityとschema不一致,誤ったScript/Sheet/version/列構成なら保存禁止,NOT RUN,adapter profile and response pins; endpoint schema/pins,NOT RUN,0
+PRIV-01,共通,ログ・応答・画面・CSV,直接識別情報、生token、署名鍵の露出なし,NOT RUN,fixture privacy + adapter/GAS rejection; live logs/export not run,NOT RUN,0
+QA-01,共通,独立QA判定,全必須証拠確認、重大欠陥0、未解決を承認なしで除外しない,NOT RUN,NOT RUN: independent QA or real backup rehearsal required,NOT RUN,0

@@ -387,6 +387,7 @@ def _office_email_addresses():
 
 
 def _smtp_send(subject: str, content: str, to_addrs: list[str], html_content: str | None = None):
+    return False, "UAT_EMAIL_DISABLED"
     import streamlit as st
     try:
         mail_user = st.secrets["email"]["user"]
@@ -506,56 +507,9 @@ def _juog_actor_auth(action: str, payload: dict, st):
     return actor, None
 
 def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
-    """Call the central registration service.
-
-    Expected Streamlit secrets:
-    [registry]
-    url = "https://script.google.com/macros/s/.../exec"
-    token = "..."
-    """
     import streamlit as st
-    try:
-        url = st.secrets["registry"]["url"]
-        token = st.secrets["registry"]["token"]
-    except Exception:
-        return {"ok": False, "error": "REGISTRY_NOT_CONFIGURED"}
-    actor, err = _juog_actor_auth(action, payload or {}, st)
-    if err:
-        return {"ok": False, "error": err}
-    body = {"action": action, "token": token, "payload": payload or {}}
-    if actor is not None:
-        body["actor_auth"] = actor
-    req = urllib.request.Request(
-        url,
-        data=json.dumps(body, ensure_ascii=False, default=str).encode("utf-8"),
-        headers={"Content-Type": "application/json"},
-        method="POST",
-    )
-    # Google Apps Script ContentService may transiently fail while resolving its
-    # one-time redirect URL. Retry a small number of times from the canonical
-    # /exec endpoint; persistent configuration errors still surface unchanged.
-    import time
-    retryable_http = {404, 408, 429, 500, 502, 503, 504}
-    last_error = None
-    for attempt in range(3):
-        try:
-            ctx = ssl.create_default_context()
-            with urllib.request.urlopen(req, timeout=timeout, context=ctx) as res:
-                text_body = res.read().decode("utf-8")
-            data = json.loads(text_body)
-            return data if isinstance(data, dict) else {"ok": False, "error": "INVALID_RESPONSE"}
-        except urllib.error.HTTPError as exc:
-            last_error = {"ok": False, "error": f"HTTP_{exc.code}"}
-            if exc.code not in retryable_http or attempt == 2:
-                return last_error
-            time.sleep(0.6 * (attempt + 1))
-        except Exception as exc:
-            last_error = {"ok": False, "error": f"REGISTRY_ERROR:{exc}"}
-            if attempt == 2:
-                return last_error
-            time.sleep(0.6 * (attempt + 1))
-    return last_error or {"ok": False, "error": "REGISTRY_ERROR:UNKNOWN"}
-
+    from isolated_crf_adapter import call
+    return call(st, action, payload, timeout)
 
 
 
@@ -739,16 +693,10 @@ def validate_registry_id(registration_id: str, facility_code: str):
 
 def render_facility(label="施設名*", key="facility_name", disabled=False):
     import streamlit as st
-    options = ["選択してください"] + FACILITY_NAMES
-    current = st.session_state.get(key, "選択してください")
-    try:
-        idx = options.index(current)
-    except ValueError:
-        idx = 0
-    name = st.selectbox(label, options, index=idx, key=f"widget_{key}", disabled=disabled)
+    name = "完全架空施設（隔離UAT専用）"
+    st.selectbox(label, [name], key=f"widget_{key}", disabled=True)
     st.session_state[key] = name
-    code = FACILITY_NAME_TO_CODE.get(name, "")
-    return code, name
+    return "TEST01", name
 
 
 def render_lab_panel(prefix: str, required: bool, disabled=False, columns=2):
@@ -794,3 +742,4 @@ def render_submission_kind(prefix: str, disabled=False):
     if kind == "訂正報告":
         reason = st.text_area("訂正理由*", key=f"{prefix}_correction_reason", disabled=disabled)
     return kind, reason
+

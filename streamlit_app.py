@@ -1,135 +1,48 @@
-import re
-from datetime import datetime
-
+"""Existing fixture entry integration candidate; profile ships disabled."""
+import runpy
+import time
+from pathlib import Path
 import streamlit as st
+from isolated_crf_adapter import call, context, begin_edit
 
-from juog_common import FACILITY_NAMES, TZ, send_support_email, valid_email, valid_registration_id
+def safe_logout():
+    iat,exp=st.user.get('iat'),st.user.get('exp')
+    if type(iat) is int and type(exp) is int and int(time.time())>=min(iat+3600,exp):
+        st.logout();return
+    r=call(st,'session_revoke',{})
+    if r.get('ok') is not True or r.get('revoked') is not True:
+        raise PermissionError('REVOCATION_UNCONFIRMED')
+    st.logout()
 
-st.set_page_config(page_title="JUOG UTUC_Consolidative eCRF", layout="wide")
+def run():
+    st.set_page_config(page_title='JUOG 隔離CRF統合候補',layout='wide')
+    st.title('JUOG-UTUC01 隔離CRF')
+    if not st.user.is_logged_in:
+        if st.button('Googleでログイン'):st.login('google')
+        st.stop()
+    if st.button('セッションを失効してログアウト'):
+        try:safe_logout()
+        except Exception:st.error('失効を確認できません。停止を維持します。')
+        st.stop()
+    if st.session_state.get('auth_connect_halted'):
+        st.error('認証・ACLの確認が必要です。保存を停止しています。');st.stop()
+    try:context(st)
+    except Exception:
+        st.info('統合候補は未承認・無効です。接続・保存は行いません。');st.stop()
+    r=call(st,'ui_context',{})
+    if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
+        st.session_state['auth_connect_halted']=True
+        st.error('本人ACLを確認できません。');st.stop()
+    st.caption('TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。')
+    subject=st.text_input('編集対象のJUOG登録番号',key='_integration_subject').strip().upper()
+    if st.button('症例と現在のVersionを確認して編集開始'):
+        checked=begin_edit(st,subject)
+        if checked.get('ok') is not True:
+            st.error('編集を開始できません。未確定保存・所有権・Versionを確認してください。');st.stop()
+    if st.session_state.get('_integration_edit_subject')!=subject or not subject:
+        st.info('編集対象を確認してください。');st.stop()
+    pages={'30日':'02_perioperative_30d_crf.py','90日':'03_day90_crf.py','6〜24か月':'04_followup_crf.py'}
+    page=st.selectbox('報告時点',list(pages))
+    runpy.run_path(str(Path(__file__).with_name(pages[page])),run_name='__main__')
 
-# Make vertical scrollbars easier to grab without changing page content.
-st.markdown(
-    """
-    <style>
-    html { scrollbar-width: auto; }
-    /* Keep Streamlit subheaders visually below the blue section bars. */
-    h3, [data-testid="stHeadingWithActionElements"] h3 {
-        font-size: 18px !important;
-        line-height: 1.35 !important;
-        margin-top: 0.75rem !important;
-        margin-bottom: 0.5rem !important;
-    }
-    ::-webkit-scrollbar { width: 20px; height: 20px; }
-    ::-webkit-scrollbar-thumb {
-        background: #94A3B8;
-        border-radius: 999px;
-        border: 2px solid transparent;
-        background-clip: content-box;
-        min-height: 44px;
-    }
-    ::-webkit-scrollbar-track { background: transparent; }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-pages = {
-    "症例入力": [
-        st.Page("01_registration_crf.py", title="中央MDT審査申請", default=True),
-        st.Page("02_perioperative_30d_crf.py", title="周術期・術後30日"),
-        st.Page("03_day90_crf.py", title="術後90日"),
-        st.Page("04_followup_crf.py", title="定期経過（6〜24か月）"),
-    ],
-    "関係者専用": [
-        st.Page("06_mdt_reviewer.py", title="中央MDT判定者専用"),
-        st.Page("05_admin_mdt_registration.py", title="事務局専用：中央MDT集約・正式登録"),
-    ],
-}
-
-page = st.navigation(pages, position="sidebar")
-
-# ---------------- compact sidebar support ----------------
-st.sidebar.divider()
-with st.sidebar.popover("✉ 不具合を連絡", use_container_width=True):
-    st.caption("eCRFの不具合・エラーを研究事務局へ送信します。")
-
-    # Outside st.form so selecting "未発番" immediately switches the required input.
-    # Streamlit batches form widgets until submit and cannot dynamically update
-    # the conditional field while the selectbox lives inside the form.
-    id_kind = st.selectbox(
-        "症例識別*",
-        ["JUOG登録番号", "MDT受付番号", "未発番"],
-        key="support_id_kind",
-    )
-
-    with st.form("juog_support_form", clear_on_submit=False):
-        case_id = ""
-        facility_name = ""
-        if id_kind == "JUOG登録番号":
-            case_id = st.text_input("JUOG登録番号*", placeholder="JUOG-001", key="support_juog_id").strip().upper()
-        elif id_kind == "MDT受付番号":
-            case_id = st.text_input("MDT受付番号*", placeholder="JUOG-SCR-001", key="support_scr_id").strip().upper()
-        else:
-            facility_name = st.selectbox(
-                "施設名*",
-                ["選択してください"] + FACILITY_NAMES,
-                key="support_facility",
-            )
-
-        screen_name = st.selectbox(
-            "発生画面*",
-            [
-                "中央MDT審査申請",
-                "周術期・術後30日",
-                "術後90日",
-                "定期経過（6〜24か月）",
-                "中央MDT判定者専用",
-                "事務局専用：中央MDT集約・正式登録",
-                "その他",
-            ],
-            key="support_screen",
-        )
-        reply_email = st.text_input("返信先メールアドレス*", key="support_reply_email").strip()
-        details = st.text_area("不具合・エラー内容*", height=110, key="support_details").strip()
-        st.caption("患者氏名・カルテ番号・生年月日等の個人情報は入力しないでください。")
-
-        submitted = st.form_submit_button("送信", use_container_width=True)
-
-    if submitted:
-        errors = []
-        if id_kind == "JUOG登録番号" and not valid_registration_id(case_id):
-            errors.append("JUOG登録番号を正しい形式（例：JUOG-001）で入力してください。")
-        elif id_kind == "MDT受付番号" and not re.fullmatch(r"JUOG-SCR-\d{3,4}", case_id):
-            errors.append("MDT受付番号を正しい形式（例：JUOG-SCR-001）で入力してください。")
-        elif id_kind == "未発番" and (not facility_name or facility_name == "選択してください"):
-            errors.append("施設名を選択してください。")
-
-        if not valid_email(reply_email):
-            errors.append("返信先メールアドレスを正しく入力してください。")
-        if not details:
-            errors.append("不具合・エラー内容を入力してください。")
-
-        if errors:
-            for message in errors:
-                st.error(message)
-        else:
-            identifier = case_id if id_kind != "未発番" else f"未発番 / {facility_name}"
-            occurred_at = datetime.now(TZ).strftime("%Y-%m-%d %H:%M:%S %Z")
-            subject = f"JUOG UTUC eCRF 不具合報告 [{identifier}]"
-            content = (
-                "JUOG UTUC_Consolidative eCRF サポート依頼\n\n"
-                f"症例識別：{identifier}\n"
-                f"発生画面：{screen_name}\n"
-                f"送信日時：{occurred_at}\n"
-                f"返信先メールアドレス：{reply_email}\n\n"
-                "不具合・エラー内容：\n"
-                f"{details}\n\n"
-                "※患者氏名、カルテ番号、生年月日等の個人情報は入力しない運用です。"
-            )
-            ok, _err = send_support_email(subject, content)
-            if ok:
-                st.success("研究事務局へ送信しました。")
-            else:
-                st.error("送信できませんでした。時間をおいて再度お試しいただくか、yoshida.tks@kmu.ac.jp へご連絡ください。")
-
-page.run()
+run()

@@ -1,0 +1,22 @@
+PASS default disabled, wrong script/workbook and old generation deny
+PASS no legacy token bypass, bad signature and payload tamper
+PASS valid native-derived signed context and assert replay
+PASS ACL disabled expired wrong role other facility and duplicate principal
+PASS signature expiry and 60min deadline nonrenewal
+PASS logout rejects pending signature and future requests
+PASS case ownership, facility injection and forbidden routes deny
+PASS all nine visits v1 v2 immutable replay audit and actor
+PASS same UUID different content rejected and version conflict
+PASS single writer lock contention fails before storage
+PASS lost audit append blocks success then same UUID repairs
+PASS silent CRF append and operation append never success
+PASS expiry between body and audit no successful receipt
+PASS corrupt session head closes gate
+PASS committed missing CRF is not recreated as success
+PASS draft save resume delete plus principal binding
+PASS direct identifier and empty clinical payload rejected
+PASS read status is owner scoped and never asserts unverified success
+PASS privacy regression encoded JSON NFKC camelcase free text
+PASS missing schema and UUID/audit corruption fail closed
+PASS actual fixture Python signer accepted by actual GAS verifier
+ALL 21 GROUPS PASSED

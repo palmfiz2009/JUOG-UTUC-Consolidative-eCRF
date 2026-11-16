@@ -194,47 +194,10 @@ function reviewerMdtProgressOnly_(result) {
 
 function doPost(e) {
   try {
-    const body = JSON.parse((e && e.postData && e.postData.contents) || '{}');
-    const props = PropertiesService.getScriptProperties();
-    if (!body.token || body.token !== props.getProperty('JUOG_API_TOKEN')) {
-      return jsonResponse_({ok: false, error: 'UNAUTHORIZED'});
-    }
-    const action = String(body.action || '');
-    const payload = body.payload || {};
-    const scope = authorizeJuogAction_(action, body.actor_auth, payload, props);
-    if (!scope.ok) return jsonResponse_(scope);
-
-    if (action === 'submit_screening') return jsonResponse_(submitScreening_(payload));
-    if (action === 'list_screenings') return jsonResponse_(listScreenings_(payload));
-    if (action === 'list_review_cases') return jsonResponse_(listReviewCases_(payload));
-    if (action === 'get_screening') return jsonResponse_(getScreening_(payload));
-    if (action === 'get_screening_crf') return jsonResponse_(getScreeningCrf_(payload));
-    if (action === 'get_own_review') return jsonResponse_(getOwnReview_(payload));
-    if (action === 'submit_mdt_review') return jsonResponse_(submitMdtReview_(payload));
-    if (action === 'get_mdt_reviews') {
-      const result = getMdtReviews_(payload);
-      return jsonResponse_(scope.kind === 'reviewer' ? reviewerMdtProgressOnly_(result) : result);
-    }
-    if (action === 'finalize_mdt') return jsonResponse_(finalizeMdt_(payload));
-    if (action === 'save_crf') return jsonResponse_(saveCrf_(payload));
-    if (action === 'save_screening_draft') return jsonResponse_(saveScreeningDraft_(payload));
-    if (action === 'get_screening_draft') return jsonResponse_(getScreeningDraft_(payload));
-    if (action === 'delete_screening_draft') return jsonResponse_(deleteScreeningDraft_(payload));
-    if (action === 'save_draft') return jsonResponse_(saveDraft_(payload));
-    if (action === 'get_draft') return jsonResponse_(getDraft_(payload));
-    if (action === 'delete_draft') return jsonResponse_(deleteDraft_(payload));
-    if (action === 'reset_draft_code') return jsonResponse_(resetDraftCode_(payload));
-    if (action === 'update_draft_email') return jsonResponse_(updateDraftEmail_(payload));
-    if (action === 'get_crf_linkage') return jsonResponse_(getCrfLinkage_(payload));
-    if (action === 'validate') return jsonResponse_(validateSubject_(payload));
-    if (action === 'backend_info') return jsonResponse_(getBackendInfo_());
-    if (action === 'stats') return jsonResponse_(getStats_());
-    if (action === 'register') return jsonResponse_(legacyRegister_(payload));
-
-    return jsonResponse_({ok: false, error: 'UNKNOWN_ACTION'});
-  } catch (err) {
-    return jsonResponse_({ok: false, error: 'SERVER_ERROR', message: String(err)});
-  }
+    const envelope = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    const config = JSON.parse(PropertiesService.getScriptProperties().getProperty('JUOG_PR15_CONFIG') || '{}');
+    return jsonResponse_(juogPr15Entry_(envelope, config));
+  } catch (_) { return jsonResponse_({ok:false,error:'INTEGRATION_UNAVAILABLE'}); }
 }
 
 
@@ -1129,6 +1092,11 @@ function deleteScreeningDraft_(p) {
 }
 
 function saveDraft_(p) {
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
+  try { return saveDraft_UnderLock_(p); } finally {lock.releaseLock();}
+}
+function saveDraft_UnderLock_(p) {
   const id = String(p.registration_id || '').trim().toUpperCase();
   const crfType = String(p.crf_type || '').trim();
   const visit = String(p.visit || '').trim();
@@ -1144,9 +1112,7 @@ function saveDraft_(p) {
   const registry = validateSubject_({registration_id:id, facility_code:String(p.facility_code || '').trim()});
   if (!registry.ok) return registry;
 
-  const lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
-  try {
+
     const ss = getSpreadsheet_();
     const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
     const values = sh.getDataRange().getValues();
@@ -1195,12 +1161,14 @@ function saveDraft_(p) {
       facility_name:String(registry.facility_name || ''),
       reporter_email:ownerEmail
     };
-  } finally {
-    lock.releaseLock();
-  }
 }
 
 function getDraft_(p) {
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
+  try { return getDraft_UnderLock_(p); } finally {lock.releaseLock();}
+}
+function getDraft_UnderLock_(p) {
   const id = String(p.registration_id || '').trim().toUpperCase();
   const crfType = String(p.crf_type || '').trim();
   const visit = String(p.visit || '').trim();
@@ -1211,9 +1179,7 @@ function getDraft_(p) {
   const registry = validateSubject_({registration_id:id, facility_code:''});
   if (!registry.ok) return registry;
 
-  const lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
-  try {
+
     const ss = getSpreadsheet_();
     const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
     const values = sh.getDataRange().getValues();
@@ -1248,9 +1214,6 @@ function getDraft_(p) {
       };
     }
     return {ok:true, source_found:false, registration_id:id};
-  } finally {
-    lock.releaseLock();
-  }
 }
 
 function resetDraftCode_(p) {
@@ -1361,6 +1324,11 @@ function updateDraftEmail_(p) {
 }
 
 function deleteDraft_(p) {
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
+  try { return deleteDraft_UnderLock_(p); } finally {lock.releaseLock();}
+}
+function deleteDraft_UnderLock_(p) {
   const id = String(p.registration_id || '').trim().toUpperCase();
   const crfType = String(p.crf_type || '').trim();
   const visit = String(p.visit || '').trim();
@@ -1369,9 +1337,7 @@ function deleteDraft_(p) {
   const registry = validateSubject_({registration_id:id, facility_code:''});
   if (!registry.ok) return registry;
 
-  const lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) return {ok:false, error:'LOCK_TIMEOUT'};
-  try {
+
     const ss = getSpreadsheet_();
     const sh = ensureSheetHeaders_(ss, CRF_DRAFT_SHEET, CRF_DRAFT_HEADERS);
     const values = sh.getDataRange().getValues();
@@ -1386,12 +1352,14 @@ function deleteDraft_(p) {
       }
     }
     return {ok:true, deleted:false};
-  } finally {
-    lock.releaseLock();
-  }
 }
 
 function saveCrf_(p) {
+  const lock=LockService.getScriptLock();
+  if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
+  try { return saveCrf_UnderLock_(p); } finally {lock.releaseLock();}
+}
+function saveCrf_UnderLock_(p) {
   const payload = p.payload;
   if (!payload || typeof payload !== 'object') return {ok: false, error: 'MISSING_PAYLOAD'};
   if (containsDirectIdentifier_(payload)) return {ok:false, error:'DIRECT_IDENTIFIER_NOT_ALLOWED'};
@@ -1405,17 +1373,12 @@ function saveCrf_(p) {
   const hardCheck = validateCrfHardStops_(payload, validation);
   if (!hardCheck.ok) return hardCheck;
 
-  const lock = LockService.getScriptLock();
-  if (!lock.tryLock(30000)) return {ok: false, error: 'LOCK_TIMEOUT'};
-  try {
+
     // A retry UUID must belong to one CRF row and one type/visit only.
     // Enforce this across all three CRF tabs while holding the same save lock.
     const uuidScope = verifyCrfUuidScope_(sheetName, payload);
     if (!uuidScope.ok) return uuidScope;
     return savePayloadToSheet_(sheetName, payload, true);
-  } finally {
-    lock.releaseLock();
-  }
 }
 
 function verifyCrfUuidScope_(targetSheetName, payload) {
@@ -1645,14 +1608,23 @@ function getBackendInfo_() {
 }
 
 // Privacy safeguard: reject direct identifier keys in submitted payloads.
-function containsDirectIdentifier_(value) {
-  const prohibited = ['full_patient_name', 'patient_name', 'patient_full_name', 'mrn',
-    'medical_record_number', 'patient_address', 'personal_address', 'patient_phone',
-    'birth_date', 'full_dob', 'date_of_birth'];
-  if (!value || typeof value !== 'object') return false;
-  return Object.keys(value).some(key => {
-    if (prohibited.indexOf(String(key).trim().toLowerCase()) >= 0) return true;
-    return containsDirectIdentifier_(value[key]);
+function containsDirectIdentifier_(value, depth) {
+  depth=depth||0;if(depth>30)return true;
+  if(typeof value==='string'){
+    const text=value.normalize('NFKC');
+    if(/^[\s]*[\[{]/.test(text)){
+      try { const parsed=JSON.parse(text);if(parsed&&typeof parsed==='object'&&containsDirectIdentifier_(parsed,depth+1))return true; } catch(_) {}
+    }
+    return /(?:生年月日|患者氏名|カルテ番号)\s*(?:は|が|[:=])\s*\S/i.test(text)||
+     /(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S/i.test(text)||
+     /(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]/i.test(text);
+  }
+  if(!value||typeof value!=='object')return false;
+  return Object.keys(value).some(key=>{
+    const text=String(key).normalize('NFKC');
+    if(/(?:^|[^一-龯ぁ-んァ-ヶ])(?:患者氏名|患者姓名|カルテ番号|診療録番号|生年月日)$/.test(text))return true;
+    const normalized=text.replace(/([A-Z]+)([A-Z][a-z])/g,'$1_$2').replace(/([a-z0-9])([A-Z])/g,'$1_$2').toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_|_$/g,'');
+    return /(?:^|_)(?:birth_date|dob|full_dob|date_of_birth|patient_name|patient_full_name|full_patient_name|first_name|last_name|given_name|family_name|patient_surname|mrn|medical_record_number|patient_address|personal_address|patient_phone)$/.test(normalized)||containsDirectIdentifier_(value[key],depth+1);
   });
 }
 
@@ -1802,6 +1774,7 @@ function flattenObject_(obj, prefix, out) {
 }
 
 function ensureDynamicHeaders_(sh, headers) {
+  if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
   const current = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0].map(String);
   let changed = false;
   headers.forEach(h => { if (current.indexOf(h) < 0) { current.push(h); changed = true; } });
@@ -1809,6 +1782,7 @@ function ensureDynamicHeaders_(sh, headers) {
 }
 
 function appendByHeaders_(sh, obj) {
+  if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
   const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
   sh.appendRow(headers.map(h => safeCell_(Object.prototype.hasOwnProperty.call(obj, h) ? obj[h] : '')));
 }
@@ -1822,6 +1796,7 @@ function safeCell_(value) {
 }
 
 function setByHeader_(sh, rowNo, idx, obj) {
+  if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
   Object.keys(obj).forEach(k => { if (idx[k] !== undefined) sh.getRange(rowNo, idx[k] + 1).setValue(safeCell_(obj[k])); });
 }
 

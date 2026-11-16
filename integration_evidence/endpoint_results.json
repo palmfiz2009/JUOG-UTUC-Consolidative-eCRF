@@ -1,0 +1,29 @@
+{
+  "mode": "OFFLINE_IN_MEMORY_REAL_SOURCE",
+  "test_groups": 21,
+  "tests": [
+    "default disabled, wrong script/workbook and old generation deny",
+    "no legacy token bypass, bad signature and payload tamper",
+    "valid native-derived signed context and assert replay",
+    "ACL disabled expired wrong role other facility and duplicate principal",
+    "signature expiry and 60min deadline nonrenewal",
+    "logout rejects pending signature and future requests",
+    "case ownership, facility injection and forbidden routes deny",
+    "all nine visits v1 v2 immutable replay audit and actor",
+    "same UUID different content rejected and version conflict",
+    "single writer lock contention fails before storage",
+    "lost audit append blocks success then same UUID repairs",
+    "silent CRF append and operation append never success",
+    "expiry between body and audit no successful receipt",
+    "corrupt session head closes gate",
+    "committed missing CRF is not recreated as success",
+    "draft save resume delete plus principal binding",
+    "direct identifier and empty clinical payload rejected",
+    "read status is owner scoped and never asserts unverified success",
+    "privacy regression encoded JSON NFKC camelcase free text",
+    "missing schema and UUID/audit corruption fail closed",
+    "actual fixture Python signer accepted by actual GAS verifier"
+  ],
+  "formal_uat_pass_delta": 0,
+  "independent_qa_approved": false
+}
