@@ -156,12 +156,18 @@ def submit_crf_with_feedback(
 
     # Never show "saved", send mail or delete a draft on an ambiguous or
     # mismatched server response. A retry must retain this frozen UUID.
-    if (result.get("submission_id") != attempt["payload"]["submission_id"]
+    frozen = attempt["payload"]
+    if (result.get("submission_id") != frozen["submission_id"]
+            or result.get("record_key") != frozen["record_key"]
+            or result.get("crf_type") != crf_type
+            or str(result.get("visit") or "") != str(frozen.get("visit") or "")
+            or str(result.get("spreadsheet_id") or "").strip() != expected_sheet_id
+            or result.get("audit_verified") is not True
             or type(result.get("record_version")) is not int
             or result["record_version"] < 1
             or type(result.get("existing")) is not bool):
         attempt["status"] = "uncertain"
-        st.error("保存応答の送信ID・Versionを照合できません。確定扱いせず、同じ送信IDで確認してください。")
+        st.error("保存応答の症例・送信ID・Version・監査確認・保存先を照合できません。確定扱いせず、同じ送信IDで確認してください。")
         return False
 
     attempt["record_version"] = str(result["record_version"])
