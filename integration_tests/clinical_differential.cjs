@@ -1,0 +1,2 @@
+const fs=require('fs'),vm=require('vm');const x={};vm.createContext(x);for(const f of ['clinical_contract_generated.gs','clinical_validation.gs'])vm.runInContext(fs.readFileSync(f,'utf8'),x);
+const input=JSON.parse(fs.readFileSync(0,'utf8'));const results=input.map(p=>{const trace={};const result=x.juogClinicalValidate_(p,'2026-11-16',trace);return {result,trace}});process.stdout.write(JSON.stringify(results));

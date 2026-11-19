@@ -143,6 +143,12 @@ def submit_crf_with_feedback(
         st.error("保存先台帳のバージョンまたはIDが一致しません。正式保存は実行していません。管理者へ連絡してください。")
         return False
 
+    from clinical_validation import validate_payload
+    clinical = validate_payload(attempt["payload"])
+    if not clinical["ok"]:
+        st.error("臨床入力を確認してください：" + " / ".join(clinical["missing"] + clinical["errors"]))
+        return False
+
     attempt["status"] = "saving"
     attempt["saving_started_at"] = time.time()
     try:

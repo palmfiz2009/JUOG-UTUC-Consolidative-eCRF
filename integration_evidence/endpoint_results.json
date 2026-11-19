@@ -1,6 +1,6 @@
 {
   "mode": "OFFLINE_IN_MEMORY_REAL_SOURCE",
-  "test_groups": 21,
+  "test_groups": 31,
   "tests": [
     "default disabled, wrong script/workbook and old generation deny",
     "no legacy token bypass, bad signature and payload tamper",
@@ -22,7 +22,17 @@
     "read status is owner scoped and never asserts unverified success",
     "privacy regression encoded JSON NFKC camelcase free text",
     "missing schema and UUID/audit corruption fail closed",
-    "actual fixture Python signer accepted by actual GAS verifier"
+    "actual fixture Python signer accepted by actual GAS verifier",
+    "recovery lists saved UUID version and audit after browser loss",
+    "recovery retries stored payload same UUID using new signed request",
+    "recovery cannot substitute payload or invent UUID or mix visit",
+    "recovery missing canonical payload or corrupted digest stops",
+    "recovery owner revocation and expired assertion deny",
+    "clinical rejection cannot append body version audit or operation intent",
+    "clinically complete operated fixture saves v1 and correction with old version retained",
+    "all visit clinical failures leave CRF audit intent and notification state unchanged",
+    "recovery payload digest mismatch and untracked rows prevent retry",
+    "recovery jti replay fails while fresh signature can reconcile"
   ],
   "formal_uat_pass_delta": 0,
   "independent_qa_approved": false

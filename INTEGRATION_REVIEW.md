@@ -1,3 +1,18 @@
+# Current implementation update — 2026-11-20 JST
+
+Parent commit: `2c358c4bc14af399cabd431f6adc6e31ac294fae`. Only the existing isolation development branch is updated. No deployment or live service/configuration change. Current test results supersede the historical baseline counts below.
+
+- Python: **165 passed** = original 156 + 5 clinical + 4 recovery UI tests.
+- GAS integration: **31 groups passed** = original 21 + 10 added groups.
+- Existing PR GAS and 14 identity cases: passed.
+- Clinical Python/GAS differential corpus: **8,062 cases, 0 differences**; see `integration_evidence/clinical_coverage.json`. 254 conditions reached; 253 both outcomes; the remaining unselected-visit case is rejected by a preceding schema gate and explicitly tested.
+- Conditions, widget inventory and branch witnesses are committed. Existing 74-row UAT mapping retains NOT RUN and formal PASS delta 0.
+- `.github/workflows/pr15-isolated-offline.yml` is a manual-only rerun definition, not evidence of a hosted Actions run.
+
+**Live UAT: NO-GO for now.** Approved clinical protocol conformity, independent QA, verified writer exclusion/backup and individual deployment/settings approvals remain required. Notification success/failure is still outside this change because external mail remains disabled. No identified failure remains in the executed offline tests; this is not proof of zero clinical or real-environment defects.
+
+## Historical integration baseline and retained operating procedures
+
 # PR #15 authenticated CRF integration candidate — OFFLINE ONLY
 
 2026-11-16 UTC. Not deployed. Profile disabled. Independent QA **not approved**.
@@ -69,20 +84,8 @@ writer must be stopped separately after approval. No automatic stop is included.
 
 ## Remaining major issues / release blockers
 
-1. **Clinical server-side validation parity remains incomplete (inherited PR issue).**
-   The PR hard-stop validator checks selected date/vital contradictions, not the
-   complete UI conditional-required field dictionary or all future-date rules.
-   Adapter rejects empty clinical data but a nonempty incomplete clinical payload
-   is not thereby proven valid. The all-visit persistence fixtures test storage,
-   not clinical completeness. Complete/review the server contract and negative
-   cases before enabling real save UAT. Do not interpret all-green regressions
-   as absence of this known gap.
-2. **Browser/session loss recovery is safely stopped but not a completed user flow.**
-   In-session retry preserves UUID and payload. Server `request_status` is
-   owner-scoped and returns `UNCONFIRMED` or `COMMITTED_RECHECK_REQUIRED`; it never
-   turns historical receipt alone into current verified success. If the browser
-   loses its frozen payload/UUID, automatic reconstruction/new submission is not
-   implemented. An operator reconciliation/recovery flow is still needed for NET-04.
+1. **UI/GAS contract is now implemented and differentially tested.** See `clinical_contract/README.md`, the 191-widget specification, 254-condition table and current evidence. Full conformity to the approved 2026-09-16 clinical protocol is still NOT VERIFIED; repository alignment notes refer to a different version. This remains a release gate, not an invented approval.
+2. **Browser-loss recovery is now implemented in the existing app.** See `RECOVERY_IMPLEMENTATION.md`. Server-held canonical intent enables same-UUID repair; unknown, legacy or contradictory evidence stops new submission. Real browser/OIDC and GAS/Sheets behavior still require live UAT.
 3. **Notification success/failure UAT remains blocked.** SMTP is intentionally
    disabled. No notification outbox or mail-success claim is added. A separately
    approved existing test mailbox and notification implementation/review are needed.

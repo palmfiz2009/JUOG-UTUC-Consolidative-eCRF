@@ -18,7 +18,7 @@ SCRIPT = '1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR'
 SHEET = '1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs'
 STAGE = 'PR15_ISOLATED_CRFS'
 ROUTES = {'ui_context','session_revoke','backend_info','validate','get_crf_linkage',
-          'save_crf','save_draft','get_draft','delete_draft','read_crf','request_status'}
+          'save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry'}
 
 def load_profile():
     return json.loads(Path(__file__).with_name('isolated_crf_profile.json').read_text())
@@ -80,6 +80,7 @@ def call(st,action,payload=None,timeout=20):
                 raise PermissionError('FICTIONAL_CONTACT_REQUIRED')
             if redact_draft_identifiers(body)!=body:raise PermissionError('DIRECT_IDENTIFIER_NOT_ALLOWED')
         if action=='save_crf':
+            if st.session_state.get('_recovery_blocks_new'):raise PermissionError('RECOVERY_RECONCILIATION_REQUIRED')
             body=p.get('payload',{})
             if st.session_state.get('_integration_edit_subject')!=body.get('registration_id'):
                 raise PermissionError('EDIT_SUBJECT_REQUIRED')
@@ -120,7 +121,7 @@ def call(st,action,payload=None,timeout=20):
             'INTEGRATION_NOT_APPROVED','PRINCIPAL_NOT_APPROVED','CONFIG_BINDING_MISMATCH',
             'SESSION_HALTED','ACTOR_CHANGED','SUBMISSION_ID_CONFLICT','OBSERVED_VERSION_REQUIRED',
             'INVALID_VERSION','RESPONSE_BINDING_MISMATCH','ACL_RESPONSE_MISMATCH','INVALID_VERSION_RESPONSE','EDIT_SUBJECT_REQUIRED',
-            'FICTIONAL_CONTACT_REQUIRED','DIRECT_IDENTIFIER_NOT_ALLOWED'
+            'FICTIONAL_CONTACT_REQUIRED','DIRECT_IDENTIFIER_NOT_ALLOWED','RECOVERY_RECONCILIATION_REQUIRED'
         } else 'AUTHENTICATION_REQUIRED'}
     except Exception:
         # Do not leak URLs, credentials or raw transport exceptions. No retry.

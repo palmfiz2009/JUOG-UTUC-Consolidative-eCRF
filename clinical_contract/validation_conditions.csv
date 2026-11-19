@@ -1,0 +1,255 @@
+﻿id,file,line,condition,test,approval
+02-613,02_perioperative_30d_crf.py,613,facility_name == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-614,02_perioperative_30d_crf.py,614,not registration_id,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-616,02_perioperative_30d_crf.py,616,not valid_registration_id(registration_id),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-618,02_perioperative_30d_crf.py,618,not text(reporter_email),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-620,02_perioperative_30d_crf.py,620,not valid_email(reporter_email),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-622,02_perioperative_30d_crf.py,622,submission_kind == '訂正報告' and (not text(correction_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-623,02_perioperative_30d_crf.py,623,surgery_performed is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-625,02_perioperative_30d_crf.py,625,planned_or_reference_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-627,02_perioperative_30d_crf.py,627,surgery_performed is not None and last_evp_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-630,02_perioperative_30d_crf.py,630,surgery_performed == '実施した',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-632,02_perioperative_30d_crf.py,632,v is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-633,02_perioperative_30d_crf.py,633,initial_hospital_outcome is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-635,02_perioperative_30d_crf.py,635,initial_hospital_outcome == '退院済み' and op_discharge_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-637,02_perioperative_30d_crf.py,637,op_type == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-638,02_perioperative_30d_crf.py,638,"op_type == 'その他（プロトコル逸脱）' and (not text(st.session_state.get('peri_op_other', '')))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-639,02_perioperative_30d_crf.py,639,not approaches,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-640,02_perioperative_30d_crf.py,640,len(approaches) >= 2 and approach_pattern == '',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-641,02_perioperative_30d_crf.py,641,approach_pattern == '予定外のアプローチ変更（conversion）' and (not text(conversion_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-642,02_perioperative_30d_crf.py,642,op_completed is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-643,02_perioperative_30d_crf.py,643,op_completed == 'いいえ' and (not text(op_incomplete_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-644,02_perioperative_30d_crf.py,644,op_time is None or op_time <= 0,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-645,02_perioperative_30d_crf.py,645,bleeding is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-646,02_perioperative_30d_crf.py,646,eau_grade == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-647,02_perioperative_30d_crf.py,647,"eau_grade not in ['選択してください', 'Grade 0'] and (not text(eau_detail))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-648,02_perioperative_30d_crf.py,648,ln_dissection is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-649,02_perioperative_30d_crf.py,649,ln_dissection == '実施した' and (not ln_range),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-650,02_perioperative_30d_crf.py,650,unrecovered_g2_relevant is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-651,02_perioperative_30d_crf.py,651,"unrecovered_g2_relevant == 'あり' and (not text(st.session_state.get('peri_g2_detail', '')))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-652,02_perioperative_30d_crf.py,652,op_date and last_evp_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-654,02_perioperative_30d_crf.py,654,last_evp_date > op_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-655,02_perioperative_30d_crf.py,655,(wd > 56 or wd < 28) and (not text(protocol_deviation_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-656,02_perioperative_30d_crf.py,656,op_admission_date and op_date and (op_admission_date > op_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-657,02_perioperative_30d_crf.py,657,op_discharge_date and op_date and (op_discharge_date < op_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-659,02_perioperative_30d_crf.py,659,op_discharge_date and op_admission_date and (op_discharge_date < op_admission_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-662,02_perioperative_30d_crf.py,662,initial_hospital_outcome == '退院済み',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-663,02_perioperative_30d_crf.py,663,op_discharge_date and op_date and (op_discharge_date <= op_date + timedelta(days=30)) and (readmission_30d is None),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-665,02_perioperative_30d_crf.py,665,readmission_30d == 'あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-666,02_perioperative_30d_crf.py,666,readmission_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-668,02_perioperative_30d_crf.py,668,not text(readmission_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-670,02_perioperative_30d_crf.py,670,readmission_day30_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-672,02_perioperative_30d_crf.py,672,readmission_day30_status == '再退院済み' and readmission_discharge_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-674,02_perioperative_30d_crf.py,674,readmission_date and op_discharge_date and (readmission_date < op_discharge_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-676,02_perioperative_30d_crf.py,676,readmission_date and op_date and (readmission_date > op_date + timedelta(days=30)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-678,02_perioperative_30d_crf.py,678,readmission_discharge_date and readmission_date and (readmission_discharge_date < readmission_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-680,02_perioperative_30d_crf.py,680,op_type == 'その他（プロトコル逸脱）',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-681,02_perioperative_30d_crf.py,681,unrecovered_g2_relevant == 'あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-685,02_perioperative_30d_crf.py,685,"path.get(key) in [None, '', '選択してください']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-686,02_perioperative_30d_crf.py,686,path.get('histology') == 'その他' and (not text(path.get('histology_other'))),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-687,02_perioperative_30d_crf.py,687,path.get('subtype_presence') is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-688,02_perioperative_30d_crf.py,688,path.get('subtype_presence') == 'あり' and (not path.get('subtypes')),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-689,02_perioperative_30d_crf.py,689,path.get('size_mm') is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-690,02_perioperative_30d_crf.py,690,not path.get('locations'),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-691,02_perioperative_30d_crf.py,691,"path.get('ypn') in [None, '', '選択してください']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-692,02_perioperative_30d_crf.py,692,ln_dissection == '実施した' and path.get('ln_count_examined') is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-694,02_perioperative_30d_crf.py,694,"path.get('ypn') in ['ypN1', 'ypN2'] and (not path.get('ypn_sites'))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-695,02_perioperative_30d_crf.py,695,"(path.get('ypn') == 'ypNX（評価不能）' or '評価不能' in [path.get('histology'), path.get('ypt'), path.get('lvi'), path.get('r0'), path.get('trg')]) and (not text(path.get('eval_failed_reason')))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-696,02_perioperative_30d_crf.py,696,surgery_performed == '実施しなかった',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-697,02_perioperative_30d_crf.py,697,no_op_reason == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-698,02_perioperative_30d_crf.py,698,"no_op_reason == 'その他' and (not text(st.session_state.get('peri_noop_other', '')))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-702,02_perioperative_30d_crf.py,702,surgery_performed == '実施した',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-709,02_perioperative_30d_crf.py,709,v is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-713,02_perioperative_30d_crf.py,713,initial_hospital_outcome == '退院済み',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-720,02_perioperative_30d_crf.py,720,v is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-723,02_perioperative_30d_crf.py,723,discharge_lab_available is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-725,02_perioperative_30d_crf.py,725,discharge_lab_available == 'あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-726,02_perioperative_30d_crf.py,726,discharge_lab_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-728,02_perioperative_30d_crf.py,728,not any((text(v) for v in discharge_labs_raw.values())),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-730,02_perioperative_30d_crf.py,730,discharge_lab_date and op_date and (discharge_lab_date < op_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-732,02_perioperative_30d_crf.py,732,discharge_lab_date and op_discharge_date and (discharge_lab_date > op_discharge_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-735,02_perioperative_30d_crf.py,735,visit_date_30 is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-736,02_perioperative_30d_crf.py,736,reference_date and visit_date_30,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-738,02_perioperative_30d_crf.py,738,visit_date_30 < reference_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-739,02_perioperative_30d_crf.py,739,visit_date_30 > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-740,02_perioperative_30d_crf.py,740,not wi['min'] <= visit_date_30 <= wi['max'],clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-741,02_perioperative_30d_crf.py,741,not text(window_deviation_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-746,02_perioperative_30d_crf.py,746,day30_lab_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-748,02_perioperative_30d_crf.py,748,not any((text(v) for v in day30_labs_raw.values())),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-750,02_perioperative_30d_crf.py,750,reference_date and day30_lab_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-752,02_perioperative_30d_crf.py,752,not lab_wi['min'] <= day30_lab_date <= lab_wi['max'],clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-755,02_perioperative_30d_crf.py,755,surgery_performed == '実施した',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-756,02_perioperative_30d_crf.py,756,cd_grade == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-757,02_perioperative_30d_crf.py,757,"cd_grade not in ['選択してください', 'Grade 0']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-758,02_perioperative_30d_crf.py,758,cd_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-759,02_perioperative_30d_crf.py,759,not text(cd_detail),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-760,02_perioperative_30d_crf.py,760,cd_relation == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-761,02_perioperative_30d_crf.py,761,renal_exception and (not text(renal_exception_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-762,02_perioperative_30d_crf.py,762,op_date and cd_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-763,02_perioperative_30d_crf.py,763,cd_date < op_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-764,02_perioperative_30d_crf.py,764,cd_date > op_date + timedelta(days=30),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-765,02_perioperative_30d_crf.py,765,has_ctcae and (not text(ctcae_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-767,02_perioperative_30d_crf.py,767,adj_plan == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-768,02_perioperative_30d_crf.py,768,"adj_plan in ['治験（TROP2標的ADC、その他）', 'その他'] and (not text(adj_detail))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-769,02_perioperative_30d_crf.py,769,"adj_plan not in ['選択してください', '無治療（経過観察）'] and adj_start is None",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-770,02_perioperative_30d_crf.py,770,adj_start and adj_end and (adj_end < adj_start),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-772,02_perioperative_30d_crf.py,772,"initial_hospital_outcome == '初回入院中に死亡' and status_alive not in [None, '死亡']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-774,02_perioperative_30d_crf.py,774,"readmission_day30_status == '再入院中に死亡' and status_alive not in [None, '死亡']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-777,02_perioperative_30d_crf.py,777,status_alive is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-778,02_perioperative_30d_crf.py,778,status_alive == '生存',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-779,02_perioperative_30d_crf.py,779,final_visit_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-782,02_perioperative_30d_crf.py,782,final_visit_date > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-784,02_perioperative_30d_crf.py,784,visit_date_30 and final_visit_date < visit_date_30,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-786,02_perioperative_30d_crf.py,786,cd_grade == 'Grade V',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-789,02_perioperative_30d_crf.py,789,death_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-792,02_perioperative_30d_crf.py,792,death_date > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-794,02_perioperative_30d_crf.py,794,death_cause == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-795,02_perioperative_30d_crf.py,795,surgery_performed == '実施した' and death_date and op_date and (death_date < op_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-454,03_day90_crf.py,454,not facility_name or facility_name == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-456,03_day90_crf.py,456,not registration_id,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-458,03_day90_crf.py,458,not valid_registration_id(registration_id),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-460,03_day90_crf.py,460,not text(reporter_email),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-462,03_day90_crf.py,462,not valid_email(reporter_email),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-464,03_day90_crf.py,464,submission_kind == '訂正報告' and (not text(correction_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-466,03_day90_crf.py,466,"surgery_performed not in ['実施した', '実施しなかった']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-468,03_day90_crf.py,468,reference_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-470,03_day90_crf.py,470,visit_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-471,03_day90_crf.py,471,reference_date and visit_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-473,03_day90_crf.py,473,visit_date < reference_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-474,03_day90_crf.py,474,visit_date > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-475,03_day90_crf.py,475,not wi['min'] <= visit_date <= wi['max'],clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-477,03_day90_crf.py,477,not text(visit_deviation_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-481,03_day90_crf.py,481,lab_available is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-483,03_day90_crf.py,483,lab_available == 'あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-484,03_day90_crf.py,484,lab_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-486,03_day90_crf.py,486,not any((text(v) for v in labs_raw.values())),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-488,03_day90_crf.py,488,lab_date and reference_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-490,03_day90_crf.py,490,not wi_lab['min'] <= lab_date <= wi_lab['max'],clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-492,03_day90_crf.py,492,lab_date and lab_date > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-494,03_day90_crf.py,494,lab_date and visit_date and (lab_date > visit_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-498,03_day90_crf.py,498,cytology == '未実施' and (not text(required_test_omission_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-500,03_day90_crf.py,500,imaging_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-501,03_day90_crf.py,501,imaging_status == '実施',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-502,03_day90_crf.py,502,imaging_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-503,03_day90_crf.py,503,recist_status == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-504,03_day90_crf.py,504,recist_status == 'PDあり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-505,03_day90_crf.py,505,progression_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-506,03_day90_crf.py,506,not progression_sites,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-507,03_day90_crf.py,507,not text(progression_detail),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-508,03_day90_crf.py,508,not text(imaging_not_done_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-510,03_day90_crf.py,510,cystoscopy_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-511,03_day90_crf.py,511,cystoscopy_status == '実施',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-512,03_day90_crf.py,512,cystoscopy_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-513,03_day90_crf.py,513,cystoscopy_result == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-514,03_day90_crf.py,514,"cystoscopy_result in ['腫瘍あり', '評価不能'] and (not text(cystoscopy_detail))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-515,03_day90_crf.py,515,not text(cystoscopy_not_done_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-518,03_day90_crf.py,518,d and visit_date and (d > visit_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-519,03_day90_crf.py,519,d and d > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-520,03_day90_crf.py,520,"d and reference_date and (label in ['画像検査日', '膀胱鏡日'])",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-522,03_day90_crf.py,522,not wi_test['min'] <= d <= wi_test['max'],clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-525,03_day90_crf.py,525,surgery_performed == '実施した',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-526,03_day90_crf.py,526,new_complication is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-527,03_day90_crf.py,527,new_complication == 'あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-528,03_day90_crf.py,528,"cd_grade in ['選択してください', 'Grade 0', 'N/A']",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-529,03_day90_crf.py,529,cd_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-530,03_day90_crf.py,530,not text(cd_detail),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-531,03_day90_crf.py,531,cd_relation == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-532,03_day90_crf.py,532,renal_exception and (not text(renal_exception_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-533,03_day90_crf.py,533,cd_date and reference_date,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-535,03_day90_crf.py,535,d <= 30,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-536,03_day90_crf.py,536,d > 90,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-537,03_day90_crf.py,537,has_ctcae and (not text(ctcae_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-539,03_day90_crf.py,539,intra_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-540,03_day90_crf.py,540,intra_status == 'あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-541,03_day90_crf.py,541,intra_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-542,03_day90_crf.py,542,not intra_sites,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-543,03_day90_crf.py,543,'その他' in intra_sites and (not text(intra_site_other)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-544,03_day90_crf.py,544,not intra_tx,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-545,03_day90_crf.py,545,'経過観察' in intra_tx and len(intra_tx) > 1,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-546,03_day90_crf.py,546,'その他' in intra_tx and (not text(intra_tx_other)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-547,03_day90_crf.py,547,intra_tx and '経過観察' not in intra_tx and (intra_tx_status is None),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-549,03_day90_crf.py,549,intra_tx_status == '実施済み・継続中',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-550,03_day90_crf.py,550,"any((x in intra_tx for x in ['TURBT', '上部尿路内視鏡的治療', '手術（腎尿管全摘等）']))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-551,03_day90_crf.py,551,intra_procedure_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-552,03_day90_crf.py,552,not text(intra_path),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-553,03_day90_crf.py,553,"any((x in intra_tx for x in ['BCG注入療法', '抗がん剤注入療法']))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-554,03_day90_crf.py,554,intra_instill_start is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-555,03_day90_crf.py,555,not intra_instill_ongoing and intra_instill_end is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-556,03_day90_crf.py,556,intra_instill_start and intra_instill_end and (intra_instill_end < intra_instill_start),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-559,03_day90_crf.py,559,intra_date and dt and (dt < intra_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-562,03_day90_crf.py,562,adj_plan == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-563,03_day90_crf.py,563,"adj_plan in ['治験（TROP2標的ADC、その他）', 'その他'] and (not text(adj_detail))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-564,03_day90_crf.py,564,"adj_plan not in ['選択してください', '無治療（経過観察）'] and adj_start is None",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-565,03_day90_crf.py,565,adj_start and adj_end and (adj_end < adj_start),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-567,03_day90_crf.py,567,vital_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-568,03_day90_crf.py,568,vital_status == '生存',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-569,03_day90_crf.py,569,last_alive_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-570,03_day90_crf.py,570,cd_grade == 'Grade V',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-572,03_day90_crf.py,572,death_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-573,03_day90_crf.py,573,death_cause == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+03-575,03_day90_crf.py,575,d and d > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-384,04_followup_crf.py,384,not facility_code or not facility_name,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-386,04_followup_crf.py,386,source_30d_record_version <= 0 or not source_30d_submission_id,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-388,04_followup_crf.py,388,facility_name == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-389,04_followup_crf.py,389,not valid_registration_id(registration_id),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-390,04_followup_crf.py,390,not valid_email(reporter_email),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-391,04_followup_crf.py,391,surgery_performed is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-392,04_followup_crf.py,392,reference_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-393,04_followup_crf.py,393,submission_kind == '訂正報告' and (not text(correction_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-394,04_followup_crf.py,394,visit_month == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-395,04_followup_crf.py,395,visit_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-396,04_followup_crf.py,396,visit_date and visit_date > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-397,04_followup_crf.py,397,reference_date and visit_date and (visit_date < reference_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-400,04_followup_crf.py,400,cytology_not_done_now and (not text(required_test_omission_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-402,04_followup_crf.py,402,imaging_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-403,04_followup_crf.py,403,imaging_status == '実施',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-404,04_followup_crf.py,404,imaging_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-405,04_followup_crf.py,405,recist_status == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-406,04_followup_crf.py,406,recist_status == '今回PDあり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-407,04_followup_crf.py,407,progression_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-408,04_followup_crf.py,408,not progression_sites,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-409,04_followup_crf.py,409,not text(progression_detail),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-410,04_followup_crf.py,410,not text(imaging_not_done_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-412,04_followup_crf.py,412,cystoscopy_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-413,04_followup_crf.py,413,cystoscopy_status == '実施',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-414,04_followup_crf.py,414,cystoscopy_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-415,04_followup_crf.py,415,cystoscopy_result == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-416,04_followup_crf.py,416,"cystoscopy_result in ['腫瘍あり', '評価不能'] and (not text(cystoscopy_detail))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-417,04_followup_crf.py,417,not text(cystoscopy_not_done_reason),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-420,04_followup_crf.py,420,d and visit_date and (d > visit_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-421,04_followup_crf.py,421,d and d > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-422,04_followup_crf.py,422,"d and reference_date and (visit_month != '選択してください') and (label in ['画像検査日', '膀胱鏡日'])",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-425,04_followup_crf.py,425,abs((d - target_check).days) > 30,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-429,04_followup_crf.py,429,lab_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-431,04_followup_crf.py,431,lab_status == '実施あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-435,04_followup_crf.py,435,not any((text(v) for v in labs_raw.values())),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-440,04_followup_crf.py,440,intra_status == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-441,04_followup_crf.py,441,intra_status == '今回新規あり',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-442,04_followup_crf.py,442,intra_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-443,04_followup_crf.py,443,not intra_sites,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-444,04_followup_crf.py,444,'その他' in intra_sites and (not text(intra_site_other)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-445,04_followup_crf.py,445,not intra_tx,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-446,04_followup_crf.py,446,'経過観察' in intra_tx and len(intra_tx) > 1,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-447,04_followup_crf.py,447,'その他' in intra_tx and (not text(intra_tx_other)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-448,04_followup_crf.py,448,intra_tx and '経過観察' not in intra_tx and (intra_tx_status is None),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-450,04_followup_crf.py,450,intra_tx_status == '実施済み・継続中',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-451,04_followup_crf.py,451,"any((x in intra_tx for x in ['TURBT', '上部尿路内視鏡的治療', '手術（腎尿管全摘等）']))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-452,04_followup_crf.py,452,intra_procedure_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-453,04_followup_crf.py,453,not text(intra_path),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-454,04_followup_crf.py,454,"any((x in intra_tx for x in ['BCG注入療法', '抗がん剤注入療法']))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-455,04_followup_crf.py,455,intra_instill_start is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-456,04_followup_crf.py,456,not intra_instill_ongoing and intra_instill_end is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-457,04_followup_crf.py,457,intra_instill_start and intra_instill_end and (intra_instill_end < intra_instill_start),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-460,04_followup_crf.py,460,intra_date and dt and (dt < intra_date),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-463,04_followup_crf.py,463,current_treatment == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-464,04_followup_crf.py,464,"current_treatment in ['治験（TROP2標的ADC、その他）', 'その他'] and (not text(current_treatment_detail))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-465,04_followup_crf.py,465,"current_treatment not in ['選択してください', '無治療（経過観察）', '上記尿路内再発に対する治療を継続中', '緩和ケア'] and treatment_start is None",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-467,04_followup_crf.py,467,treatment_start and treatment_end and (treatment_end < treatment_start),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-469,04_followup_crf.py,469,has_event and (not text(ae_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-470,04_followup_crf.py,470,vital_status is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-471,04_followup_crf.py,471,vital_status == '生存',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-472,04_followup_crf.py,472,last_alive_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-473,04_followup_crf.py,473,cd_grade == 'Grade V',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-475,04_followup_crf.py,475,death_date is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-476,04_followup_crf.py,476,death_cause == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+04-478,04_followup_crf.py,478,d and d > today_jst(),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED

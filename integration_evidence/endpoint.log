@@ -19,4 +19,14 @@ PASS read status is owner scoped and never asserts unverified success
 PASS privacy regression encoded JSON NFKC camelcase free text
 PASS missing schema and UUID/audit corruption fail closed
 PASS actual fixture Python signer accepted by actual GAS verifier
-ALL 21 GROUPS PASSED
+PASS recovery lists saved UUID version and audit after browser loss
+PASS recovery retries stored payload same UUID using new signed request
+PASS recovery cannot substitute payload or invent UUID or mix visit
+PASS recovery missing canonical payload or corrupted digest stops
+PASS recovery owner revocation and expired assertion deny
+PASS clinical rejection cannot append body version audit or operation intent
+PASS clinically complete operated fixture saves v1 and correction with old version retained
+PASS all visit clinical failures leave CRF audit intent and notification state unchanged
+PASS recovery payload digest mismatch and untracked rows prevent retry
+PASS recovery jti replay fails while fresh signature can reconcile
+ALL 31 GROUPS PASSED

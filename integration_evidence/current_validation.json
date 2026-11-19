@@ -1,0 +1,29 @@
+{
+  "validated_on": "2026-11-20 JST",
+  "base_commit": "2c358c4bc14af399cabd431f6adc6e31ac294fae",
+  "python_tests": 165,
+  "gas_integration_groups": 31,
+  "existing_gas_regression": "PASS",
+  "identity_cases": 14,
+  "clinical_differential": {
+    "cases": 8062,
+    "differences": 0,
+    "conditions": 254,
+    "covered_conditions": 254,
+    "both_outcomes": 253,
+    "uncovered": [],
+    "single_outcome": [
+      "04-394"
+    ],
+    "formal_uat_pass_delta": 0
+  },
+  "all_suites_exit_zero": true,
+  "generator_reproducibility": "PASS after sorting DIFF_KEYS",
+  "auth_primitives_equal_to_base": true,
+  "profile_enabled": false,
+  "hosted_actions_run": "NOT_RUN",
+  "formal_uat_pass_delta": 0,
+  "independent_qa_approved": false,
+  "approved_clinical_protocol_alignment": "NOT_VERIFIED",
+  "live_uat_transition": "NO_GO_PENDING_CLINICAL_REVIEW_AND_INDIVIDUAL_APPROVALS"
+}

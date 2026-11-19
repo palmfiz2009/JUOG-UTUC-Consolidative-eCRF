@@ -951,6 +951,8 @@ def _render_peri_crf():
                     "day30_lab_available": day30_lab_available,
                     "day30_lab_date": date_str(day30_lab_date),
                     "day30_labs": day30_parsed,
+                    "day30_labs_raw": day30_labs_raw,
+                    "discharge_labs_raw": discharge_labs_raw,
                     "day30_required_test_omission_reason": "",
                     "cd_grade_30": cd_grade,
                     "cd_event_date_30": date_str(cd_date),
@@ -1007,3 +1009,4 @@ def _render_peri_crf():
 
 
 _render_peri_crf()
+

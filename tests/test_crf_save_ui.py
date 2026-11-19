@@ -91,15 +91,13 @@ class CRFSaveUITests(unittest.TestCase):
             self.addCleanup(p.stop)
 
     def fixture(self, crf_type="perioperative_30d", visit="30d", submission_id="fictional-uuid"):
-        return {
-            "registration_id": "JUOG-901",
-            "crf_type": crf_type,
-            "visit": visit,
-            "record_key": f"JUOG-901|{crf_type}|{visit}",
-            "submission_id": submission_id,
-            "reporter_email": "synthetic@example.invalid",
-            "data": {"fictional": True},
-        }
+        import json
+        from pathlib import Path
+        value=json.loads((Path(__file__).resolve().parents[1]/'clinical_contract/valid_fixtures.json').read_text())[crf_type]
+        value.update(visit=visit,record_key=f"JUOG-901|{crf_type}|{visit}",submission_id=submission_id,reporter_email="synthetic@example.invalid")
+        value["data"]["fictional"]=True
+        if crf_type=="followup":value["data"]["visit_month"]=visit.replace("m","ヶ月")+("（終了）" if visit=="24m" else "")
+        return value
 
     def test_full_save_marks_saved_and_shows_version(self):
         ok = self.helper.submit_crf_with_feedback(

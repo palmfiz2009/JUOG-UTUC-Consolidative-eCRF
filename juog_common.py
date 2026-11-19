@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import ssl
 import urllib.request
@@ -235,8 +236,12 @@ def parse_lab_value(raw):
         return "blank", None
     if s.upper() in {"NA", "N/A", "未実施", "欠測"}:
         return "na", None
+    # Canonical numeric syntax shared with GAS; non-finite values are never clinical numbers.
+    if not re.fullmatch(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?", s):
+        return "invalid", None
     try:
-        return "value", float(s)
+        number = float(s)
+        return ("value", number) if math.isfinite(number) else ("invalid", None)
     except ValueError:
         return "invalid", None
 

@@ -610,7 +610,9 @@ def _render_followup_crf():
                         "cystoscopy_detail": text(cystoscopy_detail),
                         "cystoscopy_not_done_reason": text(cystoscopy_not_done_reason),
                         "labs_performed": lab_status == "実施あり",
+                        "lab_status": lab_status,
                         "labs": parsed_labs,
+                        "labs_raw": labs_raw,
                         "intraluminal_recurrence_status": intra_status,
                         "intraluminal_recurrence_date": date_str(intra_date),
                         "intraluminal_sites": intra_sites,
@@ -669,3 +671,4 @@ def _render_followup_crf():
 
 
 _render_followup_crf()
+

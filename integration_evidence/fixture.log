@@ -76,6 +76,6 @@ test_timer_repeated_tick_sends_once (test_uat_boundary_probe.Tests.test_timer_re
 test_wrong_pending_deadline_is_not_sent (test_uat_boundary_probe.Tests.test_wrong_pending_deadline_is_not_sent) ... ok
 
 ----------------------------------------------------------------------
-Ran 76 tests in 0.036s
+Ran 76 tests in 0.041s
 
 OK

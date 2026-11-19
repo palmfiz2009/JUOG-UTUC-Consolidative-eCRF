@@ -34,6 +34,15 @@ def run():
         st.session_state['auth_connect_halted']=True
         st.error('本人ACLを確認できません。');st.stop()
     st.caption('TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。')
+    if st.button('保存状態の照合・復旧を開く'):
+        st.session_state['_show_recovery']=True
+    if st.session_state.get('_show_recovery'):
+        from isolated_recovery_ui import render
+        render(st)
+        if st.button('編集画面へ戻る'):
+            st.session_state['_show_recovery']=False
+            st.rerun()
+        st.stop()
     subject=st.text_input('編集対象のJUOG登録番号',key='_integration_subject').strip().upper()
     if st.button('症例と現在のVersionを確認して編集開始'):
         checked=begin_edit(st,subject)

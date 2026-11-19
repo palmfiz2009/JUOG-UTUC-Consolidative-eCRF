@@ -1,0 +1,31 @@
+name: PR15 isolated offline regressions
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  offline:
+    if: github.ref == 'refs/heads/review/pr15-authenticated-crf-integration-20261116'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -r requirements.txt -r requirements-dev.txt
+      - name: Check generated validator drift
+        run: |
+          python build_clinical_contract.py
+          git diff --exit-code -- clinical_contract/contract.json clinical_contract/validation_conditions.csv clinical_contract/input_specification.csv clinical_contract_generated.gs
+      - name: Run only offline suites
+        run: python run_offline.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pr15-offline-evidence
+          path: integration_evidence/
+          retention-days: 7

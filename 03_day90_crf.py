@@ -695,6 +695,7 @@ def _render_day90_crf():
                         "lab_available": lab_available,
                         "lab_date": date_str(lab_date),
                         "labs": parsed_labs,
+                        "labs_raw": labs_raw,
                         "urine_cytology": cytology,
                         "required_test_omission_reason": text(required_test_omission_reason),
                         "imaging_status": imaging_status,
@@ -773,3 +774,4 @@ def _render_day90_crf():
 
 
 _render_day90_crf()
+

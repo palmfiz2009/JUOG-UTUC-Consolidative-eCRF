@@ -12,6 +12,11 @@ test_submission_validate_cannot_silently_advance_observed_version (test_adapter.
 test_transport_loss_not_retried_or_exposed (test_adapter.Tests.test_transport_loss_not_retried_or_exposed) ... ok
 test_unsupported_route_has_no_token_fallback (test_adapter.Tests.test_unsupported_route_has_no_token_fallback) ... ok
 test_validate_observes_version_frozen_retry_new_jti (test_adapter.Tests.test_validate_observes_version_frozen_retry_new_jti) ... ok
+test_differential_ui_gas (test_clinical.Clinical.test_differential_ui_gas) ... ok
+test_missing_dates_and_false_are_not_valid_numbers (test_clinical.Clinical.test_missing_dates_and_false_are_not_valid_numbers) ... ok
+test_operated_positive (test_clinical.Clinical.test_operated_positive) ... ok
+test_positive_all_visits (test_clinical.Clinical.test_positive_all_visits) ... ok
+test_unselected_visit_rejected_before_rule_04_394 (test_clinical.Clinical.test_unselected_visit_rejected_before_rule_04_394) ... ok
 test_acl_denied_no_form (test_entry.Entry.test_acl_denied_no_form) ... ok
 test_auth_before_form (test_entry.Entry.test_auth_before_form) ... ok
 test_failed_revoke_does_not_logout (test_entry.Entry.test_failed_revoke_does_not_logout) ... ok
@@ -19,8 +24,12 @@ test_halted_no_form (test_entry.Entry.test_halted_no_form) ... ok
 test_signed_revoke_before_logout (test_entry.Entry.test_signed_revoke_before_logout) ... ok
 test_unapproved_no_network_or_form (test_entry.Entry.test_unapproved_no_network_or_form) ... ok
 test_unauthenticated_no_form (test_entry.Entry.test_unauthenticated_no_form) ... ok
+test_retry_sends_only_server_uuid_then_rechecks (test_recovery_ui.RecoveryUI.test_retry_sends_only_server_uuid_then_rechecks) ... ok
+test_saved_marks_only_matching_attempt_complete (test_recovery_ui.RecoveryUI.test_saved_marks_only_matching_attempt_complete) ... ok
+test_unknown_and_transport_failure_block_new (test_recovery_ui.RecoveryUI.test_unknown_and_transport_failure_block_new) ... ok
+test_unverified_retry_never_shows_success (test_recovery_ui.RecoveryUI.test_unverified_retry_never_shows_success) ... ok
 
 ----------------------------------------------------------------------
-Ran 21 tests in 0.014s
+Ran 30 tests in 13.068s
 
 OK
