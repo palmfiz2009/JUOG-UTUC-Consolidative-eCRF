@@ -1,0 +1,45 @@
+{
+  "base_commit": "c23e4edc99efd6e397c9728a5d80452a21f73b7c",
+  "validated_on": "2026-11-20 JST",
+  "mode": "OFFLINE_ONLY",
+  "python_tests": 180,
+  "python_suites": {
+    "fixture": 76,
+    "fixture_bridge_entry": 20,
+    "pr": 39,
+    "adapter": 45
+  },
+  "new_python_tests": 15,
+  "gas_integration_groups": 40,
+  "new_gas_groups": 9,
+  "existing_gas_regression": "PASS",
+  "identity_cases": 14,
+  "clinical_differential": {
+    "cases": 8062,
+    "differences": 0,
+    "conditions": 254,
+    "covered_conditions": 254,
+    "both_outcomes": 253,
+    "uncovered": [],
+    "single_outcome": [
+      "04-371"
+    ],
+    "formal_uat_pass_delta": 0
+  },
+  "generator_reproducibility": "PASS",
+  "all_suites_exit_zero": true,
+  "auth_primitives_equal_to_base": true,
+  "profile_enabled": false,
+  "hosted_actions_run": "NOT_RUN",
+  "formal_uat_pass_delta": 0,
+  "formal_uat": {
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 74,
+    "NOT_RUN": 0
+  },
+  "independent_qa_approved": false,
+  "clinical_protocol_original": "LOCATED_20260916_V1",
+  "approved_clinical_protocol_alignment": "NOT_VERIFIED",
+  "live_uat_transition": "PENDING_APPROVED_RUNTIME_AND_ACL_AND_REVIEW"
+}

@@ -1,3 +1,5 @@
+> Latest section-autosave work: [implementation and limits](integration_evidence/autosave_20261120/README.md). Offline **180 Python tests / 40 GAS groups PASS**; formal UAT **0 PASS / 74 BLOCKED**. The following earlier integration notes are retained as history. Clinical original is now located; conformity and independent QA remain unapproved.
+
 # Current implementation update — 2026-11-20 JST
 
 Parent commit: `2c358c4bc14af399cabd431f6adc6e31ac294fae`. Only the existing isolation development branch is updated. No deployment or live service/configuration change. Current test results supersede the historical baseline counts below.

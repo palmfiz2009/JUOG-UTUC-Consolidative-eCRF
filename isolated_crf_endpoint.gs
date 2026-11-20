@@ -58,7 +58,7 @@ function juogPr15Entry_(envelope,c){
  try{
   const auth=juogV3DecodeBridge_(envelope,c);let a=auth.request.action,p=auth.request.payload;
   if(!p||typeof p!=='object'||Array.isArray(p))throw Error('REQUEST_INVALID');
-  const allowed=['ui_context','session_revoke','backend_info','validate','get_crf_linkage','save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry'];
+  const allowed=['ui_context','session_revoke','backend_info','validate','get_crf_linkage','save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry','get_sections','save_section'];
   if(!allowed.includes(a))throw Error('ROUTE_DENIED');
   const ss=SpreadsheetApp.openById(c.spreadsheetId),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
   const gate=juogSessionGateB2_(ss,c,auth,who);
@@ -79,6 +79,11 @@ function juogPr15Entry_(envelope,c){
    if(q.reporter_email!=='fictional@example.invalid')throw Error('FICTIONAL_CONTACT_REQUIRED');
   }
   const journal=pr15Journal_(ss,JUOG_PR15_GUARD_),history=journal.read();
+  if(a==='get_sections'||a==='save_section'){
+   const dk=[q.registration_id,q.crf_type,q.visit].join('|');
+   if(history.some(e=>e.kind==='INTENT'&&e.key===dk&&!history.some(x=>x.uuid===e.uuid&&x.kind==='COMMIT')))throw Error('PENDING_OPERATION');
+   return respond(pr15SectionDraft_(ss,who,q,a,JUOG_PR15_GUARD_));
+  }
   if(a==='request_status'){
    const matches=history.filter(e=>e.uuid===p.submission_id);
    if(!matches.length)return respond({ok:true,state:'UNKNOWN'});
@@ -165,6 +170,6 @@ function juogPr15Entry_(envelope,c){
   return respond(result);
  }catch(e){
   const safe=['AUTH_REQUIRED','AUTH_INVALID','AUTH_EXPIRED','REQUEST_SIGNATURE_MISMATCH','SESSION_REQUIRED','SESSION_INVALID','SESSION_REVOKED','ASSERTION_REPLAY','SESSION_STORE_UNAVAILABLE','SESSION_STORE_INVALID','SESSION_STORE_FULL','ACL_DENIED','ACL_CHANGED','SUBJECT_FORBIDDEN','ACTOR_OVERRIDE_DENIED','ROUTE_DENIED','REQUEST_INVALID','VISIT_INVALID','SUBMISSION_METADATA_INVALID','PAYLOAD_INVALID','DIRECT_IDENTIFIER_NOT_ALLOWED','SUBMISSION_ID_CONFLICT','VERSION_CONFLICT','VERSION_KIND_INVALID','PENDING_OPERATION','UNTRACKED_SUBMISSION','SCHEMA_MISSING','SCHEMA_INVALID','VERSION_STORE_INVALID','OPERATION_STORE_INVALID','OPERATION_WRITE_UNCONFIRMED','RECEIPT_MISMATCH'];
-  return {ok:false,error:safe.concat(['UNTRACKED_DRAFT','DRAFT_WRITE_UNCONFIRMED','DRAFT_AUDIT_UNCONFIRMED','COMMITTED_RECORD_MISSING','FICTIONAL_CONTACT_REQUIRED','RECOVERY_RECONCILIATION_REQUIRED']).includes(e.message)?e.message:'TRANSACTION_UNCONFIRMED'};
+  return {ok:false,error:safe.concat(['UNTRACKED_DRAFT','DRAFT_WRITE_UNCONFIRMED','DRAFT_AUDIT_UNCONFIRMED','COMMITTED_RECORD_MISSING','FICTIONAL_CONTACT_REQUIRED','RECOVERY_RECONCILIATION_REQUIRED','DRAFT_STORE_INVALID','DRAFT_CONFLICT','DRAFT_DATA_INVALID']).includes(e.message)?e.message:'TRANSACTION_UNCONFIRMED'};
  }finally{JUOG_PR15_GUARD_=null;lock.releaseLock();}
 }

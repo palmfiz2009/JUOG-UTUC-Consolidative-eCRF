@@ -1,6 +1,6 @@
 {
   "mode": "OFFLINE_IN_MEMORY_REAL_SOURCE",
-  "test_groups": 31,
+  "test_groups": 40,
   "tests": [
     "default disabled, wrong script/workbook and old generation deny",
     "no legacy token bypass, bad signature and payload tamper",
@@ -32,7 +32,16 @@
     "clinically complete operated fixture saves v1 and correction with old version retained",
     "all visit clinical failures leave CRF audit intent and notification state unchanged",
     "recovery payload digest mismatch and untracked rows prevent retry",
-    "recovery jti replay fails while fresh signature can reconcile"
+    "recovery jti replay fails while fresh signature can reconcile",
+    "section draft debounce target is a single audited append with immutable replay",
+    "section stale-tab conflicts and same UUID different payload deny without audit append",
+    "section silent append failure safe same UUID retry with fresh assertion",
+    "section lost response after append expiry resumes canonical server data",
+    "section all nine visits are isolated and no wrong field or arbitrary session restore",
+    "section ownership ACL session revocation and transferred cases reject",
+    "section old drafts never resurrect after official version and journal corruption fails",
+    "section pending official transaction blocks new draft and preserves zero false null",
+    "section date identity fields and expired signatures fail before any draft append"
   ],
   "formal_uat_pass_delta": 0,
   "independent_qa_approved": false

@@ -12,6 +12,43 @@ test_submission_validate_cannot_silently_advance_observed_version (test_adapter.
 test_transport_loss_not_retried_or_exposed (test_adapter.Tests.test_transport_loss_not_retried_or_exposed) ... ok
 test_unsupported_route_has_no_token_fallback (test_adapter.Tests.test_unsupported_route_has_no_token_fallback) ... ok
 test_validate_observes_version_frozen_retry_new_jti (test_adapter.Tests.test_validate_observes_version_frozen_retry_new_jti) ... ok
+test_debounce_resets_and_unchanged_never_sends (test_autosave.Autosave.test_debounce_resets_and_unchanged_never_sends) ... ok
+test_dirty_section_only_and_no_state_alias (test_autosave.Autosave.test_dirty_section_only_and_no_state_alias) ... ok
+test_hidden_field_removal_is_a_change_not_false_or_zero (test_autosave.Autosave.test_hidden_field_removal_is_a_change_not_false_or_zero) ... ok
+test_nonfinite_never_serializes (test_autosave.Autosave.test_nonfinite_never_serializes) ... ok
+test_receipt_binding_and_audit_required (test_autosave.Autosave.test_receipt_binding_and_audit_required) ... ok
+test_restore_store_validation (test_autosave.Autosave.test_restore_store_validation) ... ok
+test_sections_preserve_null_zero_false_empty_date_and_exclude_other_sections (test_autosave.Autosave.test_sections_preserve_null_zero_false_empty_date_and_exclude_other_sections) ... ok
+test_uncertain_freezes_uuid_payload_and_manual_retry (test_autosave.Autosave.test_uncertain_freezes_uuid_payload_and_manual_retry) ... ok
+test_server_response_cannot_restore_arbitrary_session_keys (test_autosave.RestoreBoundaries.test_server_response_cannot_restore_arbitrary_session_keys) ... ok
+test_integral_float_receipt_is_equal_but_false_is_distinct (test_autosave.TypedBoundaries.test_integral_float_receipt_is_equal_but_false_is_distinct) ... ok
+test_malformed_response_never_acknowledges (test_autosave.TypedBoundaries.test_malformed_response_never_acknowledges) ... ok
+test_all_three_debounce_and_only_changed_section (test_autosave_ui.UI.test_all_three_debounce_and_only_changed_section) ... 2026-11-20 22:33:33.134 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:33.134 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:33.134 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_close_browser_new_session_resume_uses_server_sections (test_autosave_ui.UI.test_close_browser_new_session_resume_uses_server_sections) ... 2026-11-20 22:33:34.762 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.762 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:34.762 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:35.016 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_failed_save_no_false_success_or_automatic_retry_overlay_removed (test_autosave_ui.UI.test_failed_save_no_false_success_or_automatic_retry_overlay_removed) ... 2026-11-20 22:33:35.266 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:35.266 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:35.266 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_identity_change_purges_previous_form_and_never_sends (test_autosave_ui.UI.test_identity_change_purges_previous_form_and_never_sends) ... 2026-11-20 22:33:35.673 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:35.673 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 22:33:35.673 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
 test_differential_ui_gas (test_clinical.Clinical.test_differential_ui_gas) ... ok
 test_missing_dates_and_false_are_not_valid_numbers (test_clinical.Clinical.test_missing_dates_and_false_are_not_valid_numbers) ... ok
 test_operated_positive (test_clinical.Clinical.test_operated_positive) ... ok
@@ -30,6 +67,6 @@ test_unknown_and_transport_failure_block_new (test_recovery_ui.RecoveryUI.test_u
 test_unverified_retry_never_shows_success (test_recovery_ui.RecoveryUI.test_unverified_retry_never_shows_success) ... ok
 
 ----------------------------------------------------------------------
-Ran 30 tests in 13.068s
+Ran 45 tests in 17.239s
 
 OK

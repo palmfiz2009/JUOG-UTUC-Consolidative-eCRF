@@ -19,17 +19,16 @@ class AllCrfPagesTests(unittest.TestCase):
                 tree = ast.parse(source)
                 fragment = next(n for n in tree.body
                     if isinstance(n, ast.FunctionDef) and n.name == fn_name)
-                self.assertTrue(any(isinstance(d,ast.Attribute) and d.attr=="fragment"
+                self.assertTrue(any(isinstance(d, ast.Attribute) and d.attr == "fragment"
                                     for d in fragment.decorator_list))
                 fragment_src = ast.get_source_segment(source,fragment)
-                self.assertIn('st.rerun(scope="fragment")', fragment_src)
                 self.assertNotIn("st.rerun()", fragment_src)
                 self.assertIn(f'pending_attempt("{page}", st.session_state)',fragment_src)
                 self.assertIn(f'page="{page}"', fragment_src)
-                self.assertIn('st.spinner("仮保存しています…", show_time=True)',fragment_src)
                 self.assertIn("submit_crf_with_feedback(",fragment_src)
-                self.assertIn('"💾 仮保存"',fragment_src)
-                self.assertIn('"↩ 再開"',fragment_src)
+                self.assertIn(f'resume_panel("{page}")', fragment_src)
+                self.assertIn(f'section_feedback("{page}",', fragment_src)
+                self.assertNotIn("save_crf_draft(", fragment_src)
 
     def test_no_direct_crf_write_or_replay_generated_in_pages(self):
         for name, _, _ in FILES:
@@ -42,3 +41,4 @@ class AllCrfPagesTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+

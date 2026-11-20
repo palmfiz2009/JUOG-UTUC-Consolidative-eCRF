@@ -1,161 +1,145 @@
 {
-  "base_commit": "2c358c4bc14af399cabd431f6adc6e31ac294fae",
+  "base_commit": "c23e4edc99efd6e397c9728a5d80452a21f73b7c",
   "files": [
     {
       "path": ".github/workflows/pr15-isolated-offline.yml",
-      "sha256": "ed7d840b49d581cf8b3544135144b5671bcc79311a5e3f25ce183e7e6fb60642"
+      "sha256": "43f018d05df31a0ec158eb67fd32710b451921b1b48a3bbaecc428817b72b5d1"
     },
     {
       "path": "02_perioperative_30d_crf.py",
-      "sha256": "2d029d057fa5f557ec65c555d9c0949f44086dd741ca585399dab777f6ba9866"
+      "sha256": "07cbc31c6feeb74da0101603801748780c5047d394b6612a9650facf12554bd6"
     },
     {
       "path": "03_day90_crf.py",
-      "sha256": "0f0e45d457a2299e1ecc233629b90225c6283f16b9eb2fa7020362fe857cab2c"
+      "sha256": "b8ac7e94d9742f08cdac7472cc123e14b1c20eee29af40f4f9481036f6f97e3d"
     },
     {
       "path": "04_followup_crf.py",
-      "sha256": "39c236b747b72349a5648af7ec4e15acc76d9e7459e9d1dfdeda7d4c8c35ecb0"
+      "sha256": "8d5b890a0e1b4314eecaabfff1302cd8732ef2c582c3b50addc7113fb4a3dc30"
     },
     {
       "path": "INTEGRATION_REVIEW.md",
-      "sha256": "cc4c7f398b739ced65b0107dd02108397e7c59556bd044651365ef9772c3bb4f"
+      "sha256": "670be9f04cee6613f3afd6138f60cbcb34c681df1ddfee93f1f32bde10e4aa32"
     },
     {
-      "path": "RECOVERY_IMPLEMENTATION.md",
-      "sha256": "e4c2d935b7dcd92877e08e9f0c53d322cac883464316c976000fe4ed9c0a54bb"
+      "path": "SHA256SUMS.txt",
+      "sha256": "047a18014caceb97fb529e0e74f8993a6be49d3ce678143e386b2fb42343c84f"
     },
     {
-      "path": "build_clinical_contract.py",
-      "sha256": "a74f089335c5391eb4536c034178392c9c7017d4e80a5015d057b3b08640ff12"
+      "path": "autosave_sections.json",
+      "sha256": "92f155a8b01a7c29092910e971d820a9c42b6fd37f3713f960370ca33d775882"
     },
     {
-      "path": "clinical_contract/README.md",
-      "sha256": "65bf52873c3db8848301765407567bfd7c24281be9c4b6faa6aea0396054ffd0"
+      "path": "autosave_sections_generated.gs",
+      "sha256": "6e754e8e07910ac02d7cf53d106693af80b0b75dd5a1990b67f3b991f270cd29"
+    },
+    {
+      "path": "build_autosave_sections.py",
+      "sha256": "f13ae94ab37e1d194c6663df51198e1ac78b501a4d1f9abfe113cf5cb4ebb4ae"
     },
     {
       "path": "clinical_contract/contract.json",
-      "sha256": "1d7b48a4ac48ca9f4d58ecf78de5bafe6bdc922fd9b23d46fc5a60f5c0a55ab9"
+      "sha256": "4b56b76d0b8bc4b92866960497e6e5b3ac088333d40455b1a8cfb77dea399cd6"
     },
     {
       "path": "clinical_contract/input_specification.csv",
-      "sha256": "63cec89227212c51b13719990718081fc4cb4aaef7d61bde8c1119506ddd20e4"
-    },
-    {
-      "path": "clinical_contract/operated_fixture.json",
-      "sha256": "14c38e3e3934f536769d360b12c1b1114220931e3a17abfed795bef91e76efb2"
-    },
-    {
-      "path": "clinical_contract/valid_fixtures.json",
-      "sha256": "6f5b6b3fa81a68f9c1ad6bfa3bfa163ee9aa7ea4675a025a895e700b95c06b0e"
+      "sha256": "646b38e4ea1349e72702468932b12a77e61214a3497a1f919ec8951d79e78423"
     },
     {
       "path": "clinical_contract/validation_conditions.csv",
-      "sha256": "d162ebd15e16dd6e6cf3d8560aa6b31bad21994dd7512944378dc96e4c65992e"
+      "sha256": "dd1999556fa843cb512871987c25b9a345f645d5319995a3a0145cb1615b3dfd"
     },
     {
       "path": "clinical_contract_generated.gs",
-      "sha256": "bad3e1ad3ee0e8741c036039252bb49e0d019d9dcdced6e836475fb260e2c142"
-    },
-    {
-      "path": "clinical_validation.gs",
-      "sha256": "c0fca947ff49ea72b5d96a24daba29f05651c0f4a7ed284b38fed5fe121c8acb"
-    },
-    {
-      "path": "clinical_validation.py",
-      "sha256": "cccf7e26fc7a67c899d30f778592a24541f18f89316bd8d5e717d5ad9aab9330"
+      "sha256": "7aed0671732b6004b8399d5539a4bf5a22877b99b33805d984d5a2a9275c16e9"
     },
     {
       "path": "integration_evidence/UAT_MAPPING.csv",
-      "sha256": "f6a4c9e8a640c487f91208beac4017a9a41f220593c8a8238baaf4f7b142d25e"
+      "sha256": "d70ec898035cc43d7da87c1109cef24e71f837a616209277cd46fa66f7b980b3"
     },
     {
       "path": "integration_evidence/adapter.log",
-      "sha256": "a33c6c9467fd9f6a4d478f00d515e2201ff11049fb7504acf8bd5d367045a90e"
+      "sha256": "98a6a43d9da3219b6a1cb62b21ea7369cfbfc72d56b3d8a00c2f85824e7b6952"
+    },
+    {
+      "path": "integration_evidence/autosave_20261120/README.md",
+      "sha256": "edc12b46ebcd3c5f7afce970aa627763c25cd10494f5c080bdb24b528d048127"
+    },
+    {
+      "path": "integration_evidence/autosave_20261120/clinical_rules_unchanged.json",
+      "sha256": "b302f29a7bec0af298321c2570c6a5031c0a7f55df1a80e7926719ab14e347a4"
+    },
+    {
+      "path": "integration_evidence/autosave_20261120/protocol_source.json",
+      "sha256": "bb4b1424c4caef29922110493172e2e0ca26813043907667b7f6dfe556495d52"
+    },
+    {
+      "path": "integration_evidence/autosave_20261120/results.json",
+      "sha256": "f05aa5737c64fb123636e8879a60391f0339b76a39c7984fd3b76b614e97299a"
     },
     {
       "path": "integration_evidence/clinical_coverage.json",
-      "sha256": "7fefebd30a9214b7f7a62c0d7f5e9f5bf39ffb1638c90a2c039b4686543bb4ee"
-    },
-    {
-      "path": "integration_evidence/clinical_differences.json",
-      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+      "sha256": "2191315768ba719fff5a6322baf2fb14a1709de4f9b3111bd7f63d7f5969edbe"
     },
     {
       "path": "integration_evidence/clinical_witnesses.json",
-      "sha256": "3a53875b876a9876fba01d98b15bb10f5e03eca02f7a4ae0683b733da8480f5b"
+      "sha256": "cd56b9a42907b79893aa5952eeb94d676dfca1e1034abb839f0547958a7ba42e"
     },
     {
       "path": "integration_evidence/current_validation.json",
-      "sha256": "e7b21ecebda8f4dcb00aab9fa40bee9828ef6b44d90d0af8ff551d5ae67063d4"
+      "sha256": "f05aa5737c64fb123636e8879a60391f0339b76a39c7984fd3b76b614e97299a"
     },
     {
       "path": "integration_evidence/endpoint.log",
-      "sha256": "3869455a4c17171f18866eb43c0598a7014a85f2b9cd4fe14f814fb6fbf048e3"
+      "sha256": "507b057d1b4741471e92f7286ebb5aeab22af72f478831d947f06bfe383b3baa"
     },
     {
       "path": "integration_evidence/endpoint_results.json",
-      "sha256": "2280f3e9e00d2df8676cada798ebfbdc8feb53437b1ed79be871e2af2d46be7a"
+      "sha256": "f46ddc80403efb4f9c1375e433d972e4de919885cd3aa91cc92a9e73626e3cff"
     },
     {
       "path": "integration_evidence/fixture.log",
-      "sha256": "a4f0f9794edd8086adfb15b07875895f25a93a1d49d2532990edb38abdc817f9"
+      "sha256": "c71729601ff9bf1cc9a5d5aaa632515b6e3f2c3237f08db1e032ef5bd07d6460"
     },
     {
       "path": "integration_evidence/fixture_bridge_entry.log",
-      "sha256": "fd314bc3747e050b008424581d433bce80a614701888ccde8dd9e088088e18c5"
+      "sha256": "b16e2f4a7e41053f59b0de05f071a60df35e2d51579c341993ee33fc1a487e28"
     },
     {
       "path": "integration_evidence/pr.log",
-      "sha256": "2b678092b17e7b84321dbc18d274ac0be0977076cfc47c33377cc9c818fbda14"
+      "sha256": "d1824c4825f19f8dcd18f13ad98e978ec180d78912cfc5a0027f13b4612416c6"
     },
     {
-      "path": "integration_tests/clinical_differential.cjs",
-      "sha256": "d92d3435f9453238b513b4293595720ebd3d699b089ffe96b50d0b03c6f7f1f5"
+      "path": "integration_tests/test_autosave.py",
+      "sha256": "76747d23e46589a15fec85657deb14f3d2d9f2428719e7c14b63125f7ef37c63"
     },
     {
-      "path": "integration_tests/test_clinical.py",
-      "sha256": "c5eb619e92465333befce72c5161132267602956858e4baa765b68b771d00f27"
+      "path": "integration_tests/test_autosave_ui.py",
+      "sha256": "68da19ff2d8134987125661869964a4f012c4b910e8d76289586c8aa512976ba"
     },
     {
       "path": "integration_tests/test_endpoint.cjs",
-      "sha256": "5fbca9c090bca2f55bc478d762d1d1463ddc7e93f425f5a8f064f503309f8db5"
+      "sha256": "e3c2db4006b16216de66887798766bf143761a5a4521fde2f8d77ba8e119b7e7"
     },
     {
-      "path": "integration_tests/test_recovery_ui.py",
-      "sha256": "38b9f784f7ab2fe1c0332f01cef3e315a7c29197b201f13883ec0c28f6e9ea1e"
+      "path": "isolated_autosave.gs",
+      "sha256": "5c28040e7a4aa6f3852240cc1b8810b0f34b3ad2a83058bf22b81a35151cbe22"
+    },
+    {
+      "path": "isolated_autosave_ui.py",
+      "sha256": "5870304c53c7d8e2541dcc2be05366cd62da3abd9f2ae1d4ebca84c1262494f9"
     },
     {
       "path": "isolated_crf_adapter.py",
-      "sha256": "3803c3227c85b9016ef5affed233714966552ba89ad36538d66db2ddc8d83835"
+      "sha256": "17d9635d0c2ed0a22f64b3388d26c0cabb1d82876db543916347d07b081424ee"
     },
     {
       "path": "isolated_crf_endpoint.gs",
-      "sha256": "10d509e350d9027911c4ed54755331980c19eb6751c58a81bcbb14575bc65fb4"
+      "sha256": "ea44ee5814cd23f54904ffbdc4d91cdf32276c0199dd02ac920a3b6e9ca3396a"
     },
     {
-      "path": "isolated_recovery.gs",
-      "sha256": "ee6e1d52b555ca4cb46393fd0233b7dc55028b7dadd8c9570682f0fff608fe24"
-    },
-    {
-      "path": "isolated_recovery_ui.py",
-      "sha256": "4b986249c3556eb05386f1930333229aedd8ed6f757ff8850d74e694e9a2fa99"
-    },
-    {
-      "path": "juog_common.py",
-      "sha256": "91fe6acc27c399bc08b6b8d267927eb8abff0cd5d950331c091b2850cc551d18"
-    },
-    {
-      "path": "juog_crf_save_ui.py",
-      "sha256": "bd5e30ca0866df003d433e778ce8c05f462c72a3ab3f1599f5b1e6edbde2f648"
-    },
-    {
-      "path": "streamlit_app.py",
-      "sha256": "5975ad2b961e99c53eef6f5f5e247e78a3c9f1a7b3014e6e50394e6d5abca74b"
-    },
-    {
-      "path": "tests/test_crf_save_ui.py",
-      "sha256": "9b19340f95d0677d570cbdf52dff06c28fc2bcd840d3b48febb8153ded0aa8ca"
+      "path": "tests/test_all_crf_fragments.py",
+      "sha256": "8ce565059b4174adab3988e47fd8bf124b23566b3fe953089166eeb4f8764324"
     }
   ]
 }

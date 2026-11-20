@@ -4,7 +4,7 @@ const fs=require('fs'),vm=require('vm'),crypto=require('crypto'),assert=require(
 const root=path.resolve(__dirname,'..');
 const hash=s=>crypto.createHash('sha256').update(s).digest('hex');
 const copy=x=>JSON.parse(JSON.stringify(x));
-const files=['05_registry_google_apps_script.gs','isolated_auth_bridge.gs','isolated_session_store.gs','isolated_crf_endpoint.gs','isolated_recovery.gs','clinical_contract_generated.gs','clinical_validation.gs'];
+const files=['05_registry_google_apps_script.gs','isolated_auth_bridge.gs','isolated_session_store.gs','isolated_crf_endpoint.gs','isolated_recovery.gs','clinical_contract_generated.gs','clinical_validation.gs','autosave_sections_generated.gs','isolated_autosave.gs'];
 function fixture(){
  let now=Date.parse('2026-11-16T00:00:00Z'),locked=false,drop='',expireOn='',nextJti=0;
  const props={},tables={};
@@ -104,5 +104,56 @@ test('clinically complete operated fixture saves v1 and correction with old vers
 test('all visit clinical failures leave CRF audit intent and notification state unchanged',f=>{for(const [type,visit] of [['perioperative_30d','30d'],['day90','90d'],...['6m','9m','12m','15m','18m','21m','24m'].map(v=>['followup',v])]){const p=f.payload(type,visit);p.data.vital_status=null;const names=['CRF_30d','CRF_90d','CRF_Followup','CRFSubmissionAudit','R1_Operations'];const before=names.map(n=>JSON.stringify(f.tables[n].rows));assert.equal(f.save(p).error,'CLINICAL_VALIDATION_FAILED');assert.deepEqual(names.map(n=>JSON.stringify(f.tables[n].rows)),before);}});
 test('recovery payload digest mismatch and untracked rows prevent retry',f=>{const p=f.payload();f.drop('CRF_30d');f.save(p);f.drop('');const q={registration_id:p.registration_id,crf_type:p.crf_type,visit:p.visit};const row=f.tables.R1_Operations.rows[1],event=JSON.parse(row[1]);event.payload.data.day30_visit_date='2026-02-10';row[1]=JSON.stringify(event);row[2]=hash(row[1]);assert.equal(f.call('recovery_status',q).recovery.state,'NEEDS_RECONCILIATION');assert.equal(f.call('recovery_retry',{...q,submission_id:p.submission_id}).ok,false);assert.equal(f.tables.CRF_30d.rows.length,1);});
 test('recovery jti replay fails while fresh signature can reconcile',f=>{const p=f.payload();f.save(p);const q={registration_id:p.registration_id,crf_type:p.crf_type,visit:p.visit};const e=f.envelope('recovery_status',q);assert.equal(f.x.juogPr15Entry_(e,f.c).ok,true);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'ASSERTION_REPLAY');assert.equal(f.call('recovery_status',q).recovery.state,'SAVED');});
+
+function sectionQ(type='perioperative_30d',visit='30d') {return {registration_id:'JUOG-901',facility_code:'TEST01',crf_type:type,visit};}
+function sectionOp(id='fictional-section-uuid-0001',changes={}) {return {...sectionQ(),section:'1',record_version:0,expected_revision:0,operation_id:id,data:{peri_registration_id:{type:'value',value:'JUOG-901'}},...changes};}
+test('section draft debounce target is a single audited append with immutable replay',f=>{
+ const q=sectionOp();let r=f.call('save_section',q);assert.equal(r.ok,true,JSON.stringify(r));assert.equal(r.receipt.revision,1);assert.equal(r.audit_verified,true);
+ assert.equal(f.call('save_section',q).existing,true);assert.equal(f.tables.R1_DraftEvents.rows.length,2);
+ assert.equal(f.tables.Registry.rows.length,2);assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.R1_Operations.rows.length,1);
+ const resumed=f.call('get_sections',sectionQ());assert.deepEqual(resumed.sections['1'].data,q.data);
+});
+test('section stale-tab conflicts and same UUID different payload deny without audit append',f=>{
+ const q=sectionOp();f.call('save_section',q);const count=f.tables.R1_DraftEvents.rows.length;
+ assert.equal(f.call('save_section',sectionOp('different-operation-0002')).error,'DRAFT_CONFLICT');
+ q.data.peri_reporter_email={type:'value',value:'fictional@example.invalid'};
+ assert.equal(f.call('save_section',q).error,'DRAFT_CONFLICT');assert.equal(f.tables.R1_DraftEvents.rows.length,count);
+});
+test('section silent append failure safe same UUID retry with fresh assertion',f=>{
+ const q=sectionOp();f.drop('R1_DraftEvents');assert.equal(f.call('save_section',q).error,'DRAFT_WRITE_UNCONFIRMED');f.drop('');
+ const e=f.envelope('save_section',q);assert.equal(f.x.juogPr15Entry_(e,f.c).ok,true);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'ASSERTION_REPLAY');assert.equal(f.call('save_section',q).existing,true);
+});
+test('section lost response after append expiry resumes canonical server data',f=>{
+ const q=sectionOp();f.expireOn('R1_DraftEvents');assert.equal(f.call('save_section',q).ok,false);assert.equal(f.tables.R1_DraftEvents.rows.length,2);f.expireOn('');
+ assert.equal(f.call('get_sections',sectionQ()).sections['1'].operation_id,q.operation_id);assert.equal(f.call('save_section',q).existing,true);
+});
+test('section all nine visits are isolated and no wrong field or arbitrary session restore',f=>{
+ for(const [t,v,p] of [['perioperative_30d','30d','peri'],['day90','90d','d90'],...['6m','9m','12m','15m','18m','21m','24m'].map(v=>['followup',v,'fu'])]){
+  const q=sectionOp('fictional-section-'+v,{...sectionQ(t,v),data:{[p+'_registration_id']:{type:'value',value:'JUOG-901'}}});assert.equal(f.call('save_section',q).ok,true,JSON.stringify(q));
+  assert.equal(Object.keys(f.call('get_sections',sectionQ(t,v)).sections).length,1);
+ }
+ const q=sectionOp('fictional-bad-field',{section:'2',data:{auth_connect_halted:{type:'value',value:false}}});assert.equal(f.call('save_section',q).error,'DRAFT_DATA_INVALID');
+});
+test('section ownership ACL session revocation and transferred cases reject',f=>{
+ const q=sectionOp();f.call('save_section',q);f.tables.R1_CaseOwners.rows[1][2]='someone-else';assert.equal(f.call('get_sections',sectionQ()).error,'SUBJECT_FORBIDDEN');f.tables.R1_CaseOwners.rows[1][2]='fictional-user';
+ const row=f.tables.R1_DraftEvents.rows[1],e=JSON.parse(row[0]);e.actor='previous-owner';row[0]=JSON.stringify(e);row[1]=hash(row[0]);assert.equal(f.call('get_sections',sectionQ()).error,'SUBJECT_FORBIDDEN');
+ f.call('session_revoke');assert.equal(f.call('save_section',q).error,'SESSION_REVOKED');
+});
+test('section old drafts never resurrect after official version and journal corruption fails',f=>{
+ const q=sectionOp();f.call('save_section',q);assert.equal(f.save(f.payload()).ok,true);assert.deepEqual(f.call('get_sections',sectionQ()).sections,{});assert.equal(f.call('save_section',q).error,'DRAFT_CONFLICT');
+ f.tables.R1_DraftEvents.rows[1][1]='corrupt';assert.equal(f.call('get_sections',sectionQ()).error,'DRAFT_STORE_INVALID');
+});
+test('section pending official transaction blocks new draft and preserves zero false null',f=>{
+ const q=sectionOp();q.data.peri_reporter_email={type:'value',value:''};assert.equal(f.call('save_section',q).ok,true);
+ const q2=sectionOp('fictional-section-null',{section:'2',data:{peri_op_completed:{type:'value',value:null},peri_bleeding:{type:'value',value:0}}});assert.equal(f.call('save_section',q2).ok,true);
+ f.drop('CRF_30d');assert.equal(f.save(f.payload()).ok,false);f.drop('');assert.equal(f.call('get_sections',sectionQ()).error,'PENDING_OPERATION');
+});
+
+test('section date identity fields and expired signatures fail before any draft append',f=>{
+ const before=f.tables.R1_DraftEvents.rows.length;
+ for(const data of [{peri_op_date:{type:'date',value:'2026-02-30'}},{auth_connect_halted:{type:'value',value:false}}])assert.equal(f.call('save_section',sectionOp('invalid-data-operation',{section:'2',data})).error,'DRAFT_DATA_INVALID');
+ assert.equal(f.call('save_section',sectionOp('invalid-case-operation',{data:{peri_registration_id:{type:'value',value:'JUOG-902'}}})).error,'DRAFT_DATA_INVALID');
+ const e=f.envelope('save_section',sectionOp());f.advance(15000);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'AUTH_EXPIRED');assert.equal(f.tables.R1_DraftEvents.rows.length,before);
+});
 fs.writeFileSync(path.join(root,'integration_evidence/endpoint_results.json'),JSON.stringify({mode:'OFFLINE_IN_MEMORY_REAL_SOURCE',test_groups:tests.length,tests,formal_uat_pass_delta:0,independent_qa_approved:false},null,2)+'\n');
 console.log('ALL '+tests.length+' GROUPS PASSED');

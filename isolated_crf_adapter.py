@@ -18,7 +18,7 @@ SCRIPT = '1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR'
 SHEET = '1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs'
 STAGE = 'PR15_ISOLATED_CRFS'
 ROUTES = {'ui_context','session_revoke','backend_info','validate','get_crf_linkage',
-          'save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry'}
+          'save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry','get_sections','save_section'}
 
 def load_profile():
     return json.loads(Path(__file__).with_name('isolated_crf_profile.json').read_text())
@@ -73,6 +73,10 @@ def call(st,action,payload=None,timeout=20):
             raise PermissionError('ACTOR_CHANGED')
         st.session_state['_integration_actor']=actor
         p=copy.deepcopy(payload or {})
+        if action == 'save_section':
+            from isolated_privacy import redact_draft_identifiers
+            if redact_draft_identifiers(p.get('data', {})) != p.get('data', {}):
+                raise PermissionError('DIRECT_IDENTIFIER_NOT_ALLOWED')
         if action in ('save_crf','save_draft'):
             from isolated_privacy import redact_draft_identifiers
             body=p.get('payload',{}) if action=='save_crf' else p

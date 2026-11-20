@@ -21,6 +21,10 @@ jobs:
         run: |
           python build_clinical_contract.py
           git diff --exit-code -- clinical_contract/contract.json clinical_contract/validation_conditions.csv clinical_contract/input_specification.csv clinical_contract_generated.gs
+      - name: Check generated section allowlist drift
+        run: |
+          python build_autosave_sections.py
+          git diff --exit-code -- autosave_sections.json autosave_sections_generated.gs
       - name: Run only offline suites
         run: python run_offline.py
       - uses: actions/upload-artifact@v4

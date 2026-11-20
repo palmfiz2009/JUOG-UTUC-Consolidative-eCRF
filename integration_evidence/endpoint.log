@@ -29,4 +29,13 @@ PASS clinically complete operated fixture saves v1 and correction with old versi
 PASS all visit clinical failures leave CRF audit intent and notification state unchanged
 PASS recovery payload digest mismatch and untracked rows prevent retry
 PASS recovery jti replay fails while fresh signature can reconcile
-ALL 31 GROUPS PASSED
+PASS section draft debounce target is a single audited append with immutable replay
+PASS section stale-tab conflicts and same UUID different payload deny without audit append
+PASS section silent append failure safe same UUID retry with fresh assertion
+PASS section lost response after append expiry resumes canonical server data
+PASS section all nine visits are isolated and no wrong field or arbitrary session restore
+PASS section ownership ACL session revocation and transferred cases reject
+PASS section old drafts never resurrect after official version and journal corruption fails
+PASS section pending official transaction blocks new draft and preserves zero false null
+PASS section date identity fields and expired signatures fail before any draft append
+ALL 40 GROUPS PASSED
