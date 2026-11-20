@@ -58,7 +58,7 @@ def submit_crf_with_feedback(
     retry. The server must still enforce UUID idempotency and append-only audit.
     """
     import streamlit as st
-    from juog_common import delete_crf_draft, registry_call, save_crf_payload, send_email
+    from juog_common import delete_crf_draft, registry_call, save_crf_payload
 
     if page not in _PROFILES:
         raise ValueError("Unknown CRF page")
@@ -188,22 +188,12 @@ def submit_crf_with_feedback(
 
     attempt["record_version"] = str(result["record_version"])
     attempt["status"] = "committed"
-    # If this UUID already existed, an earlier request may have sent mail.
-    # Never send a duplicate; don't falsely report a mail failure either.
-    if result.get("existing"):
-        mail_status = "unconfirmed"
-        st.info("前回の送信IDによる保存を確認しました。メール通知は重複送信しません。通知状況は事務局で確認できます。")
-    else:
-        try:
-            with st.spinner("保存完了の通知メールを送信しています…", show_time=True):
-                mail_ok, _mail_error = send_email(
-                    attempt["email_subject"],
-                    attempt["email_body"],
-                    attempt["payload"]["reporter_email"],
-                )
-            mail_status = "sent" if mail_ok else "failed"
-        except Exception:
-            mail_status = "failed"
+    # This PR15 integration candidate runs in a no-notification isolation.
+    # A verified CRF receipt authorizes neither SMTP nor any recipient.
+    # No imported send_email(), silent fallback or conditional SMTP branch.
+    # Even an initial successful submission must never contact recipients.
+    mail_status = "disabled"
+    st.info("隔離UAT中：通知メールは送信しません。正式保存の証拠は中央台帳・監査記録で確認してください。")
 
     try:
         with st.spinner("仮保存データを整理しています…", show_time=True):

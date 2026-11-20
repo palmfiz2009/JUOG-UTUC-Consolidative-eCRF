@@ -107,7 +107,7 @@ class CRFSaveUITests(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(self.st.session_state["peri_sent_version"], "1")
         self.assertTrue(self.st.session_state["peri_sent"])
-        self.assertEqual(len(self.emails), 1)
+        self.assertEqual(self.emails, [])
         self.assertEqual(self.deleted[0], ("JUOG-901", "perioperative_30d", "30d"))
         self.assertTrue(any(k == "success" and "Version 1" in m for k,m,*_ in self.st.messages))
 
@@ -128,8 +128,31 @@ class CRFSaveUITests(unittest.TestCase):
         self.assertEqual([a["submission_id"] for a in self.saved], ["fixed-uuid", "fixed-uuid"])
         self.assertEqual([a["data"]["fictional"] for a in self.saved], [True, True])
         self.assertEqual(self.emails, [])
-        self.assertTrue(self.st.session_state["d90_sent_email_unconfirmed"])
+        self.assertFalse(self.st.session_state["d90_sent_email_unconfirmed"])
         self.assertEqual(self.st.session_state["d90_sent_version"], "2")
+
+    def test_verified_initial_save_explicitly_disables_smtp(self):
+        # Distinct from replay: a brand-new committed Version must not send.
+        # Existing send_email mock captures *any* attempted invocation.
+        ok = self.helper.submit_crf_with_feedback(
+            page="peri", registration_id="JUOG-901",
+            payload=self.fixture(), email_subject="do not send",
+            email_body="fictional body")
+        self.assertTrue(ok)
+        self.assertEqual(self.emails, [])
+        self.assertFalse(self.st.session_state["peri_sent_email_failed"])
+        self.assertFalse(self.st.session_state["peri_sent_email_unconfirmed"])
+        self.assertTrue(any(k == "info" and "通知メールは送信しません" in m
+                            for k,m,*_ in self.st.messages))
+        self.assertEqual(len(self.deleted), 1)
+
+    def test_replay_never_dispatches_smtp(self):
+        self.responses = [{"ok": True, "record_version": 1, "existing": True}]
+        self.assertTrue(self.helper.submit_crf_with_feedback(
+            page="fu", registration_id="JUOG-901",
+            payload=self.fixture("followup","6m")))
+        self.assertEqual(self.emails, [])
+        self.assertFalse(self.st.session_state["fu_sent_email_unconfirmed"])
 
     def test_pending_retry_rejects_different_patient(self):
         self.responses = [{"ok":False,"error":"TIMEOUT"}]
@@ -149,7 +172,7 @@ class CRFSaveUITests(unittest.TestCase):
         self.assertEqual(self.st.session_state["fu_sent_visit"],"12ヶ月")
         self.assertTrue(self.helper.submit_crf_with_feedback(page="fu", registration_id="JUOG-901"))
         self.assertEqual(len(self.saved),1)
-        self.assertEqual(len(self.emails),1)
+        self.assertEqual(self.emails, [])
 
     def test_pending_followup_retry_rejects_changed_visit(self):
         self.responses = [{"ok":False,"error":"TIMEOUT"}]
