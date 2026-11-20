@@ -1,17 +1,17 @@
 {
-  "base_commit": "c23e4edc99efd6e397c9728a5d80452a21f73b7c",
+  "base_commit": "194110a210230c1fc0764c02de523491a73fc09d",
   "validated_on": "2026-11-20 JST",
   "mode": "OFFLINE_ONLY",
-  "python_tests": 180,
+  "python_tests": 183,
   "python_suites": {
     "fixture": 76,
     "fixture_bridge_entry": 20,
     "pr": 39,
-    "adapter": 45
+    "adapter": 48
   },
-  "new_python_tests": 15,
+  "new_python_tests": 3,
   "gas_integration_groups": 40,
-  "new_gas_groups": 9,
+  "new_gas_groups": 0,
   "existing_gas_regression": "PASS",
   "identity_cases": 14,
   "clinical_differential": {
@@ -41,5 +41,6 @@
   "independent_qa_approved": false,
   "clinical_protocol_original": "LOCATED_20260916_V1",
   "approved_clinical_protocol_alignment": "NOT_VERIFIED",
-  "live_uat_transition": "PENDING_APPROVED_RUNTIME_AND_ACL_AND_REVIEW"
+  "live_uat_transition": "PENDING_APPROVED_RUNTIME_AND_ACL_AND_REVIEW",
+  "protocol_targeted_review": "8_TOPICS_PARTIAL_NOT_APPROVED"
 }

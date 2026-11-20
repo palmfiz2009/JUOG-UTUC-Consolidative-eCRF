@@ -76,8 +76,10 @@ def acknowledge(slot, op, response):
     r = r if isinstance(r, dict) else {}
     if (response.get('ok') is not True or response.get('audit_verified') is not True
             or response.get('record_key') != '|'.join((op['registration_id'], op['crf_type'], op['visit']))
+            or type(response.get('record_version')) is not int
             or response.get('record_version') != op['record_version']
             or r.get('operation_id') != op['operation_id'] or r.get('section') != op['section']
+            or type(r.get('revision')) is not int
             or r.get('revision') != op['expected_revision'] + 1
             or canonical(r.get('data')) != canonical(op['data'])):
         slot['status'] = 'error'
@@ -164,7 +166,26 @@ def _read_ok(r, q):
             return False
         for key, value in e['data'].items():
             if (key not in SECTIONS[page][section]['keys'] or not isinstance(value, dict)
-                    or value.get('type') not in ('value', 'date', 'datetime') or 'value' not in value):
+                    or value.get('type') not in ('value', 'date', 'datetime') or 'value' not in value
+                    or set(value) != {'type', 'value'}):
+                return False
+            v = value['value']
+            if key.endswith('_registration_id') and v != q['registration_id']:
+                return False
+            if key == 'fu_visit_month' and v != q['visit'].replace('m', 'ヶ月') + ('（終了）' if q['visit'] == '24m' else ''):
+                return False
+            if key.endswith('_reporter_email') and v and v != 'fictional@example.invalid':
+                return False
+            try:
+                canonical(v)
+                if value['type'] == 'date':
+                    if type(v) is not str or date.fromisoformat(v).isoformat() != v:
+                        return False
+                elif value['type'] == 'datetime':
+                    if type(v) is not str:
+                        return False
+                    datetime.fromisoformat(v)
+            except (ValueError, TypeError, OverflowError):
                 return False
     return True
 

@@ -88,4 +88,40 @@ class RestoreBoundaries(unittest.TestCase):
         r['sections']['2']=r['sections'].pop('1')
         self.assertFalse(a._read_ok(r,q))
 
+class StrictRecoveryBoundaries(unittest.TestCase):
+    def test_boolean_versions_and_revisions_never_mark_saved(self):
+        q=dict(registration_id='JUOG-901',crf_type='perioperative_30d',visit='30d')
+        slot={};a.observe(slot,{},0);op=a.prepare(slot,q,'1',0,2)
+        good=dict(ok=True,audit_verified=True,record_key='JUOG-901|perioperative_30d|30d',
+                  record_version=0,receipt=dict(op,revision=1))
+        for field, value in [('record_version', False),('record_version',0.0),('revision',True),('revision',1.0)]:
+            r=deepcopy(good)
+            if field=='revision':r['receipt'][field]=value
+            else:r[field]=value
+            self.assertFalse(a.acknowledge(slot,op,r))
+            self.assertEqual(slot['pending'],op)
+        self.assertTrue(a.acknowledge(slot,op,good))
+
+    def test_restore_rejects_other_case_and_invalid_typed_dates(self):
+        q=dict(registration_id='JUOG-901',crf_type='perioperative_30d',visit='30d')
+        r=dict(ok=True,audit_verified=True,record_key='JUOG-901|perioperative_30d|30d',record_version=0,
+               sections={'1':dict(revision=1,data={'peri_registration_id':{'type':'value','value':'JUOG-902'}})})
+        self.assertFalse(a._read_ok(r,q))
+        for kind, value in [('date','2026-02-30'),('date','20260101'),('date',None),('datetime','bad'),('value',float('nan'))]:
+            r['sections']={'2':dict(revision=1,data={'peri_op_date':dict(type=kind,value=value)})}
+            self.assertFalse(a._read_ok(r,q))
+        r['sections']['2']['data']['peri_op_date']=dict(type='date',value='2026-02-28')
+        self.assertTrue(a._read_ok(r,q))
+
+    def test_restore_rejects_other_visit_and_extra_wrapper_keys(self):
+        q=dict(registration_id='JUOG-901',crf_type='followup',visit='6m')
+        section=next(k for k,v in a.SECTIONS['fu'].items() if 'fu_visit_month' in v['keys'])
+        r=dict(ok=True,audit_verified=True,record_key='JUOG-901|followup|6m',record_version=0,
+               sections={section:dict(revision=1,data={'fu_visit_month':dict(type='value',value='9ヶ月')})})
+        self.assertFalse(a._read_ok(r,q))
+        v=r['sections'][section]['data']['fu_visit_month'];v['value']='6ヶ月'
+        self.assertTrue(a._read_ok(r,q));v['unexpected']='x'
+        self.assertFalse(a._read_ok(r,q))
+
 if __name__=='__main__':unittest.main()
+

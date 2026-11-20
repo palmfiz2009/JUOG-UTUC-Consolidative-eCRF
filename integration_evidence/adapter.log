@@ -21,33 +21,36 @@ test_restore_store_validation (test_autosave.Autosave.test_restore_store_validat
 test_sections_preserve_null_zero_false_empty_date_and_exclude_other_sections (test_autosave.Autosave.test_sections_preserve_null_zero_false_empty_date_and_exclude_other_sections) ... ok
 test_uncertain_freezes_uuid_payload_and_manual_retry (test_autosave.Autosave.test_uncertain_freezes_uuid_payload_and_manual_retry) ... ok
 test_server_response_cannot_restore_arbitrary_session_keys (test_autosave.RestoreBoundaries.test_server_response_cannot_restore_arbitrary_session_keys) ... ok
+test_boolean_versions_and_revisions_never_mark_saved (test_autosave.StrictRecoveryBoundaries.test_boolean_versions_and_revisions_never_mark_saved) ... ok
+test_restore_rejects_other_case_and_invalid_typed_dates (test_autosave.StrictRecoveryBoundaries.test_restore_rejects_other_case_and_invalid_typed_dates) ... ok
+test_restore_rejects_other_visit_and_extra_wrapper_keys (test_autosave.StrictRecoveryBoundaries.test_restore_rejects_other_visit_and_extra_wrapper_keys) ... ok
 test_integral_float_receipt_is_equal_but_false_is_distinct (test_autosave.TypedBoundaries.test_integral_float_receipt_is_equal_but_false_is_distinct) ... ok
 test_malformed_response_never_acknowledges (test_autosave.TypedBoundaries.test_malformed_response_never_acknowledges) ... ok
-test_all_three_debounce_and_only_changed_section (test_autosave_ui.UI.test_all_three_debounce_and_only_changed_section) ... 2026-11-20 22:33:33.134 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:33.134 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:33.134 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.038 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.422 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_all_three_debounce_and_only_changed_section (test_autosave_ui.UI.test_all_three_debounce_and_only_changed_section) ... 2026-11-20 23:50:55.338 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:55.339 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:55.339 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.053 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.053 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.053 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.053 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.415 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
-test_close_browser_new_session_resume_uses_server_sections (test_autosave_ui.UI.test_close_browser_new_session_resume_uses_server_sections) ... 2026-11-20 22:33:34.762 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.762 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:34.762 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:35.016 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_close_browser_new_session_resume_uses_server_sections (test_autosave_ui.UI.test_close_browser_new_session_resume_uses_server_sections) ... 2026-11-20 23:50:56.701 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.701 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.701 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:56.953 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
-test_failed_save_no_false_success_or_automatic_retry_overlay_removed (test_autosave_ui.UI.test_failed_save_no_false_success_or_automatic_retry_overlay_removed) ... 2026-11-20 22:33:35.266 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:35.266 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:35.266 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_failed_save_no_false_success_or_automatic_retry_overlay_removed (test_autosave_ui.UI.test_failed_save_no_false_success_or_automatic_retry_overlay_removed) ... 2026-11-20 23:50:57.225 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:57.225 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:57.225 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
-test_identity_change_purges_previous_form_and_never_sends (test_autosave_ui.UI.test_identity_change_purges_previous_form_and_never_sends) ... 2026-11-20 22:33:35.673 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:35.673 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-20 22:33:35.673 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_identity_change_purges_previous_form_and_never_sends (test_autosave_ui.UI.test_identity_change_purges_previous_form_and_never_sends) ... 2026-11-20 23:50:57.625 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:57.626 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-20 23:50:57.626 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
 test_differential_ui_gas (test_clinical.Clinical.test_differential_ui_gas) ... ok
 test_missing_dates_and_false_are_not_valid_numbers (test_clinical.Clinical.test_missing_dates_and_false_are_not_valid_numbers) ... ok
@@ -67,6 +70,6 @@ test_unknown_and_transport_failure_block_new (test_recovery_ui.RecoveryUI.test_u
 test_unverified_retry_never_shows_success (test_recovery_ui.RecoveryUI.test_unverified_retry_never_shows_success) ... ok
 
 ----------------------------------------------------------------------
-Ran 45 tests in 17.239s
+Ran 48 tests in 16.141s
 
 OK
