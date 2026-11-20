@@ -1,0 +1,324 @@
+{
+  "approval": {
+    "source": "User message 承認 following APPROVAL_SCOPE.md",
+    "scope": "Named isolated resources only; no independent QA approval inferred"
+  },
+  "sheetBackup": {
+    "source": "1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs",
+    "backup": "1G9Qo_MfVf-uDXZzZwu4IgRuzVGQih9By_7glH8DILS4",
+    "comparisons": [
+      {
+        "sheet": "シート1",
+        "matched": true,
+        "sourceRows": 0,
+        "backupRows": 0
+      },
+      {
+        "sheet": "Registry",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "Screening",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "ScreeningAudit",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "MDTReviews",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "ScreeningCRF",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "CRF_30d",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "CRF_90d",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "CRF_Followup",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "CRFSubmissionAudit",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "CRF_Drafts",
+        "matched": true,
+        "sourceRows": 1,
+        "backupRows": 1
+      },
+      {
+        "sheet": "Settings",
+        "matched": true,
+        "sourceRows": 7,
+        "backupRows": 7
+      },
+      {
+        "sheet": "UAT_Provenance",
+        "matched": true,
+        "sourceRows": 11,
+        "backupRows": 11
+      }
+    ],
+    "sourceModifiedBeforeProvision": "2026-11-09T13:28:04.604Z",
+    "shared": false
+  },
+  "schemaChecks": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "V3_Users",
+        "headersMatch": true,
+        "rows": 1
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "V3_SessionEvents",
+        "headersMatch": true,
+        "rows": 1
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "R1_CaseOwners",
+        "headersMatch": true,
+        "rows": 1
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "R1_Operations",
+        "headersMatch": true,
+        "rows": 1
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "R1_DraftOwners",
+        "headersMatch": true,
+        "rows": 1
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "R1_DraftEvents",
+        "headersMatch": true,
+        "rows": 1
+      }
+    }
+  ],
+  "originalTabsPreserved": [
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "シート1",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "Registry",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "Screening",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "ScreeningAudit",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "MDTReviews",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "ScreeningCRF",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "CRF_30d",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "CRF_90d",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "CRF_Followup",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "CRFSubmissionAudit",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "CRF_Drafts",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "Settings",
+        "unchanged": true
+      }
+    },
+    {
+      "status": "fulfilled",
+      "value": {
+        "title": "UAT_Provenance",
+        "unchanged": true
+      }
+    }
+  ],
+  "newHeaders": {
+    "V3_Users": [
+      "issuer",
+      "subject",
+      "user_id",
+      "enabled",
+      "role",
+      "facility_ids_json",
+      "valid_until"
+    ],
+    "V3_SessionEvents": [
+      "sequence",
+      "event_json",
+      "chain_sha256"
+    ],
+    "R1_CaseOwners": [
+      "registration_id",
+      "facility_code",
+      "user_id",
+      "enabled"
+    ],
+    "R1_Operations": [
+      "sequence",
+      "event_json",
+      "digest"
+    ],
+    "R1_DraftOwners": [
+      "draft_key",
+      "user_id"
+    ],
+    "R1_DraftEvents": [
+      "event_json",
+      "digest"
+    ]
+  },
+  "oldFixture": {
+    "scriptId": "1dr1qHRY2M_Ah2FsGLWYEpsoRZFBodCjCUBN8vEX7YYdgQMIuNbBWOS7R",
+    "deploymentId": "AKfycbxq4ElxrKAQGdp_MG4oI5VuvGGRWcIdbpuQym3w67R2bvLVl0c4b8qlVXERCql3js8gbw",
+    "version": 1,
+    "state": "ARCHIVED",
+    "activeDeployments": 0,
+    "visibleTriggers": 0,
+    "spreadsheetPropertyMatched": true,
+    "runtimeHTTPAfterArchive": "NOT_TESTED",
+    "propertiesChanged": false
+  },
+  "candidate": {
+    "state": "UNDEPLOYED_UNCHANGED",
+    "visibleTriggers": 0
+  },
+  "fixture": {
+    "awakened": true,
+    "view": "JUOG AUTH_CONNECT",
+    "businessSave": "PROHIBITED",
+    "message": "本人認証・期限・設定を確認できません。送信していません。",
+    "sourceLinkBranch": "uat-fixture-isolated-20261109",
+    "servedSHA": "NOT_VERIFIED"
+  },
+  "gasSourceBackup": {
+    "driveId": "1uqk4vfvxPIp3Y-6iVhDTWZfarXea0snk",
+    "url": "https://drive.google.com/file/d/1uqk4vfvxPIp3Y-6iVhDTWZfarXea0snk/view?usp=drivesdk",
+    "shared": false,
+    "manifest": {
+      "candidate-Code.gs": {
+        "bytes": 91766,
+        "sha256": "9ae2408249cbe34e7da492962be3b698c14f9b733a8f87fb0c27f8ff320e602d"
+      },
+      "old-UAT_Isolated_Bootstrap.gs": {
+        "bytes": 2024,
+        "sha256": "b50cdbc8452ae2d554b63f82614282475ff4065ca953eca785353ce8229976cd"
+      },
+      "old-Code.gs": {
+        "bytes": 83121,
+        "sha256": "11ee6acc469266c7ffea0b31bd5b938fbc374d010d93047f43e70c77410e60c7"
+      },
+      "old-deployment-before.txt": {
+        "bytes": 375,
+        "sha256": "8b6cb3021ce50e881e893e01a782f6f98e5bc65adffd03910389ce4613850cd8"
+      }
+    },
+    "limitation": "Visible source files copied through editor. appsscript.json and secret property values not exported; original project and retained Version 1 remain intact. Not a complete disaster-recovery rehearsal."
+  },
+  "formalUAT": {
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 74,
+    "NOT_RUN": 0,
+    "newPass": 0
+  }
+}

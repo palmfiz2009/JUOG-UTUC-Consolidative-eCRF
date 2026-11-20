@@ -1,0 +1,57 @@
+Browser tab: 5, Title: "TEST_JUOG_UTUC01_FIXTURE_CSV_20261109_ISOLATED - プロジェクトのトリガー - Apps Script", URL: "https://script.google.com/home/projects/1dr1qHRY2M_Ah2FsGLWYEpsoRZFBodCjCUBN8vEX7YYdgQMIuNbBWOS7R/triggers".
+0 AXWebArea TEST_JUOG_UTUC01_FIXTURE_CSV_20261109_ISOLATED - プロジェクトのトリガー - Apps Script, URL: script.google.com/home/projects/1dr1qHRY2M_Ah2FsGLWYEpsoRZFBodCjCUBN8vEX7YYdgQMIuNbBWOS7R/triggers
+	1 container
+		2 container script.google.com では、サービスの提供および品質向上とトラフィックの分析に Google の Cookie が使用されています。 , ID: glue-cookie-notification-bar-1
+			3 container
+				4 text script.google.com では、サービスの提供および品質向上とトラフィックの分析に Google の Cookie が使用されています。 
+				5 link Description: 詳しくは、Google による Cookie の使用についての説明をご覧ください。 新しいタブで開きます。, Value: policies.google.com/technologies/cookies?hl=ja
+			6 button OK
+		7 container yDmH0d
+			8 container gb
+				9 container
+					10 link Description: Google Apps Script, Value: script.google.com/home, ID: sdgBod
+					11 button 名前を変更
+					12 pop up button (collapsed) デプロイ, ID: ow15, Secondary Actions: Expand
+					13 button 他のユーザーとこのプロジェクトを共有
+					14 pop up button (collapsed) Description: サポート, Secondary Actions: Expand
+					15 button (collapsed) Description: Google アプリ, Secondary Actions: Expand
+					16 button (collapsed) Description: Google アカウント: Takashi Yoshida (palmfiz2009@gmail.com), Secondary Actions: Expand
+			17 container
+				18 container デプロイを管理
+					19 heading デプロイを管理, Value: 2, ID: c14
+						20 text デプロイを管理
+					21 container
+						22 text アクティブ
+						23 list アクティブなデプロイメントのリスト
+							24 ISOLATED TEST ONLY | 589b374e2d4be45efec6ef258157a7bac5c0fd83 | no patient data | fixture CSV
+						25 text アーカイブ済み アーカイブしたデプロイメントはありません 設定
+						26 link Description: Deployment について詳しく学習する, Value: developers.google.com/apps-script/concepts/deployments
+						27 button 編集
+						28 button デプロイメントをアーカイブ
+						29 container
+							30 combo box (disabled, collapsed) バージョン バージョン 1（2026/11/09 22:43）, Value: バージョン 1（2026/11/09 22:43）, Secondary Actions: Expand
+							31 container
+								32 text 説明
+								33 text field (disabled) 説明, Value: ISOLATED TEST ONLY | 589b374e2d4be45efec6ef258157a7bac5c0fd83 | no patient data | fixture CSV, ID: c24
+							34 text デプロイ ID
+							35 text AKfycbxq4ElxrKAQGdp_MG4oI5VuvGGRWcIdbpuQym3w67R2bvLVl0c4b8qlVXERCql3js8gbw
+							36 button デプロイ ID をコピー
+								37 text コピー
+							38 text ウェブアプリ URL
+							39 link Description: https://script.google.com/macros/s/AKfycbxq4ElxrKAQGdp_MG4oI5VuvGGRWcIdbpuQym3w67R2bvLVl0c4b8qlVXERCql3js8gbw/exec, Value: script.google.com/macros/s/AKfycbxq4ElxrKAQGdp_MG4oI5VuvGGRWcIdbpuQym3w67R2bvLVl0c4b8qlVXERCql3js8gbw/exec
+							40 button ウェブ アプリケーションの URL をコピー
+								41 text コピー
+							42 combo box (disabled, collapsed) 次のユーザーとして実行: 自分（palmfiz2009@gmail.com）, Value: 自分（palmfiz2009@gmail.com）, Secondary Actions: Expand
+							43 text このウェブ アプリケーションを実行するために、あなたのアカウント データを使用することを許可します。
+							44 combo box (disabled, collapsed) アクセスできるユーザー 全員, Value: 全員, Secondary Actions: Expand
+							45 text ライブラリ URL
+							46 link Value: script.google.com/macros/library/d/1dr1qHRY2M_Ah2FsGLWYEpsoRZFBodCjCUBN8vEX7YYdgQMIuNbBWOS7R/1, Description: https://script.google.com/macros/library/d/1dr1qHRY2M_Ah2FsGLWYEpsoRZFBodCjCUBN8vEX7YYdgQMIuNbBWOS7R/1
+							47 button ライブラリの URL をコピー
+								48 text コピー
+							49 text 他のユーザーとグループがこのプロジェクトをライブラリとして使用できるようにするには、このプロジェクトを共有します。
+						50 button キャンセル
+							51 text キャンセル
+						52 button (disabled) デプロイ
+							53 text デプロイ
+
+The focused UI element is 23 list アクティブなデプロイメントのリスト
