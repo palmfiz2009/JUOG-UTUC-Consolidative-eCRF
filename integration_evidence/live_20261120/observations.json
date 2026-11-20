@@ -1,0 +1,71 @@
+{
+  "observed_date_jst": "2026-11-20",
+  "base_commit": "5d41bf10b2a30db312a2e4a1eaf72d3118cc1da7",
+  "mode": "LIVE_READ_ONLY_PREFLIGHT_NOT_UAT_PASS",
+  "counts": {
+    "PASS": 0,
+    "FAIL": 0,
+    "BLOCKED": 74,
+    "NOT_RUN": 0
+  },
+  "new_pass": 0,
+  "candidate_gas": {
+    "script_id": "1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR",
+    "visible_source_header": "v2.2.9",
+    "visible_files": [
+      "コード.gs"
+    ],
+    "deployment_dialog": "このプロジェクトはまだデプロイされていません",
+    "active_deployments": 0,
+    "archived_deployments": 0
+  },
+  "old_fixture_gas": {
+    "script_id": "1dr1qHRY2M_Ah2FsGLWYEpsoRZFBodCjCUBN8vEX7YYdgQMIuNbBWOS7R",
+    "active_deployment_id": "AKfycbxq4ElxrKAQGdp_MG4oI5VuvGGRWcIdbpuQym3w67R2bvLVl0c4b8qlVXERCql3js8gbw",
+    "version": 1,
+    "state": "ACTIVE; not stopped; write ability not tested"
+  },
+  "streamlit": {
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/",
+    "visible_state": "This app has gone to sleep due to inactivity. Would you like to wake it back up?",
+    "wake_button_clicked": false,
+    "running_commit": "NOT_VERIFIED"
+  },
+  "sheet": {
+    "id": "1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs",
+    "missing_required_tabs": [
+      "V3_Users",
+      "V3_SessionEvents",
+      "R1_CaseOwners",
+      "R1_Operations",
+      "R1_DraftOwners",
+      "R1_DraftEvents"
+    ],
+    "sentinel_reads": [
+      "Registry!A1:H3",
+      "CRF_30d!A1:H3",
+      "CRFSubmissionAudit!A1:H3"
+    ],
+    "sentinel_result": "header only; not a full-sheet emptiness assertion"
+  },
+  "unverified": [
+    "Approved 2026-09-16 protocol original",
+    "current consistent backup",
+    "complete old-writer/trigger exclusion",
+    "fresh ACL validity and verified subject",
+    "independent QA"
+  ],
+  "source_gaps": [
+    "Existing UI has manual draft save; automatic draft persistence and section-wise saved progress requested now are not demonstrated or counted as complete",
+    "Mail external delivery remains disabled"
+  ],
+  "mutations": {
+    "live_services": false,
+    "patient_data": false,
+    "main": false
+  },
+  "screenshots": {
+    "fixture-sleeping.jpg": "0c400e1e4fc6f33cb86b56751ddf3cd908e1a09a8d7027aaadbf5711d9dc5a1b",
+    "candidate-not-deployed.jpg": "9d58f0010cb2f4fd02bcb2d8b0e3677841117846fa415851411c5f417ec8d5e4"
+  }
+}

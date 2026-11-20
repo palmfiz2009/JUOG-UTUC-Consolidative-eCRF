@@ -1,0 +1,249 @@
+{
+  "metadata": {
+    "spreadsheetId": "1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs",
+    "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs/edit",
+    "properties": {
+      "title": "TEST_JUOG_UTUC01_FIXTURE_CSV_20261109_ISOLATED_NO_PATIENTS",
+      "locale": "ja_JP",
+      "timeZone": "Asia/Tokyo"
+    },
+    "sheets": [
+      {
+        "properties": {
+          "sheetId": 0,
+          "title": "シート1",
+          "index": 0,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 1446736710,
+          "title": "Registry",
+          "index": 1,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 843181258,
+          "title": "Screening",
+          "index": 2,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 27,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 112050599,
+          "title": "ScreeningAudit",
+          "index": 3,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 1085302581,
+          "title": "MDTReviews",
+          "index": 4,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 1341282170,
+          "title": "ScreeningCRF",
+          "index": 5,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 103485725,
+          "title": "CRF_30d",
+          "index": 6,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 751410639,
+          "title": "CRF_90d",
+          "index": 7,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 1981991039,
+          "title": "CRF_Followup",
+          "index": 8,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 419876966,
+          "title": "CRFSubmissionAudit",
+          "index": 9,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 1015539173,
+          "title": "CRF_Drafts",
+          "index": 10,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 1005879016,
+          "title": "Settings",
+          "index": 11,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      },
+      {
+        "properties": {
+          "sheetId": 2003658272,
+          "title": "UAT_Provenance",
+          "index": 12,
+          "sheetType": "GRID",
+          "gridProperties": {
+            "rowCount": 1000,
+            "columnCount": 26,
+            "frozenRowCount": 1
+          }
+        }
+      }
+    ]
+  },
+  "reads": [
+    {
+      "range": "Registry!A1:H3",
+      "majorDimension": "ROWS",
+      "values": [
+        [
+          "registered_at",
+          "registration_id",
+          "status",
+          "facility_code",
+          "facility_name",
+          "local_subject_code",
+          "reporter_email",
+          "consent_date"
+        ]
+      ]
+    },
+    {
+      "range": "CRF_30d!A1:H3",
+      "majorDimension": "ROWS",
+      "values": [
+        [
+          "saved_at",
+          "record_version",
+          "submission_id",
+          "record_key",
+          "submission_kind",
+          "correction_reason",
+          "submitted_at",
+          "registration_id"
+        ]
+      ]
+    },
+    {
+      "range": "CRFSubmissionAudit!A1:H3",
+      "majorDimension": "ROWS",
+      "values": [
+        [
+          "saved_at",
+          "sheet_name",
+          "record_key",
+          "record_version",
+          "submission_id",
+          "submission_kind",
+          "registration_id",
+          "facility_code"
+        ]
+      ]
+    },
+    {
+      "range": "UAT_Provenance!A1:H3",
+      "majorDimension": "ROWS",
+      "values": [
+        [
+          "key",
+          "value"
+        ],
+        [
+          "environment",
+          "ISOLATED TEST ONLY - NO PATIENT DATA"
+        ],
+        [
+          "actual_created_at_utc",
+          "2026-11-09T13:27:51.144Z"
+        ]
+      ]
+    }
+  ]
+}
