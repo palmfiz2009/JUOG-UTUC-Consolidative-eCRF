@@ -95,9 +95,14 @@ def _identity(st):
     return hashlib.sha256(canonical([actor, st.user.get('auth_time'), st.user.get('iat')]).encode()).hexdigest()
 
 
-def _clear(st, page):
+def _clear(st, page, clear_resume=False):
+    prefixes = (page + '_', 'widget_' + page + '_', '_autosave_' + page)
+    if clear_resume:
+        # Never show a previous principal's case ID on the resume widgets.
+        prefixes += ('_resume_case_' + page, '_resume_visit_' + page,
+                     '_resume_action_' + page, '_retry_' + page + '_')
     for key in list(st.session_state):
-        if str(key).startswith((page + '_', 'widget_' + page + '_', '_autosave_' + page)):
+        if str(key).startswith(prefixes):
             del st.session_state[key]
 
 
@@ -112,7 +117,9 @@ def resume_panel(page):
     prior = st.session_state.get('_autosave_identity')
     if prior and prior != identity:
         for p in TYPES:
-            _clear(st, p)
+            _clear(st, p, clear_resume=True)
+        for key in ('_recovery_subject', '_recovery_visit', '_recovery_open'):
+            st.session_state.pop(key, None)
         st.session_state.pop('_autosave_identity', None)
         st.error('本人認証が変更・失効しました。以前の入力を破棄しました。再認証後に下書きを再開してください。')
         st.stop()
