@@ -7,7 +7,10 @@ class UI:
  def selectbox(self,*a,**k):return '30日'
  def button(self,*a,**k):return k['key'] in self.clicked
  def __getattr__(self,name):return lambda message:self.messages.append((name,message))
-def response(state,ops=None):return {'ok':True,'recovery':{'state':state,'operations':ops or []}}
+KEY='JUOG-901|perioperative_30d|30d'
+def response(state,ops=None,key=KEY):return {'ok':True,'recovery':{'record_key':key,'state':state,'operations':ops or []}}
+def pending(uuid,key=KEY):
+ reg,typ,visit=key.split('|');return {'payload':{'submission_id':uuid,'record_key':key,'registration_id':reg,'crf_type':typ,'visit':visit},'status':'uncertain'}
 class RecoveryUI(unittest.TestCase):
  def test_unknown_and_transport_failure_block_new(self):
   for reply in ({'ok':False},response('NO_SERVER_RECORD'),response('NEEDS_RECONCILIATION')):
@@ -29,6 +32,32 @@ class RecoveryUI(unittest.TestCase):
    with patch.object(recovery,'call',side_effect=[response('RETRY_ALLOWED',[{'state':'RETRY_ALLOWED','uuid':'original'}]),{'ok':True},reply]):recovery.render(ui)
    self.assertTrue(ui.session_state['_recovery_blocks_new']);self.assertFalse(any(k=='success' for k,_ in ui.messages))
  def test_saved_marks_only_matching_attempt_complete(self):
-  ui=UI();ui.session_state['_juog_peri_save_attempt']={'payload':{'submission_id':'original'},'status':'uncertain'};ui.session_state['_juog_d90_save_attempt']={'payload':{'submission_id':'other'},'status':'uncertain'}
+  ui=UI();ui.session_state['_juog_peri_save_attempt']=pending('original');ui.session_state['_juog_d90_save_attempt']=pending('other')
   with patch.object(recovery,'call',return_value=response('SAVED',[{'state':'SAVED','uuid':'original','version':1,'audit_verified':True}])):recovery.render(ui)
   self.assertEqual(ui.session_state['_juog_peri_save_attempt']['status'],'complete');self.assertEqual(ui.session_state['_juog_d90_save_attempt']['status'],'uncertain')
+
+ def test_unverified_saved_receipts_never_clear_block(self):
+  for item in ({'state':'SAVED','uuid':'original','version':1,'audit_verified':False},
+               {'state':'SAVED','uuid':'original','version':True,'audit_verified':True},
+               {'state':'SAVED','uuid':'original','version':1.0,'audit_verified':True},
+               {'state':'SAVED','uuid':'original','version':1}):
+   ui=UI();ui.session_state['_juog_peri_save_attempt']=pending('original')
+   with patch.object(recovery,'call',return_value=response('SAVED',[item])):recovery.render(ui)
+   self.assertTrue(ui.session_state['_recovery_blocks_new'])
+   self.assertEqual(ui.session_state['_juog_peri_save_attempt']['status'],'uncertain')
+   self.assertFalse(any(k=='success' for k,_ in ui.messages))
+ def test_wrong_record_or_empty_saved_does_not_unlock(self):
+  for reply in (response('SAVED',[]),response('SAVED',[{'state':'SAVED','uuid':'original','version':1,'audit_verified':True}],key='JUOG-902|perioperative_30d|30d')):
+   ui=UI()
+   with patch.object(recovery,'call',return_value=reply):recovery.render(ui)
+   self.assertTrue(ui.session_state['_recovery_blocks_new'])
+ def test_same_uuid_other_case_does_not_mark_attempt_complete(self):
+  ui=UI();ui.session_state['_juog_peri_save_attempt']=pending('original','JUOG-902|perioperative_30d|30d')
+  with patch.object(recovery,'call',return_value=response('SAVED',[{'state':'SAVED','uuid':'original','version':1,'audit_verified':True}])):recovery.render(ui)
+  self.assertEqual(ui.session_state['_juog_peri_save_attempt']['status'],'uncertain')
+ def test_duplicate_or_inconsistent_saved_results_do_not_unlock(self):
+  saved={'state':'SAVED','uuid':'original','version':1,'audit_verified':True}
+  for ops in ([saved,saved],[saved,{'state':'RETRY_ALLOWED','uuid':'second'}]):
+   ui=UI()
+   with patch.object(recovery,'call',return_value=response('SAVED',ops)):recovery.render(ui)
+   self.assertTrue(ui.session_state['_recovery_blocks_new'])
