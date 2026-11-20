@@ -123,5 +123,30 @@ class StrictRecoveryBoundaries(unittest.TestCase):
         self.assertTrue(a._read_ok(r,q));v['unexpected']='x'
         self.assertFalse(a._read_ok(r,q))
 
+
+class IdentitySwitchPrivacy(unittest.TestCase):
+    def test_resume_case_cleared_only_when_principal_changes(self):
+        from types import SimpleNamespace
+        session = {
+            'peri_registration_id': 'JUOG-901',
+            'widget_peri_lab': 'fictional',
+            '_autosave_peri': {'identity': 'previous'},
+            '_resume_case_peri': 'JUOG-901',
+            '_resume_visit_peri': '30d',
+            '_resume_action_peri': True,
+            '_retry_peri_1': True,
+            '_resume_case_d90': 'JUOG-902',
+        }
+        st = SimpleNamespace(session_state=session)
+        a._clear(st, 'peri')
+        self.assertIn('_resume_case_peri', session)  # Switching reports within one identity.
+        self.assertNotIn('peri_registration_id', session)
+        a._clear(st, 'peri', clear_resume=True)  # Identity lost or changed.
+        for key in ('_resume_case_peri', '_resume_visit_peri',
+                    '_resume_action_peri', '_retry_peri_1'):
+            self.assertNotIn(key, session)
+        self.assertEqual(session['_resume_case_d90'], 'JUOG-902')
+
+
 if __name__=='__main__':unittest.main()
 
