@@ -1,0 +1,87 @@
+{
+  "observed_date_jst": "2026-11-21",
+  "base_commit": "b688e39cb359fd6f9e4f6f389706cce94a7d9016",
+  "authorization": {
+    "account_use": "Explicit user authorization for designated Google account",
+    "acl_expiry": "User OK for 2026-11-28 23:59 JST",
+    "isolated_preparation": "User explicitly authorized all remaining isolated work this turn",
+    "independent_qa": "NOT SUPPLIED; not inferred from PI authorization"
+  },
+  "target": {
+    "spreadsheet_id": "1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs",
+    "title": "TEST_JUOG_UTUC01_FIXTURE_CSV_20261109_ISOLATED_NO_PATIENTS"
+  },
+  "identity": {
+    "source": "Existing AUTH04 V3_Users row 2, read-only",
+    "fingerprint_matches_authenticated_fixture_pin": true,
+    "full_subject_published": false
+  },
+  "changes": [
+    {
+      "range": "V3_Users!A2:G2",
+      "before": "Empty; A2:G1000 checked",
+      "after": {
+        "role": "facility",
+        "facilities": [
+          "TEST01"
+        ],
+        "enabled": true,
+        "valid_until": "2026-11-28T23:59:00+09:00"
+      },
+      "exact_readback": true,
+      "native_visual": "Observed saved row; identifier columns remain narrow in existing layout, complete values confirmed by API"
+    },
+    {
+      "range": "Registry!A2:O2",
+      "before": "Header only; A1:O1000 checked",
+      "after": {
+        "registration_id": "JUOG-901",
+        "facility_code": "TEST01",
+        "status": "ACTIVE",
+        "facility_name": "FICTIONAL_UAT_ONLY",
+        "local_subject_code": "FICTIONAL-901",
+        "reporter_email": "fictional@example.invalid",
+        "consent_date": "2026-01-01",
+        "registered_at": "2026-01-01"
+      },
+      "readback": true,
+      "source": "Existing committed integration fixture JUOG-901; timestamps and dates are fictional test fixture values, not live clinical dates"
+    },
+    {
+      "range": "R1_CaseOwners!A2:D2",
+      "before": "Header only; A1:D1000 checked",
+      "after": {
+        "registration_id": "JUOG-901",
+        "facility_code": "TEST01",
+        "owner": "same verified principal's existing internal ID",
+        "enabled": true
+      },
+      "readback": true
+    }
+  ],
+  "old_auth_connect_acl": {
+    "changed": false,
+    "expiry_readback": "2026-11-19T23:59:00+09:00"
+  },
+  "runtime": {
+    "candidate_deployed": false,
+    "streamlit_switched": false,
+    "qaRef": "MISSING",
+    "mail_enabled": false,
+    "crf_submission_attempted": false
+  },
+  "formal_uat": {
+    "pass": 0,
+    "fail": 0,
+    "blocked": 74,
+    "not_run": 0,
+    "new_pass": 0
+  },
+  "rollback": "Preserve evidence. Before any later rollback confirm no session, draft, CRF, audit or operation depends on these seed rows; do not erase acknowledged history. Existing original backup retained; old writer was not reactivated.",
+  "limits": [
+    "Provisioning is not a live ACL authorization or CRF save PASS.",
+    "Current Streamlit still uses older AUTH_CONNECT backend; candidate ACL does not fix that backend's AUTH_CONNECT_NOT_APPROVED response.",
+    "No qaRef, approved clinical conformity, live transaction, or independent QA was fabricated.",
+    "Runtime code unchanged; prior 190 Python / 40 GAS regression evidence reused without rerun."
+  ]
+}
