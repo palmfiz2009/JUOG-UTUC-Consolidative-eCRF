@@ -1,0 +1,45 @@
+{
+  "mode": "PREAPPROVAL_LOCAL_REVIEW_ONLY",
+  "formal_uat_pass_delta": 0,
+  "script_id": "1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR",
+  "spreadsheet_id": "1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs",
+  "source_files": {
+    "05_registry_google_apps_script.gs": {
+      "bytes": 94357,
+      "sha256": "593f516524393ba7b95772fec2df4eb2dcdf7b9dfc77ee865e2450f88bbff092"
+    },
+    "isolated_auth_bridge.gs": {
+      "bytes": 4209,
+      "sha256": "b33bc116559e4860a3a63890750104ac82442bcab13b26f28510e3f2e9e0063a"
+    },
+    "isolated_session_store.gs": {
+      "bytes": 4036,
+      "sha256": "03cc5d2b14cf986c0a31f513ad8a6a74373038f969121b9d7566c7fb6171c43c"
+    },
+    "isolated_crf_endpoint.gs": {
+      "bytes": 14780,
+      "sha256": "ea44ee5814cd23f54904ffbdc4d91cdf32276c0199dd02ac920a3b6e9ca3396a"
+    },
+    "isolated_recovery.gs": {
+      "bytes": 2667,
+      "sha256": "ee6e1d52b555ca4cb46393fd0233b7dc55028b7dadd8c9570682f0fff608fe24"
+    },
+    "clinical_contract_generated.gs": {
+      "bytes": 182660,
+      "sha256": "fe13a35ac2c5a68dc2439096ab9a5ea9fd3491267f735d330cbfef7f0659ce56"
+    },
+    "clinical_validation.gs": {
+      "bytes": 8669,
+      "sha256": "c0fca947ff49ea72b5d96a24daba29f05651c0f4a7ed284b38fed5fe121c8acb"
+    },
+    "autosave_sections_generated.gs": {
+      "bytes": 8770,
+      "sha256": "6e754e8e07910ac02d7cf53d106693af80b0b75dd5a1990b67f3b991f270cd29"
+    },
+    "isolated_autosave.gs": {
+      "bytes": 5385,
+      "sha256": "e68f5d17bfe06e8f22dbebb46cde0a0e34036cac5213d3ffdaf7521be003d879"
+    }
+  },
+  "independent_qa_approved": false
+}

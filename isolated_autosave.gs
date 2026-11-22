@@ -6,6 +6,21 @@ function pr15Canonical_(v){
  if(Array.isArray(v))return '['+v.map(pr15Canonical_).join(',')+']';
  return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+pr15Canonical_(v[k])).join(',')+'}';
 }
+function pr15ValidateSectionData_(page,q){
+ if(!PR15_SECTIONS_[page]||!PR15_SECTIONS_[page][q.section])throw Error('DRAFT_DATA_INVALID');
+ if(!q.data||Array.isArray(q.data)||typeof q.data!=='object'||JSON.stringify(q.data).length>100000||containsDirectIdentifier_(q.data))throw Error('DRAFT_DATA_INVALID');
+ const patterns=PR15_SECTIONS_[page][q.section].keys;
+ for(const k of Object.keys(q.data)){
+  if(!patterns.some(p=>p.endsWith('*')?k.startsWith(p.slice(0,-1)):p===k))throw Error('DRAFT_DATA_INVALID');
+  const v=q.data[k];
+  if(!v||typeof v!=='object'||!['value','date','datetime'].includes(v.type)||!Object.prototype.hasOwnProperty.call(v,'value')||Object.keys(v).some(x=>!['type','value'].includes(x)))throw Error('DRAFT_DATA_INVALID');
+  if(v.type==='date'&&(typeof v.value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v.value)||!Number.isFinite(Date.parse(v.value))||new Date(v.value).toISOString().slice(0,10)!==v.value))throw Error('DRAFT_DATA_INVALID');
+  if(v.type==='datetime'&&(typeof v.value!=='string'||!Number.isFinite(Date.parse(v.value))))throw Error('DRAFT_DATA_INVALID');
+  if(k.endsWith('_reporter_email')&&v.value&&v.value!=='fictional@example.invalid')throw Error('DRAFT_DATA_INVALID');
+  if(k.endsWith('_registration_id')&&v.value!==q.registration_id)throw Error('DRAFT_DATA_INVALID');
+  if(k==='fu_visit_month'&&v.value!==q.visit.replace('m','ヶ月')+(q.visit==='24m'?'（終了）':''))throw Error('DRAFT_DATA_INVALID');
+ }
+}
 function pr15SectionDraft_(ss,who,q,action,guard){
  const page={perioperative_30d:'peri',day90:'d90',followup:'fu'}[q.crf_type];
  if(!page||!pr15Pair_(q,false))throw Error('VISIT_INVALID');
@@ -26,6 +41,7 @@ function pr15SectionDraft_(ss,who,q,action,guard){
    events.push(e);
    if(e.key!==key)continue;
    if(e.actor!==who.id)throw Error('SUBJECT_FORBIDDEN');
+   try{pr15ValidateSectionData_(page,Object.assign({},q,{section:e.section,data:e.data}));}catch(_){throw Error('DRAFT_STORE_INVALID');}
    if(e.record_version!==version)continue;
    if(!PR15_SECTIONS_[page][e.section]||e.revision!==(state[e.section]?.revision||0)+1)throw Error('DRAFT_STORE_INVALID');
    if(Object.keys(e.data).some(k=>!PR15_SECTIONS_[page][e.section].keys.includes(k)))throw Error('DRAFT_STORE_INVALID');
@@ -37,18 +53,7 @@ function pr15SectionDraft_(ss,who,q,action,guard){
  const response=()=>({ok:true,record_key:key,record_version:version,sections:current.state,audit_verified:true});
  if(action==='get_sections')return response();
  if(!PR15_SECTIONS_[page][q.section]||typeof q.operation_id!=='string'||!/^[-a-zA-Z0-9]{16,80}$/.test(q.operation_id)||!Number.isInteger(q.expected_revision)||q.expected_revision<0||q.record_version!==version)throw Error('DRAFT_CONFLICT');
- if(!q.data||Array.isArray(q.data)||typeof q.data!=='object'||JSON.stringify(q.data).length>100000||containsDirectIdentifier_(q.data))throw Error('DRAFT_DATA_INVALID');
- const patterns=PR15_SECTIONS_[page][q.section].keys;
- for(const k of Object.keys(q.data)){
-  if(!patterns.some(p=>p.endsWith('*')?k.startsWith(p.slice(0,-1)):p===k))throw Error('DRAFT_DATA_INVALID');
-  const v=q.data[k];
-  if(!v||typeof v!=='object'||!['value','date','datetime'].includes(v.type)||!Object.prototype.hasOwnProperty.call(v,'value')||Object.keys(v).some(x=>!['type','value'].includes(x)))throw Error('DRAFT_DATA_INVALID');
-  if(v.type==='date'&&(typeof v.value!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(v.value)||!Number.isFinite(Date.parse(v.value))||new Date(v.value).toISOString().slice(0,10)!==v.value))throw Error('DRAFT_DATA_INVALID');
-  if(v.type==='datetime'&&(typeof v.value!=='string'||!Number.isFinite(Date.parse(v.value))))throw Error('DRAFT_DATA_INVALID');
-  if(k.endsWith('_reporter_email')&&v.value&&v.value!=='fictional@example.invalid')throw Error('DRAFT_DATA_INVALID');
-  if(k.endsWith('_registration_id')&&v.value!==q.registration_id)throw Error('DRAFT_DATA_INVALID');
-  if(k==='fu_visit_month'&&v.value!==q.visit.replace('m','ヶ月')+(q.visit==='24m'?'（終了）':''))throw Error('DRAFT_DATA_INVALID');
- }
+ pr15ValidateSectionData_(page,q);
  const digest=pr15Hash_(pr15Canonical_(q.data)),same=current.events.filter(e=>e.operation_id===q.operation_id);
  if(same.length){
   const e=same[0];

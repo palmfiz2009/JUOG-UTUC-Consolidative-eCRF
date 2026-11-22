@@ -88,6 +88,14 @@ def submit_crf_with_feedback(
         if not payload.get("submission_id") or not payload.get("record_key"):
             st.error("送信IDまたは記録キーが不明です。保存を中止しました。")
             return False
+        # Reject locally before freezing an attempt or doing any network I/O.
+        # Otherwise a fixable input error becomes an immutable retry forever.
+        from clinical_validation import validate_payload
+        clinical = validate_payload(payload)
+        if not clinical["ok"]:
+            st.error("臨床入力を確認してください：" + " / ".join(clinical["missing"] + clinical["errors"]))
+            return False
+        from isolated_correction_ui import snapshot_form
         attempt = {
             "actor_key": actor,
             "status": "prepared",
@@ -97,10 +105,18 @@ def submit_crf_with_feedback(
             "email_body": str(email_body),
             "had_warnings": bool(warnings),
             "visit_display": str(visit_display),
+            "form_state": snapshot_form(page, st.session_state),
         }
         st.session_state[key] = attempt
     else:
         if attempt.get("status") == "complete":
+            frozen = attempt.get("payload") or {}
+            if (attempt.get("registration_id") != registration_id
+                    or frozen.get("crf_type") != crf_type
+                    or (current_visit and frozen.get("visit") != current_visit)
+                    or (payload is not None and payload != frozen)):
+                st.error("前回の保存済み要求とは異なります。保存済み画面の訂正開始、または対象症例の再開から操作してください。")
+                return False
             st.info("この送信はすでに確認されています。追加送信はしません。")
             return True
         frozen = attempt.get("payload") or {}

@@ -21,7 +21,7 @@ def redact_draft_identifiers(value):
             except (ValueError, TypeError):
                 pass
         s = unicodedata.normalize('NFKC', value)
-        patterns = [r'(?:生年月日|患者氏名|カルテ番号)\s*(?:は|が|[:=])\s*\S', r'(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S', r'(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]']
+        patterns = [r'(?:生年月日|患者氏名|カルテ番号)(?:\s*(?:は|が|[:=])\s*|\s+)\S', r'(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S', r'(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]']
         return '[REDACTED]' if any(re.search(p, s, re.I) for p in patterns) else value
     if isinstance(value, list):
         return [redact_draft_identifiers(v) for v in value]

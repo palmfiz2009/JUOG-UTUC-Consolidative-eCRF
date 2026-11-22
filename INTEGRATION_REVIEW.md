@@ -1,4 +1,4 @@
-> Latest section-autosave work: [implementation and limits](integration_evidence/autosave_20261120/README.md). Offline **180 Python tests / 40 GAS groups PASS**; formal UAT **0 PASS / 74 BLOCKED**. The following earlier integration notes are retained as history. Clinical original is now located; conformity and independent QA remain unapproved.
+> Latest pre-QA work (2026-11-22 JST): [fixes, regression evidence and remaining gates](integration_evidence/preqa_20261122/README.md). Offline **198 Python tests / 42 GAS groups PASS**; formal UAT **0 PASS / 74 BLOCKED**. Correction controls, request identity and stored-draft validation are hardened. Clinical 8-item decisions and actual independent QA remain unapproved. The earlier notes below are retained as history; their test counts and manual-only CI description are superseded by the linked evidence.
 
 # Current implementation update — 2026-11-20 JST
 

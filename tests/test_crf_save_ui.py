@@ -99,6 +99,33 @@ class CRFSaveUITests(unittest.TestCase):
         if crf_type=="followup":value["data"]["visit_month"]=visit.replace("m","ヶ月")+("（終了）" if visit=="24m" else "")
         return value
 
+    def test_clinical_rejection_does_not_freeze_attempt_or_contact_backend(self):
+        from juog_common import registry_call
+        bad = self.fixture()
+        bad['data']['day30_visit_date'] = '2999-01-01'
+        with patch('juog_common.registry_call') as backend:
+            self.assertFalse(self.helper.submit_crf_with_feedback(
+                page='peri', registration_id='JUOG-901', payload=bad))
+            backend.assert_not_called()
+        self.assertNotIn(self.helper.attempt_key('peri'), self.st.session_state)
+        self.assertEqual(self.saved, [])
+        fixed = self.fixture(submission_id='fictional-corrected-input')
+        self.assertTrue(self.helper.submit_crf_with_feedback(
+            page='peri', registration_id='JUOG-901', payload=fixed))
+        self.assertEqual(self.saved[0]['submission_id'], fixed['submission_id'])
+
+    def test_completed_receipt_cannot_acknowledge_another_request(self):
+        original=self.fixture()
+        self.assertTrue(self.helper.submit_crf_with_feedback(
+            page='peri',registration_id='JUOG-901',payload=original))
+        for case,visit,payload in [('JUOG-902','30d',None),('JUOG-901','90d',None),
+                ('JUOG-901','30d',self.fixture(submission_id='another-request'))]:
+            self.assertFalse(self.helper.submit_crf_with_feedback(
+                page='peri',registration_id=case,current_visit=visit,payload=payload))
+        self.assertEqual(len(self.saved),1)
+        self.assertTrue(self.helper.submit_crf_with_feedback(
+            page='peri',registration_id='JUOG-901',payload=original))
+
     def test_full_save_marks_saved_and_shows_version(self):
         ok = self.helper.submit_crf_with_feedback(
             page="peri", registration_id="JUOG-901",

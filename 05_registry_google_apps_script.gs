@@ -1615,7 +1615,7 @@ function containsDirectIdentifier_(value, depth) {
     if(/^[\s]*[\[{]/.test(text)){
       try { const parsed=JSON.parse(text);if(parsed&&typeof parsed==='object'&&containsDirectIdentifier_(parsed,depth+1))return true; } catch(_) {}
     }
-    return /(?:生年月日|患者氏名|カルテ番号)\s*(?:は|が|[:=])\s*\S/i.test(text)||
+    return /(?:生年月日|患者氏名|カルテ番号)(?:\s*(?:は|が|[:=])\s*|\s+)\S/i.test(text)||
      /(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S/i.test(text)||
      /(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]/i.test(text);
   }

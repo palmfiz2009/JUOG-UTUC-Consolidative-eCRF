@@ -1,0 +1,22 @@
+{
+  "base_sha": "78b4f127ffdbc55a86119a090f663fb1a0875bd6",
+  "base_file_blob_hashes_matched": 151,
+  "prior_local_copies_modified": false,
+  "all_254_conditions_unchanged": true,
+  "clinical_validator_ast_unchanged": {
+    "perioperative_30d": true,
+    "day90": true,
+    "followup": true
+  },
+  "python_tests": 198,
+  "gas_groups": 42,
+  "formal_uat": {
+    "pass": 0,
+    "blocked": 74,
+    "new_pass": 0
+  },
+  "hosted_actions": "PENDING_PUSH_OBSERVATION",
+  "environment_mutations_this_run": [],
+  "qa_approved": false,
+  "original_protocol_sha256": "4b66414998cb22001375a9a6e5b81c28fe387984c92692973aaabcf086b974c9"
+}

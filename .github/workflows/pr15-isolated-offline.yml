@@ -1,11 +1,23 @@
 name: PR15 isolated offline regressions
 on:
   workflow_dispatch:
+  push:
+    branches: [review/pr15-authenticated-crf-integration-20261116]
+    paths:
+      - '*.py'
+      - '*.gs'
+      - 'requirements*.txt'
+      - 'clinical_contract/**'
+      - 'integration_tests/**'
+      - 'tests/**'
+      - 'fixture_regression/**'
+      - 'tools/**'
+      - '.github/workflows/pr15-isolated-offline.yml'
 permissions:
   contents: read
 jobs:
   offline:
-    if: github.ref == 'refs/heads/review/pr15-authenticated-crf-integration-20261116'
+    if: github.ref == 'refs/heads/review/pr15-authenticated-crf-integration-20261116' && github.event.repository.private == false
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -27,9 +39,19 @@ jobs:
           git diff --exit-code -- autosave_sections.json autosave_sections_generated.gs
       - name: Run only offline suites
         run: python run_offline.py
-      - uses: actions/upload-artifact@v4
+      - name: Print offline evidence to job logs without artifact storage
         if: always()
-        with:
-          name: pr15-offline-evidence
-          path: integration_evidence/
-          retention-days: 7
+        run: |
+          python - <<'PY'
+          import pathlib, re
+          root = pathlib.Path('integration_evidence')
+          for name in ['summary.json', 'clinical_coverage.json']:
+              p = root / name
+              if p.exists(): print(name, p.read_text())
+          for name in ['fixture', 'fixture_bridge_entry', 'pr', 'adapter', 'endpoint', 'pr_gas', 'pr_identity']:
+              p = root / (name + '.log')
+              if not p.exists(): continue
+              log = p.read_text()
+              print(name, '\n'.join(re.findall(r'^.*(?:Ran \d+ tests|ALL .*PASSED|FAILED|ERROR|FAIL:).*$', log, re.M)))
+              if 'FAILED' in log or 'Traceback' in log: print(log)
+          PY

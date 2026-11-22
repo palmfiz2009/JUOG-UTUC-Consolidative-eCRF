@@ -158,6 +158,7 @@ def resume_panel(page):
 
 
 def _read_ok(r, q):
+    from isolated_privacy import redact_draft_identifiers
     if not (isinstance(r, dict) and r.get('ok') is True and r.get('audit_verified') is True
             and r.get('record_key') == '|'.join((q['registration_id'], q['crf_type'], q['visit']))
             and type(r.get('record_version')) is int and r['record_version'] >= 0
@@ -170,6 +171,8 @@ def _read_ok(r, q):
         if (section not in SECTIONS[page] or not isinstance(e, dict)
                 or not isinstance(e.get('data'), dict)
                 or type(e.get('revision')) is not int or e['revision'] < 1):
+            return False
+        if redact_draft_identifiers(e['data']) != e['data']:
             return False
         for key, value in e['data'].items():
             if (key not in SECTIONS[page][section]['keys'] or not isinstance(value, dict)

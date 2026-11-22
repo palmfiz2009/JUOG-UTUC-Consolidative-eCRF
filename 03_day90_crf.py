@@ -122,7 +122,8 @@ if st.session_state.d90_sent:
         st.info("確定送信は完了していますが、仮保存データの削除確認ができませんでした。確定データには影響ありません。")
     if st.session_state.get("d90_sent_email_unconfirmed"):
         st.info("同じ送信IDの保存を確認しました。前回のメール通知状況は事務局で確認してください。")
-    st.caption("訂正する場合はページを再読み込みし、「訂正報告」を選択して送信してください。")
+    from isolated_correction_ui import correction_panel
+    correction_panel("d90")
     st.stop()
 
 @st.fragment

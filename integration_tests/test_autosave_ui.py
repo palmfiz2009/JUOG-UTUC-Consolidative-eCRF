@@ -73,3 +73,50 @@ class UI(unittest.TestCase):
             app.run()
         self.assertEqual(len(self.saves()),n)
         self.assertTrue(any('以前の入力を破棄' in x.value for x in app.error))
+
+    def test_all_nine_visits_new_browser_restores_exact_report(self):
+        for page,visits in [('peri',['30d']),('d90',['90d']),('fu',a.VISITS)]:
+            for visit in visits:
+                with self.subTest(page=page,visit=visit):
+                    self.clock=0;self.saved={};self.calls=[]
+                    app=self.app(page)
+                    if page=='fu':
+                        label=visit.replace('m','ヶ月')+('（終了）' if visit=='24m' else '')
+                        # Start clean for this visit, not by silently rebinding a loaded draft.
+                        app=AppTest.from_file(str(ROOT/PAGES[page]),default_timeout=20)
+                        app.session_state['fu_registration_id']='JUOG-901'
+                        app.session_state['fu_reporter_email']='fictional@example.invalid'
+                        app.session_state['fu_linkage']=self.link()
+                        app.session_state['fu_visit_month']=label;app.run()
+                    app.radio(key=page+'_submission_kind').set_value('訂正報告').run()
+                    app.text_area(key=page+'_correction_reason').set_value('架空の再開試験').run()
+                    self.clock=3;app.run();self.assertTrue(self.saves())
+                    reopened=self.app(page,seed=False)
+                    reopened.text_input(key='_resume_case_'+page).set_value('JUOG-901').run()
+                    if page=='fu':reopened.selectbox(key='_resume_visit_fu').set_value(visit).run()
+                    reopened.button(key='_resume_action_'+page).click().run()
+                    self.assertFalse(list(reopened.exception))
+                    self.assertEqual(reopened.radio(key=page+'_submission_kind').value,'訂正報告')
+                    self.assertEqual(reopened.text_area(key=page+'_correction_reason').value,'架空の再開試験')
+                    self.assertEqual(reopened.session_state['_autosave_'+page]['query']['visit'],visit)
+
+    def test_completed_pages_offer_verified_correction_with_preserved_input(self):
+        from isolated_correction_ui import snapshot_form
+        from juog_crf_save_ui import attempt_key
+        for page in PAGES:
+            with self.subTest(page=page):
+                typ=a.TYPES[page];visit='30d' if page=='peri' else '90d' if page=='d90' else '6m'
+                key=f'JUOG-901|{typ}|{visit}'
+                p=dict(registration_id='JUOG-901',facility_code='TEST01',crf_type=typ,visit=visit,submission_id='fictional-v1',record_key=key)
+                form={page+'_registration_id':'JUOG-901',page+'_reporter_email':'fictional@example.invalid'}
+                if page=='fu':form['fu_visit_month']='6ヶ月'
+                app=AppTest.from_file(str(ROOT/PAGES[page]),default_timeout=20)
+                app.session_state[page+'_sent']=True
+                app.session_state[attempt_key(page)]=dict(status='complete',actor_key='fictional-actor',payload=p,record_version='1',form_state=snapshot_form(page,form))
+                app.run();self.assertFalse(list(app.exception))
+                reply=dict(ok=True,recovery=dict(state='SAVED',record_key=key,operations=[dict(state='SAVED',uuid='fictional-v1',version=1,audit_verified=True)]))
+                with patch('isolated_crf_adapter.actor_key',return_value='fictional-actor'),patch('isolated_crf_adapter.call',return_value=reply),patch('isolated_crf_adapter.begin_edit',return_value=dict(ok=True,record_versions={key:1})):
+                    app.button(key='_correction_start_'+page).click().run()
+                self.assertFalse(list(app.exception))
+                self.assertEqual(app.radio(key=page+'_submission_kind').value,'訂正報告')
+                self.assertEqual(app.text_input(key=page+'_registration_id').value,'JUOG-901')

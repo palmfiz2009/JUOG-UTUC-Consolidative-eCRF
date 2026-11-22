@@ -156,4 +156,34 @@ test('section date identity fields and expired signatures fail before any draft 
  const e=f.envelope('save_section',sectionOp());f.advance(15000);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'AUTH_EXPIRED');assert.equal(f.tables.R1_DraftEvents.rows.length,before);
 });
 fs.writeFileSync(path.join(root,'integration_evidence/endpoint_results.json'),JSON.stringify({mode:'OFFLINE_IN_MEMORY_REAL_SOURCE',test_groups:tests.length,tests,formal_uat_pass_delta:0,independent_qa_approved:false},null,2)+'\n');
+test('draft read and retry reject structurally invalid stored values without append',f=>{
+ const q=sectionOp();assert.equal(f.call('save_section',q).ok,true);
+ const original=copy(f.tables.R1_DraftEvents.rows[1]);
+ for(const data of [
+  {peri_registration_id:{type:'value',value:'JUOG-902'}},
+  {peri_reporter_email:{type:'value',value:'other@example.invalid'}},
+  {peri_correction_reason:{type:'value',value:'患者氏名 テスト太郎'}},
+  {peri_registration_id:{type:'date',value:'2026-02-30'}},
+  {peri_registration_id:{type:'unsupported',value:'JUOG-901'}}
+ ]){
+  const e=JSON.parse(original[0]);e.data=data;e.digest=hash(f.x.pr15Canonical_(data));
+  const json=JSON.stringify(e);f.tables.R1_DraftEvents.rows[1]=[json,hash(json)];
+  assert.equal(f.call('get_sections',sectionQ()).error,'DRAFT_STORE_INVALID');
+  assert.equal(f.call('save_section',q).error,'DRAFT_STORE_INVALID');
+  assert.equal(f.tables.R1_DraftEvents.rows.length,2);assert.equal(f.tables.CRF_30d.rows.length,1);
+  assert.equal(f.tables.R1_Operations.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+ }
+ f.tables.R1_DraftEvents.rows[1]=original;
+ assert.equal(f.call('get_sections',sectionQ()).ok,true);
+ assert.equal(f.call('save_section',q).existing,true);
+});
+test('space-separated explicit identifier labels denied before clinical or draft writes',f=>{
+ for(const text of ['患者氏名 テスト太郎','カルテ番号 FAKE123','生年月日 1980年1月2日','患者氏名　テスト太郎']){
+  const p=f.payload();p.data.free_text=text;assert.equal(f.save(p).error,'DIRECT_IDENTIFIER_NOT_ALLOWED');
+  const q=sectionOp();q.data.peri_correction_reason={type:'value',value:text};
+  assert.equal(f.call('save_section',q).error,'DRAFT_DATA_INVALID');
+ }
+ assert.equal(f.tables.R1_DraftEvents.rows.length,1);assert.equal(f.tables.R1_Operations.rows.length,1);
+ assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+});
 console.log('ALL '+tests.length+' GROUPS PASSED');
