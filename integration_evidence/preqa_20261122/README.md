@@ -32,7 +32,7 @@
 
 従来のworkflow_dispatchだけでは、デフォルトブランチにないworkflowを起動できない。mainを変更せず、既存隔離ブランチのコードpushのみを実行条件へ追加した。公開repo限定・標準ubuntu-latest、contents:readのみ、デプロイ/Secrets/外部送信なし。artifact uploadを外し、計算結果はjobログへ出す。料金の追加が必要な機能は使わない。
 
-参照：[手動workflowのdefault-branch条件](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)、[公開repo標準runnerとログの扱い](https://docs.github.com/en/billing/concepts/product-billing/github-actions)。この時点のHosted実測はchecks.jsonに記載し、ローカルPASSを転記しない。
+参照：[手動workflowのdefault-branch条件](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/manually-run-a-workflow)、[公開repo標準runnerとログの扱い](https://docs.github.com/en/billing/concepts/product-billing/github-actions)。**Hosted実行も成功**：[run 45001482081](https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/actions/runs/45001482081)、対象コード `4cf8ea66220c06be3fc8b593464c57cff9ae8be1`。生成物drift検査・全7suite成功。実行ログからPython 198件、GAS42群、臨床8062ケース/差異0を確認。`hosted_actions.json`と`hosted_actions_excerpt.log`へ原時刻付き証拠を保存。これはクラウドrunner上のオフライン試験で、GAS/Streamlit/Sheetsの実機UATではない。
 
 ## 残る条件
 

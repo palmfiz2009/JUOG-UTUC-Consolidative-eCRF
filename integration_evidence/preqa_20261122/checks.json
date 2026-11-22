@@ -15,8 +15,16 @@
     "blocked": 74,
     "new_pass": 0
   },
-  "hosted_actions": "PENDING_PUSH_OBSERVATION",
+  "hosted_actions": {
+    "status": "completed",
+    "conclusion": "success",
+    "run_id": 45001482081,
+    "head_sha": "4cf8ea66220c06be3fc8b593464c57cff9ae8be1",
+    "evidence": "hosted_actions.json"
+  },
   "environment_mutations_this_run": [],
   "qa_approved": false,
-  "original_protocol_sha256": "4b66414998cb22001375a9a6e5b81c28fe387984c92692973aaabcf086b974c9"
+  "original_protocol_sha256": "4b66414998cb22001375a9a6e5b81c28fe387984c92692973aaabcf086b974c9",
+  "generated_artifacts_reproducible": 6,
+  "remote_changed_blobs_verified": 38
 }
