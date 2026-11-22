@@ -1,16 +1,17 @@
-# JUOG-UTUC01 独立QA開始前レビュー記録【DRAFT・未承認】
+# JUOG-UTUC01 独立QA開始前レビュー記録【2026-11-22更新・DRAFT・未承認】
 
 **重要：この文書は記入用テンプレートであり、実在する独立QAレビュー結果・署名・承認ではない。** 中本喬大先生はPIから担当者として指定済みだが、本人のレビュー・判定は未実施。本人の追跡可能な確認記録が成立するまで、本ファイル・このコミット・PI承認を`qa_ref`に使用しない。
 
 ## 1. 対象と既存の証拠（再承認対象ではなく照合対象）
 - 研究：JUOG-UTUC01（Consolidative surgery）、2026-09-16版研究計画書。
 - Repo：`palmfiz2009/JUOG-UTUC-Consolidative-eCRF`、PR #15（Draft、対象レビュー用ブランチとPR HEADは別）。
-- **候補コード**：`b688e39cb359fd6f9e4f6f389706cce94a7d9016`。候補有効化時には実際のデプロイ対象SHAを再照合。
+- **レビュー対象の候補コード**：`4cf8ea66220c06be3fc8b593464c57cff9ae8be1`（2026-11-22修正）、証拠追加後HEAD `3c5ad8aa979b38f28ad1d6f6282d61a62308f0bd`（コード変更なし）。中本先生は**今回の修正差分も**レビューする。候補有効化時には実際のデプロイ対象SHAを再照合。
 - **準備エビデンス**：`880c895ca903a08a217a01ce45c50b4a1b3c4507`（コード変更なし、TEST01本人ACL・完全架空症例JUOG-901配置・読戻し）。
 - ACL：TEST01 facility・本人1名、2026-11-28 23:59 JSTまで。本人pinとの一致は既存証拠で確認済。実subject/認証情報を貼付しない。
 - [PR #15の独立QA依頼](https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/15#issuecomment-7060422562)、`integration_evidence/acl_fixture_provisioning_20261121/README.md`、`integration_evidence/handover_regression_20261121/README.md`、`integration_evidence/live_20261120/APPROVED_EXECUTION.md`、`integration_evidence/recovery_hardening_20261120/protocol_targeted_review.csv`。
-- 前回オフライン：Python 190件・GAS40群PASS（実機PASSではない）。正式UAT **PASS0 / FAIL0 / BLOCKED74 / NOT RUN0**。
-- **未完了**：候補GASデプロイ、B2初期化、既存Streamlit切替、qaRef、正式30日CRF保存と監査照合。外部メール停止継続。
+- 現行オフライン：Python **198件**・GAS **42試験群**PASS（実機PASSではない）。GitHub Actions [run 45001482081](https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/actions/runs/45001482081) は修正コード `4cf8ea6` で成功。臨床差分8,062ケース・差異0。正式UAT **PASS0 / FAIL0 / BLOCKED74 / NOT RUN0**。
+- **今回の変更の独立QA確認対象**：3画面訂正開始、送信ID/保存応答の取り違え防止、初回入力不備での未送信attempt固着防止、保存済み下書きの再検証、識別情報検出の強化。 [変更・回帰証拠](https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/blob/3c5ad8aa979b38f28ad1d6f6282d61a62308f0bd/integration_evidence/preqa_20261122/README.md)。
+- **未完了**：臨床8論点PI決裁、中本先生の独立QA判定、候補GASデプロイ、B2初期化、既存Streamlit切替、qaRef、正式30日CRF保存と監査照合。外部メール停止継続。
 
 ## 2. 中本先生による技術ゲートレビュー（本人がチェック・根拠記入）
 
@@ -24,14 +25,14 @@
 | T04 | 本人OIDC・TEST01 ACL・所有権・期限・主体識別子非露出 | 【未記入】 |
 | T05 | JUOG-901（完全架空）登録/owner読戻し、CRF/監査/Version人工投入なし | 【未記入】 |
 | T06 | 候補GASとB2 generation、Script/Sheet、Streamlit対応と失敗時停止 | 【未記入】 |
-| T07 | 仮保存・再開・同一UUID冪等性・訂正Version・監査・故障復旧の実装と試験証拠 | 【未記入】 |
+| T07 | 仮保存・再開・訂正開始・同一UUID冪等性・保存応答取り違え拒否・不正下書き拒否・識別情報検出・監査・故障復旧の今回修正を含む実装と試験証拠 | 【未記入】 |
 | T08 | メール送信停止・外部漏洩防止・初回UATからメール成功試験を分離 | 【未記入】 |
 | T09 | 未確定臨床8論点のPI決定・研究計画書との整合・独立QAの確認責務 | 【未記入】 |
 | T10 | 重大欠陥/未確認ゲートがある場合は候補GASを有効化しない | 【未記入】 |
 
 ## 3. 臨床条件の未確定8論点（PI/委任臨床責任者の判断とQA照合を分離）
 
-出典：2026-09-16版研究計画書と`protocol_targeted_review.csv`（節・実装行は最新版で再照合）。各行の「臨床判断」は**医療・試験責任者の実際の決裁**を記入する。中本先生は根拠・実装との一致を独立確認し、勝手に臨床判断を創作しない。
+出典：2026-09-16版研究計画書と[CLINICAL_DECISIONS.md](https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/blob/3c5ad8aa979b38f28ad1d6f6282d61a62308f0bd/integration_evidence/preqa_20261122/CLINICAL_DECISIONS.md) および`protocol_targeted_review.csv`（節・実装行は最新版で再照合）。各行の「臨床判断」は**医療・試験責任者の実際の決裁**を記入する。中本先生は根拠・実装との一致を独立確認し、勝手に臨床判断を創作しない。
 
 | ID | 原本・実装から判明した論点 | PI等の臨床判断・根拠 | 独立QAの整合判定 |
 | --- | --- | --- | --- |
@@ -39,7 +40,7 @@
 | P02 | 合併症は手術終了～術後30/90日。訪問窓とは別。Grade・因果関係・31日境界 | 【未決】 | 【未確認】 |
 | P03 | 30日採血必須/90日以降は必要時。窓外採血の一律ハードストップの根拠 | 【未決】 | 【未確認】 |
 | P04 | 尿細胞診・画像・膀胱鏡の未実施理由付き受理と逸脱/欠測の扱い | 【未決】 | 【未確認】 |
-| P05 | 6/9/12/15/18/21/24か月の評価時期、30日超警告の閾値・正式許容幅 | 【未決】 | 【未確認】 |
+| P05 | 6/9/12/15/18/21/24か月の評価時期、原本要約の「12週間毎」と表の「3か月毎」の表現差、30日超警告の閾値・正式許容幅 | 【未決】 | 【未確認】 |
 | P06 | 薬剤関連AEのCTCAE v6.0、各時点Grade/詳細のルール | 【未決】 | 【未確認】 |
 | P07 | 生理的腎機能低下・予測同意済み透析の除外と予期しない緊急透析の区別 | 【未決】 | 【未確認】 |
 | P08 | 血糖：本文の記載とスケジュール表脚注の検査項目一覧の不一致 | 【未決】 | 【未確認】 |
