@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 import re
 import ssl
 import urllib.request
@@ -235,8 +236,12 @@ def parse_lab_value(raw):
         return "blank", None
     if s.upper() in {"NA", "N/A", "未実施", "欠測"}:
         return "na", None
+    # Canonical numeric syntax shared with GAS; non-finite values are never clinical numbers.
+    if not re.fullmatch(r"[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?", s):
+        return "invalid", None
     try:
-        return "value", float(s)
+        number = float(s)
+        return ("value", number) if math.isfinite(number) else ("invalid", None)
     except ValueError:
         return "invalid", None
 
@@ -386,14 +391,37 @@ def _office_email_addresses():
         return fallback
 
 
-def _smtp_send(subject: str, content: str, to_addrs: list[str]):
-    """Validation branch only: never connect to SMTP or send notifications.
-
-    The UAT deployment must not deliver mail to participating institutions.
-    Return an explicit non-success so UI messages do not claim mail delivery.
-    Do not log message bodies, addresses, or credentials.
-    """
+def _smtp_send(subject: str, content: str, to_addrs: list[str], html_content: str | None = None):
     return False, "UAT_EMAIL_DISABLED"
+    import streamlit as st
+    try:
+        mail_user = st.secrets["email"]["user"]
+        mail_pass = st.secrets["email"]["pass"]
+        clean = []
+        for value in to_addrs:
+            addr = str(value).strip()
+            if addr and addr not in clean:
+                clean.append(addr)
+        if not clean:
+            return False, "NO_RECIPIENTS"
+
+        # HTML for human-readable, printable CRF copies. Always attach plain-text
+        # fallback for clients that do not support HTML. No external resources.
+        msg = MIMEMultipart("alternative") if html_content is not None else MIMEMultipart()
+        msg["From"] = mail_user
+        msg["To"] = ", ".join(clean)
+        msg["Subject"] = subject
+        msg.attach(MIMEText(content, "plain", "utf-8"))
+        if html_content is not None:
+            msg.attach(MIMEText(html_content, "html", "utf-8"))
+
+        import smtplib
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465, timeout=30) as server:
+            server.login(mail_user, mail_pass)
+            server.send_message(msg)
+        return True, None
+    except Exception as exc:
+        return False, str(exc)
 
 
 def send_office_email(subject: str, content: str):
@@ -414,14 +442,16 @@ def send_direct_email(to_addr: str, subject: str, content: str):
     return _smtp_send(subject, content, [addr])
 
 
-def send_email(subject: str, content: str, reporter_email: str | None = None):
+def send_email(subject: str, content: str, reporter_email: str | None = None, *, html_content: str | None = None):
     """Send an office notification, optionally also to the submitting facility."""
     to_addrs = _office_email_addresses()
     if reporter_email:
         addr = reporter_email.strip()
         if addr and addr not in to_addrs:
             to_addrs.append(addr)
-    return _smtp_send(subject, content, to_addrs)
+    if html_content is None:
+        return _smtp_send(subject, content, to_addrs)
+    return _smtp_send(subject, content, to_addrs, html_content=html_content)
 
 
 
@@ -482,19 +512,9 @@ def _juog_actor_auth(action: str, payload: dict, st):
     return actor, None
 
 def registry_call(action: str, payload: dict | None = None, timeout: int = 20):
-    """Isolated integration preview: no business transport or shared-token fallback."""
     import streamlit as st
-    from canonical_v9_bridge import preview
-    from uat_auth_connect import context
-    if action not in ('save_crf', 'save_draft', 'get_draft', 'read_crf'):
-        return {"ok": False, "error": "AUTH_CONNECT_BUSINESS_DISABLED"}
-    try:
-        result = preview(context(st), st.session_state.get('_canonical_acl_context', {}),
-                         action, payload or {}, redact_draft_identifiers, {}, st.session_state)
-        return result
-    except Exception:
-        return {"ok": False, "error": "REQUEST_PREVIEW_REJECTED"}
-
+    from isolated_crf_adapter import call
+    return call(st, action, payload, timeout)
 
 
 
@@ -619,9 +639,7 @@ def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), 
             continue
         if any(str(key).startswith(x) for x in exclude_prefixes):
             continue
-        if is_direct_identifier_key(key):
-            continue
-        value = redact_draft_identifiers(st.session_state[key])
+        value = st.session_state[key]
         if isinstance(value, datetime):
             out[str(key)] = {"type": "datetime", "value": value.isoformat()}
         elif isinstance(value, date):
@@ -630,9 +648,6 @@ def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), 
             out[str(key)] = {"type": "value", "value": value}
 
     for key, value in (overrides or {}).items():
-        value = redact_draft_identifiers(value)
-        if is_direct_identifier_key(key):
-            continue
         if isinstance(value, datetime):
             out[str(key)] = {"type": "datetime", "value": value.isoformat()}
         elif isinstance(value, date):
@@ -640,7 +655,6 @@ def capture_draft_state(prefix: str, *, exclude_prefixes: tuple[str, ...] = (), 
         else:
             out[str(key)] = {"type": "value", "value": value}
     return out
-
 
 
 def clear_session_state_prefixes(prefixes: tuple[str, ...] | list[str]):
@@ -657,12 +671,10 @@ def restore_draft_state(draft_state: dict):
     import streamlit as st
 
     for key, item in (draft_state or {}).items():
-        if is_direct_identifier_key(key):
-            continue
         if not isinstance(item, dict) or "value" not in item:
             continue
         kind = str(item.get("type") or "value")
-        value = redact_draft_identifiers(item.get("value"))
+        value = item.get("value")
         try:
             if kind == "date" and value:
                 value = date.fromisoformat(str(value)[:10])
@@ -671,7 +683,6 @@ def restore_draft_state(draft_state: dict):
         except Exception:
             continue
         st.session_state[str(key)] = value
-
 
 def validate_registry_id(registration_id: str, facility_code: str):
     if not valid_registration_id(registration_id):
@@ -687,8 +698,10 @@ def validate_registry_id(registration_id: str, facility_code: str):
 
 def render_facility(label="施設名*", key="facility_name", disabled=False):
     import streamlit as st
-    st.text_input(label, value="架空施設（隔離UAT専用） / TEST01", disabled=True)
-    return "TEST01", "架空施設（隔離UAT専用）"
+    name = "完全架空施設（隔離UAT専用）"
+    st.selectbox(label, [name], key=f"widget_{key}", disabled=True)
+    st.session_state[key] = name
+    return "TEST01", name
 
 
 def render_lab_panel(prefix: str, required: bool, disabled=False, columns=2):
@@ -734,35 +747,4 @@ def render_submission_kind(prefix: str, disabled=False):
     if kind == "訂正報告":
         reason = st.text_area("訂正理由*", key=f"{prefix}_correction_reason", disabled=disabled)
     return kind, reason
-
-
-def is_direct_identifier_key(key: str) -> bool:
-    import re, unicodedata
-    s = unicodedata.normalize('NFKC', str(key))
-    if re.search(r'(?:^|[^一-龯ぁ-んァ-ヶ])(?:患者氏名|患者姓名|カルテ番号|診療録番号|生年月日)$', s):
-        return True
-    s = re.sub(r'([A-Z]+)([A-Z][a-z])', r'\1_\2', s)
-    s = re.sub(r'([a-z0-9])([A-Z])', r'\1_\2', s)
-    s = re.sub(r'[^a-z0-9]+', '_', s.lower()).strip('_')
-    return bool(re.search(r'(?:^|_)(?:birth_date|dob|full_dob|date_of_birth|patient_name|patient_full_name|full_patient_name|first_name|last_name|given_name|family_name|patient_surname|mrn|medical_record_number|patient_address|personal_address|patient_phone)$', s))
-
-
-def redact_draft_identifiers(value):
-    import re, json, unicodedata
-    if isinstance(value, str):
-        if value.lstrip().startswith(('{', '[')):
-            try:
-                parsed = json.loads(value)
-                if isinstance(parsed, (dict, list)):
-                    return json.dumps(redact_draft_identifiers(parsed), ensure_ascii=False)
-            except (ValueError, TypeError):
-                pass
-        s = unicodedata.normalize('NFKC', value)
-        patterns = [r'(?:生年月日|患者氏名|カルテ番号)\s*(?:は|が|[:=])\s*\S', r'(?:date\s+of\s+birth|\bDOB\b|\bMRN\b|patient\s+name)\s*[:=]\s*\S', r'(?:生年月日|date\s+of\s+birth|\bDOB\b)\s*(?:は|が|[:=])?\s*[0-9]{4}\s*[-/年.]']
-        return '[REDACTED]' if any(re.search(p, s, re.I) for p in patterns) else value
-    if isinstance(value, list):
-        return [redact_draft_identifiers(v) for v in value]
-    if isinstance(value, dict):
-        return {k: redact_draft_identifiers(v) for k, v in value.items() if not is_direct_identifier_key(k)}
-    return value
 

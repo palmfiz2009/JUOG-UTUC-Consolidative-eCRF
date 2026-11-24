@@ -97,3 +97,4 @@ def policy_logout(st):
         revoke_and_logout(st)
     else:
         st.logout()
+

@@ -1,81 +1,57 @@
-"""Isolated entry: AUTH_CONNECT recovery only. No business or boundary harness.
-Reuses existing native OIDC, signed request, GAS ACL/session checks.
-"""
-import time
+"""Existing fixture entry integration candidate; profile ships disabled."""
 import runpy
+import time
 from pathlib import Path
 import streamlit as st
-from uat_auth_connect import context, context_envelope, send, valid_context
-from auth_diagnostics import checked_context, ContextFailure
+from isolated_crf_adapter import call, context, begin_edit
 
-def expired_native_login(user,now):
-    """Only offer logout for demonstrably expired native claims; never clear halt."""
-    iat,exp=user.get('iat'),user.get('exp')
-    return type(iat) is int and type(exp) is int and type(now) is int and iat<=now and exp>iat and now>=min(iat+3600,exp)
-
-
-def safe_logout(st):
-    """No business retry or halt reset. Revoke live B2 authority before logout."""
-    if expired_native_login(st.user, int(time.time())):
-        st.logout()
-        return
-    from uat_b2_auth_bridge import signed_request
-    native = context(st)
-    result = send(signed_request(native, 'session_revoke', {}))
-    if not isinstance(result, dict) or result.get('ok') is not True or result.get('revoked') is not True:
-        raise PermissionError('SESSION_REVOCATION_NOT_CONFIRMED')
+def safe_logout():
+    iat,exp=st.user.get('iat'),st.user.get('exp')
+    if type(iat) is int and type(exp) is int and int(time.time())>=min(iat+3600,exp):
+        st.logout();return
+    r=call(st,'session_revoke',{})
+    if r.get('ok') is not True or r.get('revoked') is not True:
+        raise PermissionError('REVOCATION_UNCONFIRMED')
     st.logout()
 
-
 def run():
-    st.set_page_config(page_title='JUOG AUTH_CONNECT',layout='centered')
-    st.title('JUOG 隔離認証接続')
-    st.info('AUTH_CONNECT：業務保存は禁止されています。')
+    st.set_page_config(page_title='JUOG 隔離CRF統合候補',layout='wide')
+    st.title('JUOG-UTUC01 隔離CRF')
     if not st.user.is_logged_in:
-        if st.button('Googleでログイン'):
-            st.login('google')
+        if st.button('Googleでログイン'):st.login('google')
+        st.stop()
+    if st.button('セッションを失効してログアウト'):
+        try:safe_logout()
+        except Exception:st.error('失効を確認できません。停止を維持します。')
         st.stop()
     if st.session_state.get('auth_connect_halted'):
-        st.error('前回の異常で停止しています。管理者の確認が必要です。')
-        st.caption('診断コード：'+st.session_state.get('_auth_failure_code','PREVIOUS_FAILURE_UNCLASSIFIED'))
-        if st.button('停止中のセッションを終了して再認証'):
-            try:
-                safe_logout(st)
-            except Exception:
-                st.error('セッション失効を確認できません。停止を維持し、自動再送しません。')
-        st.stop()
-    try:
-        native=context(st)
+        st.error('認証・ACLの確認が必要です。保存を停止しています。');st.stop()
+    try:context(st)
     except Exception:
-        st.error('本人認証・期限・設定を確認できません。送信していません。')
-        iat, exp = st.user.get('iat'), st.user.get('exp')
-        if type(iat) is int and type(exp) is int and int(time.time()) >= min(iat + 3600, exp):
-            if st.button('期限切れのログインを終了して再認証'):
-                st.logout()
+        st.info('統合候補は未承認・無効です。接続・保存は行いません。');st.stop()
+    r=call(st,'ui_context',{})
+    if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
+        st.session_state['auth_connect_halted']=True
+        st.error('本人ACLを確認できません。');st.stop()
+    st.caption('TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。')
+    if st.button('保存状態の照合・復旧を開く'):
+        st.session_state['_show_recovery']=True
+    if st.session_state.get('_show_recovery'):
+        from isolated_recovery_ui import render
+        render(st)
+        if st.button('編集画面へ戻る'):
+            st.session_state['_show_recovery']=False
+            st.rerun()
         st.stop()
-    inspect_crf = st.checkbox('30日CRFの画面確認（保存・取得・送信は無効）')
-    if inspect_crf or st.button('現在の本人ACLを読取確認'):
-        try:
-            response=checked_context(send,context_envelope(native),valid_context)
-            st.session_state['_canonical_acl_context'] = response
-            st.success('TEST01・facility・AUTH_CONNECT・業務保存禁止を確認しました。')
-        except Exception as error:
-            st.session_state['_auth_failure_code'] = error.code if isinstance(error,ContextFailure) else 'LOCAL_CONTEXT_ERROR'
-            st.session_state['_auth_failure_elapsed_ms'] = error.elapsed_ms if isinstance(error,ContextFailure) else None
-            st.session_state['auth_connect_halted'] = True
-            st.error('ACLまたは接続を確認できません。再送していません。')
-            st.caption('診断コード：'+st.session_state['_auth_failure_code'])
-            st.stop()
-    if inspect_crf:
-        st.warning('完全架空入力による画面確認専用です。台帳照合・保存・下書き取得・通知は実行できません。')
-        if not st.session_state.get('_canonical_form_initialized'):
-            for key in list(st.session_state):
-                if str(key).startswith(('peri_', 'widget_peri_', 'draft30_')):
-                    del st.session_state[key]
-            st.session_state['_canonical_form_initialized'] = True
-        runpy.run_path(str(Path(__file__).with_name('02_perioperative_30d_crf.py')), run_name='__main__')
-    else:
-        st.caption('30日CRFを表示する場合も、操作のたびに正規認証とGASの本人ACLを確認します。')
-    st.stop()
+    subject=st.text_input('編集対象のJUOG登録番号',key='_integration_subject').strip().upper()
+    if st.button('症例と現在のVersionを確認して編集開始'):
+        checked=begin_edit(st,subject)
+        if checked.get('ok') is not True:
+            st.error('編集を開始できません。未確定保存・所有権・Versionを確認してください。');st.stop()
+    if st.session_state.get('_integration_edit_subject')!=subject or not subject:
+        st.info('編集対象を確認してください。');st.stop()
+    pages={'30日':'02_perioperative_30d_crf.py','90日':'03_day90_crf.py','6〜24か月':'04_followup_crf.py'}
+    page=st.selectbox('報告時点',list(pages))
+    runpy.run_path(str(Path(__file__).with_name(pages[page])),run_name='__main__')
 
 run()

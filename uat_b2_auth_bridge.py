@@ -71,3 +71,4 @@ def signed_request(st, action, payload):
     signature = _b64(hmac.new(key, encoded.encode('ascii'), hashlib.sha256).digest())
     # Never print/log this envelope or include it in evidence.
     return {'request_json': request, 'identity_assertion': encoded + '.' + signature}
+

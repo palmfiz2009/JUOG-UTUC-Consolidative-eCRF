@@ -43,3 +43,4 @@ def identity_proposal(user, client_id, now):
         "acl_registered": False,
         "business_writes_allowed": False,
     }
+
