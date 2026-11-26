@@ -214,6 +214,9 @@ def section_feedback(page, section):
     # In particular, do not call the transport or start a new draft operation.
     if st.session_state.get('_show_recovery') or st.session_state.get('auth_connect_halted'):
         return
+    selected = st.session_state.get('_integration_page')
+    if selected is not None and {'30日': 'peri', '90日': 'd90', '6〜24か月': 'fu'}.get(selected) != page:
+        return
     from isolated_crf_adapter import call
     from juog_common import valid_registration_id
     from juog_crf_save_ui import pending_attempt

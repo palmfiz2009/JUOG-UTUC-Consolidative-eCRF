@@ -56,6 +56,19 @@ class UI(unittest.TestCase):
                 self.assertFalse(list(app.error))
                 self.assertFalse(list(app.warning))
                 self.assertFalse(list(app.markdown))
+    def test_previous_page_timer_cannot_write_after_visit_switch(self):
+        for selected, retired in [('90日', 'peri'), ('6〜24か月', 'd90'), ('30日', 'fu')]:
+            with self.subTest(selected=selected):
+                self.calls=[]
+                app=AppTest.from_string('import streamlit as st\nfrom isolated_autosave_ui import section_feedback\nsection_feedback('+repr(retired)+', "1")',default_timeout=20)
+                app.session_state['_integration_page']=selected
+                app.session_state[retired+'_registration_id']='JUOG-901'
+                app.run()
+                self.assertFalse(list(app.exception))
+                self.assertEqual(self.calls,[])
+                for element in ('caption','error','warning','markdown','success'):
+                    self.assertFalse(list(getattr(app,element)))
+
     def test_all_three_debounce_and_only_changed_section(self):
         for page in PAGES:
             with self.subTest(page=page):

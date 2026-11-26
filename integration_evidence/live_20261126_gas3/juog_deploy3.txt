@@ -1,0 +1,36 @@
+Browser tab: 3, Title: "無題のプロジェクト - プロジェクト編集者 - Apps Script", URL: "https://script.google.com/home/projects/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/edit".
+0 AXWebArea 無題のプロジェクト - プロジェクト編集者 - Apps Script, URL: script.google.com/home/projects/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/edit
+	1 container
+		2 container yDmH0d
+			3 container gb
+				4 container
+					5 link Description: Google Apps Script, Value: script.google.com/home, ID: sdgBod
+					6 button 名前を変更
+					7 pop up button (collapsed) デプロイ, ID: ow14, Secondary Actions: Expand
+					8 pop up button (collapsed) Description: サポート, Secondary Actions: Expand
+					9 button (collapsed) Description: Google アプリ, Secondary Actions: Expand
+					10 button (collapsed) Description: Google アカウント: Takashi Yoshida (palmfiz2009@gmail.com), Secondary Actions: Expand
+			100 container
+				101 container デプロイを管理
+					102 heading デプロイを管理, Value: 2, ID: c1
+						103 text デプロイを管理
+					104 container
+						105 container
+							106 text デプロイを更新しました。 バージョン 3（2026/11/26 23:07） デプロイ ID
+							107 text AKfycbxrn_U2A4PXxyaNcf2eGpIdGrcaeYJ7tpV5O8WukUqunQSczMJ6tAmA8VvJaMKZBg3z
+							108 button デプロイ ID をコピー
+								109 text コピー
+							110 text ウェブアプリ URL
+							111 link Description: https://script.google.com/macros/s/AKfycbxrn_U2A4PXxyaNcf2eGpIdGrcaeYJ7tpV5O8WukUqunQSczMJ6tAmA8VvJaMKZBg3z/exec, Value: script.google.com/macros/s/AKfycbxrn_U2A4PXxyaNcf2eGpIdGrcaeYJ7tpV5O8WukUqunQSczMJ6tAmA8VvJaMKZBg3z/exec
+							112 button ウェブ アプリケーションの URL をコピー
+								113 text コピー
+							114 text ライブラリ URL
+							115 link Value: script.google.com/macros/library/d/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/3, Description: https://script.google.com/macros/library/d/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/3
+							116 button ライブラリの URL をコピー
+								117 text コピー
+							118 text 他のユーザーとグループがこのプロジェクトをライブラリとして使用できるようにするには、このプロジェクトを共有します。
+						119 button 完了
+							120 text 完了
+		121 text プロジェクトをデプロイしました
+
+The focused UI element is 0 AXWebArea 無題のプロジェクト - プロジェクト編集者 - Apps Script, URL: script.google.com/home/projects/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/edit

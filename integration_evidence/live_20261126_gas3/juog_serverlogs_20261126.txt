@@ -1,0 +1,3 @@
+Browser tab: 2, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+There has been no change in the accessibility tree.
+The focused UI element is 1 AXWebArea JUOG 隔離CRF統合候補 · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
