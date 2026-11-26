@@ -60,6 +60,37 @@ def transport(url,envelope,timeout):
     if not isinstance(result,dict):raise ValueError('INVALID_RESPONSE')
     return result
 
+def _reconcile_save(st, body, expected, actor, timeout):
+    """Read-only fresh-signature reconciliation; never retransmit a write."""
+    from isolated_recovery_ui import _valid_recovery
+    if actor_key(st) != actor:
+        raise PermissionError('ACTOR_CHANGED')
+    query = {k: body[k] for k in ('registration_id', 'facility_code', 'crf_type', 'visit')}
+    status = call(st, 'recovery_status', query, timeout)
+    if not _valid_recovery(status, query):
+        return None
+    recovery = status['recovery']
+    digest = hashlib.sha256(json.dumps(body, ensure_ascii=False, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+    matches = [x for x in recovery['operations'] if x['uuid'] == body['submission_id']]
+    if (recovery['state'] != 'SAVED' or len(matches) != 1
+            or matches[0].get('digest') != digest or matches[0].get('version') != expected + 1
+            or matches[0].get('audit_verified') is not True or matches[0].get('state') != 'SAVED'):
+        return None
+    result = call(st, 'request_status', {**query, 'submission_id': body['submission_id']}, timeout)
+    receipt = result.get('receipt')
+    if (actor_key(st) != actor or result.get('ok') is not True
+            or result.get('state') != 'COMMITTED_RECHECK_REQUIRED' or not isinstance(receipt, dict)
+            or receipt.get('ok') is not True or receipt.get('audit_verified') is not True
+            or any(receipt.get(k) != body[k] for k in ('submission_id', 'record_key', 'crf_type', 'visit'))
+            or type(receipt.get('record_version')) is not int or receipt['record_version'] != expected + 1
+            or type(receipt.get('existing')) is not bool or receipt.get('spreadsheet_id') != SHEET):
+        return None
+    verified = copy.deepcopy(receipt)
+    verified.update({k: result[k] for k in ('spreadsheet_id', 'script_id', 'integration_stage', 'generation', 'role', 'facility_code')})
+    verified['reconciled_after_uncertain_response'] = True
+    return verified
+
+
 def call(st,action,payload=None,timeout=20):
     if action not in ROUTES:return {'ok':False,'error':'ROUTE_DENIED'}
     try:
@@ -103,7 +134,21 @@ def call(st,action,payload=None,timeout=20):
                 p['expected_record_version']=expected
                 pending[uuid]={'actor':actor,'digest':digest,'expected':expected}
         envelope=signed_request(native,action,p)
-        r=transport(c['url'],envelope,timeout)
+        try:
+            r=transport(c['url'],envelope,timeout)
+        except Exception:
+            if action != 'save_crf':
+                raise
+            r={'ok':False,'error':'RESULT_UNCONFIRMED'}
+        if action == 'save_crf' and r.get('error') in {'AUTH_EXPIRED','RESULT_UNCONFIRMED'}:
+            # The original assertion may expire after COMMIT. Do not bypass its
+            # checks or reuse it: independently read with fresh OIDC/B2 signatures.
+            confirmed = _reconcile_save(st, p['payload'], p['expected_record_version'], actor, timeout)
+            if confirmed is not None:
+                r = confirmed
+            else:
+                st.session_state['_recovery_blocks_new'] = True
+
         if r.get('ok') is True:
             if (r.get('spreadsheet_id')!=SHEET or r.get('script_id')!=SCRIPT or
                 r.get('integration_stage')!=STAGE or r.get('generation')!=c['generation']):

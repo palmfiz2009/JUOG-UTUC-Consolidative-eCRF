@@ -52,7 +52,7 @@ def run():
     if st.session_state.get('_integration_edit_subject')!=subject or not subject:
         st.info('編集対象を確認してください。');st.stop()
     pages={'30日':'02_perioperative_30d_crf.py','90日':'03_day90_crf.py','6〜24か月':'04_followup_crf.py'}
-    page=st.selectbox('報告時点',list(pages))
+    page=st.selectbox('報告時点',list(pages),key='_integration_page')
     runpy.run_path(str(Path(__file__).with_name(pages[page])),run_name='__main__')
 
 run()
