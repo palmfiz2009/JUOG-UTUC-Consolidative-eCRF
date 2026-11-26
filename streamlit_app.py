@@ -32,10 +32,26 @@ def run():
         st.info(connection_stop_message(error, st));st.stop()
     r=call(st,'ui_context',{})
     if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
-        st.session_state['auth_connect_halted']=True
         code=r.get('error')
+        if code in {'RESULT_UNCONFIRMED','LOCK_TIMEOUT'}:
+            # Fail closed for this run without treating a network timeout as
+            # revoked identity. Keep widget data for a fresh signed ACL check.
+            st.session_state['_connection_unconfirmed']=True
+            from isolated_autosave_ui import SECTIONS
+            from fnmatch import fnmatchcase
+            patterns=[p for sections in SECTIONS.values() for section in sections.values() for p in section['keys']]
+            patterns+=['_integration_subject','_integration_page','_resume_case_*','_resume_visit_*']
+            for key in list(st.session_state):
+                if any(fnmatchcase(str(key),p) for p in patterns):
+                    st.session_state[key]=st.session_state[key]
+            st.error('接続結果を確認できません。保存を停止しています。入力を保持して本人ACLを再確認してください。')
+            if st.button('入力を保持して接続を再確認'):
+                st.rerun()
+            st.stop()
+        st.session_state['auth_connect_halted']=True
         if code not in {'AUTH_EXPIRED','SESSION_REVOKED','ACL_DENIED','ACL_CHANGED','SESSION_STORE_FULL','SESSION_STORE_INVALID','RESULT_UNCONFIRMED','CONFIG_BINDING_MISMATCH','AUTHENTICATION_REQUIRED','LOCK_TIMEOUT'}:code='CONNECTION_UNCONFIRMED'
         st.error('本人ACLを確認できません。確認コード：'+code);st.stop()
+    st.session_state.pop('_connection_unconfirmed',None)
     st.caption('TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。')
     if st.button('保存状態の照合・復旧を開く'):
         st.session_state['_show_recovery']=True

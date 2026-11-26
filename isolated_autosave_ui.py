@@ -212,7 +212,7 @@ def section_feedback(page, section):
     # A queued fragment tick can outlive the CRF tree when the parent switches
     # to recovery or stops on an auth failure. Do not emit into that old path.
     # In particular, do not call the transport or start a new draft operation.
-    if st.session_state.get('_show_recovery') or st.session_state.get('auth_connect_halted'):
+    if st.session_state.get('_show_recovery') or st.session_state.get('auth_connect_halted') or st.session_state.get('_connection_unconfirmed'):
         return
     selected = st.session_state.get('_integration_page')
     if selected is not None and {'30日': 'peri', '90日': 'd90', '6〜24か月': 'fu'}.get(selected) != page:
