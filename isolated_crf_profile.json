@@ -1,14 +1,14 @@
 {
-  "enabled": false,
+  "enabled": true,
   "stage": "PR15_ISOLATED_CRFS",
   "script_id": "1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR",
   "spreadsheet_id": "1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs",
-  "url": "",
-  "generation": "",
-  "principal_fingerprint": "",
-  "qa_ref": "",
-  "pi_ref": "",
-  "single_writer_ref": "",
-  "backup_ref": "",
-  "b2_policy_ref": ""
+  "url": "https://script.google.com/macros/s/AKfycbxrn_U2A4PXxyaNcf2eGpIdGrcaeYJ7tpV5O8WukUqunQSczMJ6tAmA8VvJaMKZBg3z/exec",
+  "generation": "6f661f85-6aab-463f-a801-383a87dfb208",
+  "principal_fingerprint": "f0ea0ddb132e96bbd08cba4e37dc38609b73db5740530a05225c5acb6cab798f",
+  "qa_ref": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/15#issuecomment-7135183051",
+  "pi_ref": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/15#issuecomment-7135220940",
+  "single_writer_ref": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/15#issuecomment-7135667495",
+  "backup_ref": "https://docs.google.com/spreadsheets/d/1T39Xuki4k0ifqMnKBxSJ3ItSnP9ZM5jzM1JD66Nc5y4/edit",
+  "b2_policy_ref": "https://github.com/palmfiz2009/JUOG-UTUC-Consolidative-eCRF/pull/15#issuecomment-7135667495"
 }
