@@ -1,0 +1,36 @@
+{
+  "range": "CRFSubmissionAudit!A1:Z20",
+  "majorDimension": "ROWS",
+  "values": [
+    [
+      "saved_at",
+      "sheet_name",
+      "record_key",
+      "record_version",
+      "submission_id",
+      "submission_kind",
+      "registration_id",
+      "facility_code"
+    ],
+    [
+      46352.424020289356,
+      "CRF_30d",
+      "JUOG-901|perioperative_30d|30d",
+      1,
+      "54a012aa-752d-4e5c-8e01-ef92406718a9",
+      "初回報告",
+      "JUOG-901",
+      "TEST01"
+    ],
+    [
+      46352.687095393514,
+      "CRF_30d",
+      "JUOG-901|perioperative_30d|30d",
+      2,
+      "af16acfd-e8aa-4d56-87ef-926b42a20af1",
+      "訂正報告",
+      "JUOG-901",
+      "TEST01"
+    ]
+  ]
+}

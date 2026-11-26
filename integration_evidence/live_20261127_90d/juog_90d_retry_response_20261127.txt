@@ -1,0 +1,4 @@
+Browser tab: 7, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
++							42 text 結果は未確定です。新規送信せず事務局へ照合を依頼してください。
+The focused UI element is 35 button 同じUUIDで照合・再試行

@@ -1,0 +1,44 @@
+Browser tab: 7, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+1 AXWebArea JUOG 隔離CRF統合候補 · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
+	2 container
+		3 container streamlitApp
+			4 AXWebArea JUOG 隔離CRF統合候補, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
+				5 container
+					6 container
+						7 link Description: Skip to main content, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#stMain
+						8 container
+							9 button Share
+							10 button favorite
+							11 button edit
+							12 button source
+							13 pop up button (collapsed) Description: Main menu, Secondary Actions: Expand
+						14 container stMain
+							15 heading JUOG-UTUC01 隔離CRF, Value: 1, ID: juog-utuc-01-crf
+								16 text JUOG-UTUC01 隔離CRF
+								17 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog-utuc-01-crf
+							18 button セッションを失効してログアウト
+								19 text セッションを失効してログアウト
+							20 text TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。
+							21 button 保存状態の照合・復旧を開く
+								22 text 保存状態の照合・復旧を開く
+							23 heading 保存状態の照合・復旧, Value: 3, ID: 3320b710
+								24 text 保存状態の照合・復旧
+								25 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#3320b710
+							26 text 入力や送信IDを失った場合も、新しい送信を作らず本人・症例・報告時点を照合します。
+							27 container
+								28 text field (settable) Description: 照合するJUOG登録番号, Value: JUOG-901, ID: :r9:
+							29 container
+								30 combo box (collapsed, settable) Description: 照合する報告時点, Value: 90日, ID: react-aria3839823301-:rl:, Secondary Actions: Expand
+								31 pop up button (collapsed) Description: Open, ID: react-aria3839823301-:rh:, Secondary Actions: Expand
+							32 button サーバの記録を照合
+								33 text サーバの記録を照合
+							34 text サーバに元の送信内容が保持されています。同じUUIDで照合・再試行できます。
+							35 button 同じUUIDで照合・再試行
+								36 text 同じUUIDで照合・再試行
+							37 button 編集画面へ戻る
+								38 text 編集画面へ戻る
+		39 button Manage app
+			40 image
+			41 text Manage app
+
+The focused UI element is 32 button サーバの記録を照合

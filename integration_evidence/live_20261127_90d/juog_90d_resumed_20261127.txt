@@ -1,0 +1,20 @@
+Browser tab: 7, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 148-157, 175-180
+~							174 text 5. 術後治療
++							175 container
++								176 combo box (collapsed, settable) Description: 現在/これまでの術後治療*, Value: 選択してください, ID: react-aria9389366213-:rcv:, Secondary Actions: Expand
++								177 pop up button (collapsed) Description: Open, ID: react-aria9389366213-:rcr:, Secondary Actions: Expand
++							178 text 保存しました
++							179 container
++								180 text 6. 生存状況
++								181 Description: 生存状況*, ID: react-aria9389366213-:rd8:
++									182 container
++										183 radio button (settable, integer) Description: 生存, Value: 0
++										184 text 生存
++									185 container
++										186 radio button (settable, integer) Description: 死亡, Value: 0
++										187 text 死亡
++								188 text 保存中…
++								189 text 保存中 保存中
+The focused UI element is 14 container stMain

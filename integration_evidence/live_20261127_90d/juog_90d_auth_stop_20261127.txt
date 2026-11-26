@@ -1,0 +1,26 @@
+Browser tab: 7, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+1 AXWebArea JUOG 隔離CRF統合候補 · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
+	2 container
+		3 container streamlitApp
+			4 AXWebArea JUOG 隔離CRF統合候補, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
+				5 container
+					6 container
+						7 link Description: Skip to main content, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#stMain
+						8 container
+							9 button Share
+							10 button favorite
+							11 button edit
+							12 button source
+							13 pop up button (collapsed) Description: Main menu, Secondary Actions: Expand
+						14 container stMain
+							15 heading JUOG-UTUC01 隔離CRF, Value: 1, ID: juog-utuc-01-crf
+								16 text JUOG-UTUC01 隔離CRF
+								17 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog-utuc-01-crf
+							18 button セッションを失効してログアウト
+								19 text セッションを失効してログアウト
+							20 text 認証・ACLの確認が必要です。保存を停止しています。
+		21 button Manage app
+			22 image
+			23 text Manage app
+
+The focused UI element is 4 AXWebArea JUOG 隔離CRF統合候補, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/

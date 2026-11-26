@@ -1,0 +1,64 @@
+Browser tab: 7, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 9-10, 76-134
++							187 text 2. 90日検査
++							188 heading 血液検査, Value: 3, ID: 2d785b90
++								189 text 血液検査
++								190 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#2d785b90
++							191 container
++								192 Description: 今回の評価時における血液検査の実施（通常診療で実施された場合は検査結果を入力）*, ID: react-aria7338332883-:rb4:
++									193 container
++										194 radio button (settable, integer) Description: 実施あり, Value: 0
++										195 text 実施あり
++									196 container
++										197 radio button (settable, integer) Description: 実施なし, Value: 1
++										198 text 実施なし
++							199 heading 尿細胞診, Value: 3, ID: bc18f053
++								200 text 尿細胞診
++								201 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#bc18f053
++							202 container
++								203 combo box (collapsed, settable) Description: 尿細胞診*, Value: Negative (クラスI・II), ID: react-aria7338332883-:rbj:, Secondary Actions: Expand
++								204 pop up button (collapsed) Description: Open, ID: react-aria7338332883-:rbf:, Secondary Actions: Expand
++							205 heading 画像検査・膀胱鏡, Value: 3, ID: dc51600d
++								206 text 画像検査・膀胱鏡
++								207 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#dc51600d
++							208 container
++								209 Description: 画像検査（CT/MRI等）の実施*, ID: react-aria7338332883-:rbt:
++									210 container
++										211 radio button (settable, integer) Description: 実施, Value: 1
++										212 text 実施
++									213 container
++										214 radio button (settable, integer) Description: 未実施, Value: 0
++										215 text 未実施
++							216 container
++								217 container Description: 画像検査日*, ID: react-aria7338332883-:rdo:
++									218 stepper Description: year, 画像検査日*, Value: 2026, ID: react-aria7338332883-:rdt:
++									219 stepper Description: month, 画像検査日*, Value: 4, ID: react-aria7338332883-:re1:
++									220 stepper Description: day, 画像検査日*, Value: 10, ID: react-aria7338332883-:re5:
++								221 button Clear date
++								222 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
++							223 container
++								224 combo box (collapsed, settable) Description: 画像上のRECIST v1.1進行*, Value: PDなし, ID: react-aria7338332883-:red:, Secondary Actions: Expand
++								225 pop up button (collapsed) Description: Open, ID: react-aria7338332883-:re9:, Secondary Actions: Expand
++							226 container
++								227 Description: 膀胱鏡の実施*, ID: react-aria7338332883-:rc5:
++									228 container
++										229 radio button (settable, integer) Description: 実施, Value: 1
++										230 text 実施
++									231 container
++										232 radio button (settable, integer) Description: 未実施, Value: 0
++										233 text 未実施
++							234 container
++								235 container Description: 膀胱鏡日*, ID: react-aria7338332883-:rhm:
++									236 stepper Description: year, 膀胱鏡日*, Value: 2026, ID: react-aria7338332883-:rhr:
++									237 stepper Description: month, 膀胱鏡日*, Value: 4, ID: react-aria7338332883-:rhv:
++									238 stepper Description: day, 膀胱鏡日*, Value: 10, ID: react-aria7338332883-:ri3:
++								239 button Clear date
++								240 pop up button (collapsed) Description: Choose date, Secondary Actions: Expand
++							241 container
++								242 combo box (collapsed, settable) Description: 膀胱鏡所見*, Value: 腫瘍なし, ID: react-aria7338332883-:rib:, Secondary Actions: Expand
++								243 pop up button (collapsed) Description: Open, ID: react-aria7338332883-:ri7:, Secondary Actions: Expand
++							244 container
++								245 text entry area (settable) Description: 膀胱鏡所見の詳細, ID: :rj5:
++							246 text 保存しました（このセクション）
+The focused UI element is 4 AXWebArea JUOG 隔離CRF統合候補, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
