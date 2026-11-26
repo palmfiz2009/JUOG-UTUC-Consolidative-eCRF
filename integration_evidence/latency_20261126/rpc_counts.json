@@ -1,0 +1,39 @@
+{
+  "mode": "OFFLINE_API_CALL_COUNTS_NOT_LIVE_LATENCY",
+  "results": {
+    "candidate": {
+      "ok": true,
+      "metrics": {
+        "opens": 1,
+        "reads": {
+          "V3_Users": 12,
+          "V3_SessionEvents": 15,
+          "R1_CaseOwners": 9,
+          "Registry": 11,
+          "R1_Operations": 5,
+          "CRF_30d": 4,
+          "CRF_90d": 2,
+          "CRF_Followup": 2,
+          "CRFSubmissionAudit": 2
+        }
+      }
+    },
+    "baseline": {
+      "ok": true,
+      "metrics": {
+        "opens": 5,
+        "reads": {
+          "V3_Users": 12,
+          "V3_SessionEvents": 15,
+          "R1_CaseOwners": 9,
+          "Registry": 11,
+          "R1_Operations": 7,
+          "CRF_30d": 4,
+          "CRF_90d": 2,
+          "CRF_Followup": 2,
+          "CRFSubmissionAudit": 2
+        }
+      }
+    }
+  }
+}

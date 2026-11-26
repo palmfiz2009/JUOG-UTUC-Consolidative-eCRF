@@ -1,0 +1,35 @@
+{
+  "mode": "OFFLINE_ONLY",
+  "suites": [
+    {
+      "suite": "fixture",
+      "exit_code": 0
+    },
+    {
+      "suite": "fixture_bridge_entry",
+      "exit_code": 0
+    },
+    {
+      "suite": "pr",
+      "exit_code": 0
+    },
+    {
+      "suite": "adapter",
+      "exit_code": 0
+    },
+    {
+      "suite": "endpoint",
+      "exit_code": 0
+    },
+    {
+      "suite": "pr_gas",
+      "exit_code": 0
+    },
+    {
+      "suite": "pr_identity",
+      "exit_code": 0
+    }
+  ],
+  "formal_uat_pass_delta": 0,
+  "independent_qa_approved": false
+}

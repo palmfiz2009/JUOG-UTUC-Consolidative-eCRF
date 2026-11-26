@@ -7,10 +7,10 @@ const copy=x=>JSON.parse(JSON.stringify(x));
 const files=['05_registry_google_apps_script.gs','isolated_auth_bridge.gs','isolated_session_store.gs','isolated_crf_endpoint.gs','isolated_recovery.gs','clinical_contract_generated.gs','clinical_validation.gs','autosave_sections_generated.gs','isolated_autosave.gs'];
 function fixture(){
  let now=Date.parse('2026-11-16T00:00:00Z'),locked=false,drop='',expireOn='',nextJti=0;
- const props={},tables={};
+ const props={},tables={},metrics={opens:0,reads:{}};
  class Sheet{
   constructor(name,rows){this.name=name;this.rows=copy(rows);}
-  getDataRange(){return {getValues:()=>copy(this.rows.map(r=>Array.from({length:this.getLastColumn()},(_,i)=>r[i]??'')))}};
+  getDataRange(){metrics.reads[this.name]=(metrics.reads[this.name]||0)+1;return {getValues:()=>copy(this.rows.map(r=>Array.from({length:this.getLastColumn()},(_,i)=>r[i]??'')))}};
   getLastColumn(){return Math.max(0,...this.rows.map(r=>r.length))}
   getLastRow(){return this.rows.length}
   getRange(r,c,n=1,m=1){return {getValues:()=>Array.from({length:n},(_,i)=>Array.from({length:m},(_,j)=>this.rows[r-1+i]?.[c-1+j]??'')),setValues:values=>{values.forEach((line,i)=>line.forEach((v,j)=>{this.rows[r-1+i]??=[];this.rows[r-1+i][c-1+j]=v;}));},setValue:v=>{this.rows[r-1]??=[];this.rows[r-1][c-1]=v;}}}
@@ -23,7 +23,7 @@ function fixture(){
   ScriptApp:{getScriptId:()=>c.scriptId},
   PropertiesService:{getScriptProperties:()=>({getProperty:k=>props[k]??null,setProperty:(k,v)=>props[k]=v})},
   LockService:{getScriptLock:()=>({tryLock:()=>{if(locked)return false;locked=true;return true},releaseLock:()=>locked=false})},
-  SpreadsheetApp:{openById:id=>{assert.equal(id,c.spreadsheetId);return ss},flush:()=>{}},
+  SpreadsheetApp:{openById:id=>{metrics.opens++;assert.equal(id,c.spreadsheetId);return ss},flush:()=>{}},
   Utilities:{DigestAlgorithm:{SHA_256:'sha256'},Charset:{UTF_8:'utf8'},computeDigest:(_,s)=>[...crypto.createHash('sha256').update(s).digest()],computeHmacSha256Signature:(s,k)=>[...crypto.createHmac('sha256',k).update(s).digest()],base64DecodeWebSafe:s=>[...Buffer.from(s,'base64url')],base64EncodeWebSafe:b=>Buffer.from(b).toString('base64url'),newBlob:b=>({getDataAsString:()=>Buffer.from(b).toString()}),getUuid:()=>crypto.randomUUID(),formatDate:(d,tz,format)=>format==='yyyy-MM-dd'?new Date(d).toISOString().slice(0,10):new Date(d).toISOString()},
   console};
  const c={enabled:true,stage:'PR15_ISOLATED_CRFS',scriptId:'1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR',spreadsheetId:'1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs',notificationsDisabled:true,sessionPolicy:'isolated_gas_session_b2',sessionStoreApproved:true,sessionStoreGeneration:'OFFLINE_ONLY',bridgeIssuer:'JUOG_PR15_FIXTURE',audience:'JUOG_PR15_GAS',oidcIssuer:'https://accounts.google.com',signingKey:'fictional-offline-key-not-a-credential',qaRef:'OFFLINE_TEST_NOT_APPROVAL',piRef:'OFFLINE_TEST_NOT_APPROVAL',singleWriterRef:'OFFLINE_TEST_NOT_APPROVAL',backupRef:'OFFLINE_TEST_NOT_APPROVAL',b2PolicyRef:'OFFLINE_TEST_NOT_APPROVAL'};
@@ -49,9 +49,43 @@ function fixture(){
  const payload=(type='perioperative_30d',visit='30d',uuid='offline-v1')=>{const p=copy(clinicalFixtures[type]);p.visit=visit;if(type==='followup')p.data.visit_month=visit.replace('m','ヶ月')+(visit==='24m'?'（終了）':'');p.record_key=['JUOG-901',type,visit].join('|');p.submission_id=uuid;return p;};
 
  const save=(p,expected=0)=>call('save_crf',{payload:p,expected_record_version:expected});
- return {x,c,tables,props,call,save,payload,envelope,row,drop:n=>drop=n,expireOn:n=>expireOn=n,advance:ms=>now+=ms,lock:v=>locked=v};
+ return {x,c,tables,props,metrics,call,save,payload,envelope,row,drop:n=>drop=n,expireOn:n=>expireOn=n,advance:ms=>now+=ms,lock:v=>locked=v};
 }
 const tests=[];function test(name,fn){const f=fixture();fn(f);tests.push(name);console.log('PASS '+name)}
+test('locked request opens workbook once without retaining handle',f=>{
+ assert.equal(f.save(f.payload()).ok,true);assert.equal(f.metrics.opens,1);
+ assert.equal(vm.runInContext('JUOG_PR15_WORKBOOK_',f.x),null);
+ assert.equal(f.save(f.payload()).existing,true);assert.equal(f.metrics.opens,2);
+});
+test('workbook handle cleared after rejection and configured ID rechecked',f=>{
+ const p=f.payload();p.data={};assert.equal(f.save(p).ok,false);
+ assert.equal(vm.runInContext('JUOG_PR15_WORKBOOK_',f.x),null);
+ vm.runInContext('JUOG_PR15_WORKBOOK_={id:"DIFFERENT",ss:{}}',f.x);
+ assert.throws(()=>f.x.getSpreadsheet_(),/CONFIG_BINDING_MISMATCH/);
+ vm.runInContext('JUOG_PR15_WORKBOOK_=null',f.x);
+ assert.equal(f.save(f.payload()).ok,true);
+});
+test('journal append uses two fresh reads and both guards',f=>{
+ const ss=f.x.getSpreadsheet_();let guards=0;
+ const j=f.x.pr15Journal_(ss,()=>guards++),before=f.metrics.reads.R1_Operations||0;
+ j.append({kind:'INTENT',uuid:'offline-journal',key:'key',actor:'fictional-user',digest:'digest'});
+ assert.equal(f.metrics.reads.R1_Operations-before,2);assert.equal(guards,2);
+ f.tables.R1_Operations.rows[1][2]='corrupt';
+ assert.throws(()=>j.append({kind:'COMMIT',uuid:'offline-journal',key:'key',actor:'fictional-user',digest:'digest'}),/OPERATION_STORE_INVALID/);
+ assert.equal(f.tables.R1_Operations.rows.length,2);
+});
+test('live-shaped expiry after audit requires same UUID recovery and keeps Version 1',f=>{
+ const p=f.payload(),q={registration_id:p.registration_id,facility_code:p.facility_code,crf_type:p.crf_type,visit:p.visit};
+ f.expireOn('CRFSubmissionAudit');assert.equal(f.save(p).error,'AUTH_EXPIRED');
+ assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,2);
+ assert.equal(f.tables.R1_Operations.rows.length,2);
+ const original=copy(f.tables.CRF_30d.rows);
+ f.expireOn('');assert.equal(f.call('recovery_status',q).recovery.state,'RETRY_ALLOWED');
+ const r=f.call('recovery_retry',{...q,submission_id:p.submission_id});
+ assert.equal(r.ok,true);assert.equal(r.record_version,1);assert.equal(r.existing,true);
+ assert.deepEqual(f.tables.CRF_30d.rows,original);assert.equal(f.tables.CRFSubmissionAudit.rows.length,2);
+ assert.equal(f.tables.R1_Operations.rows.length,3);
+});
 test('default disabled, wrong script/workbook and old generation deny',f=>{for(const [k,v] of [['enabled',false],['scriptId','other'],['spreadsheetId','other'],['qaRef',''],['sessionStoreGeneration','d72bcf33-423d-4c4d-862d-2e2d69bc3edf']]){const old=f.c[k];f.c[k]=v;assert.equal(f.call('backend_info').error,'INTEGRATION_NOT_APPROVED');f.c[k]=old;}});
 test('no legacy token bypass, bad signature and payload tamper',f=>{assert.equal(f.x.juogPr15Entry_({token:'legacy',action:'save_crf'},f.c).error,'AUTH_REQUIRED');let e=f.envelope('backend_info',{});e.identity_assertion+='x';assert.equal(f.x.juogPr15Entry_(e,f.c).error,'AUTH_INVALID');e=f.envelope('backend_info',{});e.request_json+=' ';assert.equal(f.x.juogPr15Entry_(e,f.c).error,'REQUEST_SIGNATURE_MISMATCH');});
 test('valid native-derived signed context and assert replay',f=>{const e=f.envelope('ui_context',{});assert.equal(f.x.juogPr15Entry_(e,f.c).ok,true);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'ASSERTION_REPLAY');});

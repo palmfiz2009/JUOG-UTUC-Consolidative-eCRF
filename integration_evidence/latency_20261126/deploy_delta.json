@@ -1,0 +1,8 @@
+{
+  "target_script_id": "1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR",
+  "deployed": false,
+  "files": {
+    "05_registry_google_apps_script.gs": "eb9c5fd1cf3b52391878d5d470f2c538ed93863bd1e9c7ec2699b3af3a409667",
+    "isolated_crf_endpoint.gs": "1763bf1dd265a310111b653a081ba2ac1a3d36d1d468ceb46c2e38db8c3b8919"
+  }
+}

@@ -1832,6 +1832,10 @@ function getSettings_() {
 function getSpreadsheet_() {
   const id = PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID');
   if (!id) throw new Error('SPREADSHEET_ID is not configured. Run setupRegistry().');
+  if (typeof JUOG_PR15_WORKBOOK_ !== 'undefined' && JUOG_PR15_WORKBOOK_) {
+    if (id !== JUOG_PR15_WORKBOOK_.id) throw new Error('CONFIG_BINDING_MISMATCH');
+    return JUOG_PR15_WORKBOOK_.ss;
+  }
   return SpreadsheetApp.openById(id);
 }
 

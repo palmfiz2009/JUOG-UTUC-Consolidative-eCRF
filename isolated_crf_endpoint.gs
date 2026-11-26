@@ -2,6 +2,9 @@
  * One project, one outer ScriptLock. Legacy token routing is absent from doPost.
  */
 let JUOG_PR15_GUARD_ = null;
+// A handle only, never cached cell values or authorization decisions. Lifetime is
+// one locked request; getSpreadsheet_ still checks the configured workbook ID.
+let JUOG_PR15_WORKBOOK_ = null;
 const PR15_SCRIPT_='1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR';
 const PR15_SHEET_='1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs';
 const PR15_STAGE_='PR15_ISOLATED_CRFS';
@@ -40,11 +43,12 @@ function pr15Owner_(ss,who,p){
 }
 function pr15Journal_(ss,guard){
  const table=()=>pr15Rows_(ss,'R1_Operations',['sequence','event_json','digest']);
- function read(){return table().rows.map((r,i)=>{
+ function decode(t){return t.rows.map((r,i)=>{
   if(r.sequence!==i+1||r.digest!==pr15Hash_(r.event_json))throw Error('OPERATION_STORE_INVALID');
   const e=JSON.parse(r.event_json);if(!['INTENT','COMMIT'].includes(e.kind)||!e.uuid||!e.actor||!e.key||!e.digest)throw Error('OPERATION_STORE_INVALID');return e;
  });}
- function append(e){guard();const old=read(),seq=old.length+1,json=JSON.stringify(e);table().sh.appendRow([seq,json,pr15Hash_(json)]);SpreadsheetApp.flush();const after=read();if(after.length!==seq||JSON.stringify(after[seq-1])!==json)throw Error('OPERATION_WRITE_UNCONFIRMED');guard();}
+ function read(){return decode(table());}
+ function append(e){guard();const before=table(),old=decode(before),seq=old.length+1,json=JSON.stringify(e);before.sh.appendRow([seq,json,pr15Hash_(json)]);SpreadsheetApp.flush();const after=read();if(after.length!==seq||JSON.stringify(after[seq-1])!==json)throw Error('OPERATION_WRITE_UNCONFIRMED');guard();}
  return {read,append};
 }
 function juogPr15Entry_(envelope,c){
@@ -61,6 +65,7 @@ function juogPr15Entry_(envelope,c){
   const allowed=['ui_context','session_revoke','backend_info','validate','get_crf_linkage','save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry','get_sections','save_section'];
   if(!allowed.includes(a))throw Error('ROUTE_DENIED');
   const ss=SpreadsheetApp.openById(c.spreadsheetId),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
+  JUOG_PR15_WORKBOOK_={id:c.spreadsheetId,ss};
   const gate=juogSessionGateB2_(ss,c,auth,who);
   const bind=r=>Object.assign(r,{spreadsheet_id:c.spreadsheetId,script_id:c.scriptId,integration_stage:PR15_STAGE_,generation:c.sessionStoreGeneration,role:who&&who.role,facility_code:'TEST01'});
   if(gate.response)return bind(gate.response);
@@ -171,5 +176,5 @@ function juogPr15Entry_(envelope,c){
  }catch(e){
   const safe=['AUTH_REQUIRED','AUTH_INVALID','AUTH_EXPIRED','REQUEST_SIGNATURE_MISMATCH','SESSION_REQUIRED','SESSION_INVALID','SESSION_REVOKED','ASSERTION_REPLAY','SESSION_STORE_UNAVAILABLE','SESSION_STORE_INVALID','SESSION_STORE_FULL','ACL_DENIED','ACL_CHANGED','SUBJECT_FORBIDDEN','ACTOR_OVERRIDE_DENIED','ROUTE_DENIED','REQUEST_INVALID','VISIT_INVALID','SUBMISSION_METADATA_INVALID','PAYLOAD_INVALID','DIRECT_IDENTIFIER_NOT_ALLOWED','SUBMISSION_ID_CONFLICT','VERSION_CONFLICT','VERSION_KIND_INVALID','PENDING_OPERATION','UNTRACKED_SUBMISSION','SCHEMA_MISSING','SCHEMA_INVALID','VERSION_STORE_INVALID','OPERATION_STORE_INVALID','OPERATION_WRITE_UNCONFIRMED','RECEIPT_MISMATCH'];
   return {ok:false,error:safe.concat(['UNTRACKED_DRAFT','DRAFT_WRITE_UNCONFIRMED','DRAFT_AUDIT_UNCONFIRMED','COMMITTED_RECORD_MISSING','FICTIONAL_CONTACT_REQUIRED','RECOVERY_RECONCILIATION_REQUIRED','DRAFT_STORE_INVALID','DRAFT_CONFLICT','DRAFT_DATA_INVALID']).includes(e.message)?e.message:'TRANSACTION_UNCONFIRMED'};
- }finally{JUOG_PR15_GUARD_=null;lock.releaseLock();}
+ }finally{JUOG_PR15_GUARD_=null;JUOG_PR15_WORKBOOK_=null;lock.releaseLock();}
 }

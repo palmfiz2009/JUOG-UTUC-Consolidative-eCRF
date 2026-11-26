@@ -1,0 +1,15 @@
+PASS reuse 005, advance round
+PASS same UUID never increments
+PASS missing CRF snapshot is restored
+PASS HOLD repeat review
+PASS INELIGIBLE closed
+PASS VOID only not recycled
+PASS email mismatch blocked
+PASS replay email mismatch blocked
+PASS 01 is not 1
+PASS 02 is separate case
+PASS another facility separate
+PASS duplicate active blocked
+PASS no trusted original blocked
+PASS new case
+ALL 14 IDENTITY CASES PASSED
