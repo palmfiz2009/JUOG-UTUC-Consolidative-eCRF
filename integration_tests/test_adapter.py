@@ -152,4 +152,32 @@ class Tests(unittest.TestCase):
   self.assertEqual([x[0]['action'] for x in self.sent],['save_crf'])
   self.assertTrue(self.ui.session_state['auth_connect_halted'])
 
+ def section_transport(self, alter=None, error='AUTH_EXPIRED'):
+  from isolated_autosave_ui import canonical
+  op=dict(registration_id='JUOG-901',facility_code='TEST01',crf_type='day90',visit='90d',section='2',record_version=0,expected_revision=1,operation_id='offline-section-operation',data={'d90_lab_available':{'type':'value','value':'実施なし'}})
+  def send(url,envelope,timeout):
+   binding=self.send(url,envelope,timeout)
+   if self.sent[-1][0]['action']=='save_section':return {'ok':False,'error':error}
+   key='JUOG-901|day90|90d'
+   event=dict(action='SECTION_SAVE',key=key,record_version=0,section='2',revision=2,operation_id=op['operation_id'],data=op['data'],digest=hashlib.sha256(canonical(op['data']).encode()).hexdigest())
+   if alter:event.update(alter)
+   return dict(binding,record_key=key,record_version=0,audit_verified=True,sections={'2':event})
+  self.tx.side_effect=send
+  return op
+ def test_section_expiry_reconciled_without_write_retry(self):
+  op=self.section_transport()
+  r=a.call(self.ui,'save_section',op)
+  self.assertTrue(r['ok']);self.assertTrue(r['reconciled_after_uncertain_response'])
+  self.assertEqual([x[0]['action'] for x in self.sent],['save_section','get_sections'])
+  self.assertNotEqual(self.sent[0][1]['session']['jti'],self.sent[1][1]['session']['jti'])
+ def test_section_reconcile_mismatch_fails_closed(self):
+  for alter in ({'operation_id':'other'},{'digest':'other'},{'revision':3},{'record_version':1},{'key':'other'}):
+   self.ui.session_state.pop('auth_connect_halted',None);self.sent=[]
+   op=self.section_transport(alter)
+   self.assertFalse(a.call(self.ui,'save_section',op)['ok'])
+ def test_section_revocation_never_reconciled(self):
+  op=self.section_transport(error='SESSION_REVOKED')
+  self.assertFalse(a.call(self.ui,'save_section',op)['ok'])
+  self.assertEqual([x[0]['action'] for x in self.sent],['save_section'])
+
 if __name__=='__main__':unittest.main()
