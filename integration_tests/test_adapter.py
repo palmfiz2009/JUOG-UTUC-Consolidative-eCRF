@@ -91,4 +91,48 @@ class Tests(unittest.TestCase):
    self.assertEqual(a.call(self.ui,'save_crf',{'payload':self.payload})['error'],'DIRECT_IDENTIFIER_NOT_ALLOWED')
   self.tx.assert_not_called()
 
+ def recovery_transport(self, first_error='AUTH_EXPIRED', alter=None):
+  def send(url,envelope,timeout):
+   binding=self.send(url,envelope,timeout)
+   req=self.sent[-1][0]; action=req['action']; b=self.payload
+   if action=='save_crf':
+    if first_error=='timeout':raise TimeoutError('not exposed')
+    return {'ok':False,'error':first_error}
+   if action=='recovery_status':
+    op=dict(uuid=b['submission_id'],state='SAVED',version=2,audit_verified=True,digest=hashlib.sha256(json.dumps(b,ensure_ascii=False,separators=(',',':')).encode()).hexdigest())
+    if alter:op.update(alter)
+    return dict(binding,recovery=dict(record_key=b['record_key'],state='SAVED',operations=[op]))
+   if action=='request_status':
+    receipt=dict(ok=True,audit_verified=True,record_version=2,existing=False,spreadsheet_id=a.SHEET,**{k:b[k] for k in ('submission_id','record_key','crf_type','visit')})
+    return dict(binding,state='COMMITTED_RECHECK_REQUIRED',receipt=receipt)
+   return binding
+  self.tx.side_effect=send
+ def test_expired_save_response_fresh_signed_read_reconciles_without_write_retry(self):
+  a.call(self.ui,'validate',{'registration_id':'JUOG-901'});self.sent=[]
+  self.recovery_transport()
+  r=a.call(self.ui,'save_crf',{'payload':self.payload})
+  self.assertTrue(r['ok']);self.assertTrue(r['reconciled_after_uncertain_response'])
+  self.assertEqual([x[0]['action'] for x in self.sent],['save_crf','recovery_status','request_status'])
+  self.assertEqual(len({x[1]['session']['jti'] for x in self.sent}),3)
+  self.assertFalse(self.ui.session_state.get('auth_connect_halted'))
+ def test_lost_save_response_reconciles_read_only(self):
+  a.call(self.ui,'validate',{'registration_id':'JUOG-901'});self.sent=[]
+  self.recovery_transport('timeout')
+  self.assertTrue(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertEqual(sum(x[0]['action']=='save_crf' for x in self.sent),1)
+ def test_reconciliation_digest_version_audit_mismatch_never_success(self):
+  for alter in ({'digest':'wrong'},{'version':3},{'audit_verified':False},{'uuid':'another'}):
+   self.ui.session_state.clear();self.ui.session_state['_integration_edit_subject']='JUOG-901'
+   self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+   self.sent=[];self.recovery_transport(alter=alter)
+   self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+   self.assertTrue(self.ui.session_state['_recovery_blocks_new'])
+   self.assertNotIn('request_status',[x[0]['action'] for x in self.sent])
+ def test_revoked_save_never_triggers_reconciliation(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.recovery_transport('SESSION_REVOKED')
+  self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertEqual([x[0]['action'] for x in self.sent],['save_crf'])
+  self.assertTrue(self.ui.session_state['auth_connect_halted'])
+
 if __name__=='__main__':unittest.main()
