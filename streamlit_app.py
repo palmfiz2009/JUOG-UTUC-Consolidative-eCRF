@@ -33,7 +33,9 @@ def run():
     r=call(st,'ui_context',{})
     if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
         st.session_state['auth_connect_halted']=True
-        st.error('本人ACLを確認できません。');st.stop()
+        code=r.get('error')
+        if code not in {'AUTH_EXPIRED','SESSION_REVOKED','ACL_DENIED','ACL_CHANGED','SESSION_STORE_FULL','SESSION_STORE_INVALID','RESULT_UNCONFIRMED','CONFIG_BINDING_MISMATCH','AUTHENTICATION_REQUIRED','LOCK_TIMEOUT'}:code='CONNECTION_UNCONFIRMED'
+        st.error('本人ACLを確認できません。確認コード：'+code);st.stop()
     st.caption('TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。')
     if st.button('保存状態の照合・復旧を開く'):
         st.session_state['_show_recovery']=True
