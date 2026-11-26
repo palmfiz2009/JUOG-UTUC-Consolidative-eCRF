@@ -101,6 +101,29 @@ test('live-shaped expiry after audit requires same UUID recovery and keeps Versi
  assert.deepEqual(f.tables.CRF_30d.rows,original);assert.equal(f.tables.CRFSubmissionAudit.rows.length,2);
  assert.equal(f.tables.R1_Operations.rows.length,3);
 });
+test('B2 request-local hash reuse still reads live cells and head',f=>{
+ f.call('ui_context');
+ const store=f.x.juogSessionStoreB2_(f.x.getSpreadsheet_(),f.c);
+ let hashes=0;const digest=f.x.Utilities.computeDigest;
+ f.x.Utilities.computeDigest=(...args)=>{hashes++;return digest(...args)};
+ store.read();const first=hashes,reads=f.metrics.reads.V3_SessionEvents;
+ store.read();assert.equal(hashes,first);assert.equal(f.metrics.reads.V3_SessionEvents,reads+1);
+ f.props['JUOG_B2_HEAD_'+f.c.spreadsheetId]='corrupt';
+ assert.throws(()=>store.read(),/SESSION_STORE_INVALID/);
+});
+test('B2 prefix reuse rejects old row tamper and truncation',f=>{
+ f.call('ui_context');const sh=f.tables.V3_SessionEvents,store=f.x.juogSessionStoreB2_(f.x.getSpreadsheet_(),f.c);
+ store.read();const old=sh.rows[1][1];sh.rows[1][1]=old.replace('OPEN','REVOKE');
+ assert.throws(()=>store.read(),/SESSION_STORE_INVALID/);sh.rows[1][1]=old;
+ store.read();sh.rows.pop();assert.throws(()=>store.read(),/SESSION_STORE_INVALID/);
+});
+test('B2 prefix reuse observes correctly chained new revocation',f=>{
+ f.call('ui_context');const store=f.x.juogSessionStoreB2_(f.x.getSpreadsheet_(),f.c);
+ const before=store.read(),open=before.events[0];
+ store.append({...open,kind:'REVOKE',jti:'offline-new-revocation'});
+ assert.equal(store.read().events.at(-1).kind,'REVOKE');
+ assert.equal(f.call('ui_context').error,'SESSION_REVOKED');
+});
 test('default disabled, wrong script/workbook and old generation deny',f=>{for(const [k,v] of [['enabled',false],['scriptId','other'],['spreadsheetId','other'],['qaRef',''],['sessionStoreGeneration','d72bcf33-423d-4c4d-862d-2e2d69bc3edf']]){const old=f.c[k];f.c[k]=v;assert.equal(f.call('backend_info').error,'INTEGRATION_NOT_APPROVED');f.c[k]=old;}});
 test('no legacy token bypass, bad signature and payload tamper',f=>{assert.equal(f.x.juogPr15Entry_({token:'legacy',action:'save_crf'},f.c).error,'AUTH_REQUIRED');let e=f.envelope('backend_info',{});e.identity_assertion+='x';assert.equal(f.x.juogPr15Entry_(e,f.c).error,'AUTH_INVALID');e=f.envelope('backend_info',{});e.request_json+=' ';assert.equal(f.x.juogPr15Entry_(e,f.c).error,'REQUEST_SIGNATURE_MISMATCH');});
 test('valid native-derived signed context and assert replay',f=>{const e=f.envelope('ui_context',{});assert.equal(f.x.juogPr15Entry_(e,f.c).ok,true);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'ASSERTION_REPLAY');});

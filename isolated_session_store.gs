@@ -9,18 +9,26 @@ function juogSessionStoreB2_(ss,c) {
  const props=PropertiesService.getScriptProperties(),key='JUOG_B2_HEAD_'+c.spreadsheetId;
  const hash=s=>Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,s,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');
  const genesis=hash('JUOG-B2|'+c.spreadsheetId+'|'+c.sessionStoreGeneration);
+ // Request-local verified prefix only. Every read still fetches all live cells
+ // and the head property. Reuse hashing work only for byte-identical rows;
+ // any changed cell invalidates the suffix. Never cache an ACL/session verdict.
+ let verified=[];
  function read(){
   const rows=sh.getDataRange().getValues();
   if(JSON.stringify(rows[0])!==JSON.stringify(header)||rows.length>10001)throw Error('SESSION_STORE_INVALID');
-  let chain=genesis;const events=[];
+  let chain=genesis;const events=[],next=[];let unchanged=true;
   for(let i=1;i<rows.length;i++){
    const r=rows[i];if(r.length!==3||r[0]!==i||typeof r[1]!=='string')throw Error('SESSION_STORE_INVALID');
-   chain=hash(chain+'|'+i+'|'+r[1]);if(chain!==r[2])throw Error('SESSION_STORE_INVALID');
+   const serialized=JSON.stringify(r),prior=verified[i-1];
+   unchanged=unchanged&&!!prior&&prior.row===serialized;
+   chain=unchanged?prior.chain:hash(chain+'|'+i+'|'+r[1]);if(chain!==r[2])throw Error('SESSION_STORE_INVALID');
    const e=JSON.parse(r[1]);
    if(!e||!['OPEN','USE','REVOKE'].includes(e.kind)||!/^[a-f0-9]{64}$/.test(e.sid)||!/^[a-f0-9]{64}$/.test(e.owner)||!Number.isInteger(e.deadline)||typeof e.jti!=='string')throw Error('SESSION_STORE_INVALID');
    events.push(e);
+   next.push({row:serialized,chain});
   }
   if(props.getProperty(key)!==(events.length+':'+chain))throw Error('SESSION_STORE_INVALID');
+  verified=next;
   return {events,chain};
  }
  function append(e){
