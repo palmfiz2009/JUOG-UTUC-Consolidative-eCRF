@@ -126,7 +126,8 @@ if st.session_state.d90_sent:
     correction_panel("d90")
     st.stop()
 
-@st.fragment
+# The form uses the normal app rerun lifecycle. Only section status timers are
+# fragments: nesting them under a changing form caused stale delta paths live.
 def _render_day90_crf():
     resume_panel("d90")
     L = bool(st.session_state.get("d90_sent"))
@@ -152,7 +153,7 @@ def _render_day90_crf():
             if result.get("ok"):
                 st.session_state.d90_linkage = result
                 st.session_state.d90_linkage_message = result.get("message", "")
-                st.rerun(scope="fragment")
+                st.rerun()
             else:
                 # Safe fallback: do not infer data. Allow manual entry only after an explicit failed retrieval.
                 st.session_state.d90_linkage = {
@@ -167,7 +168,7 @@ def _render_day90_crf():
                     result.get("message")
                     or "既存の周術期・30日CRFを安全に取得できませんでした。手入力に切り替えます。"
                 )
-                st.rerun(scope="fragment")
+                st.rerun()
 
         linkage = st.session_state.get("d90_linkage")
         if linkage and linkage.get("registration_id") != registration_id:

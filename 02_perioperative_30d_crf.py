@@ -103,7 +103,8 @@ if st.session_state.peri_sent:
     correction_panel("peri")
     st.stop()
 
-@st.fragment
+# The form uses the normal app rerun lifecycle. Only section status timers are
+# fragments: nesting them under a changing form caused stale delta paths live.
 def _render_peri_crf():
     resume_panel("peri")
     L = bool(st.session_state.get("peri_sent"))

@@ -98,7 +98,8 @@ if st.session_state.fu_sent:
     correction_panel("fu")
     st.stop()
 
-@st.fragment
+# The form uses the normal app rerun lifecycle. Only section status timers are
+# fragments: nesting them under a changing form caused stale delta paths live.
 def _render_followup_crf():
     resume_panel("fu")
     L = bool(st.session_state.get("fu_sent"))
@@ -123,7 +124,7 @@ def _render_followup_crf():
             if result.get("ok") and result.get("source_found"):
                 st.session_state.fu_linkage = result
                 st.session_state.fu_linkage_message = ""
-                st.rerun(scope="fragment")
+                st.rerun()
             else:
                 st.session_state.fu_linkage = None
                 st.session_state.fu_linkage_message = (
@@ -131,7 +132,7 @@ def _render_followup_crf():
                     or result.get("error")
                     or "周術期・30日CRFから手術情報を取得できませんでした。"
                 )
-                st.rerun(scope="fragment")
+                st.rerun()
 
         linkage = st.session_state.get("fu_linkage")
         if linkage and linkage.get("registration_id") != registration_id:
