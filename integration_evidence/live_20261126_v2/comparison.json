@@ -1,0 +1,21 @@
+{
+  "checks": {
+    "exactly_versions_1_2_in_capture": true,
+    "exactly_two_audit_rows": true,
+    "exactly_two_intents_two_commits": true,
+    "version1_row_preserved": true,
+    "version1_audit_preserved": true,
+    "version1_operations_preserved": true,
+    "only_wbc_data_changed": true,
+    "correction_reason_present": true,
+    "distinct_uuids": true,
+    "journal_hashes_valid": true,
+    "v1_binding_payload_audit_receipt": true,
+    "v2_binding_payload_audit_receipt": true
+  },
+  "all_checks_true": true,
+  "formal_uat_pass_delta": 0,
+  "initial_save_response": "AUTH_EXPIRED",
+  "reconciliation_ui": "V1 and V2 audit verified",
+  "scope": "Actual live UI plus independent Sheets A1:Z20; flattened columns beyond Z not inspected."
+}

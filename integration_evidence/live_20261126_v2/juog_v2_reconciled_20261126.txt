@@ -1,0 +1,43 @@
+Browser tab: 3, Title: "JUOG 隔離CRF統合候補 · Streamlit", URL: "https://juog-utuc01-fixture-uat-20261109.streamlit.app/".
+1 AXWebArea JUOG 隔離CRF統合候補 · Streamlit, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/
+	2 container
+		3 container streamlitApp
+			4 AXWebArea JUOG 隔離CRF統合候補, URL: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/
+				5 container
+					6 container
+						7 link Description: Skip to main content, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#stMain
+						8 container
+							9 button Share
+							10 button favorite
+							11 button edit
+							12 button source
+							13 pop up button (collapsed) Description: Main menu, Secondary Actions: Expand
+						14 container stMain
+							15 heading JUOG-UTUC01 隔離CRF, Value: 1, ID: juog-utuc-01-crf
+								16 text JUOG-UTUC01 隔離CRF
+								17 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#juog-utuc-01-crf
+							18 button セッションを失効してログアウト
+								19 text セッションを失効してログアウト
+							20 text TEST01・完全架空データのみ。通知停止。B2はGoogleの直近再認証を保証しません。
+							21 button 保存状態の照合・復旧を開く
+								22 text 保存状態の照合・復旧を開く
+							31 heading 保存状態の照合・復旧, Value: 3, ID: 3320b710
+								32 text 保存状態の照合・復旧
+								33 link (opacity: 0) Description: Link to heading, Value: juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/#3320b710
+							34 text 入力や送信IDを失った場合も、新しい送信を作らず本人・症例・報告時点を照合します。
+							35 container
+								36 text field (settable) Description: 照合するJUOG登録番号, Value: JUOG-901, ID: :r9:
+							37 container
+								38 combo box (collapsed, settable) Description: 照合する報告時点, Value: 30日, ID: react-aria8088509794-:rl:, Secondary Actions: Expand
+								39 pop up button (collapsed) Description: Open, ID: react-aria8088509794-:rh:, Secondary Actions: Expand
+							40 button サーバの記録を照合
+								41 text サーバの記録を照合
+							44 text 正式保存を照合しました：Version 1 / UUID 54a012aa-752d-4e5c-8e01-ef92406718a9 / 監査一致
+							45 text 正式保存を照合しました：Version 2 / UUID af16acfd-e8aa-4d56-87ef-926b42a20af1 / 監査一致
+							42 button 編集画面へ戻る
+								43 text 編集画面へ戻る
+		28 button Manage app
+			29 image
+			30 text Manage app
+
+The focused UI element is 40 button サーバの記録を照合

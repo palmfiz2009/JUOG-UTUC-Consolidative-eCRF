@@ -1,0 +1,47 @@
+PASS locked request opens workbook once without retaining handle
+PASS workbook handle cleared after rejection and configured ID rechecked
+PASS journal append uses two fresh reads and both guards
+PASS live-shaped expiry after audit requires same UUID recovery and keeps Version 1
+PASS default disabled, wrong script/workbook and old generation deny
+PASS no legacy token bypass, bad signature and payload tamper
+PASS valid native-derived signed context and assert replay
+PASS ACL disabled expired wrong role other facility and duplicate principal
+PASS signature expiry and 60min deadline nonrenewal
+PASS logout rejects pending signature and future requests
+PASS case ownership, facility injection and forbidden routes deny
+PASS all nine visits v1 v2 immutable replay audit and actor
+PASS same UUID different content rejected and version conflict
+PASS single writer lock contention fails before storage
+PASS lost audit append blocks success then same UUID repairs
+PASS silent CRF append and operation append never success
+PASS expiry between body and audit no successful receipt
+PASS corrupt session head closes gate
+PASS committed missing CRF is not recreated as success
+PASS draft save resume delete plus principal binding
+PASS direct identifier and empty clinical payload rejected
+PASS read status is owner scoped and never asserts unverified success
+PASS privacy regression encoded JSON NFKC camelcase free text
+PASS missing schema and UUID/audit corruption fail closed
+PASS actual fixture Python signer accepted by actual GAS verifier
+PASS recovery lists saved UUID version and audit after browser loss
+PASS recovery retries stored payload same UUID using new signed request
+PASS recovery cannot substitute payload or invent UUID or mix visit
+PASS recovery missing canonical payload or corrupted digest stops
+PASS recovery owner revocation and expired assertion deny
+PASS clinical rejection cannot append body version audit or operation intent
+PASS clinically complete operated fixture saves v1 and correction with old version retained
+PASS all visit clinical failures leave CRF audit intent and notification state unchanged
+PASS recovery payload digest mismatch and untracked rows prevent retry
+PASS recovery jti replay fails while fresh signature can reconcile
+PASS section draft debounce target is a single audited append with immutable replay
+PASS section stale-tab conflicts and same UUID different payload deny without audit append
+PASS section silent append failure safe same UUID retry with fresh assertion
+PASS section lost response after append expiry resumes canonical server data
+PASS section all nine visits are isolated and no wrong field or arbitrary session restore
+PASS section ownership ACL session revocation and transferred cases reject
+PASS section old drafts never resurrect after official version and journal corruption fails
+PASS section pending official transaction blocks new draft and preserves zero false null
+PASS section date identity fields and expired signatures fail before any draft append
+PASS draft read and retry reject structurally invalid stored values without append
+PASS space-separated explicit identifier labels denied before clinical or draft writes
+ALL 46 GROUPS PASSED

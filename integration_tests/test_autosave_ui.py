@@ -41,6 +41,21 @@ class UI(unittest.TestCase):
         app.run();self.assertFalse(list(app.exception))
         return app
     def saves(self):return [q for action,q in self.calls if action=='save_section']
+    def test_retired_fragment_emits_nothing_and_never_contacts_server(self):
+        for flag in ('_show_recovery', 'auth_connect_halted'):
+            with self.subTest(flag=flag):
+                self.calls=[]
+                app=AppTest.from_string('import streamlit as st\nfrom isolated_autosave_ui import section_feedback\nsection_feedback("peri", "1")',default_timeout=20)
+                app.session_state[flag]=True
+                app.session_state['peri_registration_id']='JUOG-901'
+                self.clock=10
+                app.run()
+                self.assertFalse(list(app.exception))
+                self.assertEqual(self.calls,[])
+                self.assertFalse(list(app.caption))
+                self.assertFalse(list(app.error))
+                self.assertFalse(list(app.warning))
+                self.assertFalse(list(app.markdown))
     def test_all_three_debounce_and_only_changed_section(self):
         for page in PAGES:
             with self.subTest(page=page):

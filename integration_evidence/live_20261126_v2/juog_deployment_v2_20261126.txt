@@ -1,0 +1,4 @@
+Browser tab: 2, Title: "無題のプロジェクト - プロジェクト編集者 - Apps Script", URL: "https://script.google.com/home/projects/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/edit".
+The following is a diff from the previous accessibility tree with ~ and + representing changed and added elements, respectively. Removed elements are summarized by ID range.
+Removed element IDs: 32
+The focused UI element is 0 AXWebArea 無題のプロジェクト - プロジェクト編集者 - Apps Script, URL: script.google.com/home/projects/1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR/edit

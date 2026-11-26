@@ -1,0 +1,25 @@
+test_acl_denials (offline_test_bridge.Tests.test_acl_denials) ... ok
+test_correction_observed_version_required (offline_test_bridge.Tests.test_correction_observed_version_required) ... ok
+test_execution_timeout_reconciles_same_id (offline_test_bridge.Tests.test_execution_timeout_reconciles_same_id) ... ok
+test_legacy_projection_preserves_original (offline_test_bridge.Tests.test_legacy_projection_preserves_original) ... ok
+test_preview_never_network (offline_test_bridge.Tests.test_preview_never_network) ... ok
+test_privacy_rejected (offline_test_bridge.Tests.test_privacy_rejected) ... ok
+test_reads_and_draft_shape (offline_test_bridge.Tests.test_reads_and_draft_shape) ... ok
+test_scope_denials (offline_test_bridge.Tests.test_scope_denials) ... ok
+test_signed_prepare_exact_request (offline_test_bridge.Tests.test_signed_prepare_exact_request) ... ok
+test_stable_content_and_no_operation_invention (offline_test_bridge.Tests.test_stable_content_and_no_operation_invention) ... ok
+test_unauth_expiry_issuer (offline_test_bridge.Tests.test_unauth_expiry_issuer) ... ok
+test_uncertain_prepare_blocks_duplicate (offline_test_bridge.Tests.test_uncertain_prepare_blocks_duplicate) ... ok
+test_business_preview_or_denied_never_http (offline_test_entry.Boundary.test_business_preview_or_denied_never_http) ... ok
+test_save_buttons_disabled (offline_test_entry.Boundary.test_save_buttons_disabled) ... ok
+test_auth_order (offline_test_entry.Entry.test_auth_order) ... ok
+test_each_rerun_checks_acl (offline_test_entry.Entry.test_each_rerun_checks_acl) ... ok
+test_halted_no_render (offline_test_entry.Entry.test_halted_no_render) ... ok
+test_invalid_context_no_render (offline_test_entry.Entry.test_invalid_context_no_render) ... ok
+test_revoked_acl_no_render (offline_test_entry.Entry.test_revoked_acl_no_render) ... ok
+test_unauth_no_render (offline_test_entry.Entry.test_unauth_no_render) ... ok
+
+----------------------------------------------------------------------
+Ran 20 tests in 0.329s
+
+OK

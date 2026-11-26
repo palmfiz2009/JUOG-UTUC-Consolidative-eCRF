@@ -1,0 +1,50 @@
+[
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:54.363Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:54.703Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:54.882Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:54.914Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:54.996Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:55.362Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Cannot send rerun backMessage when disconnected from server.",
+    "timestamp": "2026-11-26T07:22:55.704Z",
+    "url": "https://juog-utuc01-fixture-uat-20261109.streamlit.app/~/+/static/js/index.DormvYxC.js"
+  },
+  {
+    "level": "error",
+    "message": "Error sending browser metadata to extension: Object",
+    "timestamp": "2026-11-26T07:22:55.802Z",
+    "url": "chrome-extension://kcdongibgcplmaagnmgpjhpjgmmaaaaa/content-script.bundle.js"
+  }
+]

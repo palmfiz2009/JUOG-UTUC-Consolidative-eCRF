@@ -1,0 +1,12 @@
+{
+  "checks": {
+    "CRF_30d_unchanged": true,
+    "CRFSubmissionAudit_unchanged": true,
+    "R1_Operations_unchanged": true,
+    "all_event_hashes_match": true
+  },
+  "draft_event_count": 46,
+  "version1_correction_draft_events": 15,
+  "latest_saved_at": "2026-11-26T07:22:11.335Z",
+  "formal_uat_pass_delta": 0
+}
