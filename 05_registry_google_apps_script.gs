@@ -1774,16 +1774,18 @@ function flattenObject_(obj, prefix, out) {
 }
 
 function ensureDynamicHeaders_(sh, headers) {
-  if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
   const current = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), 1)).getValues()[0].map(String);
   let changed = false;
   headers.forEach(h => { if (current.indexOf(h) < 0) { current.push(h); changed = true; } });
-  if (changed) sh.getRange(1, 1, 1, current.length).setValues([current]);
+  if (changed) {
+    if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
+    sh.getRange(1, 1, 1, current.length).setValues([current]);
+  }
 }
 
 function appendByHeaders_(sh, obj) {
-  if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
   const headers = sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String);
+  if (typeof JUOG_PR15_GUARD_ === 'function') JUOG_PR15_GUARD_();
   sh.appendRow(headers.map(h => safeCell_(Object.prototype.hasOwnProperty.call(obj, h) ? obj[h] : '')));
 }
 

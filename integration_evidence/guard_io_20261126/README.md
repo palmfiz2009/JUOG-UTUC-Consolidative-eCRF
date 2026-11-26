@@ -1,0 +1,5 @@
+# 追加の保存I/O削減候補
+
+基準HEAD: 36ffe8abbeae62431cfa9245842e6b46f8df969b。
+ensureDynamicHeaders_ は既存ヘッダーに変更がない場合の書込み前guardを省く。変更があればsetValues直前にguardを実行。appendByHeaders_ はヘッダー読取り後・appendRow直前へguardを移動。署名15秒、OIDC、ACL、B2、症例所有権、最終応答guardは不変。
+新規試験は、ヘッダー変更を失効状態で拒否し、ヘッダー読取り時に失効した場合もappendを拒否することを確認。Python205件/GAS47群と既存回帰は全exit0。実機の期限切れ解消は未確認。正式UAT新規PASS 0。

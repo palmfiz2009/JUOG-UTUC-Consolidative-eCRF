@@ -52,6 +52,21 @@ function fixture(){
  return {x,c,tables,props,metrics,call,save,payload,envelope,row,drop:n=>drop=n,expireOn:n=>expireOn=n,advance:ms=>now+=ms,lock:v=>locked=v};
 }
 const tests=[];function test(name,fn){const f=fixture();fn(f);tests.push(name);console.log('PASS '+name)}
+test('header no-op is read-only; changed headers and append recheck after reads',f=>{
+ const sh=f.tables.CRF_30d,original=copy(sh.rows);
+ vm.runInContext('JUOG_PR15_GUARD_=()=>{throw Error("SESSION_REVOKED")}',f.x);
+ f.x.ensureDynamicHeaders_(sh,original[0]);
+ assert.deepEqual(sh.rows,original);
+ assert.throws(()=>f.x.ensureDynamicHeaders_(sh,['new_column']),/SESSION_REVOKED/);
+ assert.deepEqual(sh.rows,original);
+ let revoked=false;
+ const getRange=sh.getRange.bind(sh);
+ sh.getRange=(...args)=>{const r=getRange(...args);return {...r,getValues:()=>{const v=r.getValues();revoked=true;return v}}};
+ f.x.guardAfterHeaderRead=()=>{if(revoked)throw Error('SESSION_REVOKED')};
+ vm.runInContext('JUOG_PR15_GUARD_=guardAfterHeaderRead',f.x);
+ assert.throws(()=>f.x.appendByHeaders_(sh,{submission_id:'fictional-blocked'}),/SESSION_REVOKED/);
+ assert.deepEqual(sh.rows,original);
+});
 test('locked request opens workbook once without retaining handle',f=>{
  assert.equal(f.save(f.payload()).ok,true);assert.equal(f.metrics.opens,1);
  assert.equal(vm.runInContext('JUOG_PR15_WORKBOOK_',f.x),null);
