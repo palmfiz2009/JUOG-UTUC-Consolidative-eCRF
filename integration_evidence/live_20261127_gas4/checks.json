@@ -1,0 +1,10 @@
+{
+  "crf_single": true,
+  "payload_unchanged": true,
+  "audit_single": true,
+  "intent_single": true,
+  "commit_single": true,
+  "receipt_verified": true,
+  "old_operations_preserved": true,
+  "old_audit_preserved": true
+}

@@ -1,0 +1,24 @@
+{
+  "range": "CRF_90d!A1:Z20",
+  "majorDimension": "ROWS",
+  "values": [
+    [
+      "saved_at",
+      "record_version",
+      "submission_id",
+      "record_key",
+      "submission_kind",
+      "correction_reason",
+      "submitted_at",
+      "registration_id",
+      "facility_code",
+      "facility_name",
+      "reporter_email",
+      "crf_type",
+      "visit",
+      "schema_version",
+      "study_code",
+      "payload_json"
+    ]
+  ]
+}
