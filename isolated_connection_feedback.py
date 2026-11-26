@@ -20,13 +20,35 @@ KEY_MESSAGES = {
 }
 
 
-def connection_stop_message(error):
+def connection_stop_message(error, st=None):
     # Do not call str/repr(error): third-party exceptions may contain secrets.
     code = error.args[0] if len(error.args) == 1 and type(error.args[0]) is str else None
     if type(error) is PermissionError and code in PERMISSION_MESSAGES:
         detail = PERMISSION_MESSAGES[code]
     elif type(error) is KeyError and code in KEY_MESSAGES:
         detail = KEY_MESSAGES[code]
+    elif st is not None:
+        # Presence-only checks after context has already failed; no network,
+        # no value display, and no attempt to repair or bypass configuration.
+        detail = '接続設定または本人認証の確認に失敗しました。管理者による確認が必要です。'
+        checks = [
+            (('auth', 'google', 'client_id'), 'Google認証設定の不足または形式不正です。'),
+            (('isolated_crf',), 'Secretsに[isolated_crf]設定がありません。'),
+            (('isolated_crf', 'signing_key'), 'isolated_crf.signing_key設定がありません。'),
+            (('isolated_crf', 'url'), 'isolated_crf.url設定がありません。'),
+            (('isolated_crf', 'generation'), 'isolated_crf.generation設定がありません。'),
+            (('isolated_crf', 'script_id'), 'isolated_crf.script_id設定がありません。'),
+            (('isolated_crf', 'spreadsheet_id'), 'isolated_crf.spreadsheet_id設定がありません。'),
+            (('registry', 'expected_spreadsheet_id'), 'registry.expected_spreadsheet_id設定がありません。'),
+        ]
+        for path, message in checks:
+            try:
+                value = st.secrets
+                for key in path:
+                    value = value[key]
+            except Exception:
+                detail = message
+                break
     else:
         detail = '接続設定または本人認証の確認に失敗しました。管理者による確認が必要です。'
     return detail + ' 接続・保存は停止しています。'

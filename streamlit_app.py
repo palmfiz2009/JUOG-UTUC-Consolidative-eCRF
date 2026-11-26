@@ -29,7 +29,7 @@ def run():
         st.error('認証・ACLの確認が必要です。保存を停止しています。');st.stop()
     try:context(st)
     except Exception as error:
-        st.info(connection_stop_message(error));st.stop()
+        st.info(connection_stop_message(error, st));st.stop()
     r=call(st,'ui_context',{})
     if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
         st.session_state['auth_connect_halted']=True
