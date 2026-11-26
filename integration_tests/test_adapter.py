@@ -91,6 +91,23 @@ class Tests(unittest.TestCase):
    self.assertEqual(a.call(self.ui,'save_crf',{'payload':self.payload})['error'],'DIRECT_IDENTIFIER_NOT_ALLOWED')
   self.tx.assert_not_called()
 
+ def test_expired_read_retries_once_with_new_signature(self):
+  def send(url,envelope,timeout):
+   r=self.send(url,envelope,timeout)
+   return {'ok':False,'error':'AUTH_EXPIRED'} if len(self.sent)==1 else r
+  self.tx.side_effect=send
+  self.assertTrue(a.call(self.ui,'ui_context')['ok'])
+  self.assertEqual(len(self.sent),2)
+  self.assertNotEqual(self.sent[0][1]['session']['jti'],self.sent[1][1]['session']['jti'])
+ def test_expired_read_retry_is_bounded(self):
+  def send(url,envelope,timeout):
+   self.send(url,envelope,timeout)
+   return {'ok':False,'error':'AUTH_EXPIRED'}
+  self.tx.side_effect=send
+  self.assertFalse(a.call(self.ui,'ui_context')['ok'])
+  self.assertEqual(len(self.sent),2)
+  self.assertTrue(self.ui.session_state['auth_connect_halted'])
+
  def recovery_transport(self, first_error='AUTH_EXPIRED', alter=None):
   def send(url,envelope,timeout):
    binding=self.send(url,envelope,timeout)

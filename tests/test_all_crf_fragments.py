@@ -12,17 +12,19 @@ FILES = [
 
 
 class AllCrfPagesTests(unittest.TestCase):
-    def test_all_three_use_local_fragments_and_same_submission_helper(self):
+    def test_all_three_use_non_nested_timers_and_same_submission_helper(self):
+        timers=(ROOT/"isolated_autosave_ui.py").read_text()
+        self.assertIn('_st.fragment(run_every="1s")(section_feedback)', timers)
         for name, fn_name, page in FILES:
             with self.subTest(file=name):
                 source = (ROOT / name).read_text(encoding="utf-8")
                 tree = ast.parse(source)
                 fragment = next(n for n in tree.body
                     if isinstance(n, ast.FunctionDef) and n.name == fn_name)
-                self.assertTrue(any(isinstance(d, ast.Attribute) and d.attr == "fragment"
+                self.assertFalse(any(isinstance(d, ast.Attribute) and d.attr == "fragment"
                                     for d in fragment.decorator_list))
                 fragment_src = ast.get_source_segment(source,fragment)
-                self.assertNotIn("st.rerun()", fragment_src)
+                self.assertNotIn('scope="fragment"', fragment_src)
                 self.assertIn(f'pending_attempt("{page}", st.session_state)',fragment_src)
                 self.assertIn(f'page="{page}"', fragment_src)
                 self.assertIn("submit_crf_with_feedback(",fragment_src)
@@ -35,7 +37,7 @@ class AllCrfPagesTests(unittest.TestCase):
             with self.subTest(file=name):
                 src=(ROOT/name).read_text(encoding="utf-8")
                 self.assertNotIn("save_result = save_crf_payload(",src)
-                self.assertNotIn("st.rerun()",src)
+                self.assertEqual(src.count("st.rerun()"), 0 if name.startswith("02_") else 2)
                 self.assertNotIn('st.form("',src)
 
 

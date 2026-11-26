@@ -140,6 +140,13 @@ def call(st,action,payload=None,timeout=20):
             if action != 'save_crf':
                 raise
             r={'ok':False,'error':'RESULT_UNCONFIRMED'}
+        if action in {'ui_context','backend_info','validate','get_crf_linkage','read_crf','request_status','recovery_status','get_sections'} and r.get('error') == 'AUTH_EXPIRED':
+            # One read-only retry with freshly validated native identity and jti.
+            # Never retry an expired write or a revoked/denied session here.
+            refreshed, fresh_config = context(st)
+            if actor_key(st) != actor or fresh_config != c:
+                raise PermissionError('ACTOR_CHANGED')
+            r = transport(c['url'], signed_request(refreshed, action, p), timeout)
         if action == 'save_crf' and r.get('error') in {'AUTH_EXPIRED','RESULT_UNCONFIRMED'}:
             # The original assertion may expire after COMMIT. Do not bypass its
             # checks or reuse it: independently read with fresh OIDC/B2 signatures.

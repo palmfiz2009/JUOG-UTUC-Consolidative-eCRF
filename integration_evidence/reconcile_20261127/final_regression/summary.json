@@ -1,0 +1,8 @@
+{
+  "python_tests": 212,
+  "gas_groups": 47,
+  "full_suite_first_run_pr_failed": "Static outer-fragment contract outdated after live-proven rendering fix; 5 failures, preserved in pr.log",
+  "pr_after_contract_update": "43 tests PASS; no auth/security expectations changed",
+  "other_suites": "all exit 0",
+  "formal_uat_pass_delta": 0
+}
