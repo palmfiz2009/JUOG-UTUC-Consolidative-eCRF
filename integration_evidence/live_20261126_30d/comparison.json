@@ -1,0 +1,23 @@
+{
+  "kind": "live_evidence_consistency_not_independent_qa",
+  "uuid": "54a012aa-752d-4e5c-8e01-ef92406718a9",
+  "checks": {
+    "one_crf_row_in_captured_range": true,
+    "one_audit_row_in_captured_range": true,
+    "intent_and_commit_only_in_captured_range": true,
+    "uuid_matches": true,
+    "key_matches": true,
+    "version_remained_one": true,
+    "original_rows_unchanged": true,
+    "payload_matches_preserved_intent": true,
+    "payload_digest_matches": true,
+    "operation_hashes_match": true,
+    "owner_and_expected_match": true,
+    "receipt_verified_existing": true,
+    "zero_and_false_retained": true,
+    "missing_lab_distinct": true,
+    "fictional_contact": true
+  },
+  "all_checks_true": true,
+  "scope": "CRF/audit A1:Z20 and operation A1:Z20; server recovery independently verifies store"
+}
