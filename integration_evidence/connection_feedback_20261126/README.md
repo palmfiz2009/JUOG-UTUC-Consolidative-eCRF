@@ -1,0 +1,9 @@
+# Connection-stop diagnostics — 2026-11-26
+
+Actual isolated app still stops in context before ui_context / CRF display. No live save attempted; formal UAT PASS0 / BLOCKED74 unchanged. User reported both signing-key settings saved; this is not cryptographic proof that they match.
+
+The existing broad exception handler mislabels missing configuration, OIDC expiry/claim failures and binding mismatch as unapproved/disabled. Added fixed allowlisted messages for known PermissionError/KeyError cases; unknown exceptions stay generic. No raw exception string, settings, key, identity subject or payload is rendered. No permission check, exception stop, call order or server code changed.
+
+Validation: 202 Python tests (76 fixture + 20 bridge/entry + 43 PR + 63 integration) PASS; GAS 42 endpoint groups PASS; existing GAS/audit and 14 identity cases PASS. Offline networking denied by run_offline.py. CI autodiscovers new tests. Four new tests cover known messages, missing setting keys, unknown/secret-bearing exceptions, and prohibition on exception string rendering. Existing entry/adapter tests preserve auth rejection, no network on unapproved config, no form on ACL denial, revocation and actor switching.
+
+Runtime files: streamlit_app.py and isolated_connection_feedback.py. Regression file: integration_tests/test_connection_feedback.py. This diagnostic change is committed only to the review branch, not yet deployed. The approved fixture runtime is still 4cf8ea6-derived code with deployment profile commit 4091b26b34aa3146d6051035dfd3b5a71efeb0fa. Existing pre-UAT QA signature is not represented as review of this new change. To observe the exact live failure, deployment of these two runtime files to the existing fixture is the next bounded change; retain profile, OIDC, ACL, key, GAS, Sheets and notification settings.

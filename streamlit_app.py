@@ -4,6 +4,7 @@ import time
 from pathlib import Path
 import streamlit as st
 from isolated_crf_adapter import call, context, begin_edit
+from isolated_connection_feedback import connection_stop_message
 
 def safe_logout():
     iat,exp=st.user.get('iat'),st.user.get('exp')
@@ -27,8 +28,8 @@ def run():
     if st.session_state.get('auth_connect_halted'):
         st.error('認証・ACLの確認が必要です。保存を停止しています。');st.stop()
     try:context(st)
-    except Exception:
-        st.info('統合候補は未承認・無効です。接続・保存は行いません。');st.stop()
+    except Exception as error:
+        st.info(connection_stop_message(error));st.stop()
     r=call(st,'ui_context',{})
     if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
         st.session_state['auth_connect_halted']=True

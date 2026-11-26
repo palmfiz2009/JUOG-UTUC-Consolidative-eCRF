@@ -1,0 +1,13 @@
+PASS CRF_90d 90d v1/v2/replay/audit (fictional)
+PASS CRF_Followup 6m v1/v2/replay/audit (fictional)
+PASS CRF_Followup 12m v1/v2/replay/audit (fictional)
+PASS CRF_Followup 24m v1/v2/replay/audit (fictional)
+PASS audit repair + repeat replay
+PASS silent audit write failure blocks success; same UUID repairs
+PASS silent CRF write failure blocks success; correction recovers
+PASS duplicate CRF UUID is rejected
+PASS audit UUID conflict rejected
+PASS missing audit sheet fails closed
+PASS cross-type UUID collision, independent UUID, duplicated row, schema fail-closed
+PASS follow-up source linkage / changed reference / manual 90-day
+PASS authenticated backend workbook binding (fictional)
