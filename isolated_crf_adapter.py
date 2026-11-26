@@ -91,6 +91,23 @@ def _reconcile_save(st, body, expected, actor, timeout):
     return verified
 
 
+def _reconcile_section(st, operation, actor, timeout):
+    from isolated_autosave_ui import _read_ok, acknowledge, canonical
+    query={k:operation[k] for k in ('registration_id','facility_code','crf_type','visit')}
+    result=call(st,'get_sections',query,timeout)
+    if actor_key(st)!=actor or not _read_ok(result,query):
+        return None
+    event=result['sections'].get(operation['section'])
+    if not isinstance(event,dict):
+        return None
+    digest=hashlib.sha256(canonical(operation['data']).encode()).hexdigest()
+    if (event.get('action')!='SECTION_SAVE' or event.get('key')!=result['record_key']
+            or event.get('record_version')!=operation['record_version'] or event.get('digest')!=digest):
+        return None
+    verified=dict(result,receipt=event,reconciled_after_uncertain_response=True)
+    return verified if acknowledge({},operation,verified) else None
+
+
 def call(st,action,payload=None,timeout=20):
     if action not in ROUTES:return {'ok':False,'error':'ROUTE_DENIED'}
     try:
@@ -137,7 +154,7 @@ def call(st,action,payload=None,timeout=20):
         try:
             r=transport(c['url'],envelope,timeout)
         except Exception:
-            if action != 'save_crf':
+            if action not in {'save_crf','save_section'}:
                 raise
             r={'ok':False,'error':'RESULT_UNCONFIRMED'}
         if action in {'ui_context','backend_info','validate','get_crf_linkage','read_crf','request_status','recovery_status','get_sections'} and r.get('error') == 'AUTH_EXPIRED':
@@ -147,6 +164,10 @@ def call(st,action,payload=None,timeout=20):
             if actor_key(st) != actor or fresh_config != c:
                 raise PermissionError('ACTOR_CHANGED')
             r = transport(c['url'], signed_request(refreshed, action, p), timeout)
+        if action == 'save_section' and r.get('error') in {'AUTH_EXPIRED','RESULT_UNCONFIRMED'}:
+            confirmed = _reconcile_section(st, p, actor, timeout)
+            if confirmed is not None:
+                r = confirmed
         if action == 'save_crf' and r.get('error') in {'AUTH_EXPIRED','RESULT_UNCONFIRMED'}:
             # The original assertion may expire after COMMIT. Do not bypass its
             # checks or reuse it: independently read with fresh OIDC/B2 signatures.
