@@ -9,6 +9,20 @@ const PR15_SCRIPT_='1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR';
 const PR15_SHEET_='1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs';
 const PR15_STAGE_='PR15_ISOLATED_CRFS';
 function pr15Hash_(s){return Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,s,Utilities.Charset.UTF_8).map(b=>('0'+((b+256)%256).toString(16)).slice(-2)).join('');}
+// Reuse service object handles within one locked request only. Every caller
+// still reads live cells; never retain ACL, ownership, header or record values.
+function pr15WorkbookHandles_(raw){
+ const sheets=new Map();
+ return {
+  getId:()=>raw.getId(), getName:()=>raw.getName(),
+  getSheetByName:name=>{
+   if(sheets.has(name))return sheets.get(name);
+   const sheet=raw.getSheetByName(name);
+   if(sheet)sheets.set(name,sheet);
+   return sheet;
+  }
+ };
+}
 function pr15Rows_(ss,name,required){
  const sh=ss.getSheetByName(name);if(!sh)throw Error('SCHEMA_MISSING');
  const rows=sh.getDataRange().getValues(),h=rows[0]||[];
@@ -64,7 +78,7 @@ function juogPr15Entry_(envelope,c){
   if(!p||typeof p!=='object'||Array.isArray(p))throw Error('REQUEST_INVALID');
   const allowed=['ui_context','session_revoke','backend_info','validate','get_crf_linkage','save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry','get_sections','save_section'];
   if(!allowed.includes(a))throw Error('ROUTE_DENIED');
-  const ss=SpreadsheetApp.openById(c.spreadsheetId),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
+  const ss=pr15WorkbookHandles_(SpreadsheetApp.openById(c.spreadsheetId)),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
   JUOG_PR15_WORKBOOK_={id:c.spreadsheetId,ss};
   const gate=juogSessionGateB2_(ss,c,auth,who);
   const bind=r=>Object.assign(r,{spreadsheet_id:c.spreadsheetId,script_id:c.scriptId,integration_stage:PR15_STAGE_,generation:c.sessionStoreGeneration,role:who&&who.role,facility_code:'TEST01'});

@@ -25,6 +25,14 @@ def _valid_recovery(reply,query):
  if recovery['state']=='SAVED' and (not operations or not all(_saved(item) for item in operations)):return False
  return True
 
+def _failure_code(reply):
+ # Show only explicit public error codes, never raw server messages/payloads.
+ allowed={'AUTH_EXPIRED','SESSION_REVOKED','ACL_DENIED','ACL_CHANGED',
+          'SESSION_STORE_INVALID','SESSION_HALTED','RESULT_UNCONFIRMED',
+          'LOCK_TIMEOUT','TRANSACTION_UNCONFIRMED','OPERATION_WRITE_UNCONFIRMED'}
+ code=reply.get('error') if isinstance(reply,dict) else None
+ return code if isinstance(code,str) and code in allowed else 'RESULT_UNCONFIRMED'
+
 def render(st):
  st.subheader('保存状態の照合・復旧')
  st.caption('入力や送信IDを失った場合も、新しい送信を作らず本人・症例・報告時点を照合します。')
@@ -49,7 +57,7 @@ def render(st):
     check=call(st,'recovery_status',q)
     verified=_valid_recovery(check,q) and any(x['uuid']==item['uuid'] and _saved(x) for x in check['recovery']['operations'])
     if isinstance(result,dict) and result.get('ok') is True and verified:st.success('同一UUIDの正式保存と監査を再照合しました。Versionの重複追加はしていません。')
-    else:st.error('結果は未確定です。新規送信せず事務局へ照合を依頼してください。')
+    else:st.error('結果は未確定です。新規送信せず事務局へ照合を依頼してください。確認コード：'+_failure_code(result))
   else:st.error('記録の整合性を確認できません。事務局による照合が必要です。')
  if recovery.get('state') in ('NO_SERVER_RECORD','NEEDS_RECONCILIATION'):
   st.error('保存結果を確定できません。新規送信は停止し、事務局へ照合を依頼してください。')

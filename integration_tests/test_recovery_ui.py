@@ -61,3 +61,16 @@ class RecoveryUI(unittest.TestCase):
    ui=UI()
    with patch.object(recovery,'call',return_value=response('SAVED',ops)):recovery.render(ui)
    self.assertTrue(ui.session_state['_recovery_blocks_new'])
+
+class RecoveryDiagnostics(unittest.TestCase):
+ def test_safe_codes_without_server_detail(self):
+  self.assertEqual(recovery._failure_code({'error':'AUTH_EXPIRED','detail':'private'}),'AUTH_EXPIRED')
+  for reply in ({'error':'private-payload'}, {'error':['private']}, None, {'ok':True}):
+   self.assertEqual(recovery._failure_code(reply),'RESULT_UNCONFIRMED')
+ def test_failed_retry_stays_blocked_and_reports_expiry(self):
+  ui=UI(['_recover_original'])
+  with patch.object(recovery,'call',side_effect=[response('RETRY_ALLOWED',[{'state':'RETRY_ALLOWED','uuid':'original'}]),{'ok':False,'error':'AUTH_EXPIRED'},response('RETRY_ALLOWED',[{'state':'RETRY_ALLOWED','uuid':'original'}])]):
+   recovery.render(ui)
+  self.assertTrue(ui.session_state['_recovery_blocks_new'])
+  self.assertFalse(any(k=='success' for k,_ in ui.messages))
+  self.assertTrue(any('AUTH_EXPIRED' in text for _,text in ui.messages))

@@ -7,7 +7,7 @@ const copy=x=>JSON.parse(JSON.stringify(x));
 const files=['05_registry_google_apps_script.gs','isolated_auth_bridge.gs','isolated_session_store.gs','isolated_crf_endpoint.gs','isolated_recovery.gs','clinical_contract_generated.gs','clinical_validation.gs','autosave_sections_generated.gs','isolated_autosave.gs'];
 function fixture(){
  let now=Date.parse('2026-11-16T00:00:00Z'),locked=false,drop='',expireOn='',nextJti=0;
- const props={},tables={},metrics={opens:0,reads:{}};
+ const props={},tables={},metrics={opens:0,reads:{},lookups:{}};
  class Sheet{
   constructor(name,rows){this.name=name;this.rows=copy(rows);}
   getDataRange(){metrics.reads[this.name]=(metrics.reads[this.name]||0)+1;return {getValues:()=>copy(this.rows.map(r=>Array.from({length:this.getLastColumn()},(_,i)=>r[i]??'')))}};
@@ -18,7 +18,7 @@ function fixture(){
   deleteRow(n){if(drop!==this.name)this.rows.splice(n-1,1)}
   setFrozenRows(){}
  }
- const ss={getId:()=>c.spreadsheetId,getName:()=> 'TEST_OFFLINE',getSheetByName:n=>tables[n]||null,insertSheet:()=>{throw Error('UNEXPECTED_CREATION')}};
+ const ss={getId:()=>c.spreadsheetId,getName:()=> 'TEST_OFFLINE',getSheetByName:n=>{metrics.lookups[n]=(metrics.lookups[n]||0)+1;return tables[n]||null},insertSheet:()=>{throw Error('UNEXPECTED_CREATION')}};
  const x={Date:class extends Date{constructor(...a){super(...(a.length?a:[now]))}static now(){return now}},
   ScriptApp:{getScriptId:()=>c.scriptId},
   PropertiesService:{getScriptProperties:()=>({getProperty:k=>props[k]??null,setProperty:(k,v)=>props[k]=v})},
@@ -52,6 +52,26 @@ function fixture(){
  return {x,c,tables,props,metrics,call,save,payload,envelope,row,drop:n=>drop=n,expireOn:n=>expireOn=n,advance:ms=>now+=ms,lock:v=>locked=v};
 }
 const tests=[];function test(name,fn){const f=fixture();fn(f);tests.push(name);console.log('PASS '+name)}
+test('request-local sheet handles retain fresh cells and miss checks',f=>{
+ let lookups=0;const raw={getId:()=> 'fixture',getName:()=> 'fixture',getSheetByName:n=>{lookups++;return f.tables[n]||null}};
+ const ss=f.x.pr15WorkbookHandles_(raw),a=ss.getSheetByName('V3_Users');
+ assert.equal(ss.getSheetByName('V3_Users'),a);assert.equal(lookups,1);
+ a.rows[1][3]=false;
+ assert.equal(ss.getSheetByName('V3_Users').getDataRange().getValues()[1][3],false);
+ assert.equal(ss.getSheetByName('missing'),null);assert.equal(ss.getSheetByName('missing'),null);
+ assert.equal(lookups,3);
+ const next=f.x.pr15WorkbookHandles_(raw);next.getSheetByName('V3_Users');assert.equal(lookups,4);
+});
+test('full save resolves each sheet once but authorization reads stay live',f=>{
+ const baseline=fixture();baseline.x.pr15WorkbookHandles_=raw=>raw;
+ assert.equal(baseline.save(baseline.payload()).ok,true);
+ assert.equal(f.save(f.payload()).ok,true);
+ assert.ok(Object.values(f.metrics.lookups).every(n=>n===1));
+ assert.deepEqual(f.metrics.reads,baseline.metrics.reads);
+ const count=m=>Object.values(m.lookups).reduce((a,b)=>a+b,0);
+ assert.ok(count(f.metrics)<count(baseline.metrics));
+ console.log('HANDLE_LOOKUPS '+JSON.stringify({before:count(baseline.metrics),after:count(f.metrics),reads:f.metrics.reads}));
+});
 test('header no-op is read-only; changed headers and append recheck after reads',f=>{
  const sh=f.tables.CRF_30d,original=copy(sh.rows);
  vm.runInContext('JUOG_PR15_GUARD_=()=>{throw Error("SESSION_REVOKED")}',f.x);
