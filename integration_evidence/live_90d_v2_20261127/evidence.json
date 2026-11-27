@@ -1,0 +1,102 @@
+{
+  "review": "8472b536a75aa3a34eb3798eaedbf681cc43b7ae",
+  "fixture": "14b30ce119c166c8e5605c1d9ac516c6e2e86a8d",
+  "gasVersion": 9,
+  "sheets": {
+    "CRF_90d": {
+      "beforeRows": 2,
+      "afterRows": 3,
+      "priorRowsUnchanged": true,
+      "newRows": [
+        [
+          46354.07390207176,
+          2,
+          "624e77cf-72f7-464f-b43d-40842502e0f7",
+          "JUOG-901|day90|90d",
+          "訂正報告",
+          "完全架空UAT：90日CRFのVersion 2訂正・監査一致を検証",
+          "2026-11-28T01:45:49+09:00",
+          "JUOG-901",
+          "TEST01",
+          "FICTIONAL_UAT_ONLY",
+          "fictional@example.invalid",
+          "day90",
+          "90d",
+          "2026-09-14-v2.2.2",
+          "JUOG_UTUC_Consolidative",
+          "{\"schema_version\":\"2026-09-14-v2.2.2\",\"study_code\":\"JUOG_UTUC_Consolidative\",\"crf_type\":\"day90\",\"visit\":\"90d\",\"record_key\":\"JUOG-901|day90|90d\",\"submission_id\":\"624e77cf-72f7-464f-b43d-40842502e0f7\",\"submitted_at\":\"2026-11-28T01:45:49+09:00\",\"submission_kind\":\"訂正報告\",\"correction_reason\":\"完全架空UAT：90日CRFのVersion 2訂正・監査一致を検証\",\"registration_id\":\"JUOG-901\",\"facility_code\":\"TEST01\",\"facility_name\":\"FICTIONAL_UAT_ONLY\",\"reporter_email\":\"fictional@example.invalid\",\"data\":{\"source_30d_linked\":true,\"source_30d_record_version\":5,\"source_30d_submission_id\":\"63c8f016-ff9a-4c53-a335-9705a30aefb5\",\"surgery_performed\":\"実施した\",\"reference_date\":\"2026-01-10\",\"visit_date\":\"2026-04-10\",\"visit_deviation_reason\":\"\",\"lab_available\":\"なし\",\"lab_date\":\"\",\"labs\":{\"WBC\":null,\"Hb\":null,\"PLT\":null,\"Neutro\":null,\"Lympho\":null,\"Mono\":null,\"Eosino\":null,\"Baso\":null,\"ALP\":null,\"T_Bil\":null,\"Alb\":null,\"AST\":null,\"ALT\":null,\"TP\":null,\"LDH\":null,\"Cre\":null,\"eGFR\":null,\"BUN\":null,\"Na\":null,\"K\":null,\"Cl\":null,\"CRP\":null},\"labs_raw\":{},\"urine_cytology\":\"Negative (クラスI・II)\",\"required_test_omission_reason\":\"\",\"imaging_status\":\"実施\",\"imaging_date\":\"2026-04-10\",\"imaging_not_done_reason\":\"\",\"recist_progression_status\":\"PDなし\",\"progression_date\":\"\",\"progression_sites\":[],\"progression_detail\":\"\",\"cystoscopy_status\":\"実施\",\"cystoscopy_date\":\"2026-04-10\",\"cystoscopy_result\":\"腫瘍なし\",\"cystoscopy_detail\":\"完全架空UAT：90日Version 2訂正確認\",\"cystoscopy_not_done_reason\":\"\",\"new_surgical_complication_day31_90\":\"なし\",\"cd_grade_day31_90\":\"Grade 0\",\"cd_event_date\":\"\",\"cd_detail\":\"\",\"cd_surgery_relation\":\"N/A\",\"renal_exception\":false,\"renal_exception_detail\":\"\",\"major_surgery_related_complication_day31_90\":false,\"ctcae_event\":false,\"ctcae_detail\":\"\",\"intraluminal_recurrence\":\"なし\",\"intraluminal_recurrence_date\":\"\",\"intraluminal_sites\":[],\"intraluminal_site_other\":\"\",\"intraluminal_treatment\":[],\"intraluminal_treatment_other\":\"\",\"intraluminal_treatment_status\":null,\"intraluminal_procedure_date\":\"\",\"intraluminal_instillation_start\":\"\",\"intraluminal_instillation_end\":\"\",\"intraluminal_instillation_ongoing\":false,\"intraluminal_other_treatment_date\":\"\",\"intraluminal_pathology\":\"\",\"postop_treatment\":\"無治療（経過観察）\",\"postop_treatment_detail\":\"\",\"postop_treatment_start\":\"\",\"postop_treatment_end\":\"\",\"postop_treatment_ongoing\":false,\"vital_status\":\"生存\",\"last_alive_date\":\"2026-04-10\",\"death_date\":\"\",\"death_cause\":\"\"}}"
+        ]
+      ]
+    },
+    "CRFSubmissionAudit": {
+      "beforeRows": 12,
+      "afterRows": 13,
+      "priorRowsUnchanged": true,
+      "newRows": [
+        [
+          46354.07391118056,
+          "CRF_90d",
+          "JUOG-901|day90|90d",
+          2,
+          "624e77cf-72f7-464f-b43d-40842502e0f7",
+          "訂正報告",
+          "JUOG-901",
+          "TEST01"
+        ]
+      ]
+    },
+    "R1_Operations": {
+      "beforeRows": 23,
+      "afterRows": 25,
+      "priorRowsUnchanged": true,
+      "newRows": [
+        [
+          23,
+          "{\"kind\":\"INTENT\",\"uuid\":\"624e77cf-72f7-464f-b43d-40842502e0f7\",\"key\":\"JUOG-901|day90|90d\",\"digest\":\"d27cf52446f7f363c374074d075334910333ebfc42b9c68a0e2e02a357f7f0a5\",\"payload\":{\"schema_version\":\"2026-09-14-v2.2.2\",\"study_code\":\"JUOG_UTUC_Consolidative\",\"crf_type\":\"day90\",\"visit\":\"90d\",\"record_key\":\"JUOG-901|day90|90d\",\"submission_id\":\"624e77cf-72f7-464f-b43d-40842502e0f7\",\"submitted_at\":\"2026-11-28T01:45:49+09:00\",\"submission_kind\":\"訂正報告\",\"correction_reason\":\"完全架空UAT：90日CRFのVersion 2訂正・監査一致を検証\",\"registration_id\":\"JUOG-901\",\"facility_code\":\"TEST01\",\"facility_name\":\"FICTIONAL_UAT_ONLY\",\"reporter_email\":\"fictional@example.invalid\",\"data\":{\"source_30d_linked\":true,\"source_30d_record_version\":5,\"source_30d_submission_id\":\"63c8f016-ff9a-4c53-a335-9705a30aefb5\",\"surgery_performed\":\"実施した\",\"reference_date\":\"2026-01-10\",\"visit_date\":\"2026-04-10\",\"visit_deviation_reason\":\"\",\"lab_available\":\"なし\",\"lab_date\":\"\",\"labs\":{\"WBC\":null,\"Hb\":null,\"PLT\":null,\"Neutro\":null,\"Lympho\":null,\"Mono\":null,\"Eosino\":null,\"Baso\":null,\"ALP\":null,\"T_Bil\":null,\"Alb\":null,\"AST\":null,\"ALT\":null,\"TP\":null,\"LDH\":null,\"Cre\":null,\"eGFR\":null,\"BUN\":null,\"Na\":null,\"K\":null,\"Cl\":null,\"CRP\":null},\"labs_raw\":{},\"urine_cytology\":\"Negative (クラスI・II)\",\"required_test_omission_reason\":\"\",\"imaging_status\":\"実施\",\"imaging_date\":\"2026-04-10\",\"imaging_not_done_reason\":\"\",\"recist_progression_status\":\"PDなし\",\"progression_date\":\"\",\"progression_sites\":[],\"progression_detail\":\"\",\"cystoscopy_status\":\"実施\",\"cystoscopy_date\":\"2026-04-10\",\"cystoscopy_result\":\"腫瘍なし\",\"cystoscopy_detail\":\"完全架空UAT：90日Version 2訂正確認\",\"cystoscopy_not_done_reason\":\"\",\"new_surgical_complication_day31_90\":\"なし\",\"cd_grade_day31_90\":\"Grade 0\",\"cd_event_date\":\"\",\"cd_detail\":\"\",\"cd_surgery_relation\":\"N/A\",\"renal_exception\":false,\"renal_exception_detail\":\"\",\"major_surgery_related_complication_day31_90\":false,\"ctcae_event\":false,\"ctcae_detail\":\"\",\"intraluminal_recurrence\":\"なし\",\"intraluminal_recurrence_date\":\"\",\"intraluminal_sites\":[],\"intraluminal_site_other\":\"\",\"intraluminal_treatment\":[],\"intraluminal_treatment_other\":\"\",\"intraluminal_treatment_status\":null,\"intraluminal_procedure_date\":\"\",\"intraluminal_instillation_start\":\"\",\"intraluminal_instillation_end\":\"\",\"intraluminal_instillation_ongoing\":false,\"intraluminal_other_treatment_date\":\"\",\"intraluminal_pathology\":\"\",\"postop_treatment\":\"無治療（経過観察）\",\"postop_treatment_detail\":\"\",\"postop_treatment_start\":\"\",\"postop_treatment_end\":\"\",\"postop_treatment_ongoing\":false,\"vital_status\":\"生存\",\"last_alive_date\":\"2026-04-10\",\"death_date\":\"\",\"death_cause\":\"\"}},\"actor\":\"UAT_TEST01_PI_01\",\"facility\":\"TEST01\",\"expected\":1,\"at\":\"2026-11-27T16:46:03.778Z\"}",
+          "8687923ef5714040b9e08c6bba85f6128713a1a0fd0531fb4ab8dac241ee4ade"
+        ],
+        [
+          24,
+          "{\"kind\":\"COMMIT\",\"uuid\":\"624e77cf-72f7-464f-b43d-40842502e0f7\",\"key\":\"JUOG-901|day90|90d\",\"digest\":\"d27cf52446f7f363c374074d075334910333ebfc42b9c68a0e2e02a357f7f0a5\",\"actor\":\"UAT_TEST01_PI_01\",\"facility\":\"TEST01\",\"expected\":1,\"at\":\"2026-11-27T16:46:44.048Z\",\"receipt\":{\"ok\":true,\"existing\":true,\"record_version\":2,\"submission_id\":\"624e77cf-72f7-464f-b43d-40842502e0f7\",\"record_key\":\"JUOG-901|day90|90d\",\"crf_type\":\"day90\",\"visit\":\"90d\",\"spreadsheet_id\":\"1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs\",\"audit_verified\":true}}",
+          "bb223bebade27441de8770ac8358641da6da19dff1c97b88bb77c6ac65107dbb"
+        ]
+      ]
+    }
+  },
+  "ui": {
+    "formalResult": "保存しました：術後90日CRF／JUOG-901／Version 2",
+    "canonicalRecoveryNotice": true,
+    "manualFormalRetry": false,
+    "externalMailSent": false,
+    "observedAt102Seconds": "仮保存データを整理しています…",
+    "allSixInputSectionsAcknowledged": true
+  },
+  "uuid": "624e77cf-72f7-464f-b43d-40842502e0f7",
+  "draftTail": [
+    [
+      "{\"action\":\"SECTION_SAVE\",\"key\":\"JUOG-901|day90|90d\",\"section\":\"6\",\"actor\":\"UAT_TEST01_PI_01\",\"record_version\":1,\"revision\":3,\"operation_id\":\"df0033df-eb98-4354-adea-ad9e5e03a719\",\"digest\":\"84069f8439bb313814c57172f8ef3b6ab219d2814f8da07a3d2c87f929dd703d\",\"data\":{\"d90_last_alive_date\":{\"type\":\"date\",\"value\":\"2026-04-10\"},\"d90_vital_status\":{\"type\":\"value\",\"value\":\"生存\"}},\"at\":\"2026-11-27T16:45:23.924Z\"}",
+      "929b4688b092e9dbbe7d252154a42e73e27ad3b3a56081877f5bddc9822444a7"
+    ],
+    [
+      "{\"action\":\"delete_draft\",\"key\":\"JUOG-901|day90|90d\",\"actor\":\"UAT_TEST01_PI_01\",\"at\":\"2026-11-27T16:47:14.635Z\",\"digest\":\"c370f2d6d13d27dbe2d6a378a39611df4da71d15312229d6be111f388d20aae0\"}",
+      "4b4e8b9a5986abef1eb823572b2ed236ef25f6beb78016f3e871515ab87aa965"
+    ]
+  ],
+  "checks": {
+    "one_crf_row": true,
+    "one_audit_row": true,
+    "old_rows_unchanged": true,
+    "uuid_key_version_match": true,
+    "intent_commit": true,
+    "expected_version_1": true,
+    "same_uuid_actor_facility": true,
+    "canonical_payload_match": true,
+    "payload_digest": true,
+    "operation_hashes": true,
+    "receipt": true,
+    "draft_cleanup": true,
+    "draft_event_hashes": true,
+    "source_30d_v5": true
+  },
+  "formal_uat": "No new formal row PASS claimed: full row criteria and outcome-specific independent QA remain separate."
+}
