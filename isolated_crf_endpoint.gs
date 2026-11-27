@@ -76,6 +76,8 @@ function juogPr15Entry_(envelope,c){
  try{
   const auth=juogV3DecodeBridge_(envelope,c);let a=auth.request.action,p=auth.request.payload;
   if(!p||typeof p!=='object'||Array.isArray(p))throw Error('REQUEST_INVALID');
+  if('staged_save' in p && (typeof p.staged_save!=='boolean'||!['save_crf','recovery_retry'].includes(a)))throw Error('REQUEST_INVALID');
+  const staged=p.staged_save===true;
   const allowed=['ui_context','session_revoke','backend_info','validate','get_crf_linkage','save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry','get_sections','save_section'];
   if(!allowed.includes(a))throw Error('ROUTE_DENIED');
   const ss=pr15WorkbookHandles_(SpreadsheetApp.openById(c.spreadsheetId)),who=juogV3ReadIndividualAcl_(ss,auth.principal.issuer,auth.principal.subject);
@@ -112,7 +114,7 @@ function juogPr15Entry_(envelope,c){
    return respond({ok:true,state:commits.length?'COMMITTED_RECHECK_REQUIRED':'UNCONFIRMED',receipt:commits.length?commits[0].receipt:null});
   }
   if(a==='recovery_status'||a==='recovery_retry'){
-   if(Object.keys(p).some(k=>!['registration_id','facility_code','crf_type','visit','submission_id'].includes(k)))throw Error('REQUEST_INVALID');
+   if(Object.keys(p).some(k=>!['registration_id','facility_code','crf_type','visit','submission_id',...(a==='recovery_retry'?['staged_save']:[])].includes(k)))throw Error('REQUEST_INVALID');
    if(!pr15Pair_(q,false))throw Error('VISIT_INVALID');
    const recovery=pr15Recovery_(ss,journal,who,q);
    if(a==='recovery_status')return respond({ok:true,recovery});
@@ -120,7 +122,7 @@ function juogPr15Entry_(envelope,c){
    if(recovery.state!=='RETRY_ALLOWED'||selected.length!==1||selected[0].state!=='RETRY_ALLOWED')throw Error('RECOVERY_RECONCILIATION_REQUIRED');
    const original=history.filter(e=>e.kind==='INTENT'&&e.uuid===p.submission_id&&e.actor===who.id);
    if(original.length!==1||!original[0].payload||pr15Hash_(JSON.stringify(original[0].payload))!==original[0].digest)throw Error('RECOVERY_RECONCILIATION_REQUIRED');
-   q=JSON.parse(JSON.stringify(original[0].payload));p={payload:q,expected_record_version:original[0].expected};a='save_crf';
+   q=JSON.parse(JSON.stringify(original[0].payload));p={payload:q,expected_record_version:original[0].expected,staged_save:staged};a='save_crf';
    pr15Owner_(ss,who,q);
   }
   const records=pr15Records_(ss,q.registration_id);
@@ -160,7 +162,7 @@ function juogPr15Entry_(envelope,c){
    }
    return respond(result);
   }
-  if(Object.keys(p).some(k=>!['payload','expected_record_version'].includes(k)))throw Error('REQUEST_INVALID');
+  if(Object.keys(p).some(k=>!['payload','expected_record_version','staged_save'].includes(k)))throw Error('REQUEST_INVALID');
   if(!pr15Pair_(q,false))throw Error('VISIT_INVALID');
   const key=[q.registration_id,q.crf_type,q.visit].join('|'),uuid=q.submission_id;
   if(q.record_key!==key||typeof uuid!=='string'||!uuid.trim()||!Number.isInteger(p.expected_record_version)||p.expected_record_version<0)throw Error('SUBMISSION_METADATA_INVALID');
@@ -180,11 +182,15 @@ function juogPr15Entry_(envelope,c){
    const validation=validateCrfHardStops_(q,validateSubject_(q));if(!validation.ok)return respond(validation);
    const linkage=validateDay90SourceLink_(q);if(!linkage.ok)return respond(linkage);
    journal.append({kind:'INTENT',uuid,key,digest,payload:JSON.parse(JSON.stringify(q)),actor:who.id,facility:'TEST01',expected:p.expected_record_version,at:new Date().toISOString()});
+   // No success receipt until body, audit and COMMIT are independently verified.
+   // A fresh signed request must resume the server-held canonical UUID.
+   if(staged)return respond({ok:false,error:'SAVE_PENDING'});
   }
   gate.guard();
   const result=saveCrf_UnderLock_({payload:q});
   if(!result.ok)return respond(result);
   if(result.record_version!==p.expected_record_version+1||result.audit_verified!==true)throw Error('RECEIPT_MISMATCH');
+  if(staged&&!commits.length&&!records.rows.some(r=>r.submission_id===uuid))return respond({ok:false,error:'SAVE_PENDING'});
   if(!commits.length)journal.append({kind:'COMMIT',uuid,key,digest,actor:who.id,facility:'TEST01',expected:p.expected_record_version,at:new Date().toISOString(),receipt:result});
   return respond(result);
  }catch(e){

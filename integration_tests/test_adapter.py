@@ -159,7 +159,7 @@ class Tests(unittest.TestCase):
    binding=self.send(url,envelope,timeout);req=self.sent[-1][0];action=req['action'];b=self.payload
    if action=='save_crf':return {'ok':False,'error':'AUTH_EXPIRED'}
    if action=='recovery_retry':
-    self.assertEqual(req['payload'],{**{k:b[k] for k in ('registration_id','facility_code','crf_type','visit')},'submission_id':b['submission_id']})
+    self.assertEqual(req['payload'],{**{k:b[k] for k in ('registration_id','facility_code','crf_type','visit')},'submission_id':b['submission_id'],'staged_save':True})
     retried[0]=True
     return {'ok':False,'error':'ACL_DENIED'} if denied else binding
    if action=='recovery_status':
@@ -210,6 +210,40 @@ class Tests(unittest.TestCase):
   self.pending_transport(remains_pending=True)
   self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
   self.assertEqual(sum(x[0]['action']=='recovery_retry' for x in self.sent),1)
+  self.assertTrue(self.ui.session_state['_recovery_blocks_new'])
+
+ def test_staged_save_requires_two_fresh_canonical_phases_and_commit(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.pending_transport();send=self.tx.side_effect;phases=[]
+  def staged(url,envelope,timeout):
+   result=send(url,envelope,timeout);req=self.sent[-1][0]
+   if req['action']=='save_crf':
+    self.assertIs(req['payload']['staged_save'],True)
+    return {'ok':False,'error':'SAVE_PENDING'}
+   if req['action']=='recovery_retry':
+    phases.append(req)
+    if len(phases)==1:return {'ok':False,'error':'SAVE_PENDING'}
+   if req['action']=='recovery_status' and len(phases)<2:
+    result['recovery']['state']='RETRY_ALLOWED'
+    op=result['recovery']['operations'][0];op.update(state='RETRY_ALLOWED',version=None,audit_verified=False)
+   return result
+  self.tx.side_effect=staged
+  result=a.call(self.ui,'save_crf',{'payload':self.payload})
+  self.assertTrue(result['ok']);self.assertEqual(result['record_version'],2)
+  self.assertEqual(len(phases),2);self.assertEqual(phases[0],phases[1])
+  self.assertEqual(len({claims['session']['jti'] for _,claims in self.sent}),len(self.sent))
+  self.assertEqual(self.sent[-1][0]['action'],'request_status')
+
+ def test_staged_pending_cannot_loop_or_claim_success(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.pending_transport(remains_pending=True);send=self.tx.side_effect
+  def pending(url,envelope,timeout):
+   result=send(url,envelope,timeout)
+   if self.sent[-1][0]['action'] in ('save_crf','recovery_retry'):return {'ok':False,'error':'SAVE_PENDING'}
+   return result
+  self.tx.side_effect=pending
+  self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertEqual(sum(req['action']=='recovery_retry' for req,_ in self.sent),2)
   self.assertTrue(self.ui.session_state['_recovery_blocks_new'])
 
  def section_transport(self, alter=None, error='AUTH_EXPIRED'):

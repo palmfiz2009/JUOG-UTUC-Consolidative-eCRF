@@ -1,6 +1,6 @@
 """PR15 isolation adapter. Disabled unless a separately approved profile is installed.
 
-Reuses the fixture native-OIDC signer. One bounded canonical recovery may finish
+Reuses the fixture native-OIDC signer. Bounded signed phases may finish
 a server-held intent; no new UUID or payload is resent. No legacy token fallback,
 deployment, secret defaults or network at import. Business API replies are checked
 against the pinned workbook and authenticated principal on every request.
@@ -61,8 +61,8 @@ def transport(url,envelope,timeout):
     if not isinstance(result,dict):raise ValueError('INVALID_RESPONSE')
     return result
 
-def _reconcile_save(st, body, expected, actor, timeout, allow_canonical_retry=True):
-    """Verify saved state; optionally finish one server-held canonical intent."""
+def _reconcile_save(st, body, expected, actor, timeout, allow_canonical_retry=True, phases_remaining=2):
+    """Finish at most two canonical phases; never treat SAVE_PENDING as success."""
     from isolated_recovery_ui import _valid_recovery
     if actor_key(st) != actor:
         raise PermissionError('ACTOR_CHANGED')
@@ -73,16 +73,19 @@ def _reconcile_save(st, body, expected, actor, timeout, allow_canonical_retry=Tr
     recovery = status['recovery']
     digest = hashlib.sha256(json.dumps(body, ensure_ascii=False, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
     matches = [x for x in recovery['operations'] if x['uuid'] == body['submission_id']]
-    if (allow_canonical_retry and recovery['state'] == 'RETRY_ALLOWED'
+    if (allow_canonical_retry and phases_remaining > 0 and recovery['state'] == 'RETRY_ALLOWED'
             and len(matches) == 1 and matches[0].get('state') == 'RETRY_ALLOWED'
             and matches[0].get('digest') == digest):
         # No new UUID or payload is sent. GAS selects its original INTENT and
         # rechecks owner, ACL, session, digest and version under the write lock.
         # call() obtains fresh native identity and a new signed jti for each step.
-        resumed = call(st, 'recovery_retry', {**query, 'submission_id': body['submission_id']}, timeout)
-        if resumed.get('ok') is not True:
+        resumed = call(st, 'recovery_retry', {**query, 'submission_id': body['submission_id'], 'staged_save': True}, timeout)
+        phase_pending = resumed.get('ok') is False and resumed.get('error') == 'SAVE_PENDING'
+        if resumed.get('ok') is not True and not phase_pending:
             return None
-        verified = _reconcile_save(st, body, expected, actor, timeout, allow_canonical_retry=False)
+        verified = _reconcile_save(st, body, expected, actor, timeout,
+                                   allow_canonical_retry=phase_pending,
+                                   phases_remaining=phases_remaining-1)
         if verified is not None:
             verified['canonical_recovery_performed'] = True
         return verified
@@ -146,6 +149,7 @@ def call(st,action,payload=None,timeout=20):
                 raise PermissionError('FICTIONAL_CONTACT_REQUIRED')
             if redact_draft_identifiers(body)!=body:raise PermissionError('DIRECT_IDENTIFIER_NOT_ALLOWED')
         if action=='save_crf':
+            p['staged_save']=True
             if st.session_state.get('_recovery_blocks_new'):raise PermissionError('RECOVERY_RECONCILIATION_REQUIRED')
             body=p.get('payload',{})
             if st.session_state.get('_integration_edit_subject')!=body.get('registration_id'):
@@ -182,7 +186,7 @@ def call(st,action,payload=None,timeout=20):
             confirmed = _reconcile_section(st, p, actor, timeout)
             if confirmed is not None:
                 r = confirmed
-        if action == 'save_crf' and r.get('error') in {'AUTH_EXPIRED','RESULT_UNCONFIRMED'}:
+        if action == 'save_crf' and r.get('error') in {'SAVE_PENDING','AUTH_EXPIRED','RESULT_UNCONFIRMED'}:
             # The original assertion may expire after COMMIT. Do not bypass its
             # checks or reuse it: independently read with fresh OIDC/B2 signatures.
             confirmed = _reconcile_save(st, p['payload'], p['expected_record_version'], actor, timeout)

@@ -292,4 +292,29 @@ test('pending recovery scans CRFs once and observes changes on the next request'
  assert.equal(f.call('recovery_retry',{...q,submission_id:p.submission_id}).ok,false);
  assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
 });
+test('staged save requires fresh authenticated intent, body/audit and commit phases',f=>{
+ const p=f.payload(),q={registration_id:p.registration_id,facility_code:'TEST01',crf_type:p.crf_type,visit:p.visit,submission_id:p.submission_id,staged_save:true};
+ const initial=f.envelope('save_crf',{payload:p,expected_record_version:0,staged_save:true});
+ assert.equal(f.x.juogPr15Entry_(initial,f.c).error,'SAVE_PENDING');
+ assert.equal(f.tables.R1_Operations.rows.length,2);assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+ assert.equal(f.x.juogPr15Entry_(initial,f.c).error,'ASSERTION_REPLAY');
+ f.advance(16000); // old phase signature expires; fresh assertion is still required
+ const second=f.envelope('recovery_retry',q);
+ assert.equal(f.x.juogPr15Entry_(second,f.c).error,'SAVE_PENDING');
+ assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,2);assert.equal(f.tables.R1_Operations.rows.length,2);
+ assert.equal(f.x.juogPr15Entry_(second,f.c).error,'ASSERTION_REPLAY');
+ f.advance(16000);
+ const result=f.call('recovery_retry',q);assert.equal(result.ok,true);assert.equal(result.record_version,1);assert.equal(result.audit_verified,true);
+ assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,2);assert.equal(f.tables.R1_Operations.rows.length,3);
+ assert.equal(f.call('recovery_retry',q).ok,false);assert.equal(f.tables.CRF_30d.rows.length,2);
+});
+test('staged intent cannot continue after owner ACL or session revocation',f=>{
+ const p=f.payload(),q={registration_id:p.registration_id,facility_code:'TEST01',crf_type:p.crf_type,visit:p.visit,submission_id:p.submission_id,staged_save:true};
+ assert.equal(f.call('save_crf',{payload:p,expected_record_version:0,staged_save:true}).error,'SAVE_PENDING');
+ f.tables.R1_CaseOwners.rows[1][2]='other';assert.equal(f.call('recovery_retry',q).error,'SUBJECT_FORBIDDEN');f.tables.R1_CaseOwners.rows[1][2]='fictional-user';
+ f.tables.V3_Users.rows[1][3]=false;assert.equal(f.call('recovery_retry',q).error,'ACL_DENIED');f.tables.V3_Users.rows[1][3]=true;
+ const expired=f.envelope('recovery_retry',q);f.advance(15000);assert.equal(f.x.juogPr15Entry_(expired,f.c).error,'AUTH_EXPIRED');
+ assert.equal(f.call('session_revoke').revoked,true);assert.equal(f.call('recovery_retry',q).error,'SESSION_REVOKED');
+ assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);assert.equal(f.tables.R1_Operations.rows.length,2);
+});
 console.log('ALL '+tests.length+' GROUPS PASSED');

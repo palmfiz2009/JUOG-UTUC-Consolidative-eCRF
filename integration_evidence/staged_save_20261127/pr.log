@@ -1,0 +1,58 @@
+test_all_three_use_non_nested_timers_and_same_submission_helper (test_all_crf_fragments.AllCrfPagesTests.test_all_three_use_non_nested_timers_and_same_submission_helper) ... ok
+test_no_direct_crf_write_or_replay_generated_in_pages (test_all_crf_fragments.AllCrfPagesTests.test_no_direct_crf_write_or_replay_generated_in_pages) ... ok
+test_30_day_surgery_path_change_does_not_raise (test_crf_app_boot.InitialRenderTests.test_30_day_surgery_path_change_does_not_raise) ... 2026-11-27 22:14:16.991 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_all_three_initial_pages_render_without_errors (test_crf_app_boot.InitialRenderTests.test_all_three_initial_pages_render_without_errors) ... 2026-11-27 22:14:18.517 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-27 22:14:18.664 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-27 22:14:18.777 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_day90_manual_linkage_path_does_not_raise (test_crf_app_boot.InitialRenderTests.test_day90_manual_linkage_path_does_not_raise) ... 2026-11-27 22:14:18.883 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-27 22:14:18.883 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-27 22:14:18.883 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_followup_linked_patient_path_does_not_raise (test_crf_app_boot.InitialRenderTests.test_followup_linked_patient_path_does_not_raise) ... 2026-11-27 22:14:19.003 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-27 22:14:19.003 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-27 22:14:19.003 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+ok
+test_backend_missing_workbook_echo_fails_closed (test_crf_save_ui.CRFSaveUITests.test_backend_missing_workbook_echo_fails_closed) ... ok
+test_backend_workbook_id_mismatch_fails_closed (test_crf_save_ui.CRFSaveUITests.test_backend_workbook_id_mismatch_fails_closed) ... ok
+test_clinical_rejection_does_not_freeze_attempt_or_contact_backend (test_crf_save_ui.CRFSaveUITests.test_clinical_rejection_does_not_freeze_attempt_or_contact_backend) ... ok
+test_committed_but_not_finalized_save_can_be_confirmed (test_crf_save_ui.CRFSaveUITests.test_committed_but_not_finalized_save_can_be_confirmed) ... ok
+test_completed_receipt_cannot_acknowledge_another_request (test_crf_save_ui.CRFSaveUITests.test_completed_receipt_cannot_acknowledge_another_request) ... ok
+test_failed_reply_retry_uses_same_frozen_payload_and_no_duplicate_mail (test_crf_save_ui.CRFSaveUITests.test_failed_reply_retry_uses_same_frozen_payload_and_no_duplicate_mail) ... ok
+test_full_save_marks_saved_and_shows_version (test_crf_save_ui.CRFSaveUITests.test_full_save_marks_saved_and_shows_version) ... ok
+test_interrupted_request_status_recovers_for_same_id_retry (test_crf_save_ui.CRFSaveUITests.test_interrupted_request_status_recovers_for_same_id_retry) ... ok
+test_missing_existing_flag_is_not_considered_confirmed (test_crf_save_ui.CRFSaveUITests.test_missing_existing_flag_is_not_considered_confirmed) ... ok
+test_missing_or_mismatched_receipt_blocks_mail_and_draft_delete (test_crf_save_ui.CRFSaveUITests.test_missing_or_mismatched_receipt_blocks_mail_and_draft_delete) ... ok
+test_missing_pinned_workbook_fails_without_writes_or_mail (test_crf_save_ui.CRFSaveUITests.test_missing_pinned_workbook_fails_without_writes_or_mail) ... ok
+test_missing_version_ack_fails_without_deleting_draft (test_crf_save_ui.CRFSaveUITests.test_missing_version_ack_fails_without_deleting_draft) ... ok
+test_multiple_visits_not_mixed_or_rekeyed (test_crf_save_ui.CRFSaveUITests.test_multiple_visits_not_mixed_or_rekeyed) ... ok
+test_old_abandoned_save_reuses_same_uuid (test_crf_save_ui.CRFSaveUITests.test_old_abandoned_save_reuses_same_uuid) ... ok
+test_old_gas_backend_is_rejected_before_save (test_crf_save_ui.CRFSaveUITests.test_old_gas_backend_is_rejected_before_save) ... ok
+test_pending_followup_retry_rejects_changed_visit (test_crf_save_ui.CRFSaveUITests.test_pending_followup_retry_rejects_changed_visit) ... ok
+test_pending_retry_rejects_different_patient (test_crf_save_ui.CRFSaveUITests.test_pending_retry_rejects_different_patient) ... ok
+test_replay_never_dispatches_smtp (test_crf_save_ui.CRFSaveUITests.test_replay_never_dispatches_smtp) ... ok
+test_saving_state_stays_locked_during_active_request (test_crf_save_ui.CRFSaveUITests.test_saving_state_stays_locked_during_active_request) ... ok
+test_status_not_marked_success_when_server_rejects (test_crf_save_ui.CRFSaveUITests.test_status_not_marked_success_when_server_rejects) ... ok
+test_valid_replay_receipt_does_not_duplicate_email (test_crf_save_ui.CRFSaveUITests.test_valid_replay_receipt_does_not_duplicate_email) ... ok
+test_verified_initial_save_explicitly_disables_smtp (test_crf_save_ui.CRFSaveUITests.test_verified_initial_save_explicitly_disables_smtp) ... ok
+test_wrong_uuid_success_reply_is_unconfirmed_and_retry_reuses_uuid (test_crf_save_ui.CRFSaveUITests.test_wrong_uuid_success_reply_is_unconfirmed_and_retry_reuses_uuid) ... ok
+test_prefill_and_new_form (test_mdt_integrated_ui.MdtCorrectionTests.test_prefill_and_new_form) ... ok
+test_failed_smtp_does_not_claim_success (test_mdt_integrated_ui.MdtMailTests.test_failed_smtp_does_not_claim_success) ... ok
+test_missing_reviewer_address_does_not_send (test_mdt_integrated_ui.MdtMailTests.test_missing_reviewer_address_does_not_send) ... ok
+test_three_reviewers_receive_final_status_and_public_reason (test_mdt_integrated_ui.MdtMailTests.test_three_reviewers_receive_final_status_and_public_reason) ... ok
+test_empty_payload_has_safe_placeholder (test_screening_crf_receipt.ScreeningReceiptTests.test_empty_payload_has_safe_placeholder) ... ok
+test_forward_compatible_without_losing_new_fields (test_screening_crf_receipt.ScreeningReceiptTests.test_forward_compatible_without_losing_new_fields) ... ok
+test_html_escapes_submitted_user_content_and_prints (test_screening_crf_receipt.ScreeningReceiptTests.test_html_escapes_submitted_user_content_and_prints) ... ok
+test_missing_values_are_distinct_from_zero_and_false (test_screening_crf_receipt.ScreeningReceiptTests.test_missing_values_are_distinct_from_zero_and_false) ... ok
+test_receipt_contains_identifiers_round_and_full_clinical_sections (test_screening_crf_receipt.ScreeningReceiptTests.test_receipt_contains_identifiers_round_and_full_clinical_sections) ... ok
+test_backend_version_is_verified_before_mutation (test_screening_ui_contract.ScreeningUiContractTests.test_backend_version_is_verified_before_mutation) ... ok
+test_one_receipt_uuid_not_recreated_in_retry_branch (test_screening_ui_contract.ScreeningUiContractTests.test_one_receipt_uuid_not_recreated_in_retry_branch) ... ok
+test_progress_shown_only_for_explicit_actions (test_screening_ui_contract.ScreeningUiContractTests.test_progress_shown_only_for_explicit_actions) ... ok
+test_registration_uses_fragment_instead_of_full_page_widget_reruns (test_screening_ui_contract.ScreeningUiContractTests.test_registration_uses_fragment_instead_of_full_page_widget_reruns) ... ok
+test_unique_frozen_request_and_retry (test_screening_ui_contract.ScreeningUiContractTests.test_unique_frozen_request_and_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 43 tests in 2.413s
+
+OK
