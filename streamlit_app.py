@@ -49,6 +49,7 @@ def run():
             from isolated_connection_state import preserve
             preserve(st.session_state)
             st.error('接続結果を確認できません。保存を停止しています。入力を保持して本人ACLを再確認してください。')
+            st.caption('接続確認コード：'+code)
             if st.button('入力を保持して接続を再確認'):
                 st.rerun()
             st.stop()
