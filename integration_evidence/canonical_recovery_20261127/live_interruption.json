@@ -1,0 +1,670 @@
+{
+  "observed_on": "2026-11-27",
+  "fixture_commit": "032f611b3f40599cdcdd70405b4a2495a5a1d474",
+  "review_commit": "49fb833699dacef671207cf87d7e324e00a199a3",
+  "formal_pass_delta": 0,
+  "crf_before": [
+    [
+      "saved_at",
+      "record_version",
+      "submission_id",
+      "record_key",
+      "submission_kind"
+    ],
+    [
+      46352.42398545139,
+      1,
+      "54a012aa-752d-4e5c-8e01-ef92406718a9",
+      "JUOG-901|perioperative_30d|30d",
+      "初回報告"
+    ],
+    [
+      46352.68706506945,
+      2,
+      "af16acfd-e8aa-4d56-87ef-926b42a20af1",
+      "JUOG-901|perioperative_30d|30d",
+      "訂正報告"
+    ],
+    [
+      46353.75329971065,
+      3,
+      "1412c1bb-2d61-4733-bb97-a60afe032b60",
+      "JUOG-901|perioperative_30d|30d",
+      "訂正報告"
+    ]
+  ],
+  "draft_events": [
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "1",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 3,
+      "revision": 1,
+      "operation_id": "6baf6bf0-e142-4b49-9cde-ca6a1f21a556",
+      "digest": "e564d762b8a35feeaadf56d22cdf53aaae358c8a589e18564eab201052fd026d",
+      "data": {
+        "peri_surgery_performed": {
+          "type": "value",
+          "value": null
+        },
+        "peri_registration_id": {
+          "type": "value",
+          "value": "JUOG-901"
+        },
+        "peri_reporter_email": {
+          "type": "value",
+          "value": "fictional@example.invalid"
+        },
+        "peri_submission_kind": {
+          "type": "value",
+          "value": "初回報告"
+        },
+        "peri_facility": {
+          "type": "value",
+          "value": "完全架空施設（隔離UAT専用）"
+        }
+      },
+      "at": "2026-11-27T11:07:11.500Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "2",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 3,
+      "revision": 1,
+      "operation_id": "22f56cd7-7e8b-4650-b4a8-a0e897f59ad6",
+      "digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "data": {},
+      "at": "2026-11-27T11:07:30.185Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "1",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 3,
+      "revision": 2,
+      "operation_id": "2d7e6bc8-51e2-499e-9c07-791c76acc21c",
+      "digest": "28dace7b4ff2a5f046aef609a913ba0ad98eb4c52bccdeb2360fff487509e5a0",
+      "data": {
+        "peri_submission_kind": {
+          "type": "value",
+          "value": "訂正報告"
+        },
+        "peri_facility": {
+          "type": "value",
+          "value": "完全架空施設（隔離UAT専用）"
+        },
+        "peri_surgery_performed": {
+          "type": "value",
+          "value": "実施した"
+        },
+        "peri_registration_id": {
+          "type": "value",
+          "value": "JUOG-901"
+        },
+        "peri_reporter_email": {
+          "type": "value",
+          "value": "fictional@example.invalid"
+        },
+        "peri_correction_reason": {
+          "type": "value",
+          "value": ""
+        }
+      },
+      "at": "2026-11-27T11:07:44.980Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "2",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 3,
+      "revision": 2,
+      "operation_id": "b0dad775-a119-410a-ba02-e4d0ffb3aa11",
+      "digest": "461a0e210ae9dc75bc2129d3a144630d72351f46beb59b48b51da2bb2f8c1c16",
+      "data": {
+        "peri_eau_grade": {
+          "type": "value",
+          "value": "Grade 0"
+        },
+        "peri_discharge_dbp": {
+          "type": "value",
+          "value": 70
+        },
+        "peri_discharge_lab_available": {
+          "type": "value",
+          "value": "なし"
+        },
+        "peri_op_type": {
+          "type": "value",
+          "value": "根治的腎尿管全摘除術"
+        },
+        "peri_approaches": {
+          "type": "value",
+          "value": [
+            "開腹"
+          ]
+        },
+        "peri_discharge_pulse": {
+          "type": "value",
+          "value": 60
+        },
+        "peri_readmission_30d": {
+          "type": "value",
+          "value": null
+        },
+        "peri_day0_temp": {
+          "type": "value",
+          "value": 36.5
+        },
+        "peri_last_evp_date": {
+          "type": "date",
+          "value": "2025-12-01"
+        },
+        "peri_op_time": {
+          "type": "value",
+          "value": 120
+        },
+        "peri_op_date": {
+          "type": "date",
+          "value": "2026-01-10"
+        },
+        "peri_discharge_temp": {
+          "type": "value",
+          "value": 36.5
+        },
+        "peri_op_discharge_date": {
+          "type": "date",
+          "value": "2026-01-20"
+        },
+        "peri_day0_pulse": {
+          "type": "value",
+          "value": 60
+        },
+        "peri_discharge_sbp": {
+          "type": "value",
+          "value": 120
+        },
+        "peri_ln_dissection": {
+          "type": "value",
+          "value": "実施しなかった"
+        },
+        "peri_bleeding": {
+          "type": "value",
+          "value": 0
+        },
+        "peri_op_completed": {
+          "type": "value",
+          "value": "はい"
+        },
+        "peri_day0_sbp": {
+          "type": "value",
+          "value": 120
+        },
+        "peri_op_admission_date": {
+          "type": "date",
+          "value": "2026-01-09"
+        },
+        "peri_day0_dbp": {
+          "type": "value",
+          "value": 70
+        },
+        "peri_initial_hospital_outcome": {
+          "type": "value",
+          "value": "退院済み"
+        },
+        "peri_unrecovered_g2_relevant": {
+          "type": "value",
+          "value": "なし"
+        }
+      },
+      "at": "2026-11-27T11:09:25.948Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "4",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 3,
+      "revision": 1,
+      "operation_id": "5e100feb-5eba-4b08-8314-18b3cf9d2c8c",
+      "digest": "944c9406a7b52c52f79f3f6b1210296e6a3cb492d1b7b09c6a8bda873da9aaf1",
+      "data": {
+        "peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_date": {
+          "type": "date",
+          "value": "2026-02-09"
+        },
+        "peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_WBC": {
+          "type": "value",
+          "value": "8"
+        },
+        "widget_peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_has_ctcae": {
+          "type": "value",
+          "value": false
+        },
+        "widget_peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_visit_date_30": {
+          "type": "date",
+          "value": "2026-02-09"
+        },
+        "widget_peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_cd_grade": {
+          "type": "value",
+          "value": "選択してください"
+        },
+        "peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_status_alive": {
+          "type": "value",
+          "value": "生存"
+        },
+        "widget_peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_final_visit_date": {
+          "type": "value",
+          "value": null
+        },
+        "peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_WBC": {
+          "type": "value",
+          "value": "8"
+        },
+        "peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_adj_plan": {
+          "type": "value",
+          "value": "選択してください"
+        },
+        "peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        }
+      },
+      "at": "2026-11-27T11:09:39.231Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "4",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 3,
+      "revision": 2,
+      "operation_id": "10153321-0572-4a34-ab29-507b338a5648",
+      "digest": "d7fe45d9f11d4fee2fa9fe5303d309d0d88ac4206ffabc7e331b6b5cf7ab65ab",
+      "data": {
+        "peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_date": {
+          "type": "date",
+          "value": "2026-02-09"
+        },
+        "peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_WBC": {
+          "type": "value",
+          "value": "8"
+        },
+        "widget_peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_has_ctcae": {
+          "type": "value",
+          "value": false
+        },
+        "widget_peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_visit_date_30": {
+          "type": "date",
+          "value": "2026-02-09"
+        },
+        "widget_peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_cd_grade": {
+          "type": "value",
+          "value": "Grade 0"
+        },
+        "peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_status_alive": {
+          "type": "value",
+          "value": "生存"
+        },
+        "widget_peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_final_visit_date": {
+          "type": "value",
+          "value": null
+        },
+        "peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_WBC": {
+          "type": "value",
+          "value": "8"
+        },
+        "peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_adj_plan": {
+          "type": "value",
+          "value": "選択してください"
+        },
+        "peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        }
+      },
+      "at": "2026-11-27T11:10:30.612Z"
+    }
+  ],
+  "observations": [
+    "Native identity expiry blocked saving; approved Google identity selected, editing restored.",
+    "No draft at record_version=3 initially; UI correctly did not reconstruct unsaved inputs.",
+    "UI displayed section-local saving and saved states; some sections showed unconfirmed failures.",
+    "Connection lost while filling correction; no formal save button submitted.",
+    "Browser console: Cannot send rerun backMessage when disconnected from server.",
+    "After reload loading persisted; existing isolated fixture Reboot requested through Manage app. Runtime logged provisioning at 11:13:10 UTC.",
+    "V1-V3 remain present. V4 not submitted. No live PASS claimed."
+  ]
+}
