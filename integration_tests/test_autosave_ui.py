@@ -79,6 +79,22 @@ class UI(unittest.TestCase):
                 app.radio(key=page+'_submission_kind').set_value('訂正報告').run()
                 self.clock=7.1;app.run();self.assertEqual([x['section'] for x in self.saves()],['1'])
                 self.assertTrue(any('保存しました' in x.value for x in app.success))
+    def test_completed_and_uncertain_save_feedback_without_draft_writes(self):
+        for page in PAGES:
+            for status in ('complete', 'uncertain'):
+                with self.subTest(page=page, status=status):
+                    self.calls=[]
+                    app=AppTest.from_string('from isolated_autosave_ui import section_feedback\nsection_feedback('+repr(page)+', "1")',default_timeout=20)
+                    app.session_state[page+'_registration_id']='JUOG-901'
+                    app.session_state['fu_visit_month']='9ヶ月'
+                    app.session_state[page+'_sent']=True
+                    app.session_state['_juog_'+page+'_save_attempt']={'status':status}
+                    app.run()
+                    self.assertFalse(list(app.exception))
+                    self.assertEqual(self.calls,[])
+                    message=''.join(x.value for x in app.caption)
+                    self.assertIn('正式保存済み' if status=='complete' else '照合中',message)
+                    if status=='uncertain':self.assertNotIn('正式保存済み',message)
     def test_close_browser_new_session_resume_uses_server_sections(self):
         app=self.app('peri');app.radio(key='peri_surgery_performed').set_value('実施しなかった').run()
         self.clock=3;app.run();self.assertTrue(self.saves())
