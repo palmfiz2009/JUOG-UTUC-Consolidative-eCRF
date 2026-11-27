@@ -4,6 +4,20 @@ from fnmatch import fnmatchcase
 from isolated_autosave_ui import SECTIONS
 
 BACKUP = '_connection_input_backup'
+RECOVERY_BACKUP = '_recovery_input_backup'
+
+def preserve_recovery(state):
+    preserve(state)
+    backup = state.pop(BACKUP, None)
+    if backup is not None:
+        state[RECOVERY_BACKUP] = backup
+
+def restore_recovery(state):
+    # Entry calls this only after a fresh signed server ACL confirmation.
+    backup = state.pop(RECOVERY_BACKUP, None)
+    if backup is not None:
+        state[BACKUP] = backup
+        restore(state)
 
 def _allowed(key):
     patterns = [p for sections in SECTIONS.values() for section in sections.values() for p in section['keys']]
