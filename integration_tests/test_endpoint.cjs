@@ -22,7 +22,7 @@ function fixture(){
  const x={Date:class extends Date{constructor(...a){super(...(a.length?a:[now]))}static now(){return now}},
   ScriptApp:{getScriptId:()=>c.scriptId},
   PropertiesService:{getScriptProperties:()=>({getProperty:k=>props[k]??null,setProperty:(k,v)=>props[k]=v})},
-  LockService:{getScriptLock:()=>({tryLock:()=>{if(locked)return false;locked=true;return true},releaseLock:()=>locked=false})},
+  LockService:{getScriptLock:()=>({tryLock:ms=>{metrics.lockWait=ms;if(locked){now+=ms;return false;}locked=true;return true},releaseLock:()=>locked=false})},
   SpreadsheetApp:{openById:id=>{metrics.opens++;assert.equal(id,c.spreadsheetId);return ss},flush:()=>{}},
   Utilities:{DigestAlgorithm:{SHA_256:'sha256'},Charset:{UTF_8:'utf8'},computeDigest:(_,s)=>[...crypto.createHash('sha256').update(s).digest()],computeHmacSha256Signature:(s,k)=>[...crypto.createHmac('sha256',k).update(s).digest()],base64DecodeWebSafe:s=>[...Buffer.from(s,'base64url')],base64EncodeWebSafe:b=>Buffer.from(b).toString('base64url'),newBlob:b=>({getDataAsString:()=>Buffer.from(b).toString()}),getUuid:()=>crypto.randomUUID(),formatDate:(d,tz,format)=>format==='yyyy-MM-dd'?new Date(d).toISOString().slice(0,10):new Date(d).toISOString()},
   console};
@@ -340,5 +340,12 @@ test('section final guard rejects ACL revoked during append',f=>{
  sh.appendRow=r=>{append(r);f.tables.V3_Users.rows[1][3]=false;};
  assert.equal(f.call('save_section',sectionOp()).error,'ACL_DENIED');
  assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+});
+test('busy lock leaves no writes or consumed jti and allows fresh retry',f=>{
+ const before=copy(f.tables.V3_SessionEvents.rows),e=f.envelope('ui_context',{});
+ f.lock(true);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'LOCK_TIMEOUT');
+ assert(f.metrics.lockWait<=1000);assert.deepEqual(f.tables.V3_SessionEvents.rows,before);assert.equal(f.metrics.opens,0);
+ f.lock(false);assert.equal(f.call('ui_context').ok,true);
+ f.advance(15000);assert.equal(f.x.juogPr15Entry_(e,f.c).error,'AUTH_EXPIRED');
 });
 console.log('ALL '+tests.length+' GROUPS PASSED');

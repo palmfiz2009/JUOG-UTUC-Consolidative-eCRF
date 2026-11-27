@@ -72,7 +72,9 @@ function juogPr15Entry_(envelope,c){
   !c.sessionStoreGeneration||c.sessionStoreGeneration==='d72bcf33-423d-4c4d-862d-2e2d69bc3edf'||
   ['qaRef','piRef','singleWriterRef','backupRef','b2PolicyRef'].some(k=>typeof c[k]!=='string'||!c[k].trim())||
   PropertiesService.getScriptProperties().getProperty('SPREADSHEET_ID')!==PR15_SHEET_)return {ok:false,error:'INTEGRATION_NOT_APPROVED'};
- const lock=LockService.getScriptLock();if(!lock.tryLock(30000))return {ok:false,error:'LOCK_TIMEOUT'};
+ // Do not queue a 15-second assertion behind a 30-second writer wait.
+ // Busy requests return without touching storage; retry requires a fresh signature.
+ const lock=LockService.getScriptLock();if(!lock.tryLock(1000))return {ok:false,error:'LOCK_TIMEOUT'};
  try{
   const auth=juogV3DecodeBridge_(envelope,c);let a=auth.request.action,p=auth.request.payload;
   if(!p||typeof p!=='object'||Array.isArray(p))throw Error('REQUEST_INVALID');

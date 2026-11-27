@@ -57,4 +57,5 @@ PASS staged intent cannot continue after owner ACL or session revocation
 PASS section save uses two fresh scans and detects tampering on next request
 PASS section postwrite snapshot verifies full prefix
 PASS section final guard rejects ACL revoked during append
-ALL 58 GROUPS PASSED
+PASS busy lock leaves no writes or consumed jti and allows fresh retry
+ALL 59 GROUPS PASSED

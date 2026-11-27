@@ -1,0 +1,506 @@
+{
+  "code_commit": "3a4770e1fe49680ccaf6c5e128869f280fcaa12f",
+  "gas_version": 7,
+  "gas_deployed_jst": "2026-11-27 23:47",
+  "fixture_branch_head": "d7c6cb85a8f102c4334472015af7863070616619",
+  "scope": "Actual isolated browser UI and independent Sheets reads",
+  "events": [
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "2",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 5,
+      "revision": 1,
+      "operation_id": "90cbc459-bbb2-4ec4-93fd-87e8bda186b5",
+      "digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "data": {},
+      "at": "2026-11-27T14:48:41.574Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "3",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 5,
+      "revision": 1,
+      "operation_id": "da3512be-7e4a-4c8d-a4ae-ebbbc2149e95",
+      "digest": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+      "data": {},
+      "at": "2026-11-27T14:48:56.938Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "4",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 5,
+      "revision": 1,
+      "operation_id": "d440bf42-29ed-4688-816c-a0d23d981d5b",
+      "digest": "c4ea83ee3631605828b1fd9b30b38e2a24ae24ca06243e35e08a9fca8a209612",
+      "data": {
+        "widget_peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_WBC": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_has_ctcae": {
+          "type": "value",
+          "value": false
+        },
+        "peri_status_alive": {
+          "type": "value",
+          "value": null
+        },
+        "widget_peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_adj_plan": {
+          "type": "value",
+          "value": "選択してください"
+        },
+        "widget_peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_WBC": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_date": {
+          "type": "value",
+          "value": null
+        },
+        "peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_visit_date_30": {
+          "type": "value",
+          "value": null
+        },
+        "widget_peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        }
+      },
+      "at": "2026-11-27T14:49:23.338Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "1",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 5,
+      "revision": 1,
+      "operation_id": "b190d5ec-2734-4509-a2e5-099ffe527607",
+      "digest": "e564d762b8a35feeaadf56d22cdf53aaae358c8a589e18564eab201052fd026d",
+      "data": {
+        "peri_reporter_email": {
+          "type": "value",
+          "value": "fictional@example.invalid"
+        },
+        "peri_registration_id": {
+          "type": "value",
+          "value": "JUOG-901"
+        },
+        "peri_facility": {
+          "type": "value",
+          "value": "完全架空施設（隔離UAT専用）"
+        },
+        "peri_surgery_performed": {
+          "type": "value",
+          "value": null
+        },
+        "peri_submission_kind": {
+          "type": "value",
+          "value": "初回報告"
+        }
+      },
+      "at": "2026-11-27T14:49:32.529Z"
+    },
+    {
+      "action": "SECTION_SAVE",
+      "key": "JUOG-901|perioperative_30d|30d",
+      "section": "4",
+      "actor": "UAT_TEST01_PI_01",
+      "record_version": 5,
+      "revision": 2,
+      "operation_id": "793f2f78-25aa-43d5-ae20-19126614dd70",
+      "digest": "0bd72fd0acda47e780e7818e95d5bb9ffe9d5968b39b9abd461ea5f9f49eb37b",
+      "data": {
+        "widget_peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_WBC": {
+          "type": "value",
+          "value": "0"
+        },
+        "widget_peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Baso": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_has_ctcae": {
+          "type": "value",
+          "value": false
+        },
+        "peri_status_alive": {
+          "type": "value",
+          "value": null
+        },
+        "widget_peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Hb": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_adj_plan": {
+          "type": "value",
+          "value": "選択してください"
+        },
+        "widget_peri_day30_lab_Alb": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_WBC": {
+          "type": "value",
+          "value": "0"
+        },
+        "widget_peri_day30_lab_AST": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_date": {
+          "type": "value",
+          "value": null
+        },
+        "peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_eGFR": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Mono": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_TP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_BUN": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_T_Bil": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cre": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Na": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_ALT": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_LDH": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_visit_date_30": {
+          "type": "value",
+          "value": null
+        },
+        "widget_peri_day30_lab_CRP": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_Eosino": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_PLT": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Lympho": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Cl": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_K": {
+          "type": "value",
+          "value": ""
+        },
+        "widget_peri_day30_lab_Neutro": {
+          "type": "value",
+          "value": ""
+        },
+        "peri_day30_lab_ALP": {
+          "type": "value",
+          "value": ""
+        }
+      },
+      "at": "2026-11-27T14:49:59.235Z"
+    }
+  ],
+  "ui_observations": {
+    "four_sections_saved": true,
+    "changed_section_only": true,
+    "reload_then_authenticated_case_resume": true,
+    "restored": {
+      "registration_id": "JUOG-901",
+      "email": "fictional@example.invalid",
+      "WBC": "0",
+      "Neutro": ""
+    },
+    "authentication_halt_observed": false
+  },
+  "formal_crf_rows": 5,
+  "audit_rows_all_visits": 7,
+  "limitations": [
+    "Partial 30d draft only; no new formal CRF",
+    "Reload is not whole-browser restart",
+    "Other-person/facility denial not exercised in this live run",
+    "No assertion lifetime or permission changes",
+    "No formal row PASS inferred from this subset"
+  ],
+  "qa_provenance": "User reports Dr Nakamoto approved previously measured results; no new signed result fabricated"
+}
