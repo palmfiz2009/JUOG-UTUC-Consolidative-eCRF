@@ -15,7 +15,7 @@
 02-594,02_perioperative_30d_crf.py,594,op_type == '選択してください',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
 02-595,02_perioperative_30d_crf.py,595,"op_type == 'その他（プロトコル逸脱）' and (not text(st.session_state.get('peri_op_other', '')))",clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
 02-596,02_perioperative_30d_crf.py,596,not approaches,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
-02-597,02_perioperative_30d_crf.py,597,len(approaches) >= 2 and approach_pattern == '',clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
+02-597,02_perioperative_30d_crf.py,597,len(approaches) >= 2 and (not text(approach_pattern)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
 02-598,02_perioperative_30d_crf.py,598,approach_pattern == '予定外のアプローチ変更（conversion）' and (not text(conversion_reason)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
 02-599,02_perioperative_30d_crf.py,599,op_completed is None,clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED
 02-600,02_perioperative_30d_crf.py,600,op_completed == 'いいえ' and (not text(op_incomplete_detail)),clinical differential corpus,UI implementation baseline; protocol original NOT VERIFIED

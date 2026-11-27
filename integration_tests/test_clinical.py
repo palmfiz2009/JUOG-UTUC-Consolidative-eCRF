@@ -107,4 +107,21 @@ class Clinical(unittest.TestCase):
  def test_missing_dates_and_false_are_not_valid_numbers(self):
   p=copy.deepcopy(FIX['perioperative_30d']);p['data']['day30_visit_date']=None;self.assertFalse(validate_payload(p)['ok'])
   p=copy.deepcopy(FIX['perioperative_30d']);p['data']['operation_time_min']=False;self.assertFalse(validate_payload(p)['ok'])
+class LiveApproachRegression(unittest.TestCase):
+ def test_unselected_multiple_approach_ui_and_server_both_reject(self):
+  from clinical_validation import context
+  p=json.loads((ROOT/'clinical_contract/operated_fixture.json').read_text())
+  p['data']['approaches']=['開腹','腹腔鏡']
+  for selection in (None, ''):
+   p['data']['approach_pattern']=selection
+   # Simulate actual st.radio(index=None), without the payload adapter's
+   # legacy normalization from None to empty string.
+   v=context(p,'2026-11-27');v['approach_pattern']=selection
+   exec(compile(CONTRACT['contracts']['perioperative_30d']['source'],'<ui-rule>','exec'),v)
+   missing=v['validate_all']()[0]
+   self.assertIn('複数アプローチの区分',missing)
+   self.assertFalse(validate_payload(p,'2026-11-27')['ok'])
+  p['data']['approach_pattern']='予定されたハイブリッド'
+  self.assertTrue(validate_payload(p,'2026-11-27')['ok'])
+
 if __name__=='__main__':unittest.main()

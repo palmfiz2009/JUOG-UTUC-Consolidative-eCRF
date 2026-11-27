@@ -594,7 +594,7 @@ def _render_peri_crf():
                 if op_type == "選択してください": missing.append("術式")
                 if op_type == "その他（プロトコル逸脱）" and not text(st.session_state.get("peri_op_other", "")): missing.append("実施術式詳細")
                 if not approaches: missing.append("アプローチ")
-                if len(approaches) >= 2 and approach_pattern == "": missing.append("複数アプローチの区分")
+                if len(approaches) >= 2 and not text(approach_pattern): missing.append("複数アプローチの区分")
                 if approach_pattern == "予定外のアプローチ変更（conversion）" and not text(conversion_reason): missing.append("conversionの理由")
                 if op_completed is None: missing.append("手術完遂")
                 if op_completed == "いいえ" and not text(op_incomplete_detail): missing.append("完遂不能理由")
