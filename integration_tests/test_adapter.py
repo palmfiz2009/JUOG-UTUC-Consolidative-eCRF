@@ -152,6 +152,66 @@ class Tests(unittest.TestCase):
   self.assertEqual([x[0]['action'] for x in self.sent],['save_crf'])
   self.assertTrue(self.ui.session_state['auth_connect_halted'])
 
+ def pending_transport(self, bad_digest=False, denied=False, remains_pending=False):
+  base_digest=hashlib.sha256(json.dumps(self.payload,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
+  retried=[False]
+  def send(url,envelope,timeout):
+   binding=self.send(url,envelope,timeout);req=self.sent[-1][0];action=req['action'];b=self.payload
+   if action=='save_crf':return {'ok':False,'error':'AUTH_EXPIRED'}
+   if action=='recovery_retry':
+    self.assertEqual(req['payload'],{**{k:b[k] for k in ('registration_id','facility_code','crf_type','visit')},'submission_id':b['submission_id']})
+    retried[0]=True
+    return {'ok':False,'error':'ACL_DENIED'} if denied else binding
+   if action=='recovery_status':
+    saved=retried[0] and not remains_pending
+    op=dict(uuid=b['submission_id'],state='SAVED' if saved else 'RETRY_ALLOWED',version=2 if saved else None,audit_verified=saved,digest='wrong' if bad_digest else base_digest)
+    return dict(binding,recovery=dict(record_key=b['record_key'],state=op['state'],operations=[op]))
+   if action=='request_status':
+    receipt=dict(ok=True,audit_verified=True,record_version=2,existing=True,spreadsheet_id=a.SHEET,**{k:b[k] for k in ('submission_id','record_key','crf_type','visit')})
+    return dict(binding,state='COMMITTED_RECHECK_REQUIRED',receipt=receipt)
+   return binding
+  self.tx.side_effect=send
+ def test_canonical_pending_retry_once_new_signatures_no_payload_resend(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.pending_transport();r=a.call(self.ui,'save_crf',{'payload':self.payload})
+  self.assertTrue(r['ok']);self.assertTrue(r['canonical_recovery_performed'])
+  self.assertEqual([x[0]['action'] for x in self.sent],['save_crf','recovery_status','recovery_retry','recovery_status','request_status'])
+  self.assertEqual(len({x[1]['session']['jti'] for x in self.sent}),5)
+ def test_pending_digest_mismatch_never_retries(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.pending_transport(bad_digest=True)
+  self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertNotIn('recovery_retry',[x[0]['action'] for x in self.sent])
+ def test_pending_retry_denied_halts_and_never_succeeds(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.pending_transport(denied=True)
+  self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertTrue(self.ui.session_state['auth_connect_halted'])
+  self.assertEqual(sum(x[0]['action']=='recovery_retry' for x in self.sent),1)
+ def test_native_expiry_or_actor_change_between_check_and_retry_blocks_write(self):
+  for change in ('expired','actor'):
+   self.user['sub']='fictional-sub';self.user['exp']=self.now+7200
+   self.ui.session_state.clear();self.sent=[]
+   self.ui.session_state['_integration_edit_subject']='JUOG-901'
+   self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+   self.pending_transport();send=self.tx.side_effect
+   def changed(url,envelope,timeout):
+    r=send(url,envelope,timeout)
+    if self.sent[-1][0]['action']=='recovery_status':
+     if change=='expired':self.user['exp']=int(time.time())-1
+     else:self.user['sub']='another-person'
+    return r
+   self.tx.side_effect=changed
+   self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+   self.assertNotIn('recovery_retry',[x[0]['action'] for x in self.sent])
+
+ def test_pending_retry_is_bounded_and_requires_commit(self):
+  self.ui.session_state['_integration_versions']={self.payload['record_key']:1}
+  self.pending_transport(remains_pending=True)
+  self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertEqual(sum(x[0]['action']=='recovery_retry' for x in self.sent),1)
+  self.assertTrue(self.ui.session_state['_recovery_blocks_new'])
+
  def section_transport(self, alter=None, error='AUTH_EXPIRED'):
   from isolated_autosave_ui import canonical
   op=dict(registration_id='JUOG-901',facility_code='TEST01',crf_type='day90',visit='90d',section='2',record_version=0,expected_revision=1,operation_id='offline-section-operation',data={'d90_lab_available':{'type':'value','value':'実施なし'}})

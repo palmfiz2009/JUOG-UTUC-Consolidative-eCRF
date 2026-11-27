@@ -233,6 +233,8 @@ def submit_crf_with_feedback(
         f"保存しました：{display_name}CRF／{registration_id}／"
         f"Version {result.get('record_version') or '未確認'}"
     )
+    if result.get("canonical_recovery_performed") is True:
+        st.info("通信・署名応答を照合し、元の送信IDで復旧して保存を確認しました。重複Versionは追加していません。")
     if mail_status == "failed":
         st.warning("中央台帳は保存済みですが、通知メール送信は失敗しました。再申請はしないでください。")
     if draft_delete_failed:

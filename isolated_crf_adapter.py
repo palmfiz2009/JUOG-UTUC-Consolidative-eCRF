@@ -1,6 +1,7 @@
 """PR15 isolation adapter. Disabled unless a separately approved profile is installed.
 
-Reuses the fixture native-OIDC signer. No legacy token fallback, automatic retry,
+Reuses the fixture native-OIDC signer. One bounded canonical recovery may finish
+a server-held intent; no new UUID or payload is resent. No legacy token fallback,
 deployment, secret defaults or network at import. Business API replies are checked
 against the pinned workbook and authenticated principal on every request.
 """
@@ -60,8 +61,8 @@ def transport(url,envelope,timeout):
     if not isinstance(result,dict):raise ValueError('INVALID_RESPONSE')
     return result
 
-def _reconcile_save(st, body, expected, actor, timeout):
-    """Read-only fresh-signature reconciliation; never retransmit a write."""
+def _reconcile_save(st, body, expected, actor, timeout, allow_canonical_retry=True):
+    """Verify saved state; optionally finish one server-held canonical intent."""
     from isolated_recovery_ui import _valid_recovery
     if actor_key(st) != actor:
         raise PermissionError('ACTOR_CHANGED')
@@ -72,6 +73,19 @@ def _reconcile_save(st, body, expected, actor, timeout):
     recovery = status['recovery']
     digest = hashlib.sha256(json.dumps(body, ensure_ascii=False, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
     matches = [x for x in recovery['operations'] if x['uuid'] == body['submission_id']]
+    if (allow_canonical_retry and recovery['state'] == 'RETRY_ALLOWED'
+            and len(matches) == 1 and matches[0].get('state') == 'RETRY_ALLOWED'
+            and matches[0].get('digest') == digest):
+        # No new UUID or payload is sent. GAS selects its original INTENT and
+        # rechecks owner, ACL, session, digest and version under the write lock.
+        # call() obtains fresh native identity and a new signed jti for each step.
+        resumed = call(st, 'recovery_retry', {**query, 'submission_id': body['submission_id']}, timeout)
+        if resumed.get('ok') is not True:
+            return None
+        verified = _reconcile_save(st, body, expected, actor, timeout, allow_canonical_retry=False)
+        if verified is not None:
+            verified['canonical_recovery_performed'] = True
+        return verified
     if (recovery['state'] != 'SAVED' or len(matches) != 1
             or matches[0].get('digest') != digest or matches[0].get('version') != expected + 1
             or matches[0].get('audit_verified') is not True or matches[0].get('state') != 'SAVED'):
