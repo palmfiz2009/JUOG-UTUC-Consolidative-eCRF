@@ -275,3 +275,58 @@ class Tests(unittest.TestCase):
   self.assertEqual([x[0]['action'] for x in self.sent],['save_section'])
 
 if __name__=='__main__':unittest.main()
+
+
+class SerializedCalls(unittest.TestCase):
+ setUp=Tests.setUp
+ send=Tests.send
+ def test_same_actor_http_calls_do_not_overlap(self):
+  import threading
+  entered=threading.Event(); release=threading.Event(); second_started=threading.Event()
+  active=0; maximum=0; results=[]; mutex=threading.Lock()
+  def tx(*args):
+   nonlocal active,maximum
+   with mutex:active+=1;maximum=max(maximum,active)
+   entered.set();self.assertTrue(release.wait(2))
+   r=self.send(*args)
+   with mutex:active-=1
+   return r
+  self.tx.side_effect=tx
+  def invoke(second=False):
+   if second:second_started.set()
+   results.append(a.call(self.ui,'ui_context',timeout=2))
+  t1=threading.Thread(target=invoke);t2=threading.Thread(target=lambda:invoke(True))
+  t1.start();self.assertTrue(entered.wait(2));t2.start();self.assertTrue(second_started.wait(2));release.set()
+  t1.join(3);t2.join(3)
+  self.assertFalse(t1.is_alive());self.assertFalse(t2.is_alive());self.assertEqual(maximum,1)
+  self.assertEqual(len(results),2);self.assertTrue(all(r['ok'] for r in results))
+  self.assertNotEqual(self.sent[0][1]['session']['jti'],self.sent[1][1]['session']['jti'])
+ def test_wait_timeout_never_signs_or_sends(self):
+  import threading
+  lock=a._actor_lock(a.actor_key(self.ui));held=threading.Event();release=threading.Event()
+  def hold():
+   with lock:held.set();release.wait(2)
+  t=threading.Thread(target=hold);t.start();self.assertTrue(held.wait(2))
+  try:self.assertEqual(a.call(self.ui,'ui_context',timeout=.01)['error'],'LOCK_TIMEOUT')
+  finally:release.set();t.join(3)
+  self.tx.assert_not_called();self.assertFalse(self.ui.session_state.get('auth_connect_halted'))
+ def test_identity_rechecked_after_wait_before_transport(self):
+  actor=a.actor_key(self.ui)
+  with patch.object(a,'actor_key',side_effect=[actor,'changed-actor']):
+   self.assertEqual(a.call(self.ui,'ui_context')['error'],'ACTOR_CHANGED')
+  self.tx.assert_not_called()
+ def test_signature_is_created_after_queue_wait_and_native_expiry_still_denies(self):
+  from unittest.mock import Mock
+  clock=[self.now]
+  lock=Mock()
+  def acquired(**kwargs):clock[0]+=16;return True
+  lock.acquire.side_effect=acquired
+  with patch.object(a,'_actor_lock',return_value=lock),patch('time.time',side_effect=lambda:clock[0]):
+   self.assertTrue(a.call(self.ui,'ui_context')['ok'])
+  self.assertEqual(self.sent[-1][1]['iat'],self.now+16)
+  self.assertEqual(self.sent[-1][1]['exp'],self.now+31)
+  self.sent=[];self.tx.reset_mock();clock[0]=self.now
+  self.user['exp']=self.now+10
+  with patch.object(a,'_actor_lock',return_value=lock),patch('time.time',side_effect=lambda:clock[0]):
+   self.assertFalse(a.call(self.ui,'ui_context')['ok'])
+  self.tx.assert_not_called()

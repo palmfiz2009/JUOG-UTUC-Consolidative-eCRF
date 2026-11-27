@@ -1,0 +1,6 @@
+test_signature_is_created_after_queue_wait_and_native_expiry_still_denies (integration_tests.test_adapter.SerializedCalls.test_signature_is_created_after_queue_wait_and_native_expiry_still_denies) ... ok
+
+----------------------------------------------------------------------
+Ran 1 test in 0.006s
+
+OK

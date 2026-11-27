@@ -1,0 +1,7 @@
+# Serialize same-principal requests before assertion creation
+
+Live GAS Version8 (2026-11-28 00:00 JST) limits ScriptLock wait to 1s. Reauthentication succeeded, but a subsequent 9m draft-resume rerun again encountered an uncertain connection. No 9m formal save was attempted. Reducing lock wait alone is not proven to resolve interactive latency.
+
+Streamlit may overlap an interrupted script's outstanding HTTP request with its replacement rerun. The adapter now holds a process-local, per-native-principal reentrant mutex before creating a signed request. It obtains fresh native identity/configuration again after waiting; principal changes and native expiry refuse transport. The mutex holds no authorization verdict or patient content and weak entries expire when no calls reference them. The server's distributed ScriptLock, expiry, replay, ACL, owner and postwrite checks remain authoritative. Recursive canonical reconciliation is permitted with the same reentrant lock; no write is automatically repeated because of contention.
+
+Tests: Python235 total PASS (234 in full offline run plus the additional queue/signature test); GAS59 groups; legacy13 audit/14 identity PASS. Four new concurrency checks cover same-actor non-overlap, queue timeout with no transport, changed actor after wait, new signature after a 16s wait and rejection of native identity that expired during that wait. CI reruns the complete suite. Offline PASS is not live UAT PASS.

@@ -9,6 +9,8 @@ import copy
 import hashlib
 import json
 import time
+import threading
+import weakref
 import urllib.request
 from pathlib import Path
 from types import SimpleNamespace
@@ -20,6 +22,20 @@ SHEET = '1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs'
 STAGE = 'PR15_ISOLATED_CRFS'
 ROUTES = {'ui_context','session_revoke','backend_info','validate','get_crf_linkage',
           'save_crf','save_draft','get_draft','delete_draft','read_crf','request_status','recovery_status','recovery_retry','get_sections','save_section'}
+
+# Streamlit can start a new rerun while an old HTTP request is still in flight.
+# Serialize per native principal, before signing, without caching authorization.
+# Weak entries retain no patient state and disappear after active/waiting calls.
+_actor_locks = weakref.WeakValueDictionary()
+_actor_locks_guard = threading.Lock()
+
+def _actor_lock(actor):
+    with _actor_locks_guard:
+        lock = _actor_locks.get(actor)
+        if lock is None:
+            lock = threading.RLock()
+            _actor_locks[actor] = lock
+        return lock
 
 def load_profile():
     return json.loads(Path(__file__).with_name('isolated_crf_profile.json').read_text())
@@ -128,8 +144,29 @@ def _reconcile_section(st, operation, actor, timeout):
 def call(st,action,payload=None,timeout=20):
     if action not in ROUTES:return {'ok':False,'error':'ROUTE_DENIED'}
     try:
+        actor = actor_key(st)
+    except PermissionError as error:
+        code = str(error)
+        return {'ok':False,'error':code if code in {
+            'INTEGRATION_NOT_APPROVED','PRINCIPAL_NOT_APPROVED','CONFIG_BINDING_MISMATCH'
+        } else 'AUTHENTICATION_REQUIRED'}
+    except Exception:
+        return {'ok':False,'error':'RESULT_UNCONFIRMED'}
+    lock = _actor_lock(actor)
+    if not lock.acquire(timeout=timeout):
+        return {'ok':False,'error':'LOCK_TIMEOUT'}
+    try:
+        return _call_locked(st, action, payload, timeout, required_actor=actor)
+    finally:
+        lock.release()
+
+def _call_locked(st,action,payload=None,timeout=20,required_actor=None):
+    if action not in ROUTES:return {'ok':False,'error':'ROUTE_DENIED'}
+    try:
         native,c=context(st)
         actor=actor_key(st)
+        if required_actor is not None and actor != required_actor:
+            raise PermissionError('ACTOR_CHANGED')
         if st.session_state.get('auth_connect_halted') and action!='session_revoke':
             raise PermissionError('SESSION_HALTED')
         prior=st.session_state.get('_integration_actor')

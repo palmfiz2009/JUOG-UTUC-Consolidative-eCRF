@@ -20,6 +20,6 @@ test_revoked_acl_no_render (offline_test_entry.Entry.test_revoked_acl_no_render)
 test_unauth_no_render (offline_test_entry.Entry.test_unauth_no_render) ... ok
 
 ----------------------------------------------------------------------
-Ran 20 tests in 0.721s
+Ran 20 tests in 0.381s
 
 OK
