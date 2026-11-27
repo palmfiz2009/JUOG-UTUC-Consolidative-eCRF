@@ -317,4 +317,28 @@ test('staged intent cannot continue after owner ACL or session revocation',f=>{
  assert.equal(f.call('session_revoke').revoked,true);assert.equal(f.call('recovery_retry',q).error,'SESSION_REVOKED');
  assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);assert.equal(f.tables.R1_Operations.rows.length,2);
 });
+test('section save uses two fresh scans and detects tampering on next request',f=>{
+ const q=sectionOp(),before=f.metrics.reads.R1_DraftEvents||0;
+ assert.equal(f.call('save_section',q).ok,true);
+ assert.equal(f.metrics.reads.R1_DraftEvents-before,2);
+ const first=f.tables.R1_DraftEvents.rows[1];first[1]='tampered';
+ const count=f.tables.R1_DraftEvents.rows.length;
+ assert.equal(f.call('get_sections',sectionQ()).error,'DRAFT_STORE_INVALID');
+ assert.equal(f.call('save_section',q).error,'DRAFT_STORE_INVALID');
+ assert.equal(f.tables.R1_DraftEvents.rows.length,count);
+});
+test('section postwrite snapshot verifies full prefix',f=>{
+ const q=sectionOp();assert.equal(f.call('save_section',q).ok,true);
+ const sh=f.tables.R1_DraftEvents,append=sh.appendRow.bind(sh);
+ sh.appendRow=r=>{append(r);sh.rows[1][1]='tampered-during-write';};
+ const q2=sectionOp('fictional-second-section',{expected_revision:1});
+ assert.equal(f.call('save_section',q2).error,'DRAFT_STORE_INVALID');
+ assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+});
+test('section final guard rejects ACL revoked during append',f=>{
+ const sh=f.tables.R1_DraftEvents,append=sh.appendRow.bind(sh);
+ sh.appendRow=r=>{append(r);f.tables.V3_Users.rows[1][3]=false;};
+ assert.equal(f.call('save_section',sectionOp()).error,'ACL_DENIED');
+ assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+});
 console.log('ALL '+tests.length+' GROUPS PASSED');

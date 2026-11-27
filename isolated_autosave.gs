@@ -30,9 +30,9 @@ function pr15SectionDraft_(ss,who,q,action,guard){
  const key=[q.registration_id,q.crf_type,q.visit].join('|');
  const version=pr15Records_(ss,q.registration_id).versions[key];
  const table=()=>pr15Rows_(ss,'R1_DraftEvents',['event_json','digest']);
- function read(){
+ function read(snapshot){
   const state={},events=[],ids=new Set();
-  for(const row of table().rows){
+  for(const row of snapshot.rows){
    if(row.digest!==pr15Hash_(row.event_json))throw Error('DRAFT_STORE_INVALID');
    const e=JSON.parse(row.event_json);
    if(e.action!=='SECTION_SAVE')continue;
@@ -49,7 +49,10 @@ function pr15SectionDraft_(ss,who,q,action,guard){
   }
   return {state,events};
  }
- let current=read();
+ // Request-local snapshots under the existing single-writer lock only.
+ // Keep both fresh reads and every authorization guard; avoid redundant full
+ // sheet scans while the same locked request has made no intervening write.
+ const before=table();let current=read(before);
  const response=()=>({ok:true,record_key:key,record_version:version,sections:current.state,audit_verified:true});
  if(action==='get_sections')return response();
  if(!PR15_SECTIONS_[page][q.section]||typeof q.operation_id!=='string'||!/^[-a-zA-Z0-9]{16,80}$/.test(q.operation_id)||!Number.isInteger(q.expected_revision)||q.expected_revision<0||q.record_version!==version)throw Error('DRAFT_CONFLICT');
@@ -63,8 +66,8 @@ function pr15SectionDraft_(ss,who,q,action,guard){
  }
  if((current.state[q.section]?.revision||0)!==q.expected_revision)throw Error('DRAFT_CONFLICT');
  const event={action:'SECTION_SAVE',key,section:q.section,actor:who.id,record_version:version,revision:q.expected_revision+1,operation_id:q.operation_id,digest,data:q.data,at:new Date().toISOString()};
- const json=JSON.stringify(event);guard();const count=table().rows.length;
- table().sh.appendRow([json,pr15Hash_(json)]);SpreadsheetApp.flush();
- const after=table().rows;if(after.length!==count+1||after[count].event_json!==json||after[count].digest!==pr15Hash_(json))throw Error('DRAFT_WRITE_UNCONFIRMED');
- guard();current=read();return Object.assign(response(),{receipt:current.state[q.section],existing:false});
+ const json=JSON.stringify(event);guard();const count=before.rows.length;
+ before.sh.appendRow([json,pr15Hash_(json)]);SpreadsheetApp.flush();
+ const after=table();if(after.rows.length!==count+1||after.rows[count].event_json!==json||after.rows[count].digest!==pr15Hash_(json))throw Error('DRAFT_WRITE_UNCONFIRMED');
+ guard();current=read(after);return Object.assign(response(),{receipt:current.state[q.section],existing:false});
 }
