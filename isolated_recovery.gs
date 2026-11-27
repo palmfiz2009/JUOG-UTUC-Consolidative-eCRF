@@ -1,10 +1,10 @@
 /* Read-only reconciliation. Never repairs on read, never infers a UUID. */
-function pr15Recovery_(ss,journal,who,q){
+function pr15Recovery_(ss,journal,who,q,requestSnapshot){
  const key=[q.registration_id,q.crf_type,q.visit].join('|');
  // This reconciliation is read-only inside the caller's single-writer lock.
  // Reuse this fresh record scan for its rows and version: there is no write
  // between them. Do not retain it across requests or cache ACL/session data.
- const events=journal.read().filter(e=>e.key===key),snapshot=pr15Records_(ss,q.registration_id);
+ const events=(requestSnapshot?requestSnapshot.history:journal.read()).filter(e=>e.key===key),snapshot=requestSnapshot?requestSnapshot.records:pr15Records_(ss,q.registration_id);
  const records=snapshot.rows.filter(r=>r.record_key===key);
  const audits=pr15Rows_(ss,'CRFSubmissionAudit',['submission_id','record_key','record_version','facility_code','registration_id','sheet_name']).rows;
  const uuids=[...new Set(events.filter(e=>e.actor===who.id).map(e=>e.uuid))],operations=[];

@@ -115,10 +115,15 @@ function juogPr15Entry_(envelope,c){
    if(commits.length>1)throw Error('OPERATION_STORE_INVALID');
    return respond({ok:true,state:commits.length?'COMMITTED_RECHECK_REQUIRED':'UNCONFIRMED',receipt:commits.length?commits[0].receipt:null});
   }
+  let recoveryRecords=null;
   if(a==='recovery_status'||a==='recovery_retry'){
    if(Object.keys(p).some(k=>!['registration_id','facility_code','crf_type','visit','submission_id',...(a==='recovery_retry'?['staged_save']:[])].includes(k)))throw Error('REQUEST_INVALID');
    if(!pr15Pair_(q,false))throw Error('VISIT_INVALID');
-   const recovery=pr15Recovery_(ss,journal,who,q);
+   // No business write occurs between these reads, reconciliation, and the
+   // version baseline below. Reuse only this locked request's fresh snapshot.
+   // Authorization guards and postwrite readbacks remain live and uncached.
+   recoveryRecords=pr15Records_(ss,q.registration_id);
+   const recovery=pr15Recovery_(ss,journal,who,q,{history,records:recoveryRecords});
    if(a==='recovery_status')return respond({ok:true,recovery});
    const selected=recovery.operations.filter(x=>x.uuid===p.submission_id);
    if(recovery.state!=='RETRY_ALLOWED'||selected.length!==1||selected[0].state!=='RETRY_ALLOWED')throw Error('RECOVERY_RECONCILIATION_REQUIRED');
@@ -127,7 +132,7 @@ function juogPr15Entry_(envelope,c){
    q=JSON.parse(JSON.stringify(original[0].payload));p={payload:q,expected_record_version:original[0].expected,staged_save:staged};a='save_crf';
    pr15Owner_(ss,who,q);
   }
-  const records=pr15Records_(ss,q.registration_id);
+  const records=recoveryRecords||pr15Records_(ss,q.registration_id);
   if(a==='validate')return respond(Object.assign(validateSubject_(q),{record_versions:records.versions}));
   if(a==='get_crf_linkage')return respond(getCrfLinkage_(q));
   if(a==='read_crf'){

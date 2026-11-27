@@ -1,0 +1,84 @@
+{
+  "uuid": "1ac498a7-5ee3-4997-9bd1-c39703fcdf2c",
+  "kind": "actual live 9m correction and recovery",
+  "initialUI": "SAVE_PENDING; auth/ACL halt on opening recovery",
+  "recoveryUI": "After logout/relogin, original UUID retry; final screen Version1/UUID5c3a2fd8... and Version2/UUID1ac498a7... audit matched",
+  "normalSavePass": false,
+  "missingReason": {
+    "ui": "未入力または入力エラーを修正してください。",
+    "formalStoresUnchanged": true
+  },
+  "sheets": {
+    "CRF_Followup": {
+      "beforeRows": 3,
+      "afterRows": 4,
+      "priorRowsUnchanged": true,
+      "newRows": [
+        [
+          46354.01707184028,
+          2,
+          "1ac498a7-5ee3-4997-9bd1-c39703fcdf2c",
+          "JUOG-901|followup|9m",
+          "訂正報告",
+          "完全架空UAT：9か月の膀胱鏡所見詳細を追記しVersion 2を検証",
+          "2026-11-28T00:23:53+09:00",
+          "JUOG-901",
+          "TEST01",
+          "FICTIONAL_UAT_ONLY",
+          "fictional@example.invalid",
+          "followup",
+          "9m",
+          "2026-09-14-v2.2.2",
+          "JUOG_UTUC_Consolidative",
+          "{\"schema_version\":\"2026-09-14-v2.2.2\",\"study_code\":\"JUOG_UTUC_Consolidative\",\"crf_type\":\"followup\",\"visit\":\"9m\",\"record_key\":\"JUOG-901|followup|9m\",\"submission_id\":\"1ac498a7-5ee3-4997-9bd1-c39703fcdf2c\",\"submitted_at\":\"2026-11-28T00:23:53+09:00\",\"submission_kind\":\"訂正報告\",\"correction_reason\":\"完全架空UAT：9か月の膀胱鏡所見詳細を追記しVersion 2を検証\",\"registration_id\":\"JUOG-901\",\"facility_code\":\"TEST01\",\"facility_name\":\"FICTIONAL_UAT_ONLY\",\"reporter_email\":\"fictional@example.invalid\",\"data\":{\"source_30d_linked\":true,\"source_30d_record_version\":5,\"source_30d_submission_id\":\"63c8f016-ff9a-4c53-a335-9705a30aefb5\",\"surgery_performed\":\"実施した\",\"reference_date\":\"2026-01-10\",\"visit_month\":\"9ヶ月\",\"visit_date\":\"2026-10-10\",\"timing_note\":\"\",\"urine_cytology\":\"Negative (クラスI・II)\",\"required_test_omission_reason\":\"\",\"imaging_status\":\"実施\",\"imaging_date\":\"2026-10-10\",\"imaging_not_done_reason\":\"\",\"recist_progression_status\":\"PDなし\",\"progression_date\":\"\",\"progression_sites\":[],\"progression_detail\":\"\",\"cystoscopy_status\":\"実施\",\"cystoscopy_date\":\"2026-10-10\",\"cystoscopy_result\":\"腫瘍なし\",\"cystoscopy_detail\":\"完全架空UAT：Version 2訂正確認\",\"cystoscopy_not_done_reason\":\"\",\"labs_performed\":false,\"lab_status\":\"実施なし\",\"labs\":{},\"labs_raw\":{},\"intraluminal_recurrence_status\":\"なし\",\"intraluminal_recurrence_date\":\"\",\"intraluminal_sites\":[],\"intraluminal_site_other\":\"\",\"intraluminal_treatment\":[],\"intraluminal_treatment_other\":\"\",\"intraluminal_treatment_status\":null,\"intraluminal_procedure_date\":\"\",\"intraluminal_instillation_start\":\"\",\"intraluminal_instillation_end\":\"\",\"intraluminal_instillation_ongoing\":false,\"intraluminal_other_treatment_date\":\"\",\"intraluminal_pathology\":\"\",\"current_treatment\":\"無治療（経過観察）\",\"current_treatment_detail\":\"\",\"treatment_start\":\"\",\"treatment_end\":\"\",\"treatment_ongoing\":false,\"event_present\":false,\"cd_grade\":\"N/A\",\"event_detail\":\"\",\"vital_status\":\"生存\",\"last_alive_date\":\"2026-10-10\",\"death_date\":\"\",\"death_cause\":\"\"}}"
+        ]
+      ]
+    },
+    "CRFSubmissionAudit": {
+      "beforeRows": 9,
+      "afterRows": 10,
+      "priorRowsUnchanged": true,
+      "newRows": [
+        [
+          46354.01709079861,
+          "CRF_Followup",
+          "JUOG-901|followup|9m",
+          2,
+          "1ac498a7-5ee3-4997-9bd1-c39703fcdf2c",
+          "訂正報告",
+          "JUOG-901",
+          "TEST01"
+        ]
+      ]
+    },
+    "R1_Operations": {
+      "beforeRows": 17,
+      "afterRows": 19,
+      "priorRowsUnchanged": true,
+      "newRows": [
+        [
+          17,
+          "{\"kind\":\"INTENT\",\"uuid\":\"1ac498a7-5ee3-4997-9bd1-c39703fcdf2c\",\"key\":\"JUOG-901|followup|9m\",\"digest\":\"3cbbd475c55d762b03d3ffc53413541955f52b5dbf2b21c12d4c8ca21748adef\",\"payload\":{\"schema_version\":\"2026-09-14-v2.2.2\",\"study_code\":\"JUOG_UTUC_Consolidative\",\"crf_type\":\"followup\",\"visit\":\"9m\",\"record_key\":\"JUOG-901|followup|9m\",\"submission_id\":\"1ac498a7-5ee3-4997-9bd1-c39703fcdf2c\",\"submitted_at\":\"2026-11-28T00:23:53+09:00\",\"submission_kind\":\"訂正報告\",\"correction_reason\":\"完全架空UAT：9か月の膀胱鏡所見詳細を追記しVersion 2を検証\",\"registration_id\":\"JUOG-901\",\"facility_code\":\"TEST01\",\"facility_name\":\"FICTIONAL_UAT_ONLY\",\"reporter_email\":\"fictional@example.invalid\",\"data\":{\"source_30d_linked\":true,\"source_30d_record_version\":5,\"source_30d_submission_id\":\"63c8f016-ff9a-4c53-a335-9705a30aefb5\",\"surgery_performed\":\"実施した\",\"reference_date\":\"2026-01-10\",\"visit_month\":\"9ヶ月\",\"visit_date\":\"2026-10-10\",\"timing_note\":\"\",\"urine_cytology\":\"Negative (クラスI・II)\",\"required_test_omission_reason\":\"\",\"imaging_status\":\"実施\",\"imaging_date\":\"2026-10-10\",\"imaging_not_done_reason\":\"\",\"recist_progression_status\":\"PDなし\",\"progression_date\":\"\",\"progression_sites\":[],\"progression_detail\":\"\",\"cystoscopy_status\":\"実施\",\"cystoscopy_date\":\"2026-10-10\",\"cystoscopy_result\":\"腫瘍なし\",\"cystoscopy_detail\":\"完全架空UAT：Version 2訂正確認\",\"cystoscopy_not_done_reason\":\"\",\"labs_performed\":false,\"lab_status\":\"実施なし\",\"labs\":{},\"labs_raw\":{},\"intraluminal_recurrence_status\":\"なし\",\"intraluminal_recurrence_date\":\"\",\"intraluminal_sites\":[],\"intraluminal_site_other\":\"\",\"intraluminal_treatment\":[],\"intraluminal_treatment_other\":\"\",\"intraluminal_treatment_status\":null,\"intraluminal_procedure_date\":\"\",\"intraluminal_instillation_start\":\"\",\"intraluminal_instillation_end\":\"\",\"intraluminal_instillation_ongoing\":false,\"intraluminal_other_treatment_date\":\"\",\"intraluminal_pathology\":\"\",\"current_treatment\":\"無治療（経過観察）\",\"current_treatment_detail\":\"\",\"treatment_start\":\"\",\"treatment_end\":\"\",\"treatment_ongoing\":false,\"event_present\":false,\"cd_grade\":\"N/A\",\"event_detail\":\"\",\"vital_status\":\"生存\",\"last_alive_date\":\"2026-10-10\",\"death_date\":\"\",\"death_cause\":\"\"}},\"actor\":\"UAT_TEST01_PI_01\",\"facility\":\"TEST01\",\"expected\":1,\"at\":\"2026-11-27T15:24:10.524Z\"}",
+          "a7a3a1a2ce58774a69459969f4ecad129572affb6123c454b7ffb93f28c97c71"
+        ],
+        [
+          18,
+          "{\"kind\":\"COMMIT\",\"uuid\":\"1ac498a7-5ee3-4997-9bd1-c39703fcdf2c\",\"key\":\"JUOG-901|followup|9m\",\"digest\":\"3cbbd475c55d762b03d3ffc53413541955f52b5dbf2b21c12d4c8ca21748adef\",\"actor\":\"UAT_TEST01_PI_01\",\"facility\":\"TEST01\",\"expected\":1,\"at\":\"2026-11-27T15:27:08.825Z\",\"receipt\":{\"ok\":true,\"existing\":true,\"record_version\":2,\"submission_id\":\"1ac498a7-5ee3-4997-9bd1-c39703fcdf2c\",\"record_key\":\"JUOG-901|followup|9m\",\"crf_type\":\"followup\",\"visit\":\"9m\",\"spreadsheet_id\":\"1XaLdVGN39skmXVhiyPN-uOb9B8zjo3rmbNgYZCndJRs\",\"audit_verified\":true}}",
+          "abbf86d42ccebdfde7af141a36954f1ee02afbb528f0509ce542c0874ad4d8c2"
+        ]
+      ]
+    }
+  },
+  "checks": {
+    "uuid": true,
+    "version": true,
+    "expected": true,
+    "payload": true,
+    "audit": true,
+    "existing": true,
+    "oldRowsPreserved": true
+  },
+  "dataChangedFields": [
+    "cystoscopy_detail"
+  ]
+}

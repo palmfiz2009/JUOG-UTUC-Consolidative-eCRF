@@ -284,6 +284,7 @@ test('pending recovery scans CRFs once and observes changes on the next request'
  const before=copy(f.metrics.reads),writes=f.tables.R1_Operations.rows.length;
  assert.equal(f.call('recovery_status',q).recovery.state,'RETRY_ALLOWED');
  for(const name of ['CRF_30d','CRF_90d','CRF_Followup'])assert.equal(f.metrics.reads[name]-before[name],1);
+ assert.equal(f.metrics.reads.R1_Operations-before.R1_Operations,1);
  assert.equal(f.tables.R1_Operations.rows.length,writes);
  assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
  // A later request must see new/corrupt cells, never a previous record snapshot.
@@ -291,6 +292,20 @@ test('pending recovery scans CRFs once and observes changes on the next request'
  assert.equal(f.call('recovery_status',q).recovery.state,'NEEDS_RECONCILIATION');
  assert.equal(f.call('recovery_retry',{...q,submission_id:p.submission_id}).ok,false);
  assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+});
+test('recovery retry reuses only prewrite record snapshots and preserves postwrite checks',f=>{
+ const p=f.payload(),q={registration_id:p.registration_id,facility_code:'TEST01',crf_type:p.crf_type,visit:p.visit,submission_id:p.submission_id,staged_save:true};
+ assert.equal(f.call('save_crf',{payload:p,expected_record_version:0,staged_save:true}).error,'SAVE_PENDING');
+ const before=copy(f.metrics.reads);
+ assert.equal(f.call('recovery_retry',q).error,'SAVE_PENDING');
+ // One reconciliation baseline plus saveCrf's independent UUID scan remain.
+ for(const name of ['CRF_90d','CRF_Followup'])assert.equal(f.metrics.reads[name]-before[name],2);
+ assert.equal(f.metrics.reads.R1_Operations-before.R1_Operations,1);
+ assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,2);
+ // New requests must not reuse the previous valid row or acknowledgement.
+ f.tables.CRF_30d.rows[1][f.tables.CRF_30d.rows[0].indexOf('payload_json')]='{}';
+ assert.equal(f.call('recovery_retry',q).error,'RECOVERY_RECONCILIATION_REQUIRED');
+ assert.equal(f.tables.R1_Operations.rows.length,2);
 });
 test('staged save requires fresh authenticated intent, body/audit and commit phases',f=>{
  const p=f.payload(),q={registration_id:p.registration_id,facility_code:'TEST01',crf_type:p.crf_type,visit:p.visit,submission_id:p.submission_id,staged_save:true};
