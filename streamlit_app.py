@@ -36,7 +36,7 @@ def run():
     r=call(st,'ui_context',{})
     if not (r.get('ok') is True and r.get('business_writes_allowed') is True):
         code=r.get('error')
-        if code in {'RESULT_UNCONFIRMED','LOCK_TIMEOUT'}:
+        if code in {'RESULT_UNCONFIRMED','LOCK_TIMEOUT','ASSERTION_RECONFIRMATION_REQUIRED'}:
             # Fail closed for this run without treating a network timeout as
             # revoked identity. Keep widget data for a fresh signed ACL check.
             st.session_state['_connection_unconfirmed']=True
