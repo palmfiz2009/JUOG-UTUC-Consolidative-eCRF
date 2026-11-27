@@ -56,6 +56,26 @@ class UI(unittest.TestCase):
                 self.assertFalse(list(app.error))
                 self.assertFalse(list(app.warning))
                 self.assertFalse(list(app.markdown))
+    def test_expired_section_assertion_returns_to_full_page_gate_with_input(self):
+        original=self.call
+        def expired(st,action,q=None,**kwargs):
+            if action=='save_section':
+                st.session_state['_assertion_recheck_required']=True
+                st.session_state['_connection_unconfirmed']=True
+                return {'ok':False,'error':'ASSERTION_RECONFIRMATION_REQUIRED'}
+            return original(st,action,q,**kwargs)
+        script='import streamlit as st\nfrom isolated_autosave_ui import section_feedback\nif st.session_state.get("_assertion_recheck_required"):\n st.error("fresh signed ACL required")\nelse:\n section_feedback("peri", "1")'
+        app=AppTest.from_string(script,default_timeout=20)
+        app.session_state['_integration_actor']='fictional-identity'
+        app.session_state['peri_registration_id']='JUOG-901'
+        app.session_state['peri_reporter_email']='fictional@example.invalid'
+        with patch('isolated_crf_adapter.call',side_effect=expired):
+            app.run();self.clock=3;app.run()
+        self.assertFalse(list(app.exception))
+        self.assertTrue(any(x.value=='fresh signed ACL required' for x in app.error))
+        self.assertEqual(app.session_state['_connection_input_backup']['values']['peri_registration_id'],'JUOG-901')
+        self.assertFalse(list(app.success))
+
     def test_previous_page_timer_cannot_write_after_visit_switch(self):
         for selected, retired in [('90日', 'peri'), ('6〜24か月', 'd90'), ('30日', 'fu')]:
             with self.subTest(selected=selected):

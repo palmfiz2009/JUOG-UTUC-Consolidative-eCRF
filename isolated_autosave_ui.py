@@ -283,6 +283,12 @@ def section_feedback(page, section):
             message.success('保存しました')
         else:
             message.error('保存できませんでした。成功とは扱いません。同じ操作IDで再確認してください。')
+            if st.session_state.get('_assertion_recheck_required'):
+                # Return to the full-page signed ACL gate; do not leave a
+                # retired fragment silently polling with the inputs hidden.
+                from isolated_connection_state import preserve
+                preserve(st.session_state)
+                st.rerun()
     elif dirty and slot.get('status') != 'error':
         st.caption('変更あり・自動仮保存待ち…')
     elif not dirty:
