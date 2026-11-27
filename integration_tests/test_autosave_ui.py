@@ -3,6 +3,7 @@ No local server, new app, live Sheets or network. GAS auth is exercised separate
 """
 from pathlib import Path
 from copy import deepcopy
+from datetime import date
 import unittest
 from unittest.mock import patch
 from streamlit.testing.v1 import AppTest
@@ -172,15 +173,21 @@ class UI(unittest.TestCase):
                 typ=a.TYPES[page];visit='30d' if page=='peri' else '90d' if page=='d90' else '6m'
                 key=f'JUOG-901|{typ}|{visit}'
                 p=dict(registration_id='JUOG-901',facility_code='TEST01',crf_type=typ,visit=visit,submission_id='fictional-v1',record_key=key)
+                p['data']=dict(source_30d_record_version=1,source_30d_submission_id='fictional',reference_date='2026-01-01',surgery_performed='実施した')
                 form={page+'_registration_id':'JUOG-901',page+'_reporter_email':'fictional@example.invalid'}
+                if page in ('d90','fu'):form[page+'_visit_date']=date(2026,4,1) if page=='d90' else date(2026,7,1)
                 if page=='fu':form['fu_visit_month']='6ヶ月'
                 app=AppTest.from_file(str(ROOT/PAGES[page]),default_timeout=20)
                 app.session_state[page+'_sent']=True
                 app.session_state[attempt_key(page)]=dict(status='complete',actor_key='fictional-actor',payload=p,record_version='1',form_state=snapshot_form(page,form))
                 app.run();self.assertFalse(list(app.exception))
                 reply=dict(ok=True,recovery=dict(state='SAVED',record_key=key,operations=[dict(state='SAVED',uuid='fictional-v1',version=1,audit_verified=True)]))
-                with patch('isolated_crf_adapter.actor_key',return_value='fictional-actor'),patch('isolated_crf_adapter.call',return_value=reply),patch('isolated_crf_adapter.begin_edit',return_value=dict(ok=True,record_versions={key:1})):
+                with patch('isolated_crf_adapter.actor_key',return_value='fictional-actor'),patch('isolated_crf_adapter.call',side_effect=lambda st,action,q=None,**kw:self.link() if action=='get_crf_linkage' else reply if action=='recovery_status' else self.call(st,action,q,**kw)),patch('isolated_crf_adapter.begin_edit',return_value=dict(ok=True,record_versions={key:1})):
                     app.button(key='_correction_start_'+page).click().run()
                 self.assertFalse(list(app.exception))
                 self.assertEqual(app.radio(key=page+'_submission_kind').value,'訂正報告')
                 self.assertEqual(app.text_input(key=page+'_registration_id').value,'JUOG-901')
+                if page in ('d90','fu'):
+                    self.assertEqual(app.date_input(key=page+'_visit_date').value,form[page+'_visit_date'])
+                    app.run();self.assertFalse(list(app.exception))
+                    self.assertEqual(app.date_input(key=page+'_visit_date').value,form[page+'_visit_date'])
