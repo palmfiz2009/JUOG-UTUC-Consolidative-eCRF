@@ -1,0 +1,65 @@
+{
+  "savedFormDoubleClick": [
+    {
+      "sheet": "CRF_90d",
+      "rows": 3,
+      "unchanged": true
+    },
+    {
+      "sheet": "CRFSubmissionAudit",
+      "rows": 13,
+      "unchanged": true
+    },
+    {
+      "sheet": "R1_Operations",
+      "rows": 25,
+      "unchanged": true
+    }
+  ],
+  "missingCorrectionReason": {
+    "ui": "未入力または入力エラーを修正してください。",
+    "recordChecks": [
+      {
+        "sheet": "CRF_90d",
+        "rows": 3,
+        "unchanged": true
+      },
+      {
+        "sheet": "CRFSubmissionAudit",
+        "rows": 13,
+        "unchanged": true
+      },
+      {
+        "sheet": "R1_Operations",
+        "rows": 25,
+        "unchanged": true
+      }
+    ]
+  },
+  "scope": "JUOG-901 TEST01 day90 90d. No formal Version3 submitted successfully. Drafts may legitimately change; no claim of zero draft writes.",
+  "futureDate": {
+    "date": "2027-04-10",
+    "requiredFieldsComplete": true,
+    "deviationReasonPresent": true,
+    "uiError": "90日評価日が未来日です",
+    "submitError": "未入力または入力エラーを修正してください。",
+    "recordChecks": [
+      {
+        "sheet": "CRF_90d",
+        "rows": 3,
+        "unchanged": true
+      },
+      {
+        "sheet": "CRFSubmissionAudit",
+        "rows": 13,
+        "unchanged": true
+      },
+      {
+        "sheet": "R1_Operations",
+        "rows": 25,
+        "unchanged": true
+      }
+    ],
+    "backendDirectBypassTestThisRun": false
+  }
+}
