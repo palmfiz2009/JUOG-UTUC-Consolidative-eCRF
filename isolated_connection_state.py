@@ -1,7 +1,9 @@
 """Keep allowlisted input independently of Streamlit widget cleanup during outages."""
 from copy import deepcopy
 from fnmatch import fnmatchcase
-from isolated_autosave_ui import SECTIONS
+import json
+from pathlib import Path
+SECTIONS = json.loads(Path(__file__).with_name('autosave_sections.json').read_text())
 
 BACKUP = '_connection_input_backup'
 RECOVERY_BACKUP = '_recovery_input_backup'

@@ -69,6 +69,9 @@ def run():
         if not st.session_state.get('_show_recovery'):
             from isolated_connection_state import preserve_recovery
             preserve_recovery(st.session_state)
+            # Recovery selectors may have been removed by widget cleanup.
+            # Do not replay an old check against a newly empty/default target.
+            st.session_state['_recovery_open']=False
         st.session_state['_show_recovery']=True
     if st.session_state.get('_show_recovery'):
         from isolated_recovery_ui import render
