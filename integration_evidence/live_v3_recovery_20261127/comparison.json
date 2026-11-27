@@ -1,0 +1,12 @@
+{
+  "one_crf_row": true,
+  "one_audit_row": true,
+  "one_intent": true,
+  "one_commit": true,
+  "payload_matches": true,
+  "digest_matches": true,
+  "version_matches": true,
+  "uuid_matches": true,
+  "audit_verified": true,
+  "versions_preserved": true
+}
