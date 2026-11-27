@@ -1,0 +1,35 @@
+{
+  "reviewCommit": "e8655e73a484a6da9af5233e61be8645cb96c8d5",
+  "gasVersion": 9,
+  "gasDisplayedTime": "2026/11/28 0:32 JST",
+  "deploymentId": "AKfycbxrn_U2A4PXxyaNcf2eGpIdGrcaeYJ7tpV5O8WukUqunQSczMJ6tAmA8VvJaMKZBg3z",
+  "scriptId": "1_oVuL1i6Kmyu5egp-iDHIku-nN5JxoQ1ySPSluAsNc2gCFXGvBSJGDAR",
+  "sourceBlobs": {
+    "isolated_crf_endpoint": "e8e9167d47c811bad70520ca47dc64d87e6f4d2d",
+    "isolated_recovery": "518da687c9bf942eb38054a22199d5de6fb5bfcc"
+  },
+  "sameUrl": true,
+  "permissionsChanged": false,
+  "secretsChanged": false,
+  "aclChanged": false,
+  "notificationsDisabled": true,
+  "workflow": {
+    "id": 46025544424,
+    "conclusion": "success"
+  },
+  "liveReadback": {
+    "browser": "actual recovery screen after Running appeared and disappeared",
+    "observedWallSeconds": 11.378,
+    "serverOnlyTiming": false,
+    "versions": [
+      1,
+      2
+    ],
+    "uuids": [
+      "5c3a2fd8-4a2d-4bee-b716-0f77d536538a",
+      "1ac498a7-5ee3-4997-9bd1-c39703fcdf2c"
+    ],
+    "auditMatched": true
+  },
+  "newWriteReliabilityRetested": false
+}
