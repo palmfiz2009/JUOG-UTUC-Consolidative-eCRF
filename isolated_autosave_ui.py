@@ -230,8 +230,11 @@ def section_feedback(page, section):
     if not valid_registration_id(case) or page == 'fu' and visit not in VISITS:
         st.caption('自動仮保存：症例番号・報告時期の入力待ち')
         return
-    if pending_attempt(page, st.session_state) or st.session_state.get(page + '_sent') or st.session_state.get('_recovery_blocks_new'):
+    if pending_attempt(page, st.session_state) or st.session_state.get('_recovery_blocks_new'):
         st.caption('正式保存の照合中は自動仮保存を停止しています。')
+        return
+    if st.session_state.get(page + '_sent'):
+        st.caption('正式保存済みです。変更する場合は訂正報告を開始してください。')
         return
     query = dict(registration_id=case, facility_code='TEST01', crf_type=TYPES[page], visit=visit)
     name = '_autosave_' + page
