@@ -1,0 +1,38 @@
+{
+  "review": "c50d4c947334be333450fa1ee329122172f7f4af",
+  "fixture": "ea16982eca4ae637d49b33378414dfb5a9b4a04a",
+  "gasVersion": 9,
+  "case": "JUOG-901",
+  "visit": "9m",
+  "actor": "same authorized TEST01 principal",
+  "observedSequence": [
+    "After prolonged session use, existing-information action reached AUTHENTICATION_REQUIRED; editor and save controls absent.",
+    "Logout reached Google login-only app view.",
+    "Selected the previously authorized existing Google account; fresh target app reached signed ACL-confirmed case selection.",
+    "Fresh case ownership/version validation, follow-up selection, explicit9m draft resume.",
+    "All7 sections restored, same case/detail/source30d Version5, correction reason still empty."
+  ],
+  "limitations": [
+    "No raw native token/iat/exp was read; AUTHENTICATION_REQUIRED is the observed code. Exact natural-expiry attribution is not asserted from the generic code alone.",
+    "No different-person re-login or stolen/old-jti injection in this live sequence.",
+    "No new independent-QA outcome or full-UAT PASS claimed."
+  ],
+  "sheetChecks": {
+    "CRF_Followup": {
+      "rows": 6,
+      "unchanged": true
+    },
+    "CRFSubmissionAudit": {
+      "rows": 12,
+      "unchanged": true
+    },
+    "R1_Operations": {
+      "rows": 23,
+      "unchanged": true
+    },
+    "R1_DraftEvents": {
+      "rows": 189,
+      "unchanged": true
+    }
+  }
+}
