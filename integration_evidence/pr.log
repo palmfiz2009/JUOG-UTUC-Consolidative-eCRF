@@ -1,18 +1,18 @@
 test_all_three_use_non_nested_timers_and_same_submission_helper (test_all_crf_fragments.AllCrfPagesTests.test_all_three_use_non_nested_timers_and_same_submission_helper) ... ok
 test_no_direct_crf_write_or_replay_generated_in_pages (test_all_crf_fragments.AllCrfPagesTests.test_no_direct_crf_write_or_replay_generated_in_pages) ... ok
-test_30_day_surgery_path_change_does_not_raise (test_crf_app_boot.InitialRenderTests.test_30_day_surgery_path_change_does_not_raise) ... 2026-11-28 00:04:29.341 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_30_day_surgery_path_change_does_not_raise (test_crf_app_boot.InitialRenderTests.test_30_day_surgery_path_change_does_not_raise) ... 2026-11-28 00:48:57.616 WARNING streamlit.runtime.scriptrunner_utils.script_run_context: Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
-test_all_three_initial_pages_render_without_errors (test_crf_app_boot.InitialRenderTests.test_all_three_initial_pages_render_without_errors) ... 2026-11-28 00:04:30.757 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-28 00:04:30.910 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-28 00:04:31.065 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_all_three_initial_pages_render_without_errors (test_crf_app_boot.InitialRenderTests.test_all_three_initial_pages_render_without_errors) ... 2026-11-28 00:48:58.870 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-28 00:48:59.024 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-28 00:48:59.144 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
-test_day90_manual_linkage_path_does_not_raise (test_crf_app_boot.InitialRenderTests.test_day90_manual_linkage_path_does_not_raise) ... 2026-11-28 00:04:31.286 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-28 00:04:31.286 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-28 00:04:31.286 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_day90_manual_linkage_path_does_not_raise (test_crf_app_boot.InitialRenderTests.test_day90_manual_linkage_path_does_not_raise) ... 2026-11-28 00:48:59.255 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-28 00:48:59.255 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-28 00:48:59.255 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
-test_followup_linked_patient_path_does_not_raise (test_crf_app_boot.InitialRenderTests.test_followup_linked_patient_path_does_not_raise) ... 2026-11-28 00:04:31.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-28 00:04:31.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
-2026-11-28 00:04:31.418 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+test_followup_linked_patient_path_does_not_raise (test_crf_app_boot.InitialRenderTests.test_followup_linked_patient_path_does_not_raise) ... 2026-11-28 00:48:59.382 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-28 00:48:59.382 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
+2026-11-28 00:48:59.382 Thread 'MainThread': missing ScriptRunContext! This warning can be ignored when running in bare mode.
 ok
 test_backend_missing_workbook_echo_fails_closed (test_crf_save_ui.CRFSaveUITests.test_backend_missing_workbook_echo_fails_closed) ... ok
 test_backend_workbook_id_mismatch_fails_closed (test_crf_save_ui.CRFSaveUITests.test_backend_workbook_id_mismatch_fails_closed) ... ok
@@ -53,6 +53,6 @@ test_registration_uses_fragment_instead_of_full_page_widget_reruns (test_screeni
 test_unique_frozen_request_and_retry (test_screening_ui_contract.ScreeningUiContractTests.test_unique_frozen_request_and_retry) ... ok
 
 ----------------------------------------------------------------------
-Ran 43 tests in 2.568s
+Ran 43 tests in 2.249s
 
 OK

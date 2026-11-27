@@ -29,7 +29,7 @@ def _failure_code(reply):
  # Show only explicit public error codes, never raw server messages/payloads.
  allowed={'AUTH_EXPIRED','SESSION_REVOKED','ACL_DENIED','ACL_CHANGED',
           'SESSION_STORE_INVALID','SESSION_HALTED','RESULT_UNCONFIRMED',
-          'LOCK_TIMEOUT','TRANSACTION_UNCONFIRMED','OPERATION_WRITE_UNCONFIRMED'}
+          'LOCK_TIMEOUT','TRANSACTION_UNCONFIRMED','OPERATION_WRITE_UNCONFIRMED','ASSERTION_RECONFIRMATION_REQUIRED'}
  code=reply.get('error') if isinstance(reply,dict) else None
  return code if isinstance(code,str) and code in allowed else 'RESULT_UNCONFIRMED'
 

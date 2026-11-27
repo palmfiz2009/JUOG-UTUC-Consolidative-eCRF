@@ -41,6 +41,11 @@ class Entry(unittest.TestCase):
   self.assertTrue(self.state['_connection_unconfirmed'])
   self.assertFalse(self.state['auth_connect_halted'])
   self.assertEqual(self.state['_integration_edit_subject'],'JUOG-901')
+ def test_expired_assertion_recheck_keeps_form_closed_and_input_identity(self):
+  self.assertEqual(self.execute(allowed=False,error='ASSERTION_RECONFIRMATION_REQUIRED'),['native','ui_context'])
+  self.assertTrue(self.state['_connection_unconfirmed'])
+  self.assertFalse(self.state['auth_connect_halted'])
+  self.assertEqual(self.state['_integration_edit_subject'],'JUOG-901')
  def test_actual_acl_denial_still_halts(self):
   self.execute(allowed=False,error='ACL_DENIED')
   self.assertTrue(self.state['auth_connect_halted'])

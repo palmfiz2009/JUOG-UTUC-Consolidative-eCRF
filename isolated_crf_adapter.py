@@ -174,6 +174,11 @@ def _call_locked(st,action,payload=None,timeout=20,required_actor=None):
             st.session_state['auth_connect_halted']=True
             raise PermissionError('ACTOR_CHANGED')
         st.session_state['_integration_actor']=actor
+        # An expired per-request assertion is not proof of session revocation.
+        # Keep every business/read route closed until a fresh signed ui_context
+        # positively revalidates the server session and ACL. Never reuse a jti.
+        if st.session_state.get('_assertion_recheck_required') and action not in {'ui_context','session_revoke'}:
+            return {'ok':False,'error':'ASSERTION_RECONFIRMATION_REQUIRED'}
         p=copy.deepcopy(payload or {})
         if action == 'save_section':
             from isolated_privacy import redact_draft_identifiers
@@ -238,6 +243,8 @@ def _call_locked(st,action,payload=None,timeout=20,required_actor=None):
                 raise PermissionError('RESPONSE_BINDING_MISMATCH')
             if action!='session_revoke' and (r.get('role')!='facility' or r.get('facility_code')!='TEST01'):
                 raise PermissionError('ACL_RESPONSE_MISMATCH')
+            if action=='ui_context' and r.get('business_writes_allowed') is True:
+                st.session_state.pop('_assertion_recheck_required',None)
             if action=='validate':
                 versions=r.get('record_versions')
                 if not isinstance(versions,dict) or any(type(v) is not int or v<0 for v in versions.values()):
@@ -245,6 +252,17 @@ def _call_locked(st,action,payload=None,timeout=20,required_actor=None):
                 # Preserve observed versions until explicit subject validation is repeated.
                 observed=st.session_state.setdefault('_integration_versions',{})
                 for key,value in versions.items():observed.setdefault(key,value)
+        elif r.get('error')=='AUTH_EXPIRED' and action!='session_revoke':
+            # Validate the native OIDC and unchanged 60-minute B2 deadline now.
+            # If those expired, do not offer connection-only recovery.
+            try:
+                if actor_key(st)!=actor:raise PermissionError('ACTOR_CHANGED')
+            except Exception:
+                st.session_state['auth_connect_halted']=True
+                raise
+            st.session_state['_assertion_recheck_required']=True
+            st.session_state['_connection_unconfirmed']=True
+            return {'ok':False,'error':'ASSERTION_RECONFIRMATION_REQUIRED'}
         elif r.get('error') in {'AUTH_EXPIRED','SESSION_REVOKED','ACL_DENIED','ACL_CHANGED','SESSION_STORE_INVALID'}:
             st.session_state['auth_connect_halted']=True
         return r

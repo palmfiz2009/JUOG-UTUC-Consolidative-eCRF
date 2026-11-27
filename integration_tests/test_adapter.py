@@ -106,7 +106,10 @@ class Tests(unittest.TestCase):
   self.tx.side_effect=send
   self.assertFalse(a.call(self.ui,'ui_context')['ok'])
   self.assertEqual(len(self.sent),2)
-  self.assertTrue(self.ui.session_state['auth_connect_halted'])
+  self.assertTrue(self.ui.session_state['_assertion_recheck_required'])
+  self.assertFalse(self.ui.session_state.get('auth_connect_halted'))
+  self.assertEqual(a.call(self.ui,'save_crf',{'payload':self.payload})['error'],'ASSERTION_RECONFIRMATION_REQUIRED')
+  self.assertEqual(len(self.sent),2)  # gate stays closed; no business request
 
  def recovery_transport(self, first_error='AUTH_EXPIRED', alter=None):
   def send(url,envelope,timeout):
@@ -266,7 +269,7 @@ class Tests(unittest.TestCase):
   self.assertNotEqual(self.sent[0][1]['session']['jti'],self.sent[1][1]['session']['jti'])
  def test_section_reconcile_mismatch_fails_closed(self):
   for alter in ({'operation_id':'other'},{'digest':'other'},{'revision':3},{'record_version':1},{'key':'other'}):
-   self.ui.session_state.pop('auth_connect_halted',None);self.sent=[]
+   self.ui.session_state.pop('auth_connect_halted',None);self.ui.session_state.pop('_assertion_recheck_required',None);self.sent=[]
    op=self.section_transport(alter)
    self.assertFalse(a.call(self.ui,'save_section',op)['ok'])
  def test_section_revocation_never_reconciled(self):
@@ -274,7 +277,6 @@ class Tests(unittest.TestCase):
   self.assertFalse(a.call(self.ui,'save_section',op)['ok'])
   self.assertEqual([x[0]['action'] for x in self.sent],['save_section'])
 
-if __name__=='__main__':unittest.main()
 
 
 class SerializedCalls(unittest.TestCase):
@@ -330,3 +332,48 @@ class SerializedCalls(unittest.TestCase):
   with patch.object(a,'_actor_lock',return_value=lock),patch('time.time',side_effect=lambda:clock[0]):
    self.assertFalse(a.call(self.ui,'ui_context')['ok'])
   self.tx.assert_not_called()
+
+class AssertionReconfirmation(unittest.TestCase):
+ setUp=Tests.setUp
+ send=Tests.send
+ def expire(self):
+  def send(url,envelope,timeout):
+   self.send(url,envelope,timeout)
+   return {'ok':False,'error':'AUTH_EXPIRED'}
+  self.tx.side_effect=send
+  self.assertEqual(a.call(self.ui,'ui_context')['error'],'ASSERTION_RECONFIRMATION_REQUIRED')
+ def test_no_business_or_recovery_until_pinned_server_acl_confirmation(self):
+  self.expire();n=len(self.sent)
+  for route in ('save_crf','save_section','recovery_retry','recovery_status','get_sections','validate'):
+   self.assertEqual(a.call(self.ui,route,{})['error'],'ASSERTION_RECONFIRMATION_REQUIRED')
+  self.assertEqual(len(self.sent),n)
+  def wrong(url,envelope,timeout):
+   return dict(self.send(url,envelope,timeout),business_writes_allowed=True,spreadsheet_id='wrong')
+  self.tx.side_effect=wrong
+  self.assertEqual(a.call(self.ui,'ui_context')['error'],'RESPONSE_BINDING_MISMATCH')
+  self.assertTrue(self.ui.session_state['_assertion_recheck_required'])
+  self.tx.side_effect=lambda *args:dict(self.send(*args),business_writes_allowed=False)
+  a.call(self.ui,'ui_context');self.assertTrue(self.ui.session_state['_assertion_recheck_required'])
+  self.tx.side_effect=lambda *args:dict(self.send(*args),business_writes_allowed=True)
+  self.assertTrue(a.call(self.ui,'ui_context')['ok'])
+  self.assertFalse(self.ui.session_state.get('_assertion_recheck_required'))
+  self.assertEqual(len({c['session']['jti'] for _,c in self.sent}),len(self.sent))
+ def test_real_deadline_expiry_never_becomes_connection_only_recovery(self):
+  def send(url,envelope,timeout):
+   self.send(url,envelope,timeout)
+   self.user['iat']=self.now-3600
+   return {'ok':False,'error':'AUTH_EXPIRED'}
+  self.tx.side_effect=send
+  self.assertFalse(a.call(self.ui,'ui_context')['ok'])
+  self.assertFalse(self.ui.session_state.get('_assertion_recheck_required'))
+  self.assertEqual(len(self.sent),1)
+  self.assertFalse(a.call(self.ui,'save_section',{})['ok']);self.assertEqual(len(self.sent),1)
+ def test_acl_revocation_after_expired_assertion_still_latches_halt(self):
+  self.expire();self.tx.side_effect=lambda *args:{'ok':False,'error':'ACL_DENIED'}
+  self.assertEqual(a.call(self.ui,'ui_context')['error'],'ACL_DENIED')
+  self.assertTrue(self.ui.session_state['auth_connect_halted'])
+  n=self.tx.call_count
+  self.assertFalse(a.call(self.ui,'save_crf',{'payload':self.payload})['ok'])
+  self.assertEqual(self.tx.call_count,n)
+
+if __name__=='__main__':unittest.main()
