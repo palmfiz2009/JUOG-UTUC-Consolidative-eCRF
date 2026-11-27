@@ -1,0 +1,230 @@
+{
+  "fixture": "ea16982eca4ae637d49b33378414dfb5a9b4a04a",
+  "review": "c50d4c947334be333450fa1ee329122172f7f4af",
+  "gasVersion": 9,
+  "action": "Browser page reload, then fresh signed case validation and server draft resume",
+  "fullBrowserProcessRestart": false,
+  "newLogin": false,
+  "case": "JUOG-901",
+  "visit": "9m",
+  "recordVersion": 4,
+  "ui": {
+    "sevenSectionsSaved": true,
+    "case": "JUOG-901",
+    "detail": "完全架空UAT：Version 4・訂正再開の入力保持確認",
+    "correctionReason": "",
+    "dates": {
+      "visit_date": "2026-10-10",
+      "imaging_date": "2026-10-10",
+      "cystoscopy_date": "2026-10-10",
+      "last_alive_date": "2026-10-10"
+    },
+    "source30dVersion": 5,
+    "missingRequired": 1,
+    "noFormalVersion5": true
+  },
+  "sections": {
+    "1": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "1",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "d458c9ed-7a97-4097-a9e8-7794a6f6c15f",
+        "digest": "f014ece4384f90b82ad393739dcd7a21b3d96c9cfa92608fb340a80bd71041e9",
+        "data": {
+          "fu_reporter_email": {
+            "type": "value",
+            "value": "fictional@example.invalid"
+          },
+          "fu_correction_reason": {
+            "type": "value",
+            "value": ""
+          },
+          "fu_submission_kind": {
+            "type": "value",
+            "value": "訂正報告"
+          },
+          "fu_registration_id": {
+            "type": "value",
+            "value": "JUOG-901"
+          },
+          "fu_visit_date": {
+            "type": "date",
+            "value": "2026-10-10"
+          },
+          "fu_visit_month": {
+            "type": "value",
+            "value": "9ヶ月"
+          }
+        },
+        "at": "2026-11-27T16:21:05.584Z"
+      },
+      "digest": "06e02a245e6f8edf433bdd49b29091d73771a1acce0d64c46702038403d17fb8"
+    },
+    "2": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "2",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "1771aeac-897d-485b-8558-965a7c1a0ea8",
+        "digest": "1dcfe9edef6d84c6a7f1b38e4ec18017a065491d3bbb575f32512a13c18ec3a1",
+        "data": {
+          "fu_cystoscopy_date": {
+            "type": "date",
+            "value": "2026-10-10"
+          },
+          "fu_cystoscopy_status": {
+            "type": "value",
+            "value": "実施"
+          },
+          "fu_imaging_date": {
+            "type": "date",
+            "value": "2026-10-10"
+          },
+          "fu_cystoscopy_detail": {
+            "type": "value",
+            "value": "完全架空UAT：Version 4・訂正再開の入力保持確認"
+          },
+          "fu_cytology": {
+            "type": "value",
+            "value": "Negative (クラスI・II)"
+          },
+          "fu_imaging_status": {
+            "type": "value",
+            "value": "実施"
+          },
+          "fu_cystoscopy_result": {
+            "type": "value",
+            "value": "腫瘍なし"
+          },
+          "fu_recist_status": {
+            "type": "value",
+            "value": "PDなし"
+          }
+        },
+        "at": "2026-11-27T16:20:31.282Z"
+      },
+      "digest": "56d5b969b5f02af83ef557ce6d60df5f375aac611b9a1fda35b3e4194a11835a"
+    },
+    "3": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "3",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "b257be10-25cb-4c42-ae5a-cab877f7cc39",
+        "digest": "1376499d337d8ab51bcda33186123663864c1189776ea08683abcb0e9207b1b7",
+        "data": {
+          "fu_lab_status": {
+            "type": "value",
+            "value": "実施なし"
+          }
+        },
+        "at": "2026-11-27T16:20:42.519Z"
+      },
+      "digest": "c47c8c9ec9af775ea4220c4ebaa3a08472c28b1c5d1eb1e8ccbfe3487a7fd0f1"
+    },
+    "4": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "4",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "1bee677e-3b4e-49a8-9098-f56685ff1606",
+        "digest": "0df217a91ab0c9c3fc6083762e5b8adbfc0eeb4cbdd6fc2da85f6556c7cb9ec7",
+        "data": {
+          "fu_intra_status": {
+            "type": "value",
+            "value": "なし"
+          }
+        },
+        "at": "2026-11-27T16:20:53.073Z"
+      },
+      "digest": "a29a07ddd697e1174277e771df6b7c62e5543e05e227ea01b8fb4b1342f8d9e2"
+    },
+    "5": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "5",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "0825bcc2-295b-478f-aa62-b0d7c986abc3",
+        "digest": "10e9a6fd89ca2e2949c0758267861bfd6e14847e19b7add718978e76f048e017",
+        "data": {
+          "fu_current_treatment": {
+            "type": "value",
+            "value": "無治療（経過観察）"
+          }
+        },
+        "at": "2026-11-27T16:21:16.634Z"
+      },
+      "digest": "b6e717a9e7209c154510841fb2f7c74d18da9ff1663d8997a7857b48f72f7944"
+    },
+    "6": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "6",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "0a86cc15-a523-4150-b70d-4e61e7dcc656",
+        "digest": "54605fbd7b3c527756109bfa4692b8c24a72c87fef403835898a5fc932989538",
+        "data": {
+          "fu_has_event": {
+            "type": "value",
+            "value": false
+          }
+        },
+        "at": "2026-11-27T16:21:32.221Z"
+      },
+      "digest": "14b171754bebdb6e6aadc28fc770ebbebb1f874599a2a57b3399ab5be6d03545"
+    },
+    "7": {
+      "event": {
+        "action": "SECTION_SAVE",
+        "key": "JUOG-901|followup|9m",
+        "section": "7",
+        "actor": "UAT_TEST01_PI_01",
+        "record_version": 4,
+        "revision": 1,
+        "operation_id": "bc01467c-09f5-4ac4-8809-14dd32dbf14b",
+        "digest": "513c47b50cac2dd0d1c1e3f315dddbb187e3a0f091a0a0262d0e227598eb3771",
+        "data": {
+          "fu_last_alive_date": {
+            "type": "date",
+            "value": "2026-10-10"
+          },
+          "fu_vital_status": {
+            "type": "value",
+            "value": "生存"
+          }
+        },
+        "at": "2026-11-27T16:21:54.317Z"
+      },
+      "digest": "485268e0f4f2a3cb0e660849b89a137e918aed023e99b55a13d806f75f13ccb9"
+    }
+  },
+  "formalRowsUnchanged": {
+    "CRF_Followup": true,
+    "CRFSubmissionAudit": true,
+    "R1_Operations": true
+  },
+  "limitations": [
+    "Same authorized actor only; no other-facility/principal live denial coverage in this sequence.",
+    "No browser process restart or explicit logout/relogin in this reload sequence.",
+    "No new independent QA outcome asserted."
+  ]
+}
