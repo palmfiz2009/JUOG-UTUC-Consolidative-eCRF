@@ -278,4 +278,18 @@ test('space-separated explicit identifier labels denied before clinical or draft
  assert.equal(f.tables.R1_DraftEvents.rows.length,1);assert.equal(f.tables.R1_Operations.rows.length,1);
  assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
 });
+test('pending recovery scans CRFs once and observes changes on the next request',f=>{
+ const p=f.payload();f.expireOn('R1_Operations');assert.equal(f.save(p).error,'AUTH_EXPIRED');f.expireOn('');
+ const q={registration_id:p.registration_id,facility_code:'TEST01',crf_type:p.crf_type,visit:p.visit};
+ const before=copy(f.metrics.reads),writes=f.tables.R1_Operations.rows.length;
+ assert.equal(f.call('recovery_status',q).recovery.state,'RETRY_ALLOWED');
+ for(const name of ['CRF_30d','CRF_90d','CRF_Followup'])assert.equal(f.metrics.reads[name]-before[name],1);
+ assert.equal(f.tables.R1_Operations.rows.length,writes);
+ assert.equal(f.tables.CRF_30d.rows.length,1);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+ // A later request must see new/corrupt cells, never a previous record snapshot.
+ f.row('CRF_30d',{submission_id:'untracked',registration_id:p.registration_id,record_key:p.record_key,record_version:1,facility_code:'TEST01',payload_json:'{}'});
+ assert.equal(f.call('recovery_status',q).recovery.state,'NEEDS_RECONCILIATION');
+ assert.equal(f.call('recovery_retry',{...q,submission_id:p.submission_id}).ok,false);
+ assert.equal(f.tables.CRF_30d.rows.length,2);assert.equal(f.tables.CRFSubmissionAudit.rows.length,1);
+});
 console.log('ALL '+tests.length+' GROUPS PASSED');

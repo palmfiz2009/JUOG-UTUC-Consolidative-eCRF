@@ -1,7 +1,11 @@
 /* Read-only reconciliation. Never repairs on read, never infers a UUID. */
 function pr15Recovery_(ss,journal,who,q){
  const key=[q.registration_id,q.crf_type,q.visit].join('|');
- const events=journal.read().filter(e=>e.key===key),records=pr15Records_(ss,q.registration_id).rows.filter(r=>r.record_key===key);
+ // This reconciliation is read-only inside the caller's single-writer lock.
+ // Reuse this fresh record scan for its rows and version: there is no write
+ // between them. Do not retain it across requests or cache ACL/session data.
+ const events=journal.read().filter(e=>e.key===key),snapshot=pr15Records_(ss,q.registration_id);
+ const records=snapshot.rows.filter(r=>r.record_key===key);
  const audits=pr15Rows_(ss,'CRFSubmissionAudit',['submission_id','record_key','record_version','facility_code','registration_id','sheet_name']).rows;
  const uuids=[...new Set(events.filter(e=>e.actor===who.id).map(e=>e.uuid))],operations=[];
  for(const uuid of uuids){
@@ -14,7 +18,7 @@ function pr15Recovery_(ss,journal,who,q){
    const auditOK=audit.length===1&&audit[0].record_key===key&&Number(audit[0].record_version)===i.expected+1&&audit[0].facility_code==='TEST01'&&audit[0].registration_id===q.registration_id&&audit[0].sheet_name===crfSheetForType_(q.crf_type);
    if(bodyOK&&auditOK&&commit.length===1&&commit[0].receipt&&commit[0].receipt.record_version===i.expected+1&&commit[0].receipt.submission_id===uuid){state='SAVED';version=i.expected+1;}
    else if(!commit.length&&body.length<=1&&audit.length<=1&&(bodyOK||!body.length)&&(!audit.length||auditOK)&&!events.some(e=>e.uuid!==uuid&&e.kind==='INTENT'&&!events.some(x=>x.uuid===e.uuid&&x.kind==='COMMIT'))){
-    const current=pr15Records_(ss,q.registration_id).versions[key];
+    const current=snapshot.versions[key];
     if(current===i.expected+(bodyOK?1:0))state='RETRY_ALLOWED';
    }
   }
