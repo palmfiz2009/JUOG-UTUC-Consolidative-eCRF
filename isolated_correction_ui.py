@@ -62,9 +62,26 @@ def start_correction(st, page):
     checked = begin_edit(st, p['registration_id'])
     if checked.get('ok') is not True or checked.get('record_versions', {}).get(key) != latest['version']:
         return '症例権限または最新Versionが変わりました。入力を変更せず停止しました。'
+    linkage = None
+    if page in ('d90', 'fu'):
+        linkage = call(st, 'get_crf_linkage', {'registration_id': p['registration_id'], 'facility_code': p['facility_code']})
+        source = p.get('data', {})
+        if (linkage.get('ok') is not True or linkage.get('source_found') is not True
+                or linkage.get('registration_id') != p['registration_id']
+                or linkage.get('facility_code') != p['facility_code']
+                or type(linkage.get('record_version')) is not int
+                or linkage['record_version'] <= 0
+                or linkage['record_version'] != source.get('source_30d_record_version')
+                or not linkage.get('submission_id')
+                or linkage['submission_id'] != source.get('source_30d_submission_id')
+                or linkage.get('reference_date') != source.get('reference_date')
+                or linkage.get('surgery_performed') != source.get('surgery_performed')):
+            return '参照元の30日CRFが変更されたか照合できません。保存時の入力を保持して停止しました。'
     # Explicit reset only after authentication, ownership, audit and CAS baseline.
     _clear(st, page)
     restore_draft_state(form)
+    if linkage is not None:
+        st.session_state[page + '_linkage'] = linkage
     st.session_state[page + '_submission_kind'] = '訂正報告'
     st.session_state[page + '_correction_reason'] = ''
     st.session_state[page + '_sent'] = False

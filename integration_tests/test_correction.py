@@ -12,6 +12,7 @@ class Correction(unittest.TestCase):
     def fixture(self, page='peri', typ='perioperative_30d', visit='30d'):
         p=dict(registration_id='JUOG-901', facility_code='TEST01', crf_type=typ,
                visit=visit, submission_id='fictional-v1', record_key=f'JUOG-901|{typ}|{visit}')
+        p['data']=dict(source_30d_record_version=5,source_30d_submission_id='fictional-30d-v5',reference_date='2026-01-01',surgery_performed='実施した')
         form={page+'_registration_id':'JUOG-901',page+'_reporter_email':'fictional@example.invalid'}
         if page=='fu':form['fu_visit_month']=visit.replace('m','ヶ月')+('（終了）' if visit=='24m' else '')
         if page=='peri':form['peri_op_date']=date(2026,1,1)
@@ -24,15 +25,17 @@ class Correction(unittest.TestCase):
         checked=dict(ok=True,record_versions={p['record_key']:1})
         return st,reply,checked
 
-    def execute(self, st, reply, checked, page='peri', actor='verified-actor'):
+    def execute(self, st, reply, checked, page='peri', actor='verified-actor', linkage_override=None):
         def restore(form):
             for k,v in form.items():st.session_state[k]=date.fromisoformat(v['value']) if v['type']=='date' else v['value']
+        linkage=dict(ok=True,source_found=True,registration_id='JUOG-901',facility_code='TEST01',record_version=5,submission_id='fictional-30d-v5',reference_date='2026-01-01',surgery_performed='実施した')
+        if linkage_override:linkage.update(linkage_override)
         with patch('isolated_crf_adapter.actor_key',return_value=actor), \
-             patch('isolated_crf_adapter.call',return_value=reply) as call, \
+             patch('isolated_crf_adapter.call',side_effect=lambda st,action,q:linkage if action=='get_crf_linkage' else reply) as call, \
              patch('isolated_crf_adapter.begin_edit',return_value=checked) as begin, \
              patch('juog_common.restore_draft_state',side_effect=restore):
             error=start_correction(st,page)
-            self.assertTrue(all(x.args[1]=='recovery_status' for x in call.call_args_list))
+            self.assertTrue(all(x.args[1] in ('recovery_status','get_crf_linkage') for x in call.call_args_list))
             return error,begin.call_count
 
     def test_all_nine_visits_restore_then_new_correction_without_writes(self):
@@ -47,6 +50,9 @@ class Correction(unittest.TestCase):
                     self.assertNotIn(attempt_key(page),st.session_state)
                     self.assertNotIn('_autosave_'+page,st.session_state)
                     self.assertEqual(st.session_state[page+'_registration_id'],'JUOG-901')
+                    if page in ('d90','fu'):
+                        self.assertEqual(st.session_state[page+'_linkage']['submission_id'],'fictional-30d-v5')
+                        self.assertEqual(st.session_state[page+'_linkage']['record_version'],5)
 
     def test_unknown_audit_wrong_uuid_newer_version_and_concurrent_edit_preserve_attempt(self):
         for fault in ('unknown','audit','uuid','newer','race','denied','actor','bad_date','identifier'):
@@ -79,3 +85,12 @@ class Correction(unittest.TestCase):
         self.assertEqual(snap['peri_op_date'],{'type':'date','value':'2026-01-01'})
         state['peri_registration_id']='JUOG-902'
         self.assertEqual(snap['peri_registration_id']['value'],'JUOG-901')
+
+    def test_linkage_failure_change_or_cross_case_preserves_saved_attempt(self):
+        for page,typ,visit in [('d90','day90','90d'),('fu','followup','9m')]:
+            for override in ({'ok':False},{'source_found':False},{'registration_id':'JUOG-902'},{'facility_code':'OTHER'},{'record_version':6},{'record_version':True},{'submission_id':'other'},{'reference_date':'2026-02-01'},{'surgery_performed':'未実施'}):
+                with self.subTest(page=page,override=override):
+                    st,r,c=self.fixture(page,typ,visit);before=deepcopy(st.session_state)
+                    error,_=self.execute(st,r,c,page,linkage_override=override)
+                    self.assertIsInstance(error,str)
+                    self.assertEqual(st.session_state,before)
